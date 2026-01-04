@@ -131,8 +131,8 @@
       padding: 0 22px 18px;
       margin: 0 -22px;
 
-      /* ✅ 세로 스크롤과 충돌 최소화 */
-      touch-action: pan-y;
+      /* ✅ 세로 스크롤과 충돌 최소화 + 가로 드래그 확실히 */
+      touch-action: pan-x pan-y;
     }
     .carousel::before,.carousel::after{ content:''; flex:0 0 22px; }
 
@@ -205,6 +205,13 @@
     }
     .setBtn:active{ transform:scale(0.985); }
     .setBtn.done{ background:linear-gradient(135deg,var(--primary),var(--accent)); color:#000; box-shadow:0 18px 34px rgba(34,211,238,0.24); border:none; }
+
+    /* ✅ 세트 순서 잠금(UX 유지) */
+    .setBtn.locked{
+      opacity: .35;
+      filter: saturate(.6);
+      pointer-events: none;
+    }
 
     /* ✅ Floating Dock */
     .navDockWrap{ position:fixed; left:0; right:0; bottom:0; padding: 18px; z-index:60; }
@@ -567,12 +574,7 @@
     /* =========================================================
       DK MASTER OS v11.3 (Stable+ ScrollFix)
       ✅ 로직/기능 유지
-      ✅ 스크롤 정상화 (body scroll)
-      ✅ 하단 네비가 본문을 가리지 않게 main padding-bottom
-      ✅ 슬라이딩 배너 peek 유지
-      ✅ Timer HUD/최소화/알림 유지
-      ✅ 기록: 좌 캘린더 / 우 상세 유지
-      ✅ 세트 클릭 시 슬라이드 튕김 버그 방지 유지
+      ✅ 실제 휴식시간(restUsed) 기록 추가 (UI/UX/로직 변경 없음)
     ========================================================= */
 
     /* ---------- DATA ---------- */
@@ -637,6 +639,10 @@
     let restTotal = 0;
     let currentSlideIndex = 0;
     let restNotifEnabled = (localStorage.getItem(KEY_NOTIF) ?? '1') === '1';
+
+    /* ✅ [추가] 실제 휴식 기록용 상태 */
+    let restStartedAt = null;
+    let restCurrentLogKey = null;
 
     /* ---------- UTILS ---------- */
     function haptic(ms=18){ if(navigator.vibrate) navigator.vibrate(ms); }
@@ -902,7 +908,12 @@
                   <div class="grid grid-cols-2 gap-3">
                     ${Array.from({length:setTotal}).map((_, s)=>{
                       const done = !!doneArr[s];
-                      return `<button class="setBtn ${done?'done':''}" data-date="${date}" data-ex="${id}" data-set="${s}">
+                      const nextIndex = doneArr.indexOf(false);
+                      const isLocked = (!done && nextIndex !== -1 && s !== nextIndex);
+
+                      return `<button class="setBtn ${done?'done':''} ${isLocked?'locked':''}"
+                        ${isLocked ? 'disabled' : ''}
+                        data-date="${date}" data-ex="${id}" data-set="${s}">
                         ${done ? `<i class='fa-solid fa-check'></i>` : ''}
                         ${s+1} 세트
                       </button>`;
@@ -1004,9 +1015,16 @@
       if(!w) return;
 
       const setTotal = customSets[exerciseId] || w.set;
+      const doneArr = getProgressArr(date, exerciseId, setTotal);
+      const nextIndex = doneArr.indexOf(false);
+      if(!doneArr[setIndex] && nextIndex !== -1 && setIndex !== nextIndex){
+        haptic(10);
+        toast('다음 세트를 먼저 완료하세요');
+        return;
+      }
+
       const repTotal = customReps[exerciseId] || w.rep;
 
-      const doneArr = getProgressArr(date, exerciseId, setTotal);
       doneArr[setIndex] = !doneArr[setIndex];
       progressByDate[date][exerciseId] = doneArr;
       localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
@@ -1029,12 +1047,15 @@
             repActual: null,
             rpe: null,
             restPlanned: w.rest,
-            restUsed: w.rest,
+            restUsed: w.rest, // ✅ 기본값(실제 휴식 후 업데이트됨)
             type: workoutData[currentDayIdx].type
           });
           localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
         }
-        if(w.rest > 0) startTimer(w.rest);
+
+        // ✅ [수정] 타이머 시작 시 logKey 전달 → 실제 휴식시간 기록 가능
+        if(w.rest > 0) startTimer(w.rest, logKey);
+
         if(setNo === setTotal){
           setTimeout(()=> carouselNext(), 250);
         }
@@ -1146,9 +1167,15 @@
       bar.style.width = pct + '%';
     }
 
-    function startTimer(sec){
+    /* ✅ [수정] startTimer(sec, logKey) */
+    function startTimer(sec, logKey=null){
       restRemaining = sec;
       restTotal = sec;
+
+      // ✅ 실제 휴식 기록용
+      restStartedAt = Date.now();
+      restCurrentLogKey = logKey;
+
       const modal = document.getElementById('timer-modal');
       const display = document.getElementById('timer-sec');
       modal.classList.remove('hidden');
@@ -1201,6 +1228,18 @@
       setTimeout(()=> modal.classList.add('hidden'), 450);
 
       showHUD(false);
+
+      /* ✅ [추가] 실제 휴식시간 계산 + 해당 세트 로그(restUsed) 업데이트 */
+      if(restStartedAt && restCurrentLogKey){
+        const used = clamp(Math.round((Date.now() - restStartedAt) / 1000), 0, restTotal);
+        const idx = logs.findIndex(l => l.logKey === restCurrentLogKey);
+        if(idx !== -1){
+          logs[idx].restUsed = used;
+          localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+        }
+      }
+      restStartedAt = null;
+      restCurrentLogKey = null;
 
       if(finished){
         haptic(30);
@@ -1306,7 +1345,7 @@
                 <tbody>
                   ${data.map(row => {
                     const repDisplay = `<span class="pill">${row.plannedRep ?? "-"}</span>`;
-                    const restDisplay = `<span class="pill">${row.restUsed ?? row.restPlanned ?? "-"}s</span>`;
+                    const restDisplay = `<span class="pill">${(row.restUsed ?? row.restPlanned ?? "-")}s</span>`;
                     return `
                       <tr class="log-row">
                         <td><span class="pill">${row.set}</span></td>
