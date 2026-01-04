@@ -18,9 +18,8 @@
       --bg:#050507;
       --card:rgba(255,255,255,0.04);
 
-      /* ✅ dock dynamic space */
-      --dock-space: 92px;
-      --dock-radius: 28px;
+      /* ✅ Dock safe space */
+      --dock-space: 118px;
     }
 
     html,body{ height:100%; }
@@ -32,7 +31,7 @@
       margin:0;
       overflow-x:hidden;
 
-      /* ✅ Dock가 떠도 본문이 절대 가려지지 않게 공간 확보(동적 업데이트) */
+      /* ✅ Dock가 떠도 본문 절대 안 가림 */
       padding-bottom: calc(var(--dock-space) + env(safe-area-inset-bottom));
 
       background-image:
@@ -100,6 +99,21 @@
     }
     .pill.cyan{ border-color:rgba(34,211,238,0.25); background:rgba(34,211,238,0.10); color:rgba(34,211,238,0.95); }
 
+    /* ✅ Layout */
+    .pageWrap{
+      width:100%;
+      margin:0 auto;
+      padding-left:18px;
+      padding-right:18px;
+      max-width: 1120px;
+    }
+    @media (max-width: 520px){
+      .pageWrap{ padding-left:16px; padding-right:16px; max-width:none; }
+    }
+    @media (min-width: 1400px){
+      .pageWrap{ max-width: 1240px; }
+    }
+
     /* ✅ Carousel: banner + strong peek */
     .carousel{
       display:flex;
@@ -118,7 +132,7 @@
       min-height: calc(100dvh - 260px);
       transition: opacity .22s ease, transform .22s ease, filter .22s ease;
     }
-    .slide.peek{ opacity:.55; transform:scale(.92); filter:blur(1.2px); }
+    .slide.peek{ opacity:.58; transform:scale(.93); filter:blur(1.05px); }
     .slide.focus{ opacity:1; transform:scale(1); filter:none; }
 
     @media (min-width: 860px){
@@ -134,11 +148,9 @@
       justify-content:space-between;
       border-radius:32px;
       box-shadow: 0 30px 80px rgba(0,0,0,0.55);
-      transition: transform .22s ease, box-shadow .22s ease;
     }
-    .slide.focus .slideCard{ box-shadow: 0 40px 90px rgba(0,0,0,0.65); }
 
-    /* Right Panel */
+    /* ✅ Right Panel */
     .rightPanel{ border-radius:26px; padding:18px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); }
 
     .stepper{
@@ -184,22 +196,16 @@
     .setBtn:active{ transform:scale(0.985); }
     .setBtn.done{ background:linear-gradient(135deg,var(--primary),var(--accent)); color:#000; box-shadow:0 18px 34px rgba(34,211,238,0.24); border:none; }
 
-    /* ✅ Day quick nav (요일 네비) 복구 + Dock와 충돌 방지 */
-    #day-nav-wrap{
-      transition: all .35s ease;
-      position: sticky;
-      top: 86px;
-      z-index: 20;
-    }
-    #day-nav-wrap.hide{ transform:translateY(18px); opacity:0; pointer-events:none; }
+    /* ✅ Day quick nav (훈련 탭에서 항상 보이기) */
+    #day-nav-wrap{ transition: all .25s ease; margin-bottom: 12px; }
+    #day-nav-wrap.hide{ display:none; }
     .day-chip{
       width:44px; height:44px; border-radius:18px;
       display:flex; align-items:center; justify-content:center;
       font-weight:900; font-size:12px;
       color:rgba(255,255,255,0.55);
       border:1px solid rgba(255,255,255,0.10);
-      background:rgba(10,10,12,0.45);
-      backdrop-filter: blur(18px);
+      background:rgba(255,255,255,0.04);
       flex:0 0 auto;
     }
     .day-chip.active{
@@ -208,152 +214,76 @@
       box-shadow:0 10px 24px rgba(34,211,238,0.25);
     }
 
-    /* ✅ Bottom Sheet Dock (mini + expanded) */
-    .dockWrap{
-      position:fixed;
-      left:0; right:0; bottom:0;
+    /* ✅ Bottom Dock */
+    .navDockWrap{
+      position:fixed; left:0; right:0; bottom:0;
+      padding: 14px 16px calc(env(safe-area-inset-bottom) + 10px);
       z-index:60;
-      display:flex;
-      justify-content:center;
-      padding: 10px 16px calc(env(safe-area-inset-bottom) + 10px);
-      transition: transform .35s cubic-bezier(.2,.9,.2,1), opacity .35s ease;
-      pointer-events:none;
     }
-    .dockWrap.hide{
-      transform: translateY(120%);
-      opacity: 0;
-    }
-
-    .dockSheet{
-      pointer-events:auto;
-      width:min(640px, calc(100vw - 34px));
-      background:rgba(10,10,12,0.62);
-      border:1px solid rgba(255,255,255,0.12);
-      backdrop-filter: blur(24px);
-      border-radius: var(--dock-radius);
-      box-shadow:0 18px 45px rgba(0,0,0,0.65);
-      overflow:hidden;
-      position:relative;
-      transform: translateY(0);
-      transition: height .35s cubic-bezier(.2,.9,.2,1);
-      height: 72px; /* mini */
-      display:flex;
-      flex-direction:column;
-    }
-
-    /* grabber */
-    .dockGrab{
-      height: 18px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-    .dockGrab::before{
-      content:'';
-      width: 44px;
-      height: 4px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.18);
-    }
-
-    /* expanded sheet */
-    .dockSheet.expanded{
-      height: 160px;
-    }
-
     .nav-dock{
-      padding: 8px 12px 14px;
+      background:rgba(10,10,12,0.78);
+      border:1px solid rgba(255,255,255,0.12);
+      backdrop-filter:blur(22px);
+      border-radius:34px;
+      padding:10px;
       display:flex;
       justify-content:space-around;
       align-items:center;
+      box-shadow:0 25px 50px -12px rgba(0,0,0,0.7);
     }
-    .nav-item{
-      position:relative;
-      padding:10px 0;
-      flex:1;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:4px;
-      transition:all .25s;
-      color:#777;
-      -webkit-tap-highlight-color:transparent;
-    }
+    .nav-item{ position:relative; padding:12px 0; flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; transition:all .25s; color:#777; -webkit-tap-highlight-color:transparent; }
     .nav-item.active{ color:var(--primary); transform:translateY(-3px); }
-    .nav-item i{ font-size:1.15rem; }
-    .nav-active-dot{
-      position:absolute; bottom:1px;
-      width:4px; height:4px;
-      background:var(--primary);
-      border-radius:50%;
-      box-shadow:0 0 12px var(--primary);
-      opacity:0;
-      transition:all .25s;
-    }
+    .nav-item i{ font-size:1.25rem; }
+    .nav-active-dot{ position:absolute; bottom:1px; width:4px; height:4px; background:var(--primary); border-radius:50%; box-shadow:0 0 12px var(--primary); opacity:0; transition:all .25s; }
     .nav-item.active .nav-active-dot{ opacity:1; transform:scale(1.6); }
 
-    /* expanded quick actions */
-    .dockActions{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
-      padding: 0 12px 12px;
-    }
-    .dockActionBtn{
-      height:44px;
+    /* ✅ Minimal Calendar */
+    .calGrid{ display:grid; grid-template-columns: repeat(7, 1fr); gap:10px; }
+    .calDay{
+      aspect-ratio:1;
       border-radius:16px;
-      font-weight:950;
-      font-size:12px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      background: rgba(255,255,255,0.05);
-      border:1px solid rgba(255,255,255,0.10);
-      color: rgba(255,255,255,0.85);
-      -webkit-tap-highlight-color:transparent;
+      display:flex; align-items:center; justify-content:center;
+      font-size:13px;
+      font-weight:900;
+      color:rgba(255,255,255,0.70);
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.06);
+      position:relative;
+      transition: all .15s ease;
+      user-select:none;
     }
-    .dockActionBtn:active{ transform:scale(.985); }
+    .calDay:active{ transform: scale(.98); }
+    .calDay.today{ border-color: rgba(255,255,255,0.18); color: rgba(255,255,255,0.95); }
+    .calDay.selected{
+      background: rgba(34,211,238,0.12);
+      border-color: rgba(34,211,238,0.35);
+      box-shadow: 0 0 0 2px rgba(34,211,238,0.12), 0 0 26px rgba(34,211,238,0.12);
+      color: #eaffff;
+    }
+    .calDot{
+      width:6px; height:6px;
+      border-radius:999px;
+      background: rgba(34,211,238,0.9);
+      position:absolute;
+      bottom:8px;
+      box-shadow:0 0 14px rgba(34,211,238,0.35);
+    }
 
-    /* Calendar */
-    .calendar-day{ aspect-ratio:1; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:13px; position:relative; transition:all .18s; font-weight:800; color:rgba(255,255,255,0.75); background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); }
-    .calendar-day:hover{ background:rgba(255,255,255,0.07); }
-    .has-log::after{ content:''; width:6px; height:6px; background:rgba(34,211,238,0.90); border-radius:50%; position:absolute; bottom:8px; box-shadow:0 0 12px rgba(34,211,238,0.35); }
-    .calendar-day.selected{ background:rgba(34,211,238,0.14); border:1px solid rgba(34,211,238,0.35); box-shadow:0 0 0 2px rgba(34,211,238,0.18), 0 0 30px rgba(34,211,238,0.12); color:#eaffff; font-weight:900; transform:translateY(-2px); }
-    .calendar-day.today{ border:1px solid rgba(255,255,255,0.12); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08); color:rgba(255,255,255,0.95); font-weight:900; }
-
-    /* History table */
-    .log-table{ width:100%; border-collapse:separate; border-spacing:0 10px; }
-    .log-table th{ font-size:10px; text-transform:uppercase; letter-spacing:.18em; color:rgba(255,255,255,0.35); font-weight:900; text-align:left; padding:0 10px 6px; }
-    .log-row{ background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:16px; overflow:hidden; }
-    .log-row td{ padding:12px 10px; font-weight:800; font-size:12px; color:rgba(255,255,255,0.78); }
+    /* History cards */
+    .historyCard{
+      border-radius:28px;
+      padding:20px;
+      border:1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.03);
+    }
 
     /* Toast */
-    #toast{ position:fixed; left:50%; bottom: calc(var(--dock-space) + 22px); transform:translateX(-50%); z-index:250; opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; }
+    #toast{ position:fixed; left:50%; bottom: calc(var(--dock-space) + 20px); transform:translateX(-50%); z-index:250; opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; }
     #toast.show{ opacity:1; transform:translateX(-50%) translateY(-6px); }
 
     /* Summary modal */
     #summary-modal{ position:fixed; inset:0; z-index:220; display:none; align-items:center; justify-content:center; }
     #summary-modal.show{ display:flex; }
-
-    /* ✅ Layout container: 화면 좌우 여백 넉넉 + 넓게 사용 */
-    .pageWrap{
-      width:100%;
-      margin:0 auto;
-      padding-left:18px;
-      padding-right:18px;
-      max-width: 1120px;
-    }
-    @media (max-width: 520px){
-      .pageWrap{
-        padding-left:16px;
-        padding-right:16px;
-        max-width: none;
-      }
-    }
-    @media (min-width: 1400px){
-      .pageWrap{ max-width: 1240px; }
-    }
   </style>
 </head>
 
@@ -391,9 +321,9 @@
   <!-- Main -->
   <main class="pageWrap pt-28">
 
-    <!-- ✅ 요일 네비게이션 (Session에서만 자동 표시) -->
-    <div id="day-nav-wrap" class="hide mb-4">
-      <div id="day-nav" class="flex justify-center gap-2 overflow-x-auto pb-2 scroll-hide"></div>
+    <!-- ✅ Day Nav (훈련 탭에서만 표시) -->
+    <div id="day-nav-wrap" class="mb-4">
+      <div id="day-nav" class="flex justify-center gap-2 overflow-x-auto pb-1 scroll-hide"></div>
     </div>
 
     <!-- Session -->
@@ -423,18 +353,61 @@
       <div id="session-carousel" class="carousel scroll-hide"></div>
     </section>
 
-    <!-- Stats -->
+    <!-- Insights -->
     <section id="tab-stats" class="tab-content">
-      <div class="mb-8 px-2"><h2 class="text-3xl font-black italic uppercase tracking-tight">분석</h2></div>
-      <div class="glass rounded-[28px] p-8 mb-6"><canvas id="radarChart" class="max-h-[320px]"></canvas></div>
-      <div class="grid grid-cols-2 gap-5">
+      <div class="mb-8 px-2">
+        <h2 class="text-3xl font-black italic uppercase tracking-tight">인사이트</h2>
+        <p class="text-[11px] font-black text-white/40 mt-2 tracking-[0.15em] uppercase">
+          데이터 기반으로 훈련 패턴을 해석합니다
+        </p>
+      </div>
+
+      <!-- Summary Blocks -->
+      <div class="grid md:grid-cols-3 gap-4 mb-5">
         <div class="glass rounded-[28px] p-6">
-          <p class="text-[9px] text-gray-400 font-black uppercase mb-2 tracking-widest">총 기록(세트)</p>
-          <p id="stat-total-sets" class="text-4xl font-black text-white">0</p>
+          <p class="text-[9px] text-white/35 font-black uppercase tracking-widest">최근 14일 훈련일수</p>
+          <p id="ins-14days" class="text-4xl font-black text-white mt-2">0</p>
+          <p id="ins-14days-msg" class="text-[11px] font-black text-white/40 mt-2"></p>
         </div>
         <div class="glass rounded-[28px] p-6">
-          <p class="text-[9px] text-gray-400 font-black uppercase mb-2 tracking-widest">활동 일수</p>
-          <p id="stat-week-count" class="text-4xl font-black text-indigo-300">0</p>
+          <p class="text-[9px] text-white/35 font-black uppercase tracking-widest">연속 훈련(스트릭)</p>
+          <p id="ins-streak" class="text-4xl font-black text-cyan-300 mt-2">0</p>
+          <p id="ins-streak-msg" class="text-[11px] font-black text-white/40 mt-2"></p>
+        </div>
+        <div class="glass rounded-[28px] p-6">
+          <p class="text-[9px] text-white/35 font-black uppercase tracking-widest">총 완료 세트</p>
+          <p id="stat-total-sets" class="text-4xl font-black text-white mt-2">0</p>
+          <p class="text-[11px] font-black text-white/40 mt-2">꾸준함이 성장을 만듭니다.</p>
+        </div>
+      </div>
+
+      <!-- Radar -->
+      <div class="glass rounded-[28px] p-7 mb-5">
+        <div class="flex items-end justify-between">
+          <div>
+            <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/40">부위 밸런스</p>
+            <h3 class="text-xl font-black italic text-white mt-1">PUSH · PULL · LEGS · REST</h3>
+          </div>
+          <span class="pill cyan" id="ins-balance-tag">BALANCE</span>
+        </div>
+        <div class="mt-5">
+          <canvas id="radarChart" class="max-h-[320px]"></canvas>
+        </div>
+      </div>
+
+      <!-- Top Exercises + Coach -->
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="glass rounded-[28px] p-6">
+          <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/40">TOP 운동</p>
+          <div id="ins-top-ex" class="mt-4 space-y-3"></div>
+        </div>
+
+        <div class="glass rounded-[28px] p-6">
+          <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/40">코치 피드백</p>
+          <div class="mt-4">
+            <p id="ins-coach" class="text-base font-black text-white/80 leading-relaxed"></p>
+            <div class="mt-4 flex flex-wrap gap-2" id="ins-coach-tags"></div>
+          </div>
         </div>
       </div>
 
@@ -446,8 +419,13 @@
 
     <!-- History -->
     <section id="tab-history" class="tab-content">
-      <div class="mb-8 px-2 flex justify-between items-end">
-        <h2 class="text-3xl font-black italic uppercase">기록</h2>
+      <div class="mb-6 px-2 flex justify-between items-end">
+        <div>
+          <h2 class="text-3xl font-black italic uppercase">기록</h2>
+          <p class="text-[11px] font-black text-white/40 mt-2 tracking-[0.15em] uppercase">
+            날짜 선택 → 운동 기록 확인
+          </p>
+        </div>
         <div class="flex items-center gap-4 glass rounded-2xl px-5 py-2.5">
           <button onclick="changeMonth(-1)" class="p-1 hover:text-cyan-300 transition-colors"><i class="fa-solid fa-chevron-left text-xs"></i></button>
           <span id="calendar-month" class="text-xs font-black w-20 text-center tracking-widest">2026.01</span>
@@ -455,27 +433,27 @@
         </div>
       </div>
 
-      <div class="glass rounded-[28px] p-7 mb-6 shadow-2xl">
-        <div class="grid grid-cols-7 text-center text-[9px] font-black text-gray-500 mb-5 uppercase tracking-[0.2em]">
-          <div class="text-red-600">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div class="text-blue-600">토</div>
+      <!-- ✅ Minimal Calendar -->
+      <div class="glass rounded-[28px] p-6 mb-5 shadow-2xl">
+        <div class="grid grid-cols-7 text-center text-[9px] font-black text-white/35 mb-4 uppercase tracking-[0.2em]">
+          <div class="text-red-500">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div class="text-blue-400">토</div>
         </div>
-        <div id="calendar-body" class="grid grid-cols-7 gap-3"></div>
+        <div id="calendar-body" class="calGrid"></div>
       </div>
 
       <div class="flex gap-2 mb-4 px-2">
         <button onclick="resetSelectedDate()" class="pill"><i class="fa-solid fa-eraser"></i> 선택 날짜 초기화</button>
       </div>
 
+      <!-- ✅ Workout focused history -->
       <div id="history-detail" class="space-y-6"></div>
     </section>
 
   </main>
 
-  <!-- ✅ Bottom Sheet Dock -->
-  <div id="dockWrap" class="dockWrap hide">
-    <div id="dockSheet" class="dockSheet">
-      <div class="dockGrab" id="dockGrab"></div>
-
+  <!-- Bottom Dock -->
+  <div class="navDockWrap">
+    <div class="max-w-md mx-auto">
       <nav class="nav-dock">
         <button onclick="showTab('session', this)" class="nav-item active">
           <i class="fa-solid fa-bolt-lightning"></i>
@@ -484,7 +462,7 @@
         </button>
         <button onclick="showTab('stats', this)" class="nav-item">
           <i class="fa-solid fa-chart-simple"></i>
-          <span class="text-[8px] font-black uppercase tracking-tighter">분석</span>
+          <span class="text-[8px] font-black uppercase tracking-tighter">인사이트</span>
           <div class="nav-active-dot"></div>
         </button>
         <button onclick="showTab('history', this)" class="nav-item">
@@ -493,15 +471,10 @@
           <div class="nav-active-dot"></div>
         </button>
       </nav>
-
-      <div class="dockActions">
-        <button class="dockActionBtn" onclick="resetToday()"><i class="fa-solid fa-rotate-left"></i> 오늘 초기화</button>
-        <button class="dockActionBtn" onclick="backupJSON()"><i class="fa-solid fa-download"></i> 백업</button>
-      </div>
     </div>
   </div>
 
-  <!-- SUMMARY MODAL -->
+  <!-- Summary Modal -->
   <div id="summary-modal">
     <div class="absolute inset-0 bg-black/85 backdrop-blur-xl" onclick="closeSummary()"></div>
     <div class="relative glass rounded-[28px] p-7 w-[min(520px,calc(100vw-44px))]">
@@ -542,11 +515,11 @@
 
   <script>
     /* =========================================================
-      DK MASTER OS v11.3 (UPDATED FINAL)
-      - ✅ Dock: Bottom Sheet + Swipe Expand
-      - ✅ Dock: content never covered (dynamic padding)
-      - ✅ Day nav restored + fixed
-      - ✅ Carousel: banner preview
+      DK MASTER OS v11.3 (FINAL)
+      ✅ FIX: set click returns to first slide bug
+      ✅ Day nav always visible only on session tab
+      ✅ Minimal calendar, history focuses on workout content
+      ✅ Insight tab professional but easy
     ========================================================= */
 
     /* ---------- DATA ---------- */
@@ -639,122 +612,22 @@
       toastTimer = setTimeout(()=> el.classList.remove('show'), 1600);
     }
 
-    /* ---------- DOCK: NEVER COVER CONTENT ---------- */
-    function syncDockSpace(){
-      const sheet = document.getElementById('dockSheet');
-      if(!sheet) return;
-      const h = sheet.getBoundingClientRect().height + 26; // padding 여유
-      document.documentElement.style.setProperty('--dock-space', h + 'px');
-    }
-
-    /* ---------- DOCK AUTO HIDE ---------- */
-    let dockTimer = null;
-    let lastScrollY = 0;
-
-    function showDock(){
-      const wrap = document.getElementById('dockWrap');
-      wrap.classList.remove('hide');
-      if(dockTimer) clearTimeout(dockTimer);
-      dockTimer = setTimeout(()=> wrap.classList.add('hide'), 2600);
-      syncDockSpace();
-    }
-
-    function hideDock(){
-      document.getElementById('dockWrap').classList.add('hide');
-    }
-
-    window.addEventListener('scroll', ()=>{
-      const y = window.scrollY;
-      if(y > lastScrollY) hideDock();
-      else showDock();
-      lastScrollY = y;
-    }, {passive:true});
-
-    ['touchstart','mousemove'].forEach(evt=>{
-      window.addEventListener(evt, showDock, {passive:true});
-    });
-
-    /* ---------- BOTTOM SHEET SWIPE ---------- */
-    let sheetExpanded = false;
-    let dragStartY = null;
-    let dragDelta = 0;
-
-    function setSheet(expanded){
-      sheetExpanded = expanded;
-      const sheet = document.getElementById('dockSheet');
-      sheet.classList.toggle('expanded', expanded);
-      syncDockSpace();
-      showDock();
-    }
-
-    function bindSheetSwipe(){
-      const grab = document.getElementById('dockGrab');
-      const sheet = document.getElementById('dockSheet');
-
-      const start = (y) => { dragStartY = y; dragDelta = 0; };
-      const move = (y) => {
-        if(dragStartY === null) return;
-        dragDelta = y - dragStartY;
-      };
-      const end = () => {
-        if(dragStartY === null) return;
-        if(dragDelta < -22) setSheet(true);   // 위로
-        if(dragDelta > 22) setSheet(false);   // 아래로
-        dragStartY = null;
-      };
-
-      grab.addEventListener('touchstart', (e)=> start(e.touches[0].clientY), {passive:true});
-      grab.addEventListener('touchmove', (e)=> move(e.touches[0].clientY), {passive:true});
-      grab.addEventListener('touchend', end);
-
-      // 클릭으로 토글도 가능
-      grab.addEventListener('click', ()=> setSheet(!sheetExpanded));
-
-      // resize 대응
-      window.addEventListener('resize', ()=> syncDockSpace());
-      window.addEventListener('orientationchange', ()=> setTimeout(syncDockSpace, 120));
-      setTimeout(syncDockSpace, 120);
-    }
-
     /* ---------- SUMMARY MODAL ---------- */
     function openSummary(stats){
       document.getElementById('sum-sets').textContent = stats.sets;
       document.getElementById('sum-ex').textContent = stats.exercises;
       document.getElementById('sum-msg').textContent = stats.msg;
       document.getElementById('summary-modal').classList.add('show');
-      hideDock();
     }
     function closeSummary(){
       document.getElementById('summary-modal').classList.remove('show');
-      showDock();
     }
 
-    /* ---------- TABS ---------- */
-    function showTab(name, btn){
-      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-      document.getElementById(`tab-${name}`).classList.add('active');
-      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-
-      if(name === 'stats') renderStats();
-      if(name === 'history') renderCalendar();
-
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-
-      // ✅ session에서만 요일 네비 자동 표시
-      if(name === 'session') revealDayNav();
-      else document.getElementById('day-nav-wrap').classList.add('hide');
-
-      showDock();
-    }
-
-    /* ---------- DAY NAV (AUTO SHOW/HIDE) ---------- */
-    let dayNavHideTimer=null;
-    function revealDayNav(){
+    /* ---------- DAY NAV: session only ---------- */
+    function showDayNav(visible){
       const wrap = document.getElementById('day-nav-wrap');
-      wrap.classList.remove('hide');
-      if(dayNavHideTimer) clearTimeout(dayNavHideTimer);
-      dayNavHideTimer = setTimeout(()=> wrap.classList.add('hide'), 2600);
+      if(!wrap) return;
+      wrap.classList.toggle('hide', !visible);
     }
 
     function updateDayNav(){
@@ -768,6 +641,27 @@
         b.onclick = () => changeDay(dm);
         nav.appendChild(b);
       });
+    }
+
+    /* ---------- TABS ---------- */
+    function showTab(name, btn){
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.getElementById(`tab-${name}`).classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      // ✅ Day nav only on session
+      if(name === 'session'){
+        showDayNav(true);
+        updateDayNav();
+      }else{
+        showDayNav(false);
+      }
+
+      if(name === 'stats') renderStats();
+      if(name === 'history') renderCalendar();
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     /* ---------- DATE-BASED PROGRESS ---------- */
@@ -864,16 +758,14 @@
       };
       document.getElementById('view-subcue').innerText = cueMap[data.type] || "훈련 모드";
 
+      updateDayNav();
       renderCarousel();
       updateProgressUI();
-
-      updateDayNav();
-      revealDayNav();
-      showDock();
     }
 
     /* ---------- CAROUSEL ---------- */
     function renderCarousel(){
+      const keep = currentSlideIndex; // ✅ current slide 유지
       const date = todayStr();
       const data = workoutData[currentDayIdx];
       const carousel = document.getElementById('session-carousel');
@@ -898,7 +790,6 @@
                   <h3 class="text-3xl md:text-4xl font-black italic text-white tracking-tight truncate">${w.name}</h3>
                   <div class="mt-3 flex items-center gap-2 flex-wrap">
                     <span class="pill cyan">${w.target}</span>
-                    <span class="pill">${workoutData[currentDayIdx].type.toUpperCase()}</span>
                     <span class="pill">휴식 ${w.rest}s</span>
                     <span class="pill">진행 ${doneCount}/${setTotal}</span>
                   </div>
@@ -929,8 +820,6 @@
                       <p class="text-[13px] font-bold text-white/75">${w.tip} · <span class="text-white/45">${w.guide}</span></p>
                     </div>
                   </div>
-
-                  <p class="text-[11px] font-black text-white/35">* 좌우로 넘겨 다음/이전 운동으로 이동</p>
                 </div>
 
                 <div class="rightPanel space-y-3">
@@ -997,8 +886,10 @@
 
       bindSetButtons();
       bindCarouselEvents();
+
+      currentSlideIndex = clamp(keep, 0, workoutData[currentDayIdx].list.length-1);
       updateSlideHUD();
-      requestAnimationFrame(()=> scrollToSlide(0,false));
+      requestAnimationFrame(()=> scrollToSlide(currentSlideIndex,false)); // ✅ 유지
     }
 
     function bindCarouselEvents(){
@@ -1054,6 +945,7 @@
       haptic(10);
     }
 
+    /* ---------- SET BUTTONS ---------- */
     function bindSetButtons(){
       const buttons = document.querySelectorAll('.setBtn[data-ex]');
       buttons.forEach(btn => {
@@ -1067,7 +959,9 @@
       });
     }
 
+    /* ---------- TOGGLE COMPLETE + LOG ---------- */
     function toggleSetComplete(date, exerciseId, setIndex){
+      const keepIdx = currentSlideIndex; // ✅ 유지 포인트
       const [dayIdx, exIdx] = exerciseId.split('-').map(Number);
       const w = workoutData[dayIdx]?.list?.[exIdx];
       if(!w) return;
@@ -1081,21 +975,49 @@
       localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
 
       const setNo = setIndex + 1;
+      const logKey = `${date}|${exerciseId}|${setNo}`;
 
       if(doneArr[setIndex]){
-        if(w.rest > 0) startTimer(w.rest);
+        if(!logs.some(l => l.logKey === logKey)){
+          logs.push({
+            id: Date.now(),
+            logKey,
+            date,
+            ts: nowISO(),
+            exerciseId,
+            name: w.name,
+            set: setNo,
+            plannedSetTotal: setTotal,
+            plannedRep: repTotal,
+            repActual: null,
+            rpe: null,
+            restPlanned: w.rest,
+            restUsed: w.rest,
+            type: workoutData[currentDayIdx].type
+          });
+          localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+        }
+        haptic(16);
+
         if(setNo === setTotal){
           setTimeout(()=> carouselNext(), 250);
         }
-        haptic(16);
       }else{
+        logs = logs.filter(l => l.logKey !== logKey);
+        localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
         haptic(12);
       }
 
       updateProgressUI();
+
+      // ✅ 리렌더 후에도 슬라이드 유지
+      currentSlideIndex = keepIdx;
       renderCarousel();
+      scrollToSlide(currentSlideIndex,false);
+      updateSlideHUD();
     }
 
+    /* ---------- ADJUST SET/REP ---------- */
     function adjust(type, key, val){
       const [d, idx] = key.split('-').map(Number);
       const w = workoutData[d]?.list?.[idx];
@@ -1135,42 +1057,315 @@
       haptic(18);
     }
 
+    /* ---------- RESET TODAY / EXERCISE ---------- */
+    function resetExercise(exerciseId){
+      if(!confirm('이 운동의 오늘 기록을 초기화할까요?')) return;
+      const date = todayStr();
+
+      logs = logs.filter(l => !(l.date === date && l.exerciseId === exerciseId));
+      localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+
+      const [d, idx] = exerciseId.split('-').map(Number);
+      const w = workoutData[d]?.list?.[idx];
+      const setTotal = customSets[exerciseId] || w.set;
+      if(progressByDate[date] && progressByDate[date][exerciseId]){
+        progressByDate[date][exerciseId] = new Array(setTotal).fill(false);
+        localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
+      }
+
+      renderCarousel();
+      updateProgressUI();
+      toast('운동 초기화 완료');
+      haptic(22);
+    }
+
     function resetToday(){
       if(!confirm('오늘 진행/기록을 모두 초기화할까요?')) return;
       const date = todayStr();
-      if(progressByDate[date]) delete progressByDate[date];
-      localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
-      toast('오늘 초기화 완료');
-      haptic(25);
+
+      logs = logs.filter(l => l.date !== date);
+      localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+
+      if(progressByDate[date]){ delete progressByDate[date]; localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate)); }
       renderCarousel();
       updateProgressUI();
+      toast('오늘 초기화 완료');
+      haptic(25);
     }
 
-    /* --- TIMER (간소화) --- */
-    function startTimer(sec){
-      // 원본 유지하고 싶으면 원래 Timer Modal 코드 붙이면 됨
-      // 여기선 최소 구현 유지
+    /* ---------- CALENDAR (minimal picker) ---------- */
+    function renderCalendar(){
+      document.getElementById('calendar-month').innerText = `${currentYear}.${String(currentMonth + 1).padStart(2,'0')}`;
+      const first = new Date(currentYear, currentMonth, 1).getDay();
+      const last = new Date(currentYear, currentMonth + 1, 0).getDate();
+      const body = document.getElementById('calendar-body');
+      body.innerHTML = '';
+
+      for(let i=0;i<first;i++){
+        const empty = document.createElement('div');
+        body.appendChild(empty);
+      }
+
+      for(let d=1; d<=last; d++){
+        const dStr = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const hasLog = logs.some(l => l.date === dStr);
+
+        const el = document.createElement('div');
+        el.className = `calDay cursor-pointer ${dStr===todayStr()?'today':''} ${dStr===selectedDate?'selected':''}`;
+        el.innerText = d;
+        if(hasLog){
+          const dot = document.createElement('div');
+          dot.className = 'calDot';
+          el.appendChild(dot);
+        }
+        el.onclick = () => {
+          selectedDate = dStr;
+          renderCalendar();
+        };
+        body.appendChild(el);
+      }
+
+      renderHistoryDetail();
     }
 
-    /* --- Calendar/Stats/Backup/ResetAll은 원본 그대로 사용 가능 --- */
-    function renderCalendar(){ /* 원본 그대로 */ }
-    function renderStats(){ /* 원본 그대로 */ }
-    function backupJSON(){ /* 원본 그대로 */ }
-    function resetAll(){ /* 원본 그대로 */ }
-    function resetSelectedDate(){ /* 원본 그대로 */ }
+    function renderHistoryDetail(){
+      const area = document.getElementById('history-detail');
+      const dayLogs = logs
+        .filter(l => l.date === selectedDate)
+        .sort((a,b)=> (a.exerciseId > b.exerciseId ? 1 : -1) || (a.set - b.set));
+
+      area.innerHTML = `<p class="text-[10px] font-black text-white/40 tracking-widest uppercase px-2">${selectedDate} WORKOUT</p>`;
+
+      if(dayLogs.length === 0){
+        area.innerHTML += `<div class="glass rounded-[28px] p-12 text-center text-white/35 italic text-xs">기록이 없습니다</div>`;
+        return;
+      }
+
+      const groups = dayLogs.reduce((acc, o) => {
+        if(!acc[o.exerciseId]) acc[o.exerciseId] = [];
+        acc[o.exerciseId].push(o);
+        return acc;
+      }, {});
+
+      Object.entries(groups).forEach(([exerciseId, data]) => {
+        const name = data[0].name;
+        const plannedRep = data[0].plannedRep ?? "-";
+        const totalSets = data.length;
+
+        area.innerHTML += `
+          <div class="historyCard">
+            <div class="flex items-start justify-between">
+              <div>
+                <h4 class="font-black text-white italic text-lg">${name}</h4>
+                <div class="flex items-center gap-2 mt-3 flex-wrap">
+                  <span class="pill cyan">${totalSets} 세트</span>
+                  <span class="pill">목표 REP: ${plannedRep}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-5 grid grid-cols-2 sm:grid-cols-3 gap-2">
+              ${data.map(row => `
+                <div class="glass rounded-2xl p-4 border-white/5">
+                  <p class="text-[10px] font-black text-white/35 tracking-[0.18em] uppercase">SET ${row.set}</p>
+                  <p class="text-lg font-black text-white/85 mt-2">${row.plannedRep ?? "-"}</p>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function changeMonth(dir){
+      currentMonth += dir;
+      if(currentMonth < 0){ currentMonth = 11; currentYear--; }
+      if(currentMonth > 11){ currentMonth = 0; currentYear++; }
+      renderCalendar();
+    }
+
+    function resetSelectedDate(){
+      if(!confirm('선택한 날짜의 기록을 초기화할까요?')) return;
+      const date = selectedDate;
+      logs = logs.filter(l => l.date !== date);
+      localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+      if(progressByDate[date]){ delete progressByDate[date]; localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate)); }
+      toast('선택 날짜 초기화');
+      renderCalendar();
+      haptic(25);
+    }
+
+    /* ---------- INSIGHTS ---------- */
+    function renderStats(){
+      const counts = { push:0, pull:0, leg:0, rest:0 };
+      logs.forEach(l => counts[l.type] !== undefined && counts[l.type]++);
+
+      document.getElementById('stat-total-sets').innerText = logs.length;
+
+      // last 14 days
+      const now = new Date();
+      const cutoff = new Date(now); cutoff.setDate(now.getDate()-13);
+      const last14 = logs.filter(l => new Date(l.date) >= cutoff);
+      const uniqueDays14 = new Set(last14.map(l => l.date)).size;
+      document.getElementById('ins-14days').innerText = uniqueDays14;
+      document.getElementById('ins-14days-msg').innerText =
+        uniqueDays14 >= 10 ? "최상급 루틴. 과부하/휴식 밸런스만 유지." :
+        uniqueDays14 >= 6 ? "좋은 페이스. 1~2일만 더 늘려도 크게 성장." :
+        "지금은 재정비 구간. 주 3회만 복귀해도 충분히 강해짐.";
+
+      // streak
+      const allDays = Array.from(new Set(logs.map(l => l.date))).sort();
+      let streak = 0;
+      let cur = new Date(todayStr());
+      while(true){
+        const key = cur.toISOString().split('T')[0];
+        if(allDays.includes(key)){ streak++; cur.setDate(cur.getDate()-1); }
+        else break;
+      }
+      document.getElementById('ins-streak').innerText = streak;
+      document.getElementById('ins-streak-msg').innerText =
+        streak >= 5 ? "리듬 완벽. 부상 예방 위해 폼 점검 필수." :
+        streak >= 2 ? "흐름 좋음. 컨디션 유지하면 기록 상승." :
+        "오늘 시작해도 충분. 2일 연속만 만들면 루틴이 됨.";
+
+      // balance tag
+      const v = [counts.push, counts.pull, counts.leg, counts.rest];
+      const maxV = Math.max(...v);
+      const minV = Math.min(...v);
+      const balanced = maxV - minV <= Math.max(3, maxV*0.35);
+      document.getElementById('ins-balance-tag').innerText = balanced ? "BALANCED" : "UNBALANCED";
+
+      // Radar chart
+      const ctx = document.getElementById('radarChart').getContext('2d');
+      if(window.myRadar) window.myRadar.destroy();
+
+      window.myRadar = new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: ['PUSH','PULL','LEGS','REST'],
+          datasets: [{
+            data: [counts.push, counts.pull, counts.leg, counts.rest],
+            backgroundColor: 'rgba(34,211,238,0.10)',
+            borderColor: '#22d3ee',
+            borderWidth: 2,
+            pointRadius: 0
+          }]
+        },
+        options: {
+          scales: {
+            r: {
+              grid: { color: 'rgba(255,255,255,0.05)' },
+              angleLines: { color: 'rgba(255,255,255,0.05)' },
+              pointLabels: { color: '#777', font: { weight: '800' } },
+              ticks: { display: false }
+            }
+          },
+          plugins: { legend: { display: false } }
+        }
+      });
+
+      // Top exercises
+      const map = {};
+      logs.forEach(l => { map[l.name] = (map[l.name]||0) + 1; });
+      const top = Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,3);
+      const area = document.getElementById('ins-top-ex');
+      area.innerHTML = top.length ? "" : `<p class="text-white/40 text-sm font-black">기록이 충분하지 않습니다.</p>`;
+      top.forEach(([name, cnt], i)=>{
+        area.innerHTML += `
+          <div class="glass rounded-2xl p-4 flex items-center justify-between">
+            <div class="min-w-0">
+              <p class="text-[10px] font-black text-white/40 tracking-[0.18em] uppercase">TOP ${i+1}</p>
+              <p class="text-lg font-black text-white truncate mt-1">${name}</p>
+            </div>
+            <span class="pill cyan">${cnt} 세트</span>
+          </div>
+        `;
+      });
+
+      // Coach feedback
+      const coach = document.getElementById('ins-coach');
+      const tags = document.getElementById('ins-coach-tags');
+      tags.innerHTML = "";
+
+      const lackLeg = counts.leg < (counts.push+counts.pull)*0.25;
+      const tooRest = counts.rest > Math.max(counts.push, counts.pull, counts.leg);
+
+      let msg = "전체적으로 좋은 흐름입니다. ";
+      const t = [];
+
+      if(!balanced){
+        msg += "부위 밸런스가 깨져있습니다. ";
+        t.push("BALANCE");
+      }
+      if(lackLeg){
+        msg += "하체 비중이 낮아 전신 성장 효율이 떨어질 수 있습니다. 주 1회 하체를 확실히 고정하세요. ";
+        t.push("LEGS");
+      }
+      if(tooRest){
+        msg += "회복일이 많습니다. 컨디션이 괜찮다면 볼륨을 조금 올려도 됩니다. ";
+        t.push("VOLUME");
+      }
+      if(uniqueDays14 >= 10 && streak >= 4){
+        msg += "다만 부상 예방을 위해 템포/가동범위/견갑 패킹을 점검하세요.";
+        t.push("FORM");
+      }
+
+      if(t.length === 0){
+        msg += "이대로 주 3~5회만 유지하면 기록 상승이 자연스럽게 따라옵니다.";
+        t.push("CONSISTENCY");
+      }
+
+      coach.textContent = msg;
+      t.forEach(x=>{
+        const el = document.createElement('span');
+        el.className = 'pill cyan';
+        el.textContent = x;
+        tags.appendChild(el);
+      });
+    }
+
+    /* ---------- BACKUP / RESET ALL ---------- */
+    function backupJSON(){
+      const payload = { version: 'v11.3', exportedAt: nowISO(), logs, customSets, customReps, progressByDate };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `dk_master_os_backup_${todayStr()}.json`;
+      a.click();
+      toast('백업 다운로드');
+      haptic(18);
+    }
+
+    function resetAll(){
+      if(!confirm('⚠️ 모든 데이터(기록/설정/진행)를 초기화할까요?')) return;
+      localStorage.removeItem(KEY_LOGS);
+      localStorage.removeItem(KEY_SETS);
+      localStorage.removeItem(KEY_REPS);
+      localStorage.removeItem(KEY_PROGRESS_BY_DATE);
+      localStorage.removeItem(KEY_SUMMARY_SHOWN);
+      logs = []; customSets = {}; customReps = {}; progressByDate = {};
+      renderCarousel();
+      updateProgressUI();
+      renderCalendar();
+      toast('전체 초기화 완료');
+      haptic(30);
+    }
 
     /* ---------- INIT ---------- */
     window.onload = () => {
       initIntro();
 
-      updateDayNav();                 // ✅ 요일 네비 렌더
-      changeDay(new Date().getDay()); // ✅ 오늘 요일 표시
-      revealDayNav();                 // ✅ 첫 화면에서 보이게
+      // ✅ first load
+      updateDayNav();
+      changeDay(new Date().getDay());
 
-      bindSheetSwipe();               // ✅ sheet swipe enable
-      showDock();                     // ✅ dock show
-      syncDockSpace();                // ✅ body padding sync
+      // ✅ day nav: session only (초기 탭은 session)
+      showDayNav(true);
 
+      // ✅ calendar
+      renderCalendar();
+
+      // stopwatch
       const start = Date.now();
       setInterval(()=> {
         totalSec = Math.floor((Date.now() - start)/1000);
