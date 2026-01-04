@@ -4,15 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
   <title>DK MASTER OS v11.3 (Stable+ ScrollFix)</title>
-    <!-- ✅ PWA / iOS Standalone (주소창 숨김) -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="DK MASTER OS">
-<meta name="theme-color" content="#050507">
-<meta name="mobile-web-app-capable" content="yes">
 
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
+  <!-- ✅ PWA / iOS Standalone (주소창 숨김) -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DK MASTER OS">
+  <meta name="theme-color" content="#050507">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -36,6 +36,7 @@
     html{
       touch-action: manipulation;
       -webkit-text-size-adjust: 100%;
+      overscroll-behavior: none;
     }
 
     /* ✅ 스크롤 복구: 가장 중요한 수정 */
@@ -48,6 +49,7 @@
       overflow-y:auto;
       -webkit-overflow-scrolling:touch;
       padding-bottom: env(safe-area-inset-bottom);
+      overscroll-behavior: none;
 
       background-image:
         radial-gradient(1200px 700px at 15% -10%, rgba(34,211,238,0.18), transparent 55%),
@@ -70,7 +72,7 @@
     /* ✅ 전체 폭 레이아웃 컨테이너 */
     .layoutWrap{
       width:100%;
-      max-width: 1100px; /* 데스크탑 과확장 방지 */
+      max-width: 1100px;
       margin: 0 auto;
     }
 
@@ -124,13 +126,13 @@
     }
     .pill.cyan{ border-color:rgba(34,211,238,0.25); background:rgba(34,211,238,0.10); color:rgba(34,211,238,0.95); }
 
-    /* ✅ Main: fixed 제거 / 자연 스크롤 */
+    /* ✅ Main */
     main{
       padding-top: calc(var(--headerH) + 18px);
       padding-bottom: calc(var(--dockH) + env(safe-area-inset-bottom) + 28px);
     }
 
-    /* ✅ Carousel: Fullscreen + Strong Peek */
+    /* ✅ Carousel */
     .carousel{
       display:flex;
       gap:18px;
@@ -139,15 +141,13 @@
       -webkit-overflow-scrolling:touch;
       padding: 0 22px 18px;
       margin: 0 -22px;
-
-      /* ✅ iPad 스크롤 충돌 최소화 + 가로 드래그 확실히 */
       touch-action: pan-x pan-y;
     }
     .carousel::before,.carousel::after{ content:''; flex:0 0 22px; }
 
     .carousel > .slide{
       scroll-snap-align:center;
-      flex: 0 0 calc(100% - 120px); /* ✅ 강한 peek */
+      flex: 0 0 calc(100% - 120px);
       min-height: auto;
       transition: opacity .22s ease, transform .22s ease, filter .22s ease;
     }
@@ -400,7 +400,6 @@
           </button>
         </div>
 
-        <!-- ✅ 훈련 탭에서만 요일칩 표시 -->
         <div id="day-nav-wrap" class="mb-3">
           <div id="day-nav" class="flex justify-center gap-2 overflow-x-auto pb-2 scroll-hide"></div>
         </div>
@@ -452,7 +451,7 @@
             <button id="notif-toggle" class="pill cyan" onclick="toggleNotif()">ON</button>
           </div>
           <p class="text-[11px] font-black text-white/35 mt-3">
-            * iOS는 무음모드에서 소리가 제한될 수 있습니다. 진동은 대부분 동작합니다.
+            * iOS는 무음모드에서 소리가 제한될 수 있습니다. iPad는 진동이 지원되지 않을 수 있습니다.
           </p>
         </div>
 
@@ -581,11 +580,12 @@
 
   <script>
     /* =========================================================
-      DK MASTER OS v11.3 (Stable+ ScrollFix)
+      DK MASTER OS v11.3
       ✅ 로직/기능 유지
       ✅ 실제 휴식시간(restUsed) 기록
       ✅ 세트 순서 클릭
-      ✅ iPad/iOS 사운드 Unlock 적용
+      ✅ iOS/iPadOS 사운드 Unlock 적용
+      ✅ 휴식 알림 강화(4회 패턴 + 화면 플래시)
     ========================================================= */
 
     /* ---------- DATA ---------- */
@@ -1034,7 +1034,7 @@
     }
 
     function toggleSetComplete(date, exerciseId, setIndex){
-      unlockAudio(); // ✅ iPad/iOS 사운드 unlock (사용자 제스처 시점)
+      unlockAudio(); // ✅ iOS/iPadOS 사운드 unlock
 
       const [dayIdx, exIdx] = exerciseId.split('-').map(Number);
       const w = workoutData[dayIdx]?.list?.[exIdx];
@@ -1073,7 +1073,7 @@
             repActual: null,
             rpe: null,
             restPlanned: w.rest,
-            restUsed: w.rest, // 기본값 → 실제 휴식 후 업데이트됨
+            restUsed: w.rest,
             type: workoutData[currentDayIdx].type
           });
           localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
@@ -1267,14 +1267,28 @@
       if(finished){
         haptic(30);
         if(restNotifEnabled) restDoneNotify();
+        toast("휴식 끝! 다음 세트 ✅");
       }
     }
 
+    /* ✅ 알림 강화: 4회 패턴 + 플래시 */
     function restDoneNotify(){
       // ✅ 진동 (iPad는 대부분 미지원)
-      try{ if(navigator.vibrate) navigator.vibrate([90,60,180]); }catch(e){}
+      try{ if(navigator.vibrate) navigator.vibrate([120,80,200,80,220]); }catch(e){}
 
-      // ✅ 소리 (iOS/iPadOS: unlock 필요)
+      // ✅ 화면 플래시 (진동 없는 iPad에서 체감 확실)
+      try{
+        document.body.animate(
+          [
+            { filter:"brightness(1)" },
+            { filter:"brightness(1.35)" },
+            { filter:"brightness(1)" }
+          ],
+          { duration: 240, iterations: 3 }
+        );
+      }catch(e){}
+
+      // ✅ 강력 사운드: 4회 패턴 + 더 큰 볼륨 + 톤 변화
       try{
         if(!audioCtx){
           audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1283,20 +1297,32 @@
           audioCtx.resume();
         }
 
-        const o = audioCtx.createOscillator();
-        const g = audioCtx.createGain();
-        o.connect(g);
-        g.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
 
-        o.type = 'sine';
-        o.frequency.value = 880;
+        const pattern = [
+          { t: 0.00, dur: 0.22, freq: 988 },
+          { t: 0.30, dur: 0.22, freq: 880 },
+          { t: 0.60, dur: 0.25, freq: 988 },
+          { t: 0.95, dur: 0.25, freq: 1047 }
+        ];
 
-        g.gain.setValueAtTime(0.0001, audioCtx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.08, audioCtx.currentTime + 0.02);
-        g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.18);
+        pattern.forEach(p => {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.connect(g);
+          g.connect(audioCtx.destination);
 
-        o.start();
-        o.stop(audioCtx.currentTime + 0.20);
+          o.type = 'square'; // 강한 인지 톤 (너무 날카로우면 triangle로 변경 가능)
+          o.frequency.setValueAtTime(p.freq, now + p.t);
+
+          g.gain.setValueAtTime(0.0001, now + p.t);
+          g.gain.exponentialRampToValueAtTime(0.18, now + p.t + 0.02);
+          g.gain.exponentialRampToValueAtTime(0.0001, now + p.t + p.dur);
+
+          o.start(now + p.t);
+          o.stop(now + p.t + p.dur);
+        });
+
       }catch(e){}
     }
 
