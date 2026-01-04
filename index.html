@@ -3,181 +3,287 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>치닝디핑 마스터</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800&display=swap');
-        
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;700;900&display=swap');
+
+        :root {
+            --primary: #22d3ee;
+            --accent: #818cf8;
+            --bg: #09090b;
+        }
+
         body {
-            font-family: 'Pretendard', sans-serif;
-            background-color: #0f172a;
-            color: #f8fafc;
+            font-family: 'Pretendard', -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: #f4f4f5;
+            user-select: none;
             -webkit-tap-highlight-color: transparent;
+            background-image: radial-gradient(circle at 50% -10%, #1e1b4b 0%, var(--bg) 80%);
+            margin: 0;
         }
 
-        .glass {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(12px);
+        /* 엑박 방지: 폰트 어썸 로딩 전까지 공간 확보 */
+        .fa, .fas, .fa-solid {
+            display: inline-block;
+            min-width: 1em;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
         }
 
-        .active-tab {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+        .progress-fill {
+            transition: width 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            box-shadow: 0 0 15px rgba(34, 211, 238, 0.3);
         }
 
-        .checkbox-custom:checked + label {
-            background-color: #1e293b;
-            opacity: 0.5;
-            text-decoration: line-through;
+        .set-btn {
+            width: 100%;
+            height: 54px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 800;
+            color: #a1a1aa;
+            transition: all 0.2s ease;
         }
 
-        /* 아이폰 홈 화면 추가 시 앱처럼 보이기 위한 설정 */
-        meta[name="apple-mobile-web-app-capable"] { content: "yes"; }
-        meta[name="apple-mobile-web-app-status-bar-style"] { content: "black-translucent"; }
+        .set-btn.complete {
+            background: var(--primary);
+            color: #000;
+            border: none;
+            transform: scale(0.96);
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        .nav-active {
+            background: var(--primary) !important;
+            color: #000 !important;
+            font-weight: 900 !important;
+        }
+
+        /* 스크롤바 숨기기 */
+        ::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="pb-24">
+<body class="pb-32">
 
-    <header class="p-6 sticky top-0 z-10 glass">
-        <div class="flex justify-between items-center">
+    <div class="fixed top-0 left-0 right-0 z-[100] bg-[#09090b]/80 backdrop-blur-md border-b border-white/5 p-5">
+        <div class="max-w-3xl mx-auto">
+            <div class="flex justify-between items-end mb-2">
+                <span class="text-[11px] font-bold text-cyan-400 tracking-tighter">오늘의 운동 달성률</span>
+                <span id="progress-percent" class="text-xl font-black text-white italic">0%</span>
+            </div>
+            <div class="w-full h-2.5 bg-white/10 rounded-full overflow-hidden">
+                <div id="progress-bar" class="progress-fill h-full w-0"></div>
+            </div>
+        </div>
+    </div>
+
+    <header class="px-6 pt-28 pb-4">
+        <div class="flex justify-between items-end">
             <div>
-                <h1 id="today-name" class="text-2xl font-800 text-blue-400">월요일</h1>
-                <p id="routine-title" class="text-sm text-slate-400">밀기 A (가슴 · 삼두)</p>
+                <h1 id="view-day" class="text-3xl font-black text-white tracking-tighter mb-1">요일 로딩...</h1>
+                <p id="view-title" class="text-cyan-400 font-bold text-sm">루틴 불러오는 중</p>
             </div>
             <div class="text-right">
-                <span id="current-date" class="text-xs block opacity-60">2026.01.04</span>
-                <span class="text-blue-500 font-bold">GEMINI AI PARTNER</span>
+                <div id="stopwatch" class="text-2xl font-black font-mono text-white tracking-tighter">00:00</div>
+                <p class="text-[10px] text-gray-500 font-bold uppercase">운동 시간</p>
             </div>
         </div>
     </header>
 
-    <main id="workout-container" class="p-4 space-y-4">
+    <main id="workout-list" class="p-5 space-y-6 md:grid md:grid-cols-2 md:gap-6 md:space-y-0">
         </main>
 
-    <div id="timer-overlay" class="fixed inset-0 bg-black/80 z-50 flex flex-col items-center justify-center hidden">
-        <div class="text-6xl font-bold mb-8 text-blue-400" id="timer-display">90</div>
-        <p class="text-xl mb-8 uppercase tracking-widest text-slate-300">Rest Time</p>
-        <button onclick="stopTimer()" class="px-8 py-3 bg-red-500 rounded-full font-bold">SKIP</button>
+    <div id="timer-modal" class="fixed inset-0 z-[200] flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-md"></div>
+        <div class="relative text-center">
+            <p class="text-cyan-400 text-sm font-bold tracking-[0.2em] mb-6">근육 휴식 중...</p>
+            <div id="timer-sec" class="text-9xl font-black text-white leading-none mb-12 italic tracking-tighter">00</div>
+            <button onclick="closeTimer()" class="px-12 py-4 glass-card font-bold text-red-500 text-sm uppercase">휴식 건너뛰기</button>
+        </div>
     </div>
 
-    <nav class="fixed bottom-0 left-0 right-0 glass px-6 py-4 flex justify-between items-center border-t border-white/10">
-        <button onclick="loadRoutine(1)" class="nav-item flex flex-col items-center"><span class="text-xs">월</span></button>
-        <button onclick="loadRoutine(2)" class="nav-item flex flex-col items-center"><span class="text-xs">화</span></button>
-        <button onclick="loadRoutine(3)" class="nav-item flex flex-col items-center"><span class="text-xs">수</span></button>
-        <button onclick="loadRoutine(4)" class="nav-item flex flex-col items-center"><span class="text-xs">목</span></button>
-        <button onclick="loadRoutine(5)" class="nav-item flex flex-col items-center"><span class="text-xs">금</span></button>
-        <button onclick="loadRoutine(6)" class="nav-item flex flex-col items-center"><span class="text-xs">토</span></button>
-        <button onclick="loadRoutine(0)" class="nav-item flex flex-col items-center"><span class="text-xs text-red-400">일</span></button>
+    <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-xl bg-zinc-900/90 backdrop-blur-xl rounded-[24px] p-2 flex justify-between z-50 border border-white/10 shadow-2xl">
+        <button onclick="changeDay(1)" class="day-btn w-12 h-12 flex items-center justify-center rounded-2xl text-xs font-bold transition-all text-white">월</button>
+        <button onclick="changeDay(2)" class="day-btn w-12 h-12 flex items-center justify-center rounded-2xl text-xs font-bold transition-all text-white">화</button>
+        <button onclick="changeDay(3)" class="day-btn w-12 h-12 flex items-center justify-center rounded-2xl text-xs font-bold transition-all text-white">수</button>
+        <button onclick="changeDay(4)" class="day-btn w-12 h-12 flex items-center justify-center rounded-2xl text-xs font-bold transition-all text-white">목</button>
+        <button onclick="changeDay(5)" class="day-btn w-12 h-12 flex items-center justify-center rounded-2xl text-xs font-bold transition-all text-white">금</button>
+        <button onclick="changeDay(6)" class="day-btn w-12 h-12 flex items-center justify-center rounded-2xl text-xs font-bold transition-all text-white">토</button>
+        <button onclick="changeDay(0)" class="day-btn w-12 h-12 flex items-center justify-center rounded-2xl text-xs font-bold transition-all text-red-500">일</button>
     </nav>
 
     <script>
-        const routines = {
-            1: { name: "월요일", title: "밀기 A (가슴 · 삼두)", workouts: [
-                { name: "딥스 (가슴 집중)", sets: 4, reps: "8-12", rest: 90, img: "가슴으로 바닥을 밀어내며 몸이 위로!", tip: "상체 살짝 숙이기" },
-                { name: "스탠다드 푸쉬업", sets: 4, reps: "12-20", rest: 60, img: "가슴으로 바닥을 눌렀다 밀기", tip: "손바닥 전체로 지면 잡기" },
-                { name: "내로우 딥스", sets: 3, reps: "8-12", rest: 60, img: "삼두로 끝까지 잠그기", tip: "상체 수직 세우기" }
+        const workoutData = {
+            1: { day: "월요일", title: "밀기 A (가슴·삼두)", list: [
+                { name: "체스트 딥스", set: 4, rep: "8-12", rest: 90, breath: "내려갈 때 코로 흡기 / 올라올 때 입으로 호기", target: "가슴 중앙 ~ 하부 수축", mind: "가슴으로 바닥을 밀어 몸이 떠오름", tip: "상체 15도 숙여야 하부에 자극이 꽂힙니다." },
+                { name: "스탠다드 푸쉬업", set: 4, rep: "12-20", rest: 75, breath: "내릴 때 코로 들숨 / 밀 때 입으로 날숨", target: "가슴 전체 골고루", mind: "바닥을 가슴으로 눌렀다 밀기", tip: "손바닥 전체로 지면 움켜쥐기" },
+                { name: "내로우 딥스", set: 3, rep: "8-12", rest: 60, breath: "팔 펼 때 입으로 강하게 날숨", target: "삼두 전체 (팔뚝 뒷면)", mind: "삼두의 힘으로 팔을 끝까지 잠금", tip: "상체를 최대한 수직으로 세우기" }
             ]},
-            2: { name: "화요일", title: "당기기 A (등 두께)", workouts: [
-                { name: "풀업 (밴드)", sets: 4, reps: "8-10", rest: 120, img: "팔꿈치를 뒷주머니에 꽂기", tip: "숄더패킹 유지" },
-                { name: "인버티드 로우", sets: 4, reps: "10-15", rest: 90, img: "날개뼈 모았다가 풀기", tip: "가슴을 바쪽으로 마중" },
-                { name: "친업 (밴드)", sets: 3, reps: "8-10", rest: 90, img: "가슴을 봉 쪽으로 접어넣기", tip: "이두 보조 자극" }
+            2: { day: "화요일", title: "당기기 A (등 두께)", list: [
+                { name: "풀업 (밴드)", set: 4, rep: "8-10", rest: 120, breath: "당길 때 입으로 천천히 호기 / 1초 정지", target: "광배 바깥쪽 (겨드랑이 아래)", mind: "팔꿈치를 바지 뒷주머니에 꽂기", tip: "숄더 패킹 유지 후 시작" },
+                { name: "인버티드 로우", set: 4, rep: "10-15", rest: 90, breath: "당길 때 입으로 날숨", target: "등 중앙 (날개뼈 사이)", mind: "날개뼈를 뒤로 모았다 천천히 이완", tip: "가슴을 바쪽으로 마중 나가기" },
+                { name: "친업 (밴드)", set: 3, rep: "8-10", rest: 90, breath: "올라갈 때 입으로 길게 날숨", target: "등 중앙 (이두 보조)", mind: "가슴을 봉 쪽으로 접어 넣기", tip: "가슴 높이 들어올려 등 상부 집중" }
             ]},
-            3: { name: "수요일", title: "액티브 리커버리 (측면 어깨)", workouts: [
-                { name: "사이드 레터럴 레이즈", sets: 5, reps: "15-25", rest: 60, img: "팔꿈치를 대각선 멀리 던지기", tip: "승모근 고립 필수" }
+            3: { day: "수요일", title: "어깨 강화 (측면)", list: [
+                { name: "사이드 레터럴 레이즈", set: 5, rep: "15-25", rest: 60, breath: "올릴 때 날숨 / 내릴 때 들숨", target: "어깨 옆면 (측면 삼각근)", mind: "팔꿈치를 양옆 멀리 던짐", tip: "날개뼈 고정하여 승모근 개입 방지" }
             ]},
-            4: { name: "목요일", title: "밀기 B (어깨 · 삼두)", workouts: [
-                { name: "파이크 푸쉬업", sets: 4, reps: "8-12", rest: 90, img: "어깨로 천장을 밀기", tip: "엉덩이 높게 유지" },
-                { name: "발 높인 푸쉬업", sets: 4, reps: "10-15", rest: 90, img: "가슴 상부로 바닥 밀기", tip: "상부 가슴 집중" },
-                { name: "딥스 (삼두)", sets: 4, reps: "6-10", rest: 90, img: "팔꿈치 뒤로 모으기", tip: "삼두 끝까지 펴기" },
-                { name: "사레레 (보너스)", sets: 3, reps: "20", rest: 60, img: "어깨 뽕 채우기", tip: "가벼운 무게 고반복" }
+            4: { day: "목요일", title: "밀기 B (어깨·삼두)", list: [
+                { name: "파이크 푸쉬업", set: 4, rep: "8-12", rest: 90, breath: "밀어올릴 때 입으로 날숨", target: "어깨 전면 · 측면", mind: "어깨로 천장을 밀어 올림", tip: "엉덩이 높게 유지해야 어깨 부하 실림" },
+                { name: "디클라인 푸쉬업", set: 4, rep: "10-15", rest: 90, breath: "밀어올릴 때 입으로 날숨", target: "상부 가슴", mind: "상부 가슴으로 바닥 미는 느낌", tip: "발 위치 높을수록 난이도 상승" },
+                { name: "삼두 딥스", set: 4, rep: "6-10", rest: 90, breath: "삼두로 밀며 강하게 날숨", target: "삼두근 (팔 뒷면)", mind: "팔꿈치 접었다 삼두로 펴서 잠금", tip: "팔꿈치 벌어지지 않게 뒤로 모으기" },
+                { name: "보너스 사레레", set: 3, rep: "20", rest: 45, breath: "올릴 때 날숨", target: "측면 삼각근 상단", mind: "어깨 옆면 근육을 찢는 느낌", tip: "짧은 휴식으로 펌핑 유도" }
             ]},
-            5: { name: "금요일", title: "당기기 B (등 넓이)", workouts: [
-                { name: "와이드 풀업 (밴드)", sets: 4, reps: "6-8", rest: 120, img: "등이 양옆으로 펼쳐지는 느낌", tip: "손 너비 넓게" },
-                { name: "인버티드 로우", sets: 4, reps: "10-15", rest: 90, img: "등 중앙 안정성", tip: "일정한 템포" },
-                { name: "내로우 풀업 (밴드)", sets: 3, reps: "8-10", rest: 90, img: "가슴을 봉에 붙이기", tip: "등 하부 자극" }
+            5: { day: "금요일", title: "당기기 B (등 넓이)", list: [
+                { name: "와이드 풀업 (밴드)", set: 4, rep: "6-8", rest: 120, breath: "올라가며 날숨 / 상단 1초 정지", target: "광배 옆선 (V라인)", mind: "등이 날개처럼 펼쳐짐", tip: "어깨보다 넓은 그립 사용" },
+                { name: "인버티드 로우", set: 4, rep: "10-15", rest: 90, breath: "당기며 날숨", target: "등 중앙 안정성", mind: "날개뼈 고정 후 몸 끌어오기", tip: "일정한 템포 유지" },
+                { name: "내로우 풀업 (밴드)", set: 3, rep: "8-10", rest: 90, breath: "올라갈 때 날숨", target: "등 중앙부", mind: "가슴을 봉에 붙인다는 느낌", tip: "수축 지점에서 1초 버티기" }
             ]},
-            6: { name: "토요일", title: "하체 + 코어", workouts: [
-                { name: "스쿼트", sets: 4, reps: "15-20", rest: 60, img: "발바닥으로 지면 뚫기", tip: "허리 중립" },
-                { name: "런지", sets: 3, reps: "좌우 10", rest: 60, img: "앞발 뒤꿈치로 밀기", tip: "엉덩이 자극" },
-                { name: "플랭크", sets: 3, reps: "30-60s", rest: 60, img: "배를 안으로 당기기", tip: "엉덩이 꽉 조이기" }
+            6: { day: "토요일", title: "하체 및 코어", list: [
+                { name: "맨몸 스쿼트", set: 4, rep: "15-20", rest: 60, breath: "올라올 때 날숨", target: "허벅지 전체", mind: "발바닥으로 지면 뚫고 일어나기", tip: "허리 말리지 않게 중립 유지" },
+                { name: "런지", set: 3, rep: "좌우 10", rest: 60, breath: "올라올 때 날숨", target: "엉덩이 (둔근)", mind: "앞발 뒤꿈치로 땅 밀어주기", tip: "상체 숙이면 엉덩이 자극 상승" },
+                { name: "플랭크", set: 3, rep: "60초", rest: 60, breath: "일정한 호흡 유지", target: "복부 및 코어 전체", mind: "배를 안으로 당겨 몸통 고정", tip: "엉덩이를 꽉 조여 허리 보호" }
             ]},
-            0: { name: "일요일", title: "회복 & 호흡", workouts: [
-                { name: "전신 스트레칭", sets: 1, reps: "15분", rest: 0, img: "근육 이완", tip: "어깨/광배 집중" },
-                { name: "복식 호흡", sets: 1, reps: "5분", rest: 0, img: "코로 4초/입으로 6초", tip: "회복 가속" }
+            0: { day: "일요일", title: "회복과 휴식", list: [
+                { name: "전신 스트레칭", set: 1, rep: "15분", rest: 0, breath: "깊고 천천히", target: "전신 이완", mind: "근육 결대로 몸이 늘어남", tip: "어깨/광배 스트레칭 집중" },
+                { name: "복식 호흡", set: 1, rep: "5분", rest: 0, breath: "4초 흡기 / 6초 호기", target: "심신 안정", mind: "온몸에 산소 공급", tip: "눈 감고 심박수 낮추기" }
             ]}
         };
 
-        let timerInterval;
+        let currentDaySets = 0;
+        let completedSets = 0;
+        let stopwatchInterval;
+        let totalSeconds = 0;
 
-        function loadRoutine(day) {
-            const routine = routines[day];
-            document.getElementById('today-name').innerText = routine.name;
-            document.getElementById('routine-title').innerText = routine.title;
+        function updateProgress() {
+            const percent = Math.round((completedSets / currentDaySets) * 100) || 0;
+            const bar = document.getElementById('progress-bar');
+            const txt = document.getElementById('progress-percent');
+            if(bar && txt) {
+                bar.style.width = percent + '%';
+                txt.innerText = percent + '%';
+            }
+        }
+
+        function changeDay(d) {
+            const data = workoutData[d];
+            document.getElementById('view-day').innerText = data.day;
+            document.getElementById('view-title').innerText = data.title;
             
-            const container = document.getElementById('workout-container');
-            container.innerHTML = '';
+            const listArea = document.getElementById('workout-list');
+            listArea.innerHTML = '';
+            
+            currentDaySets = data.list.reduce((acc, curr) => acc + curr.set, 0);
+            completedSets = 0;
+            updateProgress();
 
-            routine.workouts.forEach((w, i) => {
+            data.list.forEach((w, idx) => {
                 const card = document.createElement('div');
-                card.className = "glass rounded-2xl p-5 relative overflow-hidden";
+                card.className = "glass-card p-6 flex flex-col";
                 card.innerHTML = `
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <h3 class="text-xl font-bold">${w.name}</h3>
-                            <p class="text-blue-400 text-sm font-semibold">${w.sets} SETS × ${w.reps}</p>
+                    <div class="mb-5 flex justify-between items-start">
+                        <h3 class="text-xl font-black text-white italic tracking-tight">${w.name}</h3>
+                        <span class="text-[10px] font-black bg-cyan-400/10 text-cyan-400 px-2 py-1 rounded-lg border border-cyan-400/20">${w.rep}</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 mb-6 text-[11px]">
+                        <div class="bg-black/40 p-3 rounded-2xl border border-white/5">
+                            <p class="text-cyan-400 font-bold mb-1"><i class="fa-solid fa-wind mr-1"></i> 호흡</p>
+                            <p class="text-gray-400 leading-snug">${w.breath}</p>
                         </div>
-                        <button onclick="this.parentElement.parentElement.classList.toggle('opacity-40')" class="text-slate-500"><i class="fa-solid fa-circle-info"></i></button>
+                        <div class="bg-black/40 p-3 rounded-2xl border border-white/5">
+                            <p class="text-indigo-400 font-bold mb-1"><i class="fa-solid fa-fire mr-1"></i> 자극</p>
+                            <p class="text-gray-400 leading-snug">${w.target}</p>
+                        </div>
+                        <div class="bg-black/40 p-3 rounded-2xl border border-white/5">
+                            <p class="text-emerald-400 font-bold mb-1"><i class="fa-solid fa-brain mr-1"></i> 심상</p>
+                            <p class="text-gray-400 leading-snug">${w.mind}</p>
+                        </div>
+                        <div class="bg-cyan-400/10 p-3 rounded-2xl border border-cyan-400/30">
+                            <p class="text-white font-bold mb-1 underline italic"><i class="fa-solid fa-lightbulb mr-1 text-yellow-400"></i> 꿀팁</p>
+                            <p class="text-white leading-snug font-medium">${w.tip}</p>
+                        </div>
                     </div>
-                    <div class="space-y-2 mb-4">
-                        <p class="text-xs text-slate-400"><i class="fa-solid fa-brain mr-2"></i>${w.img}</p>
-                        <p class="text-xs text-blue-300"><i class="fa-solid fa-lightbulb mr-2"></i>${w.tip}</p>
-                    </div>
-                    <div class="flex gap-2 flex-wrap">
-                        ${Array.from({length: w.sets}).map((_, j) => `
-                            <input type="checkbox" id="w-${i}-s-${j}" class="checkbox-custom hidden" onclick="startRest(${w.rest})">
-                            <label for="w-${i}-s-${j}" class="w-10 h-10 rounded-lg border border-white/20 flex items-center justify-center font-bold text-sm transition-all active:scale-95">${j+1}</label>
+
+                    <div class="flex gap-2.5 overflow-x-auto pb-1 mt-auto">
+                        ${Array.from({length: w.set}).map((_, s) => `
+                            <button onclick="checkSet(this, ${w.rest})" class="set-btn shrink-0 flex-1 min-w-[50px]">${s+1}</button>
                         `).join('')}
                     </div>
                 `;
-                container.appendChild(card);
+                listArea.appendChild(card);
             });
 
-            // 탭 활성화 UI
-            document.querySelectorAll('.nav-item').forEach((el, idx) => {
-                const dayMap = [0, 1, 2, 3, 4, 5, 6]; 
-                if(idx === (day === 0 ? 6 : day - 1)) el.classList.add('text-blue-400', 'font-bold');
-                else el.classList.remove('text-blue-400', 'font-bold');
+            document.querySelectorAll('.day-btn').forEach((btn, i) => {
+                const dayMatch = (i === 6) ? 0 : i + 1;
+                if(dayMatch === d) btn.classList.add('nav-active');
+                else btn.classList.remove('nav-active');
             });
         }
 
-        function startRest(seconds) {
-            if(seconds === 0) return;
-            const overlay = document.getElementById('timer-overlay');
-            const display = document.getElementById('timer-display');
-            overlay.classList.remove('hidden');
-            
-            let timeLeft = seconds;
+        function checkSet(btn, rest) {
+            btn.classList.toggle('complete');
+            if(btn.classList.contains('complete')) {
+                completedSets++;
+                if(rest > 0) startTimer(rest);
+            } else {
+                completedSets--;
+            }
+            updateProgress();
+        }
+
+        let timer;
+        function startTimer(sec) {
+            const modal = document.getElementById('timer-modal');
+            const display = document.getElementById('timer-sec');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.add('opacity-100'), 10);
+
+            let timeLeft = sec;
             display.innerText = timeLeft;
 
-            timerInterval = setInterval(() => {
+            clearInterval(timer);
+            timer = setInterval(() => {
                 timeLeft--;
                 display.innerText = timeLeft;
-                if(timeLeft <= 0) stopTimer();
+                if(timeLeft <= 0) closeTimer();
             }, 1000);
         }
 
-        function stopTimer() {
-            clearInterval(timerInterval);
-            document.getElementById('timer-overlay').classList.add('hidden');
+        function closeTimer() {
+            clearInterval(timer);
+            const modal = document.getElementById('timer-modal');
+            modal.classList.remove('opacity-100');
+            setTimeout(() => modal.classList.add('hidden'), 300);
         }
 
-        // 초기 실행 (현재 요일 로드)
-        const today = new Date().getDay();
-        document.getElementById('current-date').innerText = new Date().toLocaleDateString();
-        loadRoutine(today);
+        function startStopwatch() {
+            stopwatchInterval = setInterval(() => {
+                totalSeconds++;
+                const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+                const s = (totalSeconds % 60).toString().padStart(2, '0');
+                document.getElementById('stopwatch').innerText = `${m}:${s}`;
+            }, 1000);
+        }
 
+        // 초기 실행
+        window.onload = () => {
+            const currentDay = new Date().getDay();
+            changeDay(currentDay);
+            startStopwatch();
+        };
     </script>
 </body>
 </html>
