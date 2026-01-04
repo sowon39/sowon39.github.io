@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-  <title>DK MASTER OS v11.3 (Stable+ ScrollFix)</title>
+  <title>DK MASTER OS v11.3 (Stable+ ScrollFix + Mobile+Dock)</title>
 
   <!-- ✅ PWA / iOS Standalone (주소창 숨김) -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -241,6 +241,22 @@
     .nav-active-dot{ position:absolute; bottom:1px; width:4px; height:4px; background:var(--primary); border-radius:50%; box-shadow:0 0 12px var(--primary); opacity:0; transition:all .25s; }
     .nav-item.active .nav-active-dot{ opacity:1; transform:scale(1.6); }
 
+    /* ✅ Dock Auto Hide */
+    .navDockWrap{
+      transition: transform .45s cubic-bezier(0.22, 1, 0.36, 1), opacity .35s ease;
+      will-change: transform, opacity;
+    }
+    .navDockWrap.dock-hide{
+      transform: translateY(120%);
+      opacity: 0;
+      pointer-events: none;
+    }
+    .navDockWrap.dock-show{
+      transform: translateY(0%);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
     /* Day chips */
     .day-chip{ width:44px; height:44px; border-radius:18px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:12px; color:rgba(255,255,255,0.55); border:1px solid rgba(255,255,255,0.10); background:rgba(255,255,255,0.04); flex:0 0 auto; user-select:none;}
     .day-chip.active{ background:var(--primary); color:#000; border-color:rgba(34,211,238,0.25); box-shadow:0 10px 24px rgba(34,211,238,0.25); }
@@ -334,6 +350,55 @@
     .log-table th{ font-size:10px; text-transform:uppercase; letter-spacing:.18em; color:rgba(255,255,255,0.35); font-weight:900; text-align:left; padding:0 10px 6px; }
     .log-row{ background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:16px; overflow:hidden; }
     .log-row td{ padding:12px 10px; font-weight:800; font-size:12px; color:rgba(255,255,255,0.78); }
+
+    /* ✅ Mobile Layout Optimization */
+    @media (max-width: 520px){
+      .layoutWrap{ padding-left: 0; padding-right: 0; }
+      main .layoutWrap.px-4{ padding-left: 14px !important; padding-right: 14px !important; }
+
+      header{ padding: 14px 14px 10px !important; height: 84px; }
+      :root{ --headerH: 84px; --dockH: 92px; }
+
+      .slideCard{ border-radius: 26px; }
+      .slideCard .p-6{ padding: 16px !important; }
+      .slideCard h3{ font-size: 1.85rem !important; }
+
+      /* ✅ 카드 내부 2단(grid) → 1단 */
+      .slideCard .md\:grid-cols-2{ grid-template-columns: 1fr !important; }
+
+      .rightPanel{
+        padding: 14px !important;
+        border-radius: 22px !important;
+      }
+
+      .stepperBtn{
+        width: 44px !important;
+        height: 44px !important;
+        border-radius: 16px !important;
+      }
+      .stepperValue{ font-size: 20px !important; }
+
+      /* ✅ 세트 버튼: 2열 → 3열 */
+      .rightPanel .grid.grid-cols-2{
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      }
+      .setBtn{
+        height: 54px !important;
+        font-size: 15px !important;
+        border-radius: 18px !important;
+      }
+
+      /* ✅ 캐러셀 peek: 폰에서 과하게 넓어지는 것 방지 */
+      .carousel > .slide{
+        flex: 0 0 calc(100% - 70px) !important;
+      }
+
+      /* ✅ Dock 조금 더 컴팩트 */
+      .navDockWrap{ padding: 14px !important; }
+      .nav-dock{ border-radius: 30px !important; padding: 9px !important; }
+      .nav-item{ padding: 10px 0 !important; }
+      .nav-item i{ font-size: 1.15rem !important; }
+    }
   </style>
 </head>
 
@@ -586,6 +651,8 @@
       ✅ 세트 순서 클릭
       ✅ iOS/iPadOS 사운드 Unlock 적용
       ✅ 휴식 알림 강화(4회 패턴 + 화면 플래시)
+      ✅ Dock: 작동할 때만 등장 + 자동 숨김
+      ✅ Mobile: 폰에서 레이아웃 최적화
     ========================================================= */
 
     /* ---------- DATA ---------- */
@@ -723,6 +790,9 @@
       if(name === 'history') renderCalendar();
 
       window.scrollTo({top:0, behavior:'smooth'});
+
+      // ✅ 탭 전환 자체도 "작동"이므로 Dock 표시
+      showDockTemporarily();
     }
 
     /* ---------- DAY NAV ---------- */
@@ -836,6 +906,9 @@
       renderCarousel();
       updateProgressUI();
       updateDayNav();
+
+      // ✅ 요일 변경은 작동이므로 Dock 표시
+      showDockTemporarily();
     }
 
     /* ---------- CAROUSEL ---------- */
@@ -979,6 +1052,8 @@
           currentSlideIndex = clamp(idx, 0, slides.length-1);
           updateSlideHUD();
         }
+        // ✅ 슬라이딩 자체도 작동이므로 Dock 표시
+        showDockTemporarily();
       };
     }
 
@@ -1011,6 +1086,7 @@
       scrollToSlide(currentSlideIndex, true);
       updateSlideHUD();
       haptic(10);
+      showDockTemporarily();
     }
 
     function carouselPrev(){
@@ -1019,6 +1095,7 @@
       scrollToSlide(currentSlideIndex, true);
       updateSlideHUD();
       haptic(10);
+      showDockTemporarily();
     }
 
     function bindSetButtons(){
@@ -1035,6 +1112,7 @@
 
     function toggleSetComplete(date, exerciseId, setIndex){
       unlockAudio(); // ✅ iOS/iPadOS 사운드 unlock
+      showDockTemporarily();
 
       const [dayIdx, exIdx] = exerciseId.split('-').map(Number);
       const w = workoutData[dayIdx]?.list?.[exIdx];
@@ -1101,6 +1179,8 @@
     }
 
     function adjust(type, key, val){
+      showDockTemporarily();
+
       const [d, idx] = key.split('-').map(Number);
       const w = workoutData[d]?.list?.[idx];
       if(!w) return;
@@ -1123,6 +1203,8 @@
     }
 
     function resetSetRepToDefault(exerciseId){
+      showDockTemporarily();
+
       const [d, idx] = exerciseId.split('-').map(Number);
       const w = workoutData[d]?.list?.[idx];
       if(!w) return;
@@ -1140,6 +1222,7 @@
     }
 
     function resetExercise(exerciseId){
+      showDockTemporarily();
       if(!confirm('이 운동의 오늘 기록을 초기화할까요?')) return;
       const date = todayStr();
 
@@ -1161,6 +1244,7 @@
     }
 
     function resetToday(){
+      showDockTemporarily();
       if(!confirm('오늘 진행/기록을 모두 초기화할까요?')) return;
       const date = todayStr();
 
@@ -1218,6 +1302,7 @@
     }
 
     function minimizeTimer(){
+      showDockTemporarily();
       const modal = document.getElementById('timer-modal');
       modal.classList.remove('opacity-100');
       setTimeout(()=> modal.classList.add('hidden'), 450);
@@ -1227,6 +1312,7 @@
     }
 
     function openTimerFromHUD(){
+      showDockTemporarily();
       const modal = document.getElementById('timer-modal');
       modal.classList.remove('hidden');
       requestAnimationFrame(()=> modal.classList.add('opacity-100'));
@@ -1234,6 +1320,7 @@
     }
 
     function adjustRest(delta){
+      showDockTemporarily();
       if(!timerInt) return;
       restRemaining = clamp(restRemaining + delta, 5, 600);
       restTotal = Math.max(restTotal, restRemaining);
@@ -1273,10 +1360,7 @@
 
     /* ✅ 알림 강화: 4회 패턴 + 플래시 */
     function restDoneNotify(){
-      // ✅ 진동 (iPad는 대부분 미지원)
       try{ if(navigator.vibrate) navigator.vibrate([120,80,200,80,220]); }catch(e){}
-
-      // ✅ 화면 플래시 (진동 없는 iPad에서 체감 확실)
       try{
         document.body.animate(
           [
@@ -1288,7 +1372,6 @@
         );
       }catch(e){}
 
-      // ✅ 강력 사운드: 4회 패턴 + 더 큰 볼륨 + 톤 변화
       try{
         if(!audioCtx){
           audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1298,7 +1381,6 @@
         }
 
         const now = audioCtx.currentTime;
-
         const pattern = [
           { t: 0.00, dur: 0.22, freq: 988 },
           { t: 0.30, dur: 0.22, freq: 880 },
@@ -1311,8 +1393,7 @@
           const g = audioCtx.createGain();
           o.connect(g);
           g.connect(audioCtx.destination);
-
-          o.type = 'square'; // 강한 인지 톤 (너무 날카로우면 triangle로 변경 가능)
+          o.type = 'square';
           o.frequency.setValueAtTime(p.freq, now + p.t);
 
           g.gain.setValueAtTime(0.0001, now + p.t);
@@ -1327,6 +1408,7 @@
     }
 
     function toggleNotif(){
+      showDockTemporarily();
       restNotifEnabled = !restNotifEnabled;
       localStorage.setItem(KEY_NOTIF, restNotifEnabled ? '1' : '0');
       const btn = document.getElementById('notif-toggle');
@@ -1356,7 +1438,7 @@
         el.className = `calendar-day cursor-pointer ${dStr===todayStr()?'today':''} ${hasLog?'has-log':''}`;
         if(dStr === selectedDate) el.classList.add('selected');
         el.innerText = d;
-        el.onclick = () => { selectedDate = dStr; renderCalendar(); };
+        el.onclick = () => { selectedDate = dStr; renderCalendar(); showDockTemporarily(); };
         body.appendChild(el);
       }
 
@@ -1427,6 +1509,7 @@
     }
 
     function changeMonth(dir){
+      showDockTemporarily();
       currentMonth += dir;
       if(currentMonth < 0){ currentMonth = 11; currentYear--; }
       if(currentMonth > 11){ currentMonth = 0; currentYear++; }
@@ -1434,6 +1517,7 @@
     }
 
     function resetSelectedDate(){
+      showDockTemporarily();
       if(!confirm('선택한 날짜의 기록을 초기화할까요?')) return;
       const date = selectedDate;
       logs = logs.filter(l => l.date !== date);
@@ -1483,6 +1567,7 @@
 
     /* ---------- BACKUP / RESET ALL ---------- */
     function backupJSON(){
+      showDockTemporarily();
       const payload = { version: 'v11.3', exportedAt: nowISO(), logs, customSets, customReps, progressByDate };
       const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
       const a = document.createElement('a');
@@ -1494,6 +1579,7 @@
     }
 
     function resetAll(){
+      showDockTemporarily();
       if(!confirm('⚠️ 모든 데이터(기록/설정/진행)를 초기화할까요?')) return;
       localStorage.removeItem(KEY_LOGS);
       localStorage.removeItem(KEY_SETS);
@@ -1524,6 +1610,27 @@
       document.addEventListener('dblclick', (e)=> e.preventDefault(), {passive:false});
     })();
 
+    /* ✅ Dock Auto Hide Controller */
+    let dockTimer = null;
+    function showDockTemporarily(){
+      const dock = document.querySelector('.navDockWrap');
+      if(!dock) return;
+
+      dock.classList.remove('dock-hide');
+      dock.classList.add('dock-show');
+
+      if(dockTimer) clearTimeout(dockTimer);
+      dockTimer = setTimeout(()=>{
+        dock.classList.remove('dock-show');
+        dock.classList.add('dock-hide');
+      }, 1800);
+    }
+
+    /* ✅ 유저 작동 감지: 스크롤/터치/클릭 모두 포함 */
+    ['scroll','touchstart','touchmove','click'].forEach(ev=>{
+      window.addEventListener(ev, showDockTemporarily, {passive:true});
+    });
+
     /* ---------- INIT ---------- */
     window.onload = () => {
       initIntro();
@@ -1544,6 +1651,12 @@
         const s = (totalSec%60).toString().padStart(2,'0');
         document.getElementById('stopwatch').innerText = `${m}:${s}`;
       }, 1000);
+
+      // ✅ 시작 후 잠깐 보였다가 자동 숨김 (앱 느낌)
+      setTimeout(()=> {
+        const dock = document.querySelector('.navDockWrap');
+        dock && dock.classList.add('dock-hide');
+      }, 1200);
     };
 
     document.addEventListener('keydown', (e) => {
