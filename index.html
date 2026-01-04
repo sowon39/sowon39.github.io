@@ -28,10 +28,7 @@
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             transition: all 1s cubic-bezier(0.65, 0, 0.35, 1);
         }
-        .booting-sequence {
-            text-align: center;
-            width: 240px;
-        }
+        .booting-sequence { text-align: center; width: 240px; }
         .intro-logo {
             font-size: 6rem; font-weight: 900; font-style: italic; line-height: 1;
             background: linear-gradient(180deg, #fff 40%, var(--primary));
@@ -39,25 +36,14 @@
             letter-spacing: -0.08em; margin-bottom: 2rem;
             filter: drop-shadow(0 0 15px rgba(34, 211, 238, 0.3));
         }
-        .scan-line {
-            width: 100%; h: 2px; background: rgba(34, 211, 238, 0.2);
-            position: relative; overflow: hidden; height: 2px; border-radius: 2px;
-        }
-        .scan-bar {
-            position: absolute; width: 40%; height: 100%;
-            background: var(--primary); box-shadow: 0 0 10px var(--primary);
-            animation: scan 1.5s infinite ease-in-out;
-        }
-        .auth-text {
-            margin-top: 1rem; font-size: 10px; font-weight: 800; color: #444;
-            letter-spacing: 0.2em; text-transform: uppercase;
-        }
+        .scan-line { width: 100%; h: 2px; background: rgba(34, 211, 238, 0.2); position: relative; overflow: hidden; height: 2px; border-radius: 2px; }
+        .scan-bar { position: absolute; width: 40%; height: 100%; background: var(--primary); box-shadow: 0 0 10px var(--primary); animation: scan 1.5s infinite ease-in-out; }
+        .auth-text { margin-top: 1rem; font-size: 10px; font-weight: 800; color: #444; letter-spacing: 0.2em; text-transform: uppercase; }
         .auth-name { color: var(--primary); opacity: 0; animation: fadeIn 0.5s forwards 1.2s; }
-        
         @keyframes scan { 0% { left: -40%; } 100% { left: 100%; } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- 기존 UI 고정 및 개선 --- */
+        /* --- UI Components --- */
         .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .neo-card { border-radius: 28px; }
         .set-pill { 
@@ -75,9 +61,62 @@
         .has-log::after { content: ''; width: 4px; height: 4px; background: var(--primary); border-radius: 50%; position: absolute; bottom: 6px; }
         ::-webkit-scrollbar { display: none; }
         .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* --- 2026 TREND NAV STYLE --- */
+        .nav-dock {
+            background: rgba(10, 10, 12, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 32px;
+            padding: 8px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        }
+        .nav-item {
+            position: relative;
+            padding: 12px 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #666;
+        }
+        .nav-item.active {
+            color: var(--primary);
+            transform: translateY(-4px);
+        }
+        .nav-item i {
+            font-size: 1.25rem;
+            transition: all 0.3s;
+        }
+        .nav-item.active i {
+            filter: drop-shadow(0 0 8px var(--primary));
+        }
+        .nav-active-bg {
+            position: absolute;
+            bottom: 0;
+            width: 4px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--primary);
+            opacity: 0;
+            transition: all 0.3s;
+        }
+        .nav-item.active .nav-active-bg {
+            opacity: 1;
+            transform: scale(1.5);
+        }
+        .nav-item:active {
+            transform: scale(0.9);
+        }
     </style>
 </head>
-<body class="pb-36">
+<body class="pb-64">
 
     <div id="splash-screen">
         <div class="booting-sequence">
@@ -113,9 +152,7 @@
                     <h1 id="view-day" class="text-5xl font-black italic text-white uppercase tracking-tighter">DAY</h1>
                     <p id="view-title" class="text-gray-500 font-bold mt-1 text-sm tracking-wide"></p>
                 </div>
-                <div class="glass p-3 rounded-2xl">
-                    <i class="fa-solid fa-crown text-amber-400 text-xs"></i>
-                </div>
+                <div class="glass p-3 rounded-2xl"><i class="fa-solid fa-crown text-amber-400 text-xs"></i></div>
             </div>
             <div id="workout-list" class="space-y-8"></div>
         </section>
@@ -148,18 +185,28 @@
         </section>
     </main>
 
-    <div class="fixed bottom-0 left-0 right-0 p-8 z-50">
-        <nav class="max-w-lg mx-auto glass rounded-[36px] p-3.5 shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10">
-            <div id="day-nav" class="flex justify-between gap-2.5 mb-5 overflow-x-auto pb-1 scroll-hide"></div>
-            <div class="flex justify-around items-center pt-3 border-t border-white/5">
-                <button onclick="showTab('session', this)" class="tab-btn text-cyan-400 flex flex-col items-center gap-1.5">
-                    <i class="fa-solid fa-fire-glow text-xl"></i><span class="text-[9px] font-black uppercase">Core</span></button>
-                <button onclick="showTab('stats', this)" class="tab-btn text-gray-500 flex flex-col items-center gap-1.5">
-                    <i class="fa-solid fa-chart-pie text-xl"></i><span class="text-[9px] font-black uppercase">Insight</span></button>
-                <button onclick="showTab('history', this)" class="tab-btn text-gray-500 flex flex-col items-center gap-1.5">
-                    <i class="fa-solid fa-folder-open text-xl"></i><span class="text-[9px] font-black uppercase">Logs</span></button>
-            </div>
-        </nav>
+    <div class="fixed bottom-0 left-0 right-0 p-6 z-50 pointer-events-none">
+        <div class="max-w-md mx-auto pointer-events-auto">
+            <div id="day-nav" class="flex justify-center gap-2 mb-4 overflow-x-auto pb-2 scroll-hide"></div>
+            
+            <nav class="nav-dock">
+                <button onclick="showTab('session', this)" class="nav-item active">
+                    <i class="fa-solid fa-bolt-lightning"></i>
+                    <span class="text-[8px] font-bold uppercase tracking-tighter">Training</span>
+                    <div class="nav-active-bg"></div>
+                </button>
+                <button onclick="showTab('stats', this)" class="nav-item">
+                    <i class="fa-solid fa-chart-simple"></i>
+                    <span class="text-[8px] font-bold uppercase tracking-tighter">Insights</span>
+                    <div class="nav-active-bg"></div>
+                </button>
+                <button onclick="showTab('history', this)" class="nav-item">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <span class="text-[8px] font-bold uppercase tracking-tighter">Archive</span>
+                    <div class="nav-active-bg"></div>
+                </button>
+            </nav>
+        </div>
     </div>
 
     <div id="timer-modal" class="fixed inset-0 z-[100] flex items-center justify-center hidden opacity-0 transition-all duration-700">
@@ -171,7 +218,7 @@
     </div>
 
     <script>
-        // 데이터 정합성 유지
+        // ... (workoutData, logs, customSets 등 기존 데이터 로직 동일) ...
         const workoutData = {
             1: { day: "Monday", type: "push", title: "Chest & Triceps", list: [
                 { name: "체스트 딥스", set: 4, rep: 10, rest: 90, breath: "내려갈 때 흡기 / 올라올 때 호기", target: "가슴 하부", mind: "바닥을 가슴으로 밀어내기", tip: "상체 15도 숙이기", guide: "발을 대고 무게 조절 가능" },
@@ -206,23 +253,14 @@
             ]}
         };
 
-        // 데이터 키 v10 유지
         let logs = JSON.parse(localStorage.getItem('dk_os_v10_logs') || '[]');
         let customSets = JSON.parse(localStorage.getItem('dk_os_v10_sets') || '{}');
         let customReps = JSON.parse(localStorage.getItem('dk_os_v10_reps') || '{}');
         let sessionProgress = JSON.parse(localStorage.getItem('dk_os_v10_progress') || '{}');
-        
         let timerInt, totalSec = 0, currentDayIdx = new Date().getDay();
         let currentYear = 2026, currentMonth = new Date().getMonth();
         let selectedDate = new Date().toISOString().split('T')[0];
 
-        // [핵심] 이탈 방지 로직
-        window.addEventListener('beforeunload', (e) => {
-            e.preventDefault();
-            e.returnValue = ''; 
-        });
-
-        // [핵심] 프리미엄 인트로 제어
         function initIntro() {
             setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
@@ -230,14 +268,6 @@
                 splash.style.transform = 'scale(1.1)';
                 setTimeout(() => splash.style.display = 'none', 1000);
             }, 3000);
-        }
-
-        function resetWorkout(key) {
-            const [d, idx] = key.split('-').map(Number);
-            delete customSets[key]; delete customReps[key];
-            localStorage.setItem('dk_os_v10_sets', JSON.stringify(customSets));
-            localStorage.setItem('dk_os_v10_reps', JSON.stringify(customReps));
-            changeDay(d);
         }
 
         function changeDay(d) {
@@ -308,7 +338,20 @@
             updateDayNav();
         }
 
-        // ... [기존 logic (adjust, checkSet, startTimer, renderCalendar 등) v8/v9과 동일하게 유지] ...
+        function showTab(name, btn) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.getElementById(`tab-${name}`).classList.add('active');
+            
+            // 네비게이션 아이템 스타일 변경
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            if(name === 'stats') renderStats();
+            if(name === 'history') renderCalendar();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ... (나머지 로직 동일: adjust, checkSet, startTimer, updateProgress, renderCalendar, renderStats 등) ...
         function adjust(type, key, val) {
             const [d, idx] = key.split('-').map(Number);
             if(type === 'set') {
@@ -354,19 +397,10 @@
             document.getElementById('progress-bar').style.width = p + '%';
             document.getElementById('progress-percent').innerText = p + '%';
         }
-        function showTab(name, btn) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.getElementById(`tab-${name}`).classList.add('active');
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.replace('text-cyan-400', 'text-gray-500'));
-            btn.classList.replace('text-gray-500', 'text-cyan-400');
-            if(name === 'stats') renderStats();
-            if(name === 'history') renderCalendar();
-        }
         function renderCalendar() {
             document.getElementById('calendar-month').innerText = `${currentYear}.${String(currentMonth + 1).padStart(2,'0')}`;
             const first = new Date(currentYear, currentMonth, 1).getDay(), last = new Date(currentYear, currentMonth + 1, 0).getDate();
-            const body = document.getElementById('calendar-body');
-            body.innerHTML = '';
+            const body = document.getElementById('calendar-body'); body.innerHTML = '';
             for(let i=0; i<first; i++) body.innerHTML += '<div></div>';
             for(let d=1; d<=last; d++) {
                 const dStr = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
@@ -390,12 +424,11 @@
         }
         function changeMonth(dir) { currentMonth += dir; if(currentMonth < 0) { currentMonth = 11; currentYear--; } if(currentMonth > 11) { currentMonth = 0; currentYear++; } renderCalendar(); }
         function updateDayNav() {
-            const nav = document.getElementById('day-nav');
-            nav.innerHTML = '';
+            const nav = document.getElementById('day-nav'); nav.innerHTML = '';
             ['월','화','수','목','금','토','일'].forEach((d, i) => {
                 const dm = (i === 6) ? 0 : i + 1;
                 const b = document.createElement('button');
-                b.className = `w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-2xl text-[13px] font-black text-gray-500 glass transition-all ${dm === currentDayIdx ? 'day-active' : ''}`;
+                b.className = `w-11 h-11 flex-shrink-0 flex items-center justify-center rounded-2xl text-[12px] font-black text-gray-500 glass transition-all ${dm === currentDayIdx ? 'day-active' : ''}`;
                 b.innerText = d; b.onclick = () => changeDay(dm);
                 nav.appendChild(b);
             });
@@ -411,10 +444,7 @@
         }
 
         window.onload = () => {
-            initIntro();
-            updateDayNav();
-            changeDay(new Date().getDay());
-            renderCalendar();
+            initIntro(); updateDayNav(); changeDay(new Date().getDay()); renderCalendar();
             setInterval(() => { totalSec++; const m = Math.floor(totalSec/60).toString().padStart(2,'0'), s = (totalSec%60).toString().padStart(2,'0'); document.getElementById('stopwatch').innerText = `${m}:${s}`; }, 1000);
         };
     </script>
