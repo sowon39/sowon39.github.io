@@ -3,286 +3,419 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>치닝디핑 마스터</title>
+    <title>DK MASTER OS v10</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;700;900&display=swap');
-
-        :root {
-            --primary: #22d3ee;
-            --accent: #818cf8;
-            --bg: #09090b;
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800;900&display=swap');
+        :root { --primary: #22d3ee; --accent: #6366f1; --bg: #050507; }
+        
+        body { 
+            font-family: 'Pretendard', sans-serif; 
+            background-color: var(--bg); 
+            color: #e4e4e7; 
+            margin: 0; 
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at top right, #1e1b4b 0%, transparent 40%),
+                              radial-gradient(circle at bottom left, #0c4a6e 0%, transparent 40%);
         }
 
-        body {
-            font-family: 'Pretendard', -apple-system, sans-serif;
-            background-color: var(--bg);
-            color: #f4f4f5;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            background-image: radial-gradient(circle at 50% -10%, #1e1b4b 0%, var(--bg) 80%);
-            margin: 0;
+        /* --- 프리미엄 인트로 커버 --- */
+        #splash-screen {
+            position: fixed; inset: 0; z-index: 10000;
+            background: #000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: all 1s cubic-bezier(0.65, 0, 0.35, 1);
         }
-
-        /* 엑박 방지: 폰트 어썸 로딩 전까지 공간 확보 */
-        .fa, .fas, .fa-solid {
-            display: inline-block;
-            min-width: 1em;
+        .booting-sequence {
+            text-align: center;
+            width: 240px;
         }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
+        .intro-logo {
+            font-size: 6rem; font-weight: 900; font-style: italic; line-height: 1;
+            background: linear-gradient(180deg, #fff 40%, var(--primary));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            letter-spacing: -0.08em; margin-bottom: 2rem;
+            filter: drop-shadow(0 0 15px rgba(34, 211, 238, 0.3));
         }
-
-        .progress-fill {
-            transition: width 0.7s cubic-bezier(0.23, 1, 0.32, 1);
-            background: linear-gradient(90deg, var(--primary), var(--accent));
-            box-shadow: 0 0 15px rgba(34, 211, 238, 0.3);
+        .scan-line {
+            width: 100%; h: 2px; background: rgba(34, 211, 238, 0.2);
+            position: relative; overflow: hidden; height: 2px; border-radius: 2px;
         }
-
-        .set-btn {
-            width: 100%;
-            height: 54px;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            font-weight: 800;
-            color: #a1a1aa;
-            transition: all 0.2s ease;
+        .scan-bar {
+            position: absolute; width: 40%; height: 100%;
+            background: var(--primary); box-shadow: 0 0 10px var(--primary);
+            animation: scan 1.5s infinite ease-in-out;
         }
-
-        .set-btn.complete {
-            background: var(--primary);
-            color: #000;
-            border: none;
-            transform: scale(0.96);
-            box-shadow: 0 0 15px var(--primary);
+        .auth-text {
+            margin-top: 1rem; font-size: 10px; font-weight: 800; color: #444;
+            letter-spacing: 0.2em; text-transform: uppercase;
         }
+        .auth-name { color: var(--primary); opacity: 0; animation: fadeIn 0.5s forwards 1.2s; }
+        
+        @keyframes scan { 0% { left: -40%; } 100% { left: 100%; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .nav-active {
-            background: var(--primary) !important;
-            color: #000 !important;
-            font-weight: 900 !important;
+        /* --- 기존 UI 고정 및 개선 --- */
+        .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .neo-card { border-radius: 28px; }
+        .set-pill { 
+            width: 52px; height: 52px; border-radius: 18px; 
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 800; font-size: 15px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        /* 스크롤바 숨기기 */
+        .set-pill.complete { background: linear-gradient(135deg, var(--primary), var(--accent)); color: #000; border: none; box-shadow: 0 10px 20px rgba(34, 211, 238, 0.3); transform: translateY(-2px); }
+        .day-active { background: var(--primary) !important; color: #000 !important; font-weight: 800; box-shadow: 0 8px 20px rgba(34, 211, 238, 0.4); }
+        .tab-content { display: none; animation: fadeInContent 0.5s ease-out; }
+        .tab-content.active { display: block; }
+        @keyframes fadeInContent { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+        .calendar-day { aspect-ratio: 1; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 14px; position: relative; }
+        .has-log::after { content: ''; width: 4px; height: 4px; background: var(--primary); border-radius: 50%; position: absolute; bottom: 6px; }
         ::-webkit-scrollbar { display: none; }
+        .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="pb-32">
+<body class="pb-36">
 
-    <div class="fixed top-0 left-0 right-0 z-[100] bg-[#09090b]/80 backdrop-blur-md border-b border-white/5 p-5">
-        <div class="max-w-3xl mx-auto">
-            <div class="flex justify-between items-end mb-2">
-                <span class="text-[11px] font-bold text-cyan-400 tracking-tighter">오늘의 운동 달성률</span>
-                <span id="progress-percent" class="text-xl font-black text-white italic">0%</span>
-            </div>
-            <div class="w-full h-2.5 bg-white/10 rounded-full overflow-hidden">
-                <div id="progress-bar" class="progress-fill h-full w-0"></div>
-            </div>
+    <div id="splash-screen">
+        <div class="booting-sequence">
+            <div class="intro-logo">DK</div>
+            <div class="scan-line"><div class="scan-bar"></div></div>
+            <div class="auth-text">Authorized Access: <span class="auth-name">GRANTED</span></div>
+            <div class="text-[8px] text-gray-700 mt-12 font-mono uppercase tracking-[0.3em]">System v10.0.4 Loaded</div>
         </div>
     </div>
 
-    <header class="px-6 pt-28 pb-4">
-        <div class="flex justify-between items-end">
+    <header class="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5 px-6 py-5">
+        <div class="max-w-2xl mx-auto flex justify-between items-end">
             <div>
-                <h1 id="view-day" class="text-3xl font-black text-white tracking-tighter mb-1">요일 로딩...</h1>
-                <p id="view-title" class="text-cyan-400 font-bold text-sm">루틴 불러오는 중</p>
+                <h2 id="stopwatch" class="text-3xl font-black font-mono tracking-tighter text-white">00:00</h2>
+                <div class="flex items-center gap-2 mt-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                    <p class="text-[9px] font-bold text-gray-400 tracking-widest uppercase">Elite Athlete: DK</p>
+                </div>
             </div>
-            <div class="text-right">
-                <div id="stopwatch" class="text-2xl font-black font-mono text-white tracking-tighter">00:00</div>
-                <p class="text-[10px] text-gray-500 font-bold uppercase">운동 시간</p>
+            <div class="flex flex-col items-end">
+                <span id="progress-percent" class="text-[10px] font-black mb-1.5 text-cyan-400">0%</span>
+                <div class="w-28 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                    <div id="progress-bar" class="h-full bg-cyan-400 shadow-[0_0_12px_#22d3ee] transition-all duration-1000" style="width: 0%"></div>
+                </div>
             </div>
         </div>
     </header>
 
-    <main id="workout-list" class="p-5 space-y-6 md:grid md:grid-cols-2 md:gap-6 md:space-y-0">
-        </main>
+    <main class="max-w-2xl mx-auto pt-28 px-4">
+        <section id="tab-session" class="tab-content active">
+            <div class="mb-10 px-2 flex justify-between items-start">
+                <div>
+                    <h1 id="view-day" class="text-5xl font-black italic text-white uppercase tracking-tighter">DAY</h1>
+                    <p id="view-title" class="text-gray-500 font-bold mt-1 text-sm tracking-wide"></p>
+                </div>
+                <div class="glass p-3 rounded-2xl">
+                    <i class="fa-solid fa-crown text-amber-400 text-xs"></i>
+                </div>
+            </div>
+            <div id="workout-list" class="space-y-8"></div>
+        </section>
 
-    <div id="timer-modal" class="fixed inset-0 z-[200] flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
-        <div class="absolute inset-0 bg-black/90 backdrop-blur-md"></div>
+        <section id="tab-stats" class="tab-content">
+            <div class="mb-8 px-2"><h2 class="text-3xl font-black italic uppercase tracking-tight">Analytics</h2></div>
+            <div class="glass neo-card p-8 mb-6"><canvas id="radarChart" class="max-h-[320px]"></canvas></div>
+            <div class="grid grid-cols-2 gap-5">
+                <div class="glass neo-card p-6"><p class="text-[9px] text-gray-500 font-bold uppercase mb-2 tracking-widest">Total Volume</p><p id="stat-total-sets" class="text-4xl font-black text-white">0</p></div>
+                <div class="glass neo-card p-6"><p class="text-[9px] text-gray-500 font-bold uppercase mb-2 tracking-widest">Consistency</p><p id="stat-week-count" class="text-4xl font-black text-indigo-400">0</p></div>
+            </div>
+        </section>
+
+        <section id="tab-history" class="tab-content">
+            <div class="mb-8 px-2 flex justify-between items-end">
+                <h2 class="text-3xl font-black italic uppercase">Journal</h2>
+                <div class="flex items-center gap-4 glass rounded-2xl px-5 py-2.5">
+                    <button onclick="changeMonth(-1)" class="p-1 hover:text-cyan-400 transition-colors"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                    <span id="calendar-month" class="text-xs font-black w-20 text-center tracking-widest">2026.01</span>
+                    <button onclick="changeMonth(1)" class="p-1 hover:text-cyan-400 transition-colors"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                </div>
+            </div>
+            <div class="glass neo-card p-8 mb-8 shadow-2xl">
+                <div class="grid grid-cols-7 text-center text-[9px] font-black text-gray-600 mb-6 uppercase tracking-[0.2em]">
+                    <div class="text-red-800">Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div class="text-blue-800">Sat</div>
+                </div>
+                <div id="calendar-body" class="grid grid-cols-7 gap-3"></div>
+            </div>
+            <div id="history-detail" class="space-y-5"></div>
+        </section>
+    </main>
+
+    <div class="fixed bottom-0 left-0 right-0 p-8 z-50">
+        <nav class="max-w-lg mx-auto glass rounded-[36px] p-3.5 shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10">
+            <div id="day-nav" class="flex justify-between gap-2.5 mb-5 overflow-x-auto pb-1 scroll-hide"></div>
+            <div class="flex justify-around items-center pt-3 border-t border-white/5">
+                <button onclick="showTab('session', this)" class="tab-btn text-cyan-400 flex flex-col items-center gap-1.5">
+                    <i class="fa-solid fa-fire-glow text-xl"></i><span class="text-[9px] font-black uppercase">Core</span></button>
+                <button onclick="showTab('stats', this)" class="tab-btn text-gray-500 flex flex-col items-center gap-1.5">
+                    <i class="fa-solid fa-chart-pie text-xl"></i><span class="text-[9px] font-black uppercase">Insight</span></button>
+                <button onclick="showTab('history', this)" class="tab-btn text-gray-500 flex flex-col items-center gap-1.5">
+                    <i class="fa-solid fa-folder-open text-xl"></i><span class="text-[9px] font-black uppercase">Logs</span></button>
+            </div>
+        </nav>
+    </div>
+
+    <div id="timer-modal" class="fixed inset-0 z-[100] flex items-center justify-center hidden opacity-0 transition-all duration-700">
+        <div class="absolute inset-0 bg-black/95 backdrop-blur-2xl"></div>
         <div class="relative text-center">
-            <p class="text-cyan-400 text-sm font-bold tracking-[0.2em] mb-6">근육 휴식 중...</p>
-            <div id="timer-sec" class="text-9xl font-black text-white leading-none mb-12 italic tracking-tighter">00</div>
-            <button onclick="closeTimer()" class="px-12 py-4 glass-card font-bold text-red-500 text-sm uppercase">휴식 건너뛰기</button>
+            <div id="timer-sec" class="text-[14rem] font-black text-white italic tracking-tighter leading-none mb-8 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">00</div>
+            <button onclick="closeTimer()" class="glass px-14 py-5 rounded-full font-black text-white text-xs uppercase tracking-[0.3em] hover:bg-white/10 transition-all">Skip Rest</button>
         </div>
     </div>
 
-    <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-xl bg-zinc-900/90 backdrop-blur-xl rounded-[24px] p-2 flex justify-between z-50 border border-white/10 shadow-2xl">
-        <button onclick="changeDay(1)" class="day-btn w-12 h-12 flex items-center justify-center rounded-2xl text-xs font-bold transition-all text-white">월</button>
-        <button onclick="changeDay(2)" class="day-btn w-12 h-12 flex items-center justify-center rounded-2xl text-xs font-bold transition-all text-white">화</button>
-        <button onclick="changeDay(3)" class="day-btn w-12 h-12 flex items-center justify-center rounded-2xl text-xs font-bold transition-all text-white">수</button>
-        <button onclick="changeDay(4)" class="day-btn w-12 h-12 flex items-center justify-center rounded-2xl text-xs font-bold transition-all text-white">목</button>
-        <button onclick="changeDay(5)" class="day-btn w-12 h-12 flex items-center justify-center rounded-2xl text-xs font-bold transition-all text-white">금</button>
-        <button onclick="changeDay(6)" class="day-btn w-12 h-12 flex items-center justify-center rounded-2xl text-xs font-bold transition-all text-white">토</button>
-        <button onclick="changeDay(0)" class="day-btn w-12 h-12 flex items-center justify-center rounded-2xl text-xs font-bold transition-all text-red-500">일</button>
-    </nav>
-
     <script>
+        // 데이터 정합성 유지
         const workoutData = {
-            1: { day: "월요일", title: "밀기 A (가슴·삼두)", list: [
-                { name: "체스트 딥스", set: 4, rep: "8-12", rest: 90, breath: "내려갈 때 코로 흡기 / 올라올 때 입으로 호기", target: "가슴 중앙 ~ 하부 수축", mind: "가슴으로 바닥을 밀어 몸이 떠오름", tip: "상체 15도 숙여야 하부에 자극이 꽂힙니다." },
-                { name: "스탠다드 푸쉬업", set: 4, rep: "12-20", rest: 75, breath: "내릴 때 코로 들숨 / 밀 때 입으로 날숨", target: "가슴 전체 골고루", mind: "바닥을 가슴으로 눌렀다 밀기", tip: "손바닥 전체로 지면 움켜쥐기" },
-                { name: "내로우 딥스", set: 3, rep: "8-12", rest: 60, breath: "팔 펼 때 입으로 강하게 날숨", target: "삼두 전체 (팔뚝 뒷면)", mind: "삼두의 힘으로 팔을 끝까지 잠금", tip: "상체를 최대한 수직으로 세우기" }
+            1: { day: "Monday", type: "push", title: "Chest & Triceps", list: [
+                { name: "체스트 딥스", set: 4, rep: 10, rest: 90, breath: "내려갈 때 흡기 / 올라올 때 호기", target: "가슴 하부", mind: "바닥을 가슴으로 밀어내기", tip: "상체 15도 숙이기", guide: "발을 대고 무게 조절 가능" },
+                { name: "스탠다드 푸쉬업", set: 4, rep: 15, rest: 75, breath: "내릴 때 흡기 / 밀 때 호기", target: "가슴 전체", mind: "지면을 가슴으로 누르기", tip: "손바닥 전체 접지", guide: "무릎 대고 수행 가능" },
+                { name: "내로우 딥스", set: 3, rep: 10, rest: 60, breath: "팔 펼 때 호기", target: "삼두근", mind: "팔 뒷면의 힘으로 잠금", tip: "상체 수직 유지", guide: "팔꿈치를 몸에 밀착" }
             ]},
-            2: { day: "화요일", title: "당기기 A (등 두께)", list: [
-                { name: "풀업 (밴드)", set: 4, rep: "8-10", rest: 120, breath: "당길 때 입으로 천천히 호기 / 1초 정지", target: "광배 바깥쪽 (겨드랑이 아래)", mind: "팔꿈치를 바지 뒷주머니에 꽂기", tip: "숄더 패킹 유지 후 시작" },
-                { name: "인버티드 로우", set: 4, rep: "10-15", rest: 90, breath: "당길 때 입으로 날숨", target: "등 중앙 (날개뼈 사이)", mind: "날개뼈를 뒤로 모았다 천천히 이완", tip: "가슴을 바쪽으로 마중 나가기" },
-                { name: "친업 (밴드)", set: 3, rep: "8-10", rest: 90, breath: "올라갈 때 입으로 길게 날숨", target: "등 중앙 (이두 보조)", mind: "가슴을 봉 쪽으로 접어 넣기", tip: "가슴 높이 들어올려 등 상부 집중" }
+            2: { day: "Tuesday", type: "pull", title: "Back Thickness", list: [
+                { name: "풀업 (밴드)", set: 4, rep: 8, rest: 120, breath: "당길 때 호기", target: "광배 바깥", mind: "팔꿈치를 옆구리로 꽂기", tip: "숄더 패킹 필수", guide: "밴드 강도 조절" },
+                { name: "인버티드 로우", set: 4, rep: 12, rest: 90, breath: "당길 때 호기", target: "등 중앙", mind: "날개뼈를 뒤로 모으기", tip: "가슴을 바쪽으로 마중", guide: "발 위치로 난이도 조절" },
+                { name: "친업 (밴드)", set: 3, rep: 8, rest: 90, breath: "올라갈 때 호기", target: "등 & 이두", mind: "가슴을 봉에 붙이기", tip: "가슴 높이까지 올리기", guide: "언더그립 사용" }
             ]},
-            3: { day: "수요일", title: "어깨 강화 (측면)", list: [
-                { name: "사이드 레터럴 레이즈", set: 5, rep: "15-25", rest: 60, breath: "올릴 때 날숨 / 내릴 때 들숨", target: "어깨 옆면 (측면 삼각근)", mind: "팔꿈치를 양옆 멀리 던짐", tip: "날개뼈 고정하여 승모근 개입 방지" }
+            3: { day: "Wednesday", type: "push", title: "Side Shoulder", list: [
+                { name: "사이드 레이즈", set: 5, rep: 20, rest: 60, breath: "올릴 때 호기", target: "측면 삼각근", mind: "팔꿈치를 양옆으로 던짐", tip: "날개뼈 고정", guide: "저중량 고반복 권장" }
             ]},
-            4: { day: "목요일", title: "밀기 B (어깨·삼두)", list: [
-                { name: "파이크 푸쉬업", set: 4, rep: "8-12", rest: 90, breath: "밀어올릴 때 입으로 날숨", target: "어깨 전면 · 측면", mind: "어깨로 천장을 밀어 올림", tip: "엉덩이 높게 유지해야 어깨 부하 실림" },
-                { name: "디클라인 푸쉬업", set: 4, rep: "10-15", rest: 90, breath: "밀어올릴 때 입으로 날숨", target: "상부 가슴", mind: "상부 가슴으로 바닥 미는 느낌", tip: "발 위치 높을수록 난이도 상승" },
-                { name: "삼두 딥스", set: 4, rep: "6-10", rest: 90, breath: "삼두로 밀며 강하게 날숨", target: "삼두근 (팔 뒷면)", mind: "팔꿈치 접었다 삼두로 펴서 잠금", tip: "팔꿈치 벌어지지 않게 뒤로 모으기" },
-                { name: "보너스 사레레", set: 3, rep: "20", rest: 45, breath: "올릴 때 날숨", target: "측면 삼각근 상단", mind: "어깨 옆면 근육을 찢는 느낌", tip: "짧은 휴식으로 펌핑 유도" }
+            4: { day: "Thursday", type: "push", title: "Shoulder & Triceps", list: [
+                { name: "파이크 푸쉬업", set: 4, rep: 10, rest: 90, breath: "밀 때 호기", target: "전면 어깨", mind: "어깨로 천장 밀기", tip: "엉덩이 높이 유지", guide: "머리를 손보다 앞으로" },
+                { name: "디클라인 푸쉬업", set: 4, rep: 12, rest: 90, breath: "밀 때 호기", target: "상부 가슴", mind: "상부 가슴 집중", tip: "발 위치 높게", guide: "가슴 위쪽에 자극 집중" },
+                { name: "삼두 딥스", set: 4, rep: 8, rest: 90, breath: "밀 때 호기", target: "삼두근", mind: "삼두로 펴서 잠금", tip: "팔꿈치 뒤로 모으기", guide: "의자 사용 가능" }
             ]},
-            5: { day: "금요일", title: "당기기 B (등 넓이)", list: [
-                { name: "와이드 풀업 (밴드)", set: 4, rep: "6-8", rest: 120, breath: "올라가며 날숨 / 상단 1초 정지", target: "광배 옆선 (V라인)", mind: "등이 날개처럼 펼쳐짐", tip: "어깨보다 넓은 그립 사용" },
-                { name: "인버티드 로우", set: 4, rep: "10-15", rest: 90, breath: "당기며 날숨", target: "등 중앙 안정성", mind: "날개뼈 고정 후 몸 끌어오기", tip: "일정한 템포 유지" },
-                { name: "내로우 풀업 (밴드)", set: 3, rep: "8-10", rest: 90, breath: "올라갈 때 날숨", target: "등 중앙부", mind: "가슴을 봉에 붙인다는 느낌", tip: "수축 지점에서 1초 버티기" }
+            5: { day: "Friday", type: "pull", title: "Back Width", list: [
+                { name: "와이드 풀업", set: 4, rep: 6, rest: 120, breath: "올라갈 때 호기", target: "광배 외곽", mind: "등을 넓게 펼치기", tip: "넓은 그립 사용", guide: "상부 광배 자극 집중" },
+                { name: "인버티드 로우", set: 4, rep: 12, rest: 90, breath: "당길 때 호기", target: "등 안정성", mind: "몸을 일직선으로", tip: "템포 일정하게", guide: "코어 단단히 고정" },
+                { name: "내로우 풀업", set: 3, rep: 8, rest: 90, breath: "올라갈 때 호기", target: "등 중앙", mind: "봉에 가슴 터치", tip: "1초간 정지", guide: "좁은 그립 사용" }
             ]},
-            6: { day: "토요일", title: "하체 및 코어", list: [
-                { name: "맨몸 스쿼트", set: 4, rep: "15-20", rest: 60, breath: "올라올 때 날숨", target: "허벅지 전체", mind: "발바닥으로 지면 뚫고 일어나기", tip: "허리 말리지 않게 중립 유지" },
-                { name: "런지", set: 3, rep: "좌우 10", rest: 60, breath: "올라올 때 날숨", target: "엉덩이 (둔근)", mind: "앞발 뒤꿈치로 땅 밀어주기", tip: "상체 숙이면 엉덩이 자극 상승" },
-                { name: "플랭크", set: 3, rep: "60초", rest: 60, breath: "일정한 호흡 유지", target: "복부 및 코어 전체", mind: "배를 안으로 당겨 몸통 고정", tip: "엉덩이를 꽉 조여 허리 보호" }
+            6: { day: "Saturday", type: "leg", title: "Legs & Core", list: [
+                { name: "스쿼트", set: 4, rep: 20, rest: 60, breath: "올라올 때 호기", target: "허벅지/둔근", mind: "발바닥 지면 밀기", tip: "허리 중립 유지", guide: "뒤꿈치 고정" },
+                { name: "런지", set: 3, rep: 10, rest: 60, breath: "올라올 때 호기", target: "엉덩이", mind: "뒤꿈치에 힘 전달", tip: "상체 살짝 숙이기", guide: "무릎 안정성 유의" },
+                { name: "플랭크", set: 3, rep: 60, rest: 60, breath: "일정하게 유지", target: "코어", mind: "배를 안으로 당기기", tip: "엉덩이 수축", guide: "일직선 유지" }
             ]},
-            0: { day: "일요일", title: "회복과 휴식", list: [
-                { name: "전신 스트레칭", set: 1, rep: "15분", rest: 0, breath: "깊고 천천히", target: "전신 이완", mind: "근육 결대로 몸이 늘어남", tip: "어깨/광배 스트레칭 집중" },
-                { name: "복식 호흡", set: 1, rep: "5분", rest: 0, breath: "4초 흡기 / 6초 호기", target: "심신 안정", mind: "온몸에 산소 공급", tip: "눈 감고 심박수 낮추기" }
+            0: { day: "Sunday", type: "rest", title: "Active Recovery", list: [
+                { name: "스트레칭", set: 1, rep: 15, rest: 0, breath: "깊고 길게", target: "전신 이완", mind: "근육 이완 느끼기", tip: "어깨/광배 집중", guide: "충분한 수면 권장" }
             ]}
         };
 
-        let currentDaySets = 0;
-        let completedSets = 0;
-        let stopwatchInterval;
-        let totalSeconds = 0;
+        // 데이터 키 v10 유지
+        let logs = JSON.parse(localStorage.getItem('dk_os_v10_logs') || '[]');
+        let customSets = JSON.parse(localStorage.getItem('dk_os_v10_sets') || '{}');
+        let customReps = JSON.parse(localStorage.getItem('dk_os_v10_reps') || '{}');
+        let sessionProgress = JSON.parse(localStorage.getItem('dk_os_v10_progress') || '{}');
+        
+        let timerInt, totalSec = 0, currentDayIdx = new Date().getDay();
+        let currentYear = 2026, currentMonth = new Date().getMonth();
+        let selectedDate = new Date().toISOString().split('T')[0];
 
-        function updateProgress() {
-            const percent = Math.round((completedSets / currentDaySets) * 100) || 0;
-            const bar = document.getElementById('progress-bar');
-            const txt = document.getElementById('progress-percent');
-            if(bar && txt) {
-                bar.style.width = percent + '%';
-                txt.innerText = percent + '%';
-            }
+        // [핵심] 이탈 방지 로직
+        window.addEventListener('beforeunload', (e) => {
+            e.preventDefault();
+            e.returnValue = ''; 
+        });
+
+        // [핵심] 프리미엄 인트로 제어
+        function initIntro() {
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                splash.style.opacity = '0';
+                splash.style.transform = 'scale(1.1)';
+                setTimeout(() => splash.style.display = 'none', 1000);
+            }, 3000);
+        }
+
+        function resetWorkout(key) {
+            const [d, idx] = key.split('-').map(Number);
+            delete customSets[key]; delete customReps[key];
+            localStorage.setItem('dk_os_v10_sets', JSON.stringify(customSets));
+            localStorage.setItem('dk_os_v10_reps', JSON.stringify(customReps));
+            changeDay(d);
         }
 
         function changeDay(d) {
+            currentDayIdx = d;
             const data = workoutData[d];
             document.getElementById('view-day').innerText = data.day;
             document.getElementById('view-title').innerText = data.title;
-            
             const listArea = document.getElementById('workout-list');
             listArea.innerHTML = '';
             
-            currentDaySets = data.list.reduce((acc, curr) => acc + curr.set, 0);
-            completedSets = 0;
-            updateProgress();
-
             data.list.forEach((w, idx) => {
+                const key = `${d}-${idx}`;
+                const setTotal = customSets[key] || w.set;
+                const repTotal = customReps[key] || w.rep;
+                const doneSets = sessionProgress[key] || [];
+
                 const card = document.createElement('div');
-                card.className = "glass-card p-6 flex flex-col";
+                card.className = "glass neo-card p-7";
                 card.innerHTML = `
-                    <div class="mb-5 flex justify-between items-start">
-                        <h3 class="text-xl font-black text-white italic tracking-tight">${w.name}</h3>
-                        <span class="text-[10px] font-black bg-cyan-400/10 text-cyan-400 px-2 py-1 rounded-lg border border-cyan-400/20">${w.rep}</span>
+                    <div class="flex justify-between items-start mb-8">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-2xl font-black text-white italic tracking-tight">${w.name}</h3>
+                                <button onclick="resetWorkout('${key}')" class="text-gray-600 hover:text-cyan-400 p-1 transition-colors"><i class="fa-solid fa-arrow-rotate-left text-xs"></i></button>
+                            </div>
+                            <span class="inline-block mt-2 px-2.5 py-1 bg-white/5 text-gray-400 text-[9px] font-black uppercase rounded-lg tracking-widest">${w.target}</span>
+                        </div>
+                        <div class="flex flex-col gap-2.5">
+                            <div class="flex items-center gap-3 glass px-4 py-1.5 rounded-full border-white/5">
+                                <span class="text-[8px] font-black text-gray-500">SET</span>
+                                <button onclick="adjust('set','${key}',-1)" class="text-gray-400"><i class="fa-solid fa-minus text-[8px]"></i></button>
+                                <span class="text-xs font-black w-4 text-center">${setTotal}</span>
+                                <button onclick="adjust('set','${key}',1)" class="text-gray-400"><i class="fa-solid fa-plus text-[8px]"></i></button>
+                            </div>
+                            <div class="flex items-center gap-3 glass px-4 py-1.5 rounded-full border-white/5">
+                                <span class="text-[8px] font-black text-gray-500">REP</span>
+                                <button onclick="adjust('rep','${key}',-1)" class="text-gray-400"><i class="fa-solid fa-minus text-[8px]"></i></button>
+                                <span class="text-xs font-black w-4 text-center">${repTotal}</span>
+                                <button onclick="adjust('rep','${key}',1)" class="text-gray-400"><i class="fa-solid fa-plus text-[8px]"></i></button>
+                            </div>
+                        </div>
                     </div>
-
-                    <div class="grid grid-cols-2 gap-3 mb-6 text-[11px]">
-                        <div class="bg-black/40 p-3 rounded-2xl border border-white/5">
-                            <p class="text-cyan-400 font-bold mb-1"><i class="fa-solid fa-wind mr-1"></i> 호흡</p>
-                            <p class="text-gray-400 leading-snug">${w.breath}</p>
+                    <div class="grid grid-cols-2 gap-4 mb-8 text-[11px] leading-relaxed">
+                        <div class="bg-white/[0.02] p-4 rounded-2xl border border-white/5">
+                            <p class="text-[8px] font-black text-indigo-400 mb-2 uppercase tracking-widest">Breath</p>
+                            <p class="text-gray-400 font-medium">${w.breath}</p>
                         </div>
-                        <div class="bg-black/40 p-3 rounded-2xl border border-white/5">
-                            <p class="text-indigo-400 font-bold mb-1"><i class="fa-solid fa-fire mr-1"></i> 자극</p>
-                            <p class="text-gray-400 leading-snug">${w.target}</p>
+                        <div class="bg-white/[0.02] p-4 rounded-2xl border border-white/5">
+                            <p class="text-[8px] font-black text-indigo-400 mb-2 uppercase tracking-widest">Mind</p>
+                            <p class="text-gray-400 font-medium">${w.mind}</p>
                         </div>
-                        <div class="bg-black/40 p-3 rounded-2xl border border-white/5">
-                            <p class="text-emerald-400 font-bold mb-1"><i class="fa-solid fa-brain mr-1"></i> 심상</p>
-                            <p class="text-gray-400 leading-snug">${w.mind}</p>
-                        </div>
-                        <div class="bg-cyan-400/10 p-3 rounded-2xl border border-cyan-400/30">
-                            <p class="text-white font-bold mb-1 underline italic"><i class="fa-solid fa-lightbulb mr-1 text-yellow-400"></i> 꿀팁</p>
-                            <p class="text-white leading-snug font-medium">${w.tip}</p>
+                        <div class="bg-cyan-400/[0.03] p-4 rounded-2xl border border-cyan-400/10 col-span-2">
+                            <p class="text-[8px] font-black text-cyan-400 mb-1 uppercase tracking-widest">Elite Guide</p>
+                            <p class="text-gray-300 font-medium">${w.tip} · <span class="text-gray-500">${w.guide}</span></p>
                         </div>
                     </div>
-
-                    <div class="flex gap-2.5 overflow-x-auto pb-1 mt-auto">
-                        ${Array.from({length: w.set}).map((_, s) => `
-                            <button onclick="checkSet(this, ${w.rest})" class="set-btn shrink-0 flex-1 min-w-[50px]">${s+1}</button>
-                        `).join('')}
+                    <div class="flex gap-4 overflow-x-auto pb-2 scroll-hide">
+                        ${Array.from({length: setTotal}).map((_, s) => {
+                            const isDone = doneSets.includes(s+1);
+                            return `<button onclick="checkSet(this, ${w.rest}, '${w.name}', ${s+1}, '${key}', ${repTotal})" 
+                                    class="set-pill ${isDone ? 'complete' : ''}">${s+1}</button>`;
+                        }).join('')}
                     </div>
                 `;
                 listArea.appendChild(card);
             });
-
-            document.querySelectorAll('.day-btn').forEach((btn, i) => {
-                const dayMatch = (i === 6) ? 0 : i + 1;
-                if(dayMatch === d) btn.classList.add('nav-active');
-                else btn.classList.remove('nav-active');
-            });
-        }
-
-        function checkSet(btn, rest) {
-            btn.classList.toggle('complete');
-            if(btn.classList.contains('complete')) {
-                completedSets++;
-                if(rest > 0) startTimer(rest);
-            } else {
-                completedSets--;
-            }
             updateProgress();
+            updateDayNav();
         }
 
-        let timer;
+        // ... [기존 logic (adjust, checkSet, startTimer, renderCalendar 등) v8/v9과 동일하게 유지] ...
+        function adjust(type, key, val) {
+            const [d, idx] = key.split('-').map(Number);
+            if(type === 'set') {
+                const cur = customSets[key] || workoutData[d].list[idx].set;
+                customSets[key] = Math.max(1, Math.min(12, cur + val));
+                localStorage.setItem('dk_os_v10_sets', JSON.stringify(customSets));
+            } else {
+                const cur = customReps[key] || workoutData[d].list[idx].rep;
+                customReps[key] = Math.max(1, Math.min(100, cur + val));
+                localStorage.setItem('dk_os_v10_reps', JSON.stringify(customReps));
+            }
+            changeDay(d);
+        }
+        function checkSet(btn, rest, name, set, key, repCount) {
+            if(btn.classList.contains('complete')) return;
+            btn.classList.add('complete');
+            if(!sessionProgress[key]) sessionProgress[key] = [];
+            sessionProgress[key].push(set);
+            localStorage.setItem('dk_os_v10_progress', JSON.stringify(sessionProgress));
+            logs.push({ id: Date.now(), date: new Date().toISOString().split('T')[0], name, set, rep: repCount, type: workoutData[currentDayIdx].type });
+            localStorage.setItem('dk_os_v10_logs', JSON.stringify(logs));
+            updateProgress();
+            if(rest > 0) startTimer(rest);
+        }
         function startTimer(sec) {
             const modal = document.getElementById('timer-modal');
             const display = document.getElementById('timer-sec');
             modal.classList.remove('hidden');
             setTimeout(() => modal.classList.add('opacity-100'), 10);
-
-            let timeLeft = sec;
-            display.innerText = timeLeft;
-
-            clearInterval(timer);
-            timer = setInterval(() => {
-                timeLeft--;
-                display.innerText = timeLeft;
-                if(timeLeft <= 0) closeTimer();
-            }, 1000);
+            let left = sec; display.innerText = left;
+            clearInterval(timerInt);
+            timerInt = setInterval(() => { left--; display.innerText = left; if(left <= 0) closeTimer(); }, 1000);
+        }
+        function closeTimer() { clearInterval(timerInt); const modal = document.getElementById('timer-modal'); modal.classList.remove('opacity-100'); setTimeout(() => modal.classList.add('hidden'), 500); }
+        function updateProgress() {
+            let total = 0, done = 0;
+            workoutData[currentDayIdx].list.forEach((_, idx) => {
+                const key = `${currentDayIdx}-${idx}`;
+                total += customSets[key] || workoutData[currentDayIdx].list[idx].set;
+                done += (sessionProgress[key] || []).length;
+            });
+            const p = Math.round((done / total) * 100) || 0;
+            document.getElementById('progress-bar').style.width = p + '%';
+            document.getElementById('progress-percent').innerText = p + '%';
+        }
+        function showTab(name, btn) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.getElementById(`tab-${name}`).classList.add('active');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.replace('text-cyan-400', 'text-gray-500'));
+            btn.classList.replace('text-gray-500', 'text-cyan-400');
+            if(name === 'stats') renderStats();
+            if(name === 'history') renderCalendar();
+        }
+        function renderCalendar() {
+            document.getElementById('calendar-month').innerText = `${currentYear}.${String(currentMonth + 1).padStart(2,'0')}`;
+            const first = new Date(currentYear, currentMonth, 1).getDay(), last = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const body = document.getElementById('calendar-body');
+            body.innerHTML = '';
+            for(let i=0; i<first; i++) body.innerHTML += '<div></div>';
+            for(let d=1; d<=last; d++) {
+                const dStr = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                const hasLog = logs.some(l => l.date === dStr);
+                const el = document.createElement('div');
+                el.className = `calendar-day cursor-pointer glass hover:bg-white/10 ${dStr===new Date().toISOString().split('T')[0]?'today':''} ${dStr===selectedDate?'selected-day':''} ${hasLog?'has-log':''}`;
+                el.innerText = d; el.onclick = () => { selectedDate = dStr; renderCalendar(); };
+                body.appendChild(el);
+            }
+            renderHistoryDetail();
+        }
+        function renderHistoryDetail() {
+            const area = document.getElementById('history-detail');
+            const dayLogs = logs.filter(l => l.date === selectedDate);
+            area.innerHTML = `<p class="text-[10px] font-black text-gray-500 mb-4 tracking-widest uppercase px-2">${selectedDate} Report</p>`;
+            if(dayLogs.length === 0) { area.innerHTML += '<div class="glass neo-card p-12 text-center text-gray-600 italic text-xs">No Records Found</div>'; return; }
+            const groups = dayLogs.reduce((acc, o) => { if(!acc[o.name]) acc[o.name]=[]; acc[o.name].push(o); return acc; }, {});
+            for(const [name, data] of Object.entries(groups)) {
+                area.innerHTML += `<div class="glass neo-card p-6 border-l-4 border-cyan-400"><h4 class="font-black text-white italic mb-4">${name}</h4><div class="flex gap-6"><div><p class="text-[8px] text-gray-500 font-bold uppercase mb-1">Sets</p><p class="text-xl font-black">${data.length}</p></div><div><p class="text-[8px] text-gray-500 font-bold uppercase mb-1">Reps/Set</p><p class="text-xl font-black">${data[0].rep}</p></div></div></div>`;
+            }
+        }
+        function changeMonth(dir) { currentMonth += dir; if(currentMonth < 0) { currentMonth = 11; currentYear--; } if(currentMonth > 11) { currentMonth = 0; currentYear++; } renderCalendar(); }
+        function updateDayNav() {
+            const nav = document.getElementById('day-nav');
+            nav.innerHTML = '';
+            ['월','화','수','목','금','토','일'].forEach((d, i) => {
+                const dm = (i === 6) ? 0 : i + 1;
+                const b = document.createElement('button');
+                b.className = `w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-2xl text-[13px] font-black text-gray-500 glass transition-all ${dm === currentDayIdx ? 'day-active' : ''}`;
+                b.innerText = d; b.onclick = () => changeDay(dm);
+                nav.appendChild(b);
+            });
+        }
+        function renderStats() {
+            const counts = { push:0, pull:0, leg:0, rest:0 };
+            logs.forEach(l => counts[l.type] !== undefined && counts[l.type]++);
+            document.getElementById('stat-total-sets').innerText = logs.length;
+            document.getElementById('stat-week-count').innerText = new Set(logs.map(l => l.date)).size;
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            if(window.myRadar) window.myRadar.destroy();
+            window.myRadar = new Chart(ctx, { type: 'radar', data: { labels: ['PUSH', 'PULL', 'LEGS', 'REST'], datasets: [{ data: [counts.push, counts.pull, counts.leg, counts.rest], backgroundColor: 'rgba(34,211,238,0.1)', borderColor: '#22d3ee', borderWidth: 2, pointRadius: 0 }] }, options: { scales: { r: { grid: { color: 'rgba(255,255,255,0.05)' }, angleLines: { color: 'rgba(255,255,255,0.05)' }, pointLabels: { color: '#666', font: { weight: '800' } }, ticks: { display: false } } }, plugins: { legend: { display: false } } } });
         }
 
-        function closeTimer() {
-            clearInterval(timer);
-            const modal = document.getElementById('timer-modal');
-            modal.classList.remove('opacity-100');
-            setTimeout(() => modal.classList.add('hidden'), 300);
-        }
-
-        function startStopwatch() {
-            stopwatchInterval = setInterval(() => {
-                totalSeconds++;
-                const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
-                const s = (totalSeconds % 60).toString().padStart(2, '0');
-                document.getElementById('stopwatch').innerText = `${m}:${s}`;
-            }, 1000);
-        }
-
-        // 초기 실행
         window.onload = () => {
-            const currentDay = new Date().getDay();
-            changeDay(currentDay);
-            startStopwatch();
+            initIntro();
+            updateDayNav();
+            changeDay(new Date().getDay());
+            renderCalendar();
+            setInterval(() => { totalSec++; const m = Math.floor(totalSec/60).toString().padStart(2,'0'), s = (totalSec%60).toString().padStart(2,'0'); document.getElementById('stopwatch').innerText = `${m}:${s}`; }, 1000);
         };
     </script>
 </body>
