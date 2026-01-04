@@ -131,7 +131,7 @@
       padding: 0 22px 18px;
       margin: 0 -22px;
 
-      /* ✅ 세로 스크롤과 충돌 최소화 + 가로 드래그 확실히 */
+      /* ✅ iPad 스크롤 충돌 최소화 + 가로 드래그 확실히 */
       touch-action: pan-x pan-y;
     }
     .carousel::before,.carousel::after{ content:''; flex:0 0 22px; }
@@ -206,7 +206,7 @@
     .setBtn:active{ transform:scale(0.985); }
     .setBtn.done{ background:linear-gradient(135deg,var(--primary),var(--accent)); color:#000; box-shadow:0 18px 34px rgba(34,211,238,0.24); border:none; }
 
-    /* ✅ 세트 순서 잠금(UX 유지) */
+    /* ✅ 세트 순서 잠금 */
     .setBtn.locked{
       opacity: .35;
       filter: saturate(.6);
@@ -574,7 +574,9 @@
     /* =========================================================
       DK MASTER OS v11.3 (Stable+ ScrollFix)
       ✅ 로직/기능 유지
-      ✅ 실제 휴식시간(restUsed) 기록 추가 (UI/UX/로직 변경 없음)
+      ✅ 실제 휴식시간(restUsed) 기록
+      ✅ 세트 순서 클릭
+      ✅ iPad/iOS 사운드 Unlock 적용
     ========================================================= */
 
     /* ---------- DATA ---------- */
@@ -640,9 +642,22 @@
     let currentSlideIndex = 0;
     let restNotifEnabled = (localStorage.getItem(KEY_NOTIF) ?? '1') === '1';
 
-    /* ✅ [추가] 실제 휴식 기록용 상태 */
+    /* ✅ 실제 휴식 기록용 */
     let restStartedAt = null;
     let restCurrentLogKey = null;
+
+    /* ✅ iOS/iPadOS 오디오 unlock용 */
+    let audioCtx = null;
+    function unlockAudio(){
+      try{
+        if(!audioCtx){
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if(audioCtx.state === 'suspended'){
+          audioCtx.resume();
+        }
+      }catch(e){}
+    }
 
     /* ---------- UTILS ---------- */
     function haptic(ms=18){ if(navigator.vibrate) navigator.vibrate(ms); }
@@ -1010,6 +1025,8 @@
     }
 
     function toggleSetComplete(date, exerciseId, setIndex){
+      unlockAudio(); // ✅ iPad/iOS 사운드 unlock (사용자 제스처 시점)
+
       const [dayIdx, exIdx] = exerciseId.split('-').map(Number);
       const w = workoutData[dayIdx]?.list?.[exIdx];
       if(!w) return;
@@ -1047,13 +1064,12 @@
             repActual: null,
             rpe: null,
             restPlanned: w.rest,
-            restUsed: w.rest, // ✅ 기본값(실제 휴식 후 업데이트됨)
+            restUsed: w.rest, // 기본값 → 실제 휴식 후 업데이트됨
             type: workoutData[currentDayIdx].type
           });
           localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
         }
 
-        // ✅ [수정] 타이머 시작 시 logKey 전달 → 실제 휴식시간 기록 가능
         if(w.rest > 0) startTimer(w.rest, logKey);
 
         if(setNo === setTotal){
@@ -1167,12 +1183,10 @@
       bar.style.width = pct + '%';
     }
 
-    /* ✅ [수정] startTimer(sec, logKey) */
     function startTimer(sec, logKey=null){
       restRemaining = sec;
       restTotal = sec;
 
-      // ✅ 실제 휴식 기록용
       restStartedAt = Date.now();
       restCurrentLogKey = logKey;
 
@@ -1229,7 +1243,7 @@
 
       showHUD(false);
 
-      /* ✅ [추가] 실제 휴식시간 계산 + 해당 세트 로그(restUsed) 업데이트 */
+      // ✅ 실제 휴식시간 기록
       if(restStartedAt && restCurrentLogKey){
         const used = clamp(Math.round((Date.now() - restStartedAt) / 1000), 0, restTotal);
         const idx = logs.findIndex(l => l.logKey === restCurrentLogKey);
@@ -1248,17 +1262,32 @@
     }
 
     function restDoneNotify(){
+      // ✅ 진동 (iPad는 대부분 미지원)
       try{ if(navigator.vibrate) navigator.vibrate([90,60,180]); }catch(e){}
+
+      // ✅ 소리 (iOS/iPadOS: unlock 필요)
       try{
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.type = 'sine'; o.frequency.value = 880;
-        g.gain.setValueAtTime(0.0001, ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.06, ctx.currentTime + 0.02);
-        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.14);
-        o.start(); o.stop(ctx.currentTime + 0.16);
+        if(!audioCtx){
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if(audioCtx.state === 'suspended'){
+          audioCtx.resume();
+        }
+
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.connect(g);
+        g.connect(audioCtx.destination);
+
+        o.type = 'sine';
+        o.frequency.value = 880;
+
+        g.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.08, audioCtx.currentTime + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.18);
+
+        o.start();
+        o.stop(audioCtx.currentTime + 0.20);
       }catch(e){}
     }
 
