@@ -2,8 +2,8 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>DK MASTER OS v10.3 PRO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>DK MASTER OS v11.2</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -11,13 +11,17 @@
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800;900&display=swap');
+
     :root{
       --primary:#22d3ee;
       --accent:#6366f1;
       --bg:#050507;
-      --panel:rgba(255,255,255,0.03);
-      --border:rgba(255,255,255,0.08);
+      --ring:rgba(34,211,238,0.65);
+      --card:rgba(255,255,255,0.04);
+      --card2:rgba(255,255,255,0.06);
     }
+
+    html,body{ height:100%; }
 
     body{
       font-family:'Pretendard',sans-serif;
@@ -25,135 +29,221 @@
       color:#e4e4e7;
       margin:0;
       overflow-x:hidden;
+      padding-bottom: env(safe-area-inset-bottom);
+
+      /* ✅ 자연스러운 배경(끊김/밴딩 완화) */
       background-image:
-        radial-gradient(circle at top right,#1e1b4b 0%,transparent 40%),
-        radial-gradient(circle at bottom left,#0c4a6e 0%,transparent 40%);
+        radial-gradient(1200px 700px at 15% -10%, rgba(34,211,238,0.18), transparent 55%),
+        radial-gradient(1200px 700px at 100% 10%, rgba(99,102,241,0.22), transparent 55%),
+        radial-gradient(900px 600px at 15% 110%, rgba(12,74,110,0.25), transparent 55%),
+        linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.00));
+      background-attachment: fixed;
     }
 
     ::-webkit-scrollbar{ display:none; }
     .scroll-hide{ -ms-overflow-style:none; scrollbar-width:none; }
 
     .glass{
-      background:rgba(255,255,255,0.02);
-      backdrop-filter: blur(22px);
-      -webkit-backdrop-filter: blur(22px);
-      border: 1px solid rgba(255,255,255,0.08);
+      background:var(--card);
+      backdrop-filter:blur(22px);
+      -webkit-backdrop-filter:blur(22px);
+      border:1px solid rgba(255,255,255,0.10);
     }
 
-    .neo{
-      border-radius: 28px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    }
-
-    /* FULLSCREEN 느낌 레이아웃 (태블릿/PC에서 가운데만 뜨는 문제 해결) */
-    .wrap{
-      width: 100%;
-      max-width: 1400px; /* 큰 화면에서 너무 퍼지지 않게 */
-      margin: 0 auto;
-      padding: 0 18px;
-    }
-    @media (min-width: 1024px){
-      .wrap{ padding: 0 40px; }
-    }
-
-    /* 스플래시 */
+    /* Splash */
     #splash-screen{
       position:fixed; inset:0; z-index:10000;
       background:#000;
       display:flex; flex-direction:column; align-items:center; justify-content:center;
-      transition: all 1s cubic-bezier(0.65,0,0.35,1);
+      transition:all 1s cubic-bezier(0.65,0,0.35,1);
     }
+    .booting-sequence{ text-align:center; width:240px;}
     .intro-logo{
       font-size:6rem; font-weight:900; font-style:italic; line-height:1;
       background:linear-gradient(180deg,#fff 40%,var(--primary));
       -webkit-background-clip:text; -webkit-text-fill-color:transparent;
       letter-spacing:-0.08em; margin-bottom:2rem;
-      filter: drop-shadow(0 0 15px rgba(34,211,238,0.3));
+      filter:drop-shadow(0 0 15px rgba(34,211,238,0.3));
     }
     .scan-line{
-      width:240px; height:2px; border-radius:2px;
+      width:100%; height:2px; border-radius:2px;
       background:rgba(34,211,238,0.2);
       position:relative; overflow:hidden;
     }
     .scan-bar{
       position:absolute; width:40%; height:100%;
-      background:var(--primary); box-shadow:0 0 10px var(--primary);
-      animation: scan 1.5s infinite ease-in-out;
+      background:var(--primary);
+      box-shadow:0 0 10px var(--primary);
+      animation:scan 1.5s infinite ease-in-out;
     }
+    .auth-text{ margin-top:1rem; font-size:10px; font-weight:800; color:#444; letter-spacing:0.2em; text-transform:uppercase;}
+    .auth-name{ color:var(--primary); opacity:0; animation:fadeIn 0.5s forwards 1.2s;}
     @keyframes scan{0%{left:-40%;}100%{left:100%;}}
-    .auth-text{
-      margin-top:1rem;
-      font-size:10px; font-weight:900;
-      color:#444;
-      letter-spacing:0.2em;
-      text-transform:uppercase;
-    }
-    .auth-name{ color:var(--primary); opacity:0; animation: fadeIn .5s forwards 1.2s; }
-    @keyframes fadeIn{ from{opacity:0;} to{opacity:1;} }
+    @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
 
-    /* 상단 헤더 */
+    /* Header */
     header{
-      position: fixed;
-      top:0; left:0; right:0;
-      z-index: 50;
+      position:fixed; top:0; left:0; right:0; z-index:50;
+      padding: 18px 18px 14px;
+      border-bottom:1px solid rgba(255,255,255,0.06);
+      backdrop-filter: blur(18px);
+      background: rgba(10,10,12,0.62);
     }
 
-    /* 세트 버튼 */
-    .set-pill{
-      width: 56px; height: 56px;
-      border-radius: 18px;
+    .tab-content{ display:none; animation:fadeInContent 0.45s ease-out; }
+    .tab-content.active{ display:block; }
+    @keyframes fadeInContent{ from{opacity:0; transform:translateY(6px) scale(0.985);} to{opacity:1; transform:translateY(0) scale(1);} }
+
+    /* Pills */
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,0.10);
+      background:rgba(255,255,255,0.04);
+      font-size:11px;
+      font-weight:900;
+      color:rgba(255,255,255,0.82);
+      white-space:nowrap;
+    }
+    .pill.cyan{
+      border-color:rgba(34,211,238,0.25);
+      background:rgba(34,211,238,0.10);
+      color:rgba(34,211,238,0.95);
+    }
+
+    /* ✅ Session Carousel (전체화면 + 옆 미리보기) */
+    .carousel{
+      display:flex;
+      gap:18px;
+      overflow-x:auto;
+      scroll-snap-type:x mandatory;
+      -webkit-overflow-scrolling:touch;
+      padding: 0 10px 16px;
+      margin: 0 -10px;
+    }
+    .carousel > .slide{
+      scroll-snap-align:center;
+      flex: 0 0 calc(100% - 56px);
+      min-height: calc(100dvh - 270px);
+    }
+    @media (min-width: 860px){
+      .carousel{ padding:0 0 16px; margin:0; }
+      .carousel > .slide{ flex:0 0 100%; min-height: auto; }
+    }
+
+    .slideCard{
+      height: 100%;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      border-radius:32px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.55);
+    }
+
+    .setBtn{
+      width:100%;
+      height:66px;
+      border-radius:20px;
+      font-weight:950;
+      font-size:18px;
       display:flex;
       align-items:center;
       justify-content:center;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.10);
-      font-weight: 900;
-      font-size: 16px;
-      transition: all .2s cubic-bezier(0.4,0,0.2,1);
-      flex: 0 0 auto;
-      -webkit-tap-highlight-color: transparent;
+      gap:10px;
+      transition: transform .12s ease;
+      -webkit-tap-highlight-color:transparent;
+      background:rgba(255,255,255,0.05);
+      border:1px solid rgba(255,255,255,0.10);
     }
-    .set-pill.complete{
-      background: linear-gradient(135deg,var(--primary),var(--accent));
+    .setBtn:active{ transform:scale(0.985); }
+    .setBtn.done{
+      background:linear-gradient(135deg,var(--primary),var(--accent));
       color:#000;
-      border: none;
-      box-shadow: 0 10px 25px rgba(34,211,238,0.25);
-      transform: translateY(-2px);
-    }
-    .set-pill:active{ transform: scale(.98); }
-
-    /* 카루셀 */
-    .carousel{
-      display:flex;
-      gap: 18px;
-      overflow-x:auto;
-      scroll-snap-type:x mandatory;
-      padding-bottom:14px;
-      -webkit-overflow-scrolling: touch;
-    }
-    .slide{
-      scroll-snap-align:start;
-      flex: 0 0 100%;
-    }
-    @media (min-width: 1024px){
-      .slide{ flex: 0 0 48%; } /* 태블릿/PC에선 2장씩 보이게 = 풀화면 느낌 */
-    }
-    @media (min-width: 1280px){
-      .slide{ flex: 0 0 33.333%; } /* 더 큰 화면에선 3장씩 = 대시보드 느낌 */
+      box-shadow:0 18px 34px rgba(34,211,238,0.24);
+      border:none;
     }
 
-    /* 하단 탭 */
-    .nav-dock{
-      background: rgba(10,10,12,0.82);
-      border: 1px solid rgba(255,255,255,0.10);
-      backdrop-filter: blur(20px);
-      border-radius: 32px;
-      padding: 10px;
+    /* ✅ 오른쪽 패널(버튼/세팅 크게) */
+    .rightPanel{
+      border-radius:26px;
+      padding:18px;
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.08);
+    }
+
+    .stepper{
       display:flex;
-      justify-content: space-around;
+      gap:10px;
       align-items:center;
-      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7);
+      justify-content:space-between;
+      padding:14px 14px;
+      border-radius:22px;
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.10);
     }
+    .stepperLabel{
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      color:rgba(255,255,255,0.50);
+    }
+    .stepperValue{ font-size:22px; font-weight:950; color:white; }
+    .stepperBtn{
+      width:48px; height:48px;
+      border-radius:18px;
+      display:flex; align-items:center; justify-content:center;
+      font-weight:900;
+      background:rgba(255,255,255,0.05);
+      border:1px solid rgba(255,255,255,0.12);
+      color:rgba(255,255,255,0.9);
+      -webkit-tap-highlight-color:transparent;
+    }
+    .stepperBtn:active{ transform:scale(.98); }
+
+    .bigBtn{
+      width:100%;
+      height:60px;
+      border-radius:20px;
+      font-weight:900;
+      letter-spacing:-0.02em;
+      font-size:15px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      transition: transform .12s ease;
+      -webkit-tap-highlight-color:transparent;
+      user-select:none;
+      background:rgba(255,255,255,0.05);
+      border:1px solid rgba(255,255,255,0.10);
+    }
+    .bigBtn:active{ transform:scale(0.985); }
+
+    /* Bottom dock */
+    .navDockWrap{
+      position:fixed; left:0; right:0; bottom:0;
+      padding: 18px;
+      z-index:60;
+      pointer-events:none;
+    }
+    .navDockWrap > div{ pointer-events:auto; }
+
+    .nav-dock{
+      background:rgba(10,10,12,0.82);
+      border:1px solid rgba(255,255,255,0.1);
+      backdrop-filter:blur(20px);
+      border-radius:30px;
+      padding:8px;
+      display:flex;
+      justify-content:space-around;
+      align-items:center;
+      box-shadow:0 25px 50px -12px rgba(0,0,0,0.7);
+    }
+
     .nav-item{
       position:relative;
       padding:12px 0;
@@ -161,122 +251,133 @@
       display:flex;
       flex-direction:column;
       align-items:center;
-      gap:4px;
-      transition: all .25s cubic-bezier(0.4,0,0.2,1);
-      color:#666;
-      -webkit-tap-highlight-color: transparent;
+      gap:5px;
+      transition:all 0.25s cubic-bezier(0.4,0,0.2,1);
+      color:#777;
+      -webkit-tap-highlight-color:transparent;
     }
-    .nav-item.active{
-      color: var(--primary);
-      transform: translateY(-4px);
-    }
-    .nav-item i{ font-size: 1.28rem; }
-    .nav-item.active i{ filter: drop-shadow(0 0 8px var(--primary)); }
-    .nav-active-dot{
-      position:absolute; bottom:0;
-      width:5px; height:5px;
-      background: var(--primary);
-      border-radius:50%;
-      opacity:0;
-      transition: all .25s;
-      box-shadow: 0 0 10px var(--primary);
-    }
-    .nav-item.active .nav-active-dot{ opacity:1; transform: scale(1.4); }
+    .nav-item.active{ color:var(--primary); transform:translateY(-4px); }
+    .nav-item i{ font-size:1.25rem; transition:all 0.25s; }
+    .nav-item.active i{ filter:drop-shadow(0 0 10px var(--primary)); }
 
-    /* 캘린더 UI */
+    .nav-active-dot{
+      position:absolute; bottom:1px;
+      width:4px; height:4px;
+      background:var(--primary);
+      border-radius:50%;
+      box-shadow:0 0 12px var(--primary);
+      opacity:0;
+      transition:all 0.25s;
+    }
+    .nav-item.active .nav-active-dot{ opacity:1; transform:scale(1.6); }
+
+    /* Day quick nav (auto show/hide) */
+    #day-nav-wrap{ transition: all .35s ease; }
+    #day-nav-wrap.hide{ transform:translateY(18px); opacity:0; pointer-events:none; }
+    .day-chip{
+      width:44px; height:44px;
+      border-radius:18px;
+      display:flex; align-items:center; justify-content:center;
+      font-weight:900;
+      font-size:12px;
+      color:rgba(255,255,255,0.55);
+      border:1px solid rgba(255,255,255,0.10);
+      background:rgba(255,255,255,0.04);
+      flex:0 0 auto;
+    }
+    .day-chip.active{
+      background:var(--primary);
+      color:#000;
+      border-color:rgba(34,211,238,0.25);
+      box-shadow:0 10px 24px rgba(34,211,238,0.25);
+    }
+
+    /* Timer Modal */
+    #timer-modal{ transition:all .65s ease; }
+    #timer-sec{ letter-spacing:-0.08em; }
+
+    /* PRO INPUT MODAL */
+    #pro-modal.hidden{ display:none; }
+    #pro-modal .panel{ width:min(420px, calc(100vw - 44px)); border-radius:28px; }
+
+    .chipBtn{
+      padding:10px 14px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,0.10);
+      background:rgba(255,255,255,0.04);
+      font-weight:900;
+      font-size:12px;
+      color:rgba(255,255,255,0.92);
+      transition:all .2s;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .chipBtn.active{
+      background:rgba(34,211,238,0.15);
+      border-color:rgba(34,211,238,0.35);
+      box-shadow:0 10px 30px rgba(34,211,238,0.12);
+      color:var(--primary);
+    }
+    .chipBtn:active{ transform:scale(.98); }
+
+    .miniHint{ font-size:10px; color:rgba(255,255,255,0.45); font-weight:900; letter-spacing:.14em; text-transform:uppercase; }
+
+    /* Calendar */
     .calendar-day{
       aspect-ratio:1;
-      border-radius: 16px;
+      border-radius:16px;
       display:flex;
       align-items:center;
       justify-content:center;
-      font-size: 14px;
-      font-weight: 900;
+      font-size:13px;
       position:relative;
-      transition: all .2s;
-      border: 1px solid rgba(255,255,255,0.06);
-      background: rgba(255,255,255,0.02);
-      cursor:pointer;
-      user-select:none;
+      transition:all .18s;
+      font-weight:800;
+      color:rgba(255,255,255,0.75);
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.06);
     }
-    .calendar-day:hover{
-      background: rgba(255,255,255,0.06);
-      border-color: rgba(255,255,255,0.10);
-    }
-    .calendar-day.has-log::after{
+    .calendar-day:hover{ background:rgba(255,255,255,0.07); }
+    .has-log::after{
       content:'';
-      width: 6px; height: 6px;
-      background: rgba(34,211,238,0.85);
-      border-radius: 50%;
+      width:6px; height:6px;
+      background:rgba(34,211,238,0.90);
+      border-radius:50%;
       position:absolute;
-      bottom: 6px;
-    }
-    .calendar-day.today{
-      outline: 2px solid rgba(255,255,255,0.10);
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+      bottom:8px;
+      box-shadow:0 0 12px rgba(34,211,238,0.35);
     }
     .calendar-day.selected{
-      background: rgba(34,211,238,0.12);
-      border-color: rgba(34,211,238,0.35);
-      box-shadow: 0 0 0 2px rgba(34,211,238,0.18), 0 0 30px rgba(34,211,238,0.12);
-      transform: translateY(-2px);
+      background:rgba(34,211,238,0.14);
+      border:1px solid rgba(34,211,238,0.35);
+      box-shadow:0 0 0 2px rgba(34,211,238,0.18), 0 0 30px rgba(34,211,238,0.12);
+      color:#eaffff;
+      font-weight:900;
+      transform:translateY(-2px);
     }
-    .calendar-day.selected.has-log::after{
-      background:#fff;
-      box-shadow: 0 0 12px rgba(255,255,255,0.4);
-    }
-
-    /* 모달 공통 */
-    .modal-hidden{ display:none; }
-    .modal-bg{
-      position:fixed; inset:0;
-      background: rgba(0,0,0,0.88);
-      backdrop-filter: blur(18px);
-      z-index: 100;
-    }
-    .modal-panel{
-      position:fixed;
-      left:50%; top:50%;
-      transform: translate(-50%, -50%);
-      width: min(520px, calc(100vw - 44px));
-      z-index: 110;
-      border-radius: 28px;
-      padding: 18px;
+    .calendar-day.today{
+      border:1px solid rgba(255,255,255,0.12);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+      color:rgba(255,255,255,0.95);
+      font-weight:900;
     }
 
-    /* 타이머 */
-    #timer-sec{ letter-spacing:-0.08em; }
-
-    /* 작은 배지 */
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      padding:6px 10px;
-      border-radius:999px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(255,255,255,0.04);
-      font-size: 11px;
-      font-weight: 900;
-      color: rgba(255,255,255,0.80);
-      white-space: nowrap;
+    /* History table */
+    .log-table{ width:100%; border-collapse:separate; border-spacing:0 10px; }
+    .log-table th{
+      font-size:10px;
+      text-transform:uppercase;
+      letter-spacing:.18em;
+      color:rgba(255,255,255,0.35);
+      font-weight:900;
+      text-align:left;
+      padding:0 10px 6px;
     }
-    .pill.cyan{
-      border-color: rgba(34,211,238,0.25);
-      background: rgba(34,211,238,0.12);
-      color: rgba(34,211,238,0.95);
-    }
+    .log-row{ background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:16px; overflow:hidden; }
+    .log-row td{ padding:12px 10px; font-weight:800; font-size:12px; color:rgba(255,255,255,0.78); }
 
-    .hint{
-      font-size: 10px;
-      font-weight: 900;
-      letter-spacing: .18em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.35);
-    }
-
-    /* 요일 네비게이션 (기본 숨김) */
-    #day-drawer{ transition: all .35s ease; }
+    /* Toast */
+    #toast{ position:fixed; left:50%; bottom:115px; transform:translateX(-50%); z-index:250; opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; }
+    #toast.show{ opacity:1; transform:translateX(-50%) translateY(-6px); }
   </style>
 </head>
 
@@ -284,543 +385,377 @@
 
   <!-- Splash -->
   <div id="splash-screen">
-    <div class="flex flex-col items-center">
+    <div class="booting-sequence">
       <div class="intro-logo">DK</div>
       <div class="scan-line"><div class="scan-bar"></div></div>
       <div class="auth-text">Authorized Access: <span class="auth-name">GRANTED</span></div>
-      <div class="text-[9px] text-gray-700 mt-12 font-mono uppercase tracking-[0.3em]">System v10.3 PRO Loaded</div>
+      <div class="text-[8px] text-gray-700 mt-12 font-mono uppercase tracking-[0.3em]">System v11.2 Loaded</div>
     </div>
   </div>
 
   <!-- Header -->
-  <header class="glass border-b border-white/5">
-    <div class="wrap py-5 flex items-end justify-between gap-6">
-      <div class="min-w-0">
-        <div class="flex items-center gap-4">
-          <h2 id="stopwatch" class="text-3xl lg:text-4xl font-black font-mono tracking-tighter text-white">00:00</h2>
-          <span class="pill cyan" id="today-badge">오늘</span>
-        </div>
+  <header>
+    <div class="max-w-2xl mx-auto flex justify-between items-end">
+      <div>
+        <h2 id="stopwatch" class="text-3xl font-black font-mono tracking-tighter text-white">00:00</h2>
         <div class="flex items-center gap-2 mt-1">
           <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-          <p class="text-[10px] font-black text-gray-400 tracking-widest uppercase">
-            나만의 루틴 시스템 · DK MASTER
-          </p>
+          <p class="text-[9px] font-black text-gray-300 tracking-widest uppercase">엘리트 모드 · DK</p>
         </div>
       </div>
-
-      <div class="flex items-end gap-3 flex-shrink-0">
-        <button onclick="toggleDayDrawer(true)" class="glass px-4 py-3 rounded-2xl text-white/70 hover:text-cyan-300 transition font-black text-xs tracking-[0.2em] uppercase">
-          요일
-        </button>
-        <button onclick="openResetModal()" class="glass px-4 py-3 rounded-2xl text-white/60 hover:text-red-300 transition font-black text-xs tracking-[0.2em] uppercase">
-          초기화
-        </button>
-
-        <div class="flex flex-col items-end">
-          <span id="progress-percent" class="text-[10px] font-black mb-1.5 text-cyan-400">0%</span>
-          <div class="w-28 h-1.5 bg-white/5 rounded-full overflow-hidden">
-            <div id="progress-bar" class="h-full bg-cyan-400 shadow-[0_0_12px_#22d3ee] transition-all duration-700" style="width:0%"></div>
-          </div>
+      <div class="flex flex-col items-end">
+        <span id="progress-percent" class="text-[10px] font-black mb-1.5 text-cyan-300">0%</span>
+        <div class="w-28 h-1.5 bg-white/5 rounded-full overflow-hidden">
+          <div id="progress-bar" class="h-full bg-cyan-400 shadow-[0_0_12px_#22d3ee] transition-all duration-700" style="width:0%"></div>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- 요일 드로어 (필요할 때만) -->
-  <div id="day-drawer" class="modal-hidden">
-    <div class="modal-bg" onclick="toggleDayDrawer(false)"></div>
-    <div class="modal-panel glass">
-      <div class="flex items-start justify-between px-2 pt-2">
+  <!-- Main -->
+  <main class="max-w-2xl mx-auto pt-28 px-4">
+
+    <!-- Session -->
+    <section id="tab-session" class="tab-content active">
+      <div class="mb-6 px-2 flex justify-between items-start">
         <div>
-          <p class="text-xl font-black italic text-white">요일 선택</p>
-          <p class="hint mt-1">필요할 때만 열어 사용하세요</p>
+          <h1 id="view-day" class="text-5xl font-black italic text-white uppercase tracking-tighter">DAY</h1>
+          <p id="view-title" class="text-gray-300 font-black mt-1 text-sm tracking-wide"></p>
+          <p id="view-subcue" class="text-[10px] font-black text-white/50 mt-2 tracking-[0.18em] uppercase"></p>
         </div>
-        <button onclick="toggleDayDrawer(false)" class="text-white/40 hover:text-cyan-300 transition">
-          <i class="fa-solid fa-xmark text-xl"></i>
+        <button onclick="resetToday()" class="pill" title="오늘 기록 초기화">
+          <i class="fa-solid fa-rotate-left"></i> 오늘 초기화
         </button>
       </div>
 
-      <div class="grid grid-cols-7 gap-3 mt-6 px-2 pb-2">
-        <button class="glass rounded-2xl py-4 font-black text-white/70" onclick="changeDay(1); toggleDayDrawer(false)">월</button>
-        <button class="glass rounded-2xl py-4 font-black text-white/70" onclick="changeDay(2); toggleDayDrawer(false)">화</button>
-        <button class="glass rounded-2xl py-4 font-black text-white/70" onclick="changeDay(3); toggleDayDrawer(false)">수</button>
-        <button class="glass rounded-2xl py-4 font-black text-white/70" onclick="changeDay(4); toggleDayDrawer(false)">목</button>
-        <button class="glass rounded-2xl py-4 font-black text-white/70" onclick="changeDay(5); toggleDayDrawer(false)">금</button>
-        <button class="glass rounded-2xl py-4 font-black text-white/70" onclick="changeDay(6); toggleDayDrawer(false)">토</button>
-        <button class="glass rounded-2xl py-4 font-black text-white/70" onclick="changeDay(0); toggleDayDrawer(false)">일</button>
+      <div class="flex items-center justify-between px-2 mb-4">
+        <div class="flex items-center gap-2">
+          <span class="pill cyan" id="slide-indicator">1 / 1</span>
+          <span class="pill" id="slide-name">운동</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="carouselPrev()" class="pill"><i class="fa-solid fa-chevron-left"></i></button>
+          <button onclick="carouselNext()" class="pill"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Main -->
-  <main class="pt-28">
-    <div class="wrap">
+      <div id="session-carousel" class="carousel scroll-hide"></div>
+    </section>
 
-      <!-- 탭: 훈련 -->
-      <section id="tab-session" class="tab-content active">
-        <div class="flex items-start justify-between gap-6 mt-6 mb-6">
-          <div class="min-w-0">
-            <h1 id="view-day" class="text-5xl lg:text-6xl font-black italic text-white tracking-tighter">DAY</h1>
-            <p id="view-title" class="text-gray-500 font-black mt-1 text-sm lg:text-base tracking-wide"></p>
-            <p id="view-subcue" class="hint mt-3"></p>
-          </div>
-          <div class="glass p-3 rounded-2xl"><i class="fa-solid fa-crown text-amber-400 text-sm"></i></div>
+    <!-- Stats -->
+    <section id="tab-stats" class="tab-content">
+      <div class="mb-8 px-2"><h2 class="text-3xl font-black italic uppercase tracking-tight">분석</h2></div>
+      <div class="glass rounded-[28px] p-8 mb-6"><canvas id="radarChart" class="max-h-[320px]"></canvas></div>
+      <div class="grid grid-cols-2 gap-5">
+        <div class="glass rounded-[28px] p-6">
+          <p class="text-[9px] text-gray-400 font-black uppercase mb-2 tracking-widest">총 기록(세트)</p>
+          <p id="stat-total-sets" class="text-4xl font-black text-white">0</p>
         </div>
-
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center gap-2 flex-wrap">
-            <span class="pill cyan" id="slide-indicator">1 / 1</span>
-            <span class="pill" id="slide-name">운동</span>
-            <span class="pill" id="session-date-pill">날짜</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <button onclick="carouselPrev()" class="glass w-12 h-12 rounded-2xl flex items-center justify-center text-white/70 hover:text-cyan-300 transition">
-              <i class="fa-solid fa-chevron-left"></i>
-            </button>
-            <button onclick="carouselNext()" class="glass w-12 h-12 rounded-2xl flex items-center justify-center text-white/70 hover:text-cyan-300 transition">
-              <i class="fa-solid fa-chevron-right"></i>
-            </button>
-          </div>
+        <div class="glass rounded-[28px] p-6">
+          <p class="text-[9px] text-gray-400 font-black uppercase mb-2 tracking-widest">활동 일수</p>
+          <p id="stat-week-count" class="text-4xl font-black text-indigo-300">0</p>
         </div>
+      </div>
 
-        <div id="workout-carousel" class="carousel scroll-hide"></div>
-      </section>
+      <div class="mt-6 grid gap-3">
+        <button onclick="backupJSON()" class="bigBtn"><i class="fa-solid fa-download"></i> 백업(JSON)</button>
+        <button onclick="resetAll()" class="bigBtn" style="border-color: rgba(255,255,255,0.18);"><i class="fa-solid fa-triangle-exclamation"></i> 전체 초기화</button>
+      </div>
+    </section>
 
-      <!-- 탭: 통계 -->
-      <section id="tab-stats" class="tab-content">
-        <div class="mt-8 mb-6">
-          <h2 class="text-3xl font-black italic tracking-tight">통계</h2>
-          <p class="hint mt-2">누적 기록 기반 인사이트</p>
+    <!-- History -->
+    <section id="tab-history" class="tab-content">
+      <div class="mb-8 px-2 flex justify-between items-end">
+        <h2 class="text-3xl font-black italic uppercase">기록</h2>
+        <div class="flex items-center gap-4 glass rounded-2xl px-5 py-2.5">
+          <button onclick="changeMonth(-1)" class="p-1 hover:text-cyan-300 transition-colors"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+          <span id="calendar-month" class="text-xs font-black w-20 text-center tracking-widest">2026.01</span>
+          <button onclick="changeMonth(1)" class="p-1 hover:text-cyan-300 transition-colors"><i class="fa-solid fa-chevron-right text-xs"></i></button>
         </div>
+      </div>
 
-        <div class="glass neo p-8 mb-6">
-          <canvas id="radarChart" class="max-h-[320px]"></canvas>
+      <div class="glass rounded-[28px] p-7 mb-6 shadow-2xl">
+        <div class="grid grid-cols-7 text-center text-[9px] font-black text-gray-500 mb-5 uppercase tracking-[0.2em]">
+          <div class="text-red-600">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div class="text-blue-600">토</div>
         </div>
+        <div id="calendar-body" class="grid grid-cols-7 gap-3"></div>
+      </div>
 
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="glass neo p-6">
-            <p class="hint mb-2">총 기록</p>
-            <p id="stat-total-logs" class="text-4xl font-black text-white">0</p>
-          </div>
-          <div class="glass neo p-6">
-            <p class="hint mb-2">운동한 날</p>
-            <p id="stat-active-days" class="text-4xl font-black text-indigo-400">0</p>
-          </div>
-          <div class="glass neo p-6">
-            <p class="hint mb-2">이번 달</p>
-            <p id="stat-this-month" class="text-4xl font-black text-white">0</p>
-          </div>
-          <div class="glass neo p-6">
-            <p class="hint mb-2">이번 주</p>
-            <p id="stat-this-week" class="text-4xl font-black text-white">0</p>
-          </div>
-        </div>
-      </section>
+      <div class="flex gap-2 mb-4 px-2">
+        <button onclick="resetSelectedDate()" class="pill"><i class="fa-solid fa-eraser"></i> 선택 날짜 초기화</button>
+      </div>
 
-      <!-- 탭: 캘린더 -->
-      <section id="tab-history" class="tab-content">
-        <div class="mt-8 mb-6 flex items-end justify-between gap-6">
-          <div>
-            <h2 class="text-3xl font-black italic tracking-tight">기록</h2>
-            <p class="hint mt-2">날짜별 운동 로그</p>
-          </div>
+      <div id="history-detail" class="space-y-6"></div>
+    </section>
 
-          <div class="flex items-center gap-3 glass rounded-2xl px-5 py-3">
-            <button onclick="changeMonth(-1)" class="p-1 hover:text-cyan-300 transition"><i class="fa-solid fa-chevron-left"></i></button>
-            <span id="calendar-month" class="text-sm font-black w-24 text-center tracking-widest">2026.01</span>
-            <button onclick="changeMonth(1)" class="p-1 hover:text-cyan-300 transition"><i class="fa-solid fa-chevron-right"></i></button>
-          </div>
-        </div>
-
-        <div class="grid lg:grid-cols-[1.1fr_0.9fr] gap-6">
-          <div class="glass neo p-7">
-            <div class="grid grid-cols-7 text-center text-[10px] font-black text-gray-600 mb-6 uppercase tracking-[0.2em]">
-              <div class="text-red-800">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div class="text-blue-800">토</div>
-            </div>
-            <div id="calendar-body" class="grid grid-cols-7 gap-3"></div>
-
-            <div class="mt-6 flex items-center justify-between">
-              <span class="hint">선택한 날짜의 기록이 오른쪽에 표시됩니다</span>
-              <button onclick="goToday()" class="glass px-4 py-2 rounded-xl font-black text-xs tracking-[0.2em] uppercase text-white/70 hover:text-cyan-300 transition">
-                오늘
-              </button>
-            </div>
-          </div>
-
-          <div id="history-detail" class="space-y-5"></div>
-        </div>
-      </section>
-
-    </div>
   </main>
 
   <!-- Bottom Dock -->
-  <div class="fixed bottom-0 left-0 right-0 p-6 z-50 pointer-events-none">
-    <div class="wrap pointer-events-auto">
+  <div class="navDockWrap">
+    <div class="max-w-md mx-auto">
+      <div id="day-nav-wrap" class="hide mb-4">
+        <div id="day-nav" class="flex justify-center gap-2 overflow-x-auto pb-2 scroll-hide"></div>
+      </div>
+
       <nav class="nav-dock">
         <button onclick="showTab('session', this)" class="nav-item active">
           <i class="fa-solid fa-bolt-lightning"></i>
-          <span class="text-[9px] font-black tracking-[0.12em] uppercase">훈련</span>
+          <span class="text-[8px] font-black uppercase tracking-tighter">훈련</span>
           <div class="nav-active-dot"></div>
         </button>
         <button onclick="showTab('stats', this)" class="nav-item">
           <i class="fa-solid fa-chart-simple"></i>
-          <span class="text-[9px] font-black tracking-[0.12em] uppercase">통계</span>
+          <span class="text-[8px] font-black uppercase tracking-tighter">분석</span>
           <div class="nav-active-dot"></div>
         </button>
         <button onclick="showTab('history', this)" class="nav-item">
           <i class="fa-solid fa-calendar-days"></i>
-          <span class="text-[9px] font-black tracking-[0.12em] uppercase">기록</span>
+          <span class="text-[8px] font-black uppercase tracking-tighter">기록</span>
           <div class="nav-active-dot"></div>
         </button>
       </nav>
     </div>
   </div>
 
-  <!-- REST TIMER MODAL -->
-  <div id="timer-modal" class="modal-hidden">
-    <div class="modal-bg"></div>
-    <div class="modal-panel glass neo text-center">
-      <div class="hint mb-3">휴식 타이머</div>
-      <div id="timer-sec" class="text-[10rem] lg:text-[12rem] font-black text-white italic tracking-tighter leading-none mb-6 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">00</div>
-
+  <!-- REST TIMER MODAL (10s step) -->
+  <div id="timer-modal" class="fixed inset-0 z-[100] flex items-center justify-center hidden opacity-0">
+    <div class="absolute inset-0 bg-black/95 backdrop-blur-2xl"></div>
+    <div class="relative text-center">
+      <div class="miniHint mb-3">휴식</div>
+      <div id="timer-sec" class="text-[14rem] font-black text-white italic tracking-tighter leading-none mb-6 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">00</div>
       <div class="flex items-center justify-center gap-3">
-        <button onclick="adjustRest(-10)" class="glass px-8 py-4 rounded-full font-black text-white text-xs tracking-[0.25em] uppercase hover:bg-white/10 transition">-10초</button>
-        <button onclick="closeTimer()" class="glass px-10 py-4 rounded-full font-black text-white text-xs tracking-[0.25em] uppercase hover:bg-white/10 transition">건너뛰기</button>
-        <button onclick="adjustRest(10)" class="glass px-8 py-4 rounded-full font-black text-white text-xs tracking-[0.25em] uppercase hover:bg-white/10 transition">+10초</button>
+        <button onclick="adjustRest(-10)" class="glass px-7 py-4 rounded-full font-black text-white text-xs uppercase tracking-[0.25em] hover:bg-white/10 transition-all">-10</button>
+        <button onclick="closeTimer()" class="glass px-10 py-4 rounded-full font-black text-white text-xs uppercase tracking-[0.25em] hover:bg-white/10 transition-all">스킵</button>
+        <button onclick="adjustRest(10)" class="glass px-7 py-4 rounded-full font-black text-white text-xs uppercase tracking-[0.25em] hover:bg-white/10 transition-all">+10</button>
       </div>
-
-      <p class="hint mt-6">최소 조작 · 최대 집중</p>
+      <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/40 mt-6">최소 방해 · 최대 집중</p>
     </div>
   </div>
 
-  <!-- PRO LOG MODAL (REP/RPE) -->
-  <div id="pro-modal" class="modal-hidden">
-    <div class="modal-bg" onclick="closeProModal()"></div>
-    <div class="modal-panel glass neo">
-      <div class="flex items-start justify-between">
+  <!-- PRO INPUT MODAL -->
+  <div id="pro-modal" class="fixed inset-0 z-[110] flex items-center justify-center hidden">
+    <div class="absolute inset-0 bg-black/90 backdrop-blur-2xl" onclick="closeProModal()"></div>
+    <div class="relative glass panel p-7">
+      <div class="flex items-start justify-between gap-6">
         <div>
-          <p id="pro-ex-name" class="text-xl font-black italic text-white">운동</p>
-          <p id="pro-ex-meta" class="hint mt-1">세트</p>
+          <p id="pro-ex-name" class="text-xl font-black italic text-white tracking-tight">운동</p>
+          <p id="pro-ex-meta" class="text-[10px] font-black text-white/50 mt-1 tracking-[0.16em] uppercase">세트</p>
         </div>
-        <button onclick="closeProModal()" class="text-white/40 hover:text-cyan-300 transition">
-          <i class="fa-solid fa-xmark text-xl"></i>
+        <button onclick="closeProModal()" class="text-white/40 hover:text-cyan-300 transition-colors">
+          <i class="fa-solid fa-xmark text-lg"></i>
         </button>
       </div>
 
       <div class="mt-6">
-        <p class="hint mb-3">실제 반복수(Rep)</p>
+        <p class="miniHint mb-3">REP (실제)</p>
         <div class="flex items-center gap-3">
-          <button class="glass px-5 py-4 rounded-2xl font-black text-white/80" onclick="bumpRep(-1)">-</button>
+          <button class="chipBtn" onclick="bumpRep(-1)">-</button>
           <input id="pro-rep" type="number" min="0" max="999"
-                 class="w-full glass rounded-2xl px-5 py-4 text-2xl font-black text-white outline-none border-white/5"
-                 inputmode="numeric" />
-          <button class="glass px-5 py-4 rounded-2xl font-black text-white/80" onclick="bumpRep(1)">+</button>
+            class="w-full glass rounded-2xl px-5 py-4 text-2xl font-black text-white outline-none border-white/5"
+            inputmode="numeric" />
+          <button class="chipBtn" onclick="bumpRep(1)">+</button>
         </div>
-        <p class="text-[11px] font-black text-white/35 mt-2">비워두면 해당 세트 체크 당시 목표 REP가 기록됩니다.</p>
+        <p class="text-[11px] text-white/35 font-black mt-2">* 비워두면 “세트 체크 당시” 목표 REP가 기록됩니다.</p>
       </div>
 
       <div class="mt-6">
-        <p class="hint mb-3">RPE(난이도)</p>
+        <p class="miniHint mb-3">RPE</p>
         <div id="rpe-row" class="grid grid-cols-5 gap-2"></div>
       </div>
 
       <div class="mt-7 flex gap-3">
-        <button onclick="saveProModal()" class="w-full bg-cyan-400 text-black rounded-2xl py-4 font-black tracking-[0.25em] uppercase text-xs shadow-[0_0_20px_rgba(34,211,238,0.25)]">
-          저장
-        </button>
-        <button onclick="closeProModal()" class="w-full glass rounded-2xl py-4 font-black tracking-[0.25em] uppercase text-xs text-white/70">
-          취소
-        </button>
+        <button onclick="saveProModal()" class="w-full bg-cyan-400 text-black rounded-2xl py-4 font-black uppercase tracking-[0.25em] text-xs shadow-[0_0_20px_rgba(34,211,238,0.25)]">저장</button>
+        <button onclick="closeProModal()" class="w-full glass rounded-2xl py-4 font-black uppercase tracking-[0.25em] text-xs text-white/70">취소</button>
       </div>
     </div>
   </div>
 
-  <!-- SESSION SUMMARY MODAL (완료 요약) -->
-  <div id="summary-modal" class="modal-hidden">
-    <div class="modal-bg" onclick="closeSummaryModal()"></div>
-    <div class="modal-panel glass neo">
-      <div class="flex items-start justify-between">
-        <div>
-          <p class="text-2xl font-black italic text-white">오늘 운동 완료 ✅</p>
-          <p id="summary-date" class="hint mt-2">날짜</p>
-        </div>
-        <button onclick="closeSummaryModal()" class="text-white/40 hover:text-cyan-300 transition">
-          <i class="fa-solid fa-xmark text-xl"></i>
-        </button>
-      </div>
-
-      <div class="grid grid-cols-2 gap-4 mt-6">
-        <div class="glass rounded-2xl p-5">
-          <p class="hint mb-2">완료 세트</p>
-          <p id="sum-sets" class="text-3xl font-black text-white">0</p>
-        </div>
-        <div class="glass rounded-2xl p-5">
-          <p class="hint mb-2">평균 RPE</p>
-          <p id="sum-rpe" class="text-3xl font-black text-cyan-300">-</p>
-        </div>
-        <div class="glass rounded-2xl p-5 col-span-2">
-          <p class="hint mb-2">오늘의 하이라이트</p>
-          <p id="sum-highlight" class="text-sm font-black text-white/75 leading-relaxed">-</p>
-        </div>
-      </div>
-
-      <div class="mt-7 flex gap-3">
-        <button onclick="goHistoryFromSummary()" class="w-full bg-cyan-400 text-black rounded-2xl py-4 font-black tracking-[0.25em] uppercase text-xs">
-          기록 보기
-        </button>
-        <button onclick="closeSummaryModal()" class="w-full glass rounded-2xl py-4 font-black tracking-[0.25em] uppercase text-xs text-white/70">
-          닫기
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- RESET MODAL -->
-  <div id="reset-modal" class="modal-hidden">
-    <div class="modal-bg" onclick="closeResetModal()"></div>
-    <div class="modal-panel glass neo">
-      <div class="flex items-start justify-between">
-        <div>
-          <p class="text-xl font-black italic text-white">초기화</p>
-          <p class="hint mt-2">실수 방지를 위해 2단계로 확인합니다</p>
-        </div>
-        <button onclick="closeResetModal()" class="text-white/40 hover:text-cyan-300 transition">
-          <i class="fa-solid fa-xmark text-xl"></i>
-        </button>
-      </div>
-
-      <div class="mt-6 space-y-3">
-        <button onclick="resetTodaySession()" class="w-full glass rounded-2xl py-4 font-black text-white/80 tracking-[0.2em] uppercase text-xs hover:text-red-300 transition">
-          오늘 세션 체크(진행상태)만 초기화
-        </button>
-        <button onclick="resetAllDataConfirm()" class="w-full glass rounded-2xl py-4 font-black text-white/80 tracking-[0.2em] uppercase text-xs hover:text-red-300 transition">
-          전체 데이터(기록 포함) 완전 삭제
-        </button>
-      </div>
-
-      <p class="text-[11px] font-black text-white/35 mt-5">
-        * “오늘 세션 초기화”는 기록(log)은 남기고 체크 상태만 초기화합니다.  
-        * “전체 삭제”는 모든 데이터를 제거합니다.
-      </p>
-    </div>
-  </div>
+  <!-- Toast -->
+  <div id="toast" class="pill cyan"></div>
 
   <script>
     /* =========================================================
-      DK MASTER OS v10.3 PRO
-      - 한글 UI/UX 전면 적용
-      - 날짜별 진행 저장(progressByDate)로 구조 완전 개선
-      - 요일이 돌아와도 체크가 남지 않음(완전한 세션 분리)
-      - 풀스크린 레이아웃(태블릿/PC에서도 꽉 차는 느낌)
-      - 캘린더 UI 개선 + 초기화 버튼/기능
-      - 하루 완료 시 자동 요약 리포트 모달
+      DK MASTER OS v11.2
+      - ✅ Carousel fullscreen + peek
+      - ✅ Date-based progress (요일 반복 시 자동 초기화)
+      - ✅ Set/Rep big stepper + reset to default
+      - ✅ Background banding fix
     ========================================================= */
 
     /* ---------- DATA ---------- */
     const workoutData = {
-      1: { day: "월요일", type: "push", title: "밀기 A (가슴 · 삼두)", list: [
-        { name: "체스트 딥스", set: 4, rep: 10, rest: 90, breath: "내려갈 때 흡기 / 올라올 때 호기", target: "가슴 하부", mind: "가슴으로 바닥을 밀어내기", tip: "상체 15도 숙이기", guide: "발을 대고 무게 조절 가능", cue: "시선 바닥 1~2m + 팔 95%만 펴 긴장 유지" },
+      1: { day: "월요일", type: "push", title: "가슴 & 삼두", list: [
+        { name: "체스트 딥스", set: 4, rep: 10, rest: 90, breath: "내려갈 때 흡기 / 올라올 때 호기", target: "가슴 하부", mind: "바닥을 가슴으로 밀어내기", tip: "상체 15도 숙이기", guide: "발을 대고 무게 조절 가능", cue: "시선 바닥 1~2m + 팔 95%만 펴 긴장 유지" },
         { name: "스탠다드 푸쉬업", set: 4, rep: 15, rest: 75, breath: "내릴 때 흡기 / 밀 때 호기", target: "가슴 전체", mind: "지면을 가슴으로 누르기", tip: "손바닥 전체 접지", guide: "무릎 대고 수행 가능", cue: "겨드랑이를 붙이며 밀어 올리기" },
-        { name: "내로우 딥스", set: 3, rep: 10, rest: 60, breath: "팔 펼 때 호기", target: "삼두", mind: "삼두로 잠그듯 밀기", tip: "상체 수직 유지", guide: "팔꿈치를 몸통에 밀착", cue: "상체 수직 + 팔꿈치 뒤로 모으기" }
+        { name: "내로우 딥스", set: 3, rep: 10, rest: 60, breath: "팔 펼 때 호기", target: "삼두근", mind: "팔 뒷면의 힘으로 잠금", tip: "상체 수직 유지", guide: "팔꿈치를 몸에 밀착", cue: "상체 수직 + 팔꿈치 뒤로 모으기" }
       ]},
-      2: { day: "화요일", type: "pull", title: "당기기 A (등 두께)", list: [
+      2: { day: "화요일", type: "pull", title: "등 두께", list: [
         { name: "풀업 (밴드)", set: 4, rep: 8, rest: 120, breath: "당길 때 호기", target: "광배 바깥", mind: "팔꿈치를 옆구리로 꽂기", tip: "숄더 패킹 필수", guide: "밴드 강도 조절", cue: "숄더패킹 → 팔꿈치로 옆구리 찍기" },
-        { name: "인버티드 로우", set: 4, rep: 12, rest: 90, breath: "당길 때 호기", target: "등 중앙", mind: "날개뼈를 뒤로 모으기", tip: "가슴을 바쪽으로 마중", guide: "발 위치로 난이도 조절", cue: "몸 일직선 + 날개뼈를 레몬 짜듯 조이기" },
-        { name: "친업 (밴드)", set: 3, rep: 8, rest: 90, breath: "올라갈 때 호기", target: "등 & 이두", mind: "가슴을 봉에 붙이기", tip: "가슴 높이까지", guide: "언더그립", cue: "가슴을 봉 쪽으로 접어 넣기" }
+        { name: "인버티드 로우", set: 4, rep: 12, rest: 90, breath: "당길 때 호기", target: "등 중앙", mind: "날개뼈를 뒤로 모으기", tip: "가슴을 바로 마중", guide: "발 위치로 난이도 조절", cue: "몸 일직선 + 날개뼈를 레몬 짜듯 조이기" },
+        { name: "친업 (밴드)", set: 3, rep: 8, rest: 90, breath: "올라갈 때 호기", target: "등 & 이두", mind: "가슴을 봉에 붙이기", tip: "가슴 높이까지 올리기", guide: "언더그립 사용", cue: "가슴을 봉 쪽으로 접어 넣기" }
       ]},
-      3: { day: "수요일", type: "push", title: "액티브 리커버리 (측면 어깨)", list: [
-        { name: "사이드 레이즈", set: 5, rep: 20, rest: 60, breath: "올릴 때 호기", target: "측면 삼각근", mind: "팔꿈치를 옆으로 던짐", tip: "날개뼈 고정", guide: "저중량 고반복", cue: "위가 아니라 ‘멀리 던진다’" }
+      3: { day: "수요일", type: "push", title: "측면 어깨", list: [
+        { name: "사이드 레이즈", set: 5, rep: 20, rest: 60, breath: "올릴 때 호기", target: "측면 삼각근", mind: "팔꿈치를 양옆으로 던짐", tip: "날개뼈 고정", guide: "저중량 고반복 권장", cue: "위가 아니라 ‘멀리 던진다’" }
       ]},
-      4: { day: "목요일", type: "push", title: "밀기 B (어깨 · 삼두)", list: [
+      4: { day: "목요일", type: "push", title: "어깨 & 삼두", list: [
         { name: "파이크 푸쉬업", set: 4, rep: 10, rest: 90, breath: "밀 때 호기", target: "전면 어깨", mind: "어깨로 천장 밀기", tip: "엉덩이 높이 유지", guide: "머리를 손보다 앞으로", cue: "정수리가 바닥에 닿듯 내려갔다가 로켓처럼 밀기" },
-        { name: "디클라인 푸쉬업", set: 4, rep: 12, rest: 90, breath: "밀 때 호기", target: "상부 가슴", mind: "상부 가슴 집중", tip: "발 위치 높게", guide: "코어 강하게", cue: "쇄골 아래로 바닥을 민다" },
-        { name: "삼두 딥스", set: 4, rep: 8, rest: 90, breath: "밀 때 호기", target: "삼두", mind: "삼두로 펴서 잠금", tip: "팔꿈치 뒤로", guide: "의자 사용 가능", cue: "팔꿈치 벌어지지 않게 뒤로 모아 삼두 타격" }
+        { name: "디클라인 푸쉬업", set: 4, rep: 12, rest: 90, breath: "밀 때 호기", target: "상부 가슴", mind: "상부 가슴 집중", tip: "발 위치 높게", guide: "가슴 위쪽에 자극 집중", cue: "쇄골 아래로 바닥을 민다" },
+        { name: "삼두 딥스", set: 4, rep: 8, rest: 90, breath: "밀 때 호기", target: "삼두근", mind: "삼두로 펴서 잠금", tip: "팔꿈치 뒤로 모으기", guide: "의자 사용 가능", cue: "팔꿈치 벌어지지 않게 뒤로 모아 삼두 타격" }
       ]},
-      5: { day: "금요일", type: "pull", title: "당기기 B (등 넓이)", list: [
-        { name: "와이드 풀업", set: 4, rep: 6, rest: 120, breath: "올라갈 때 호기", target: "광배 외곽", mind: "등을 넓게 펼치기", tip: "넓은 그립", guide: "광배 옆선", cue: "팔꿈치를 아래로 찍어 광배 옆선 타격" },
-        { name: "인버티드 로우", set: 4, rep: 12, rest: 90, breath: "당길 때 호기", target: "등 안정성", mind: "몸 일직선", tip: "템포 일정", guide: "코어 고정", cue: "둔근/복부 고정 + 날개뼈 조이기" },
-        { name: "내로우 풀업", set: 3, rep: 8, rest: 90, breath: "올라갈 때 호기", target: "등 중앙", mind: "가슴 봉 터치", tip: "1초 정지", guide: "좁은 그립", cue: "가슴을 봉에 최대한 붙이기" }
+      5: { day: "금요일", type: "pull", title: "등 넓이", list: [
+        { name: "와이드 풀업", set: 4, rep: 6, rest: 120, breath: "올라갈 때 호기", target: "광배 외곽", mind: "등을 넓게 펼치기", tip: "넓은 그립 사용", guide: "상부 광배 자극 집중", cue: "팔꿈치를 아래로 찍어 광배 옆선 타격" },
+        { name: "인버티드 로우", set: 4, rep: 12, rest: 90, breath: "당길 때 호기", target: "등 안정성", mind: "몸을 일직선으로", tip: "템포 일정하게", guide: "코어 단단히 고정", cue: "둔근/복부 고정 + 날개뼈 조이기" },
+        { name: "내로우 풀업", set: 3, rep: 8, rest: 90, breath: "올라갈 때 호기", target: "등 중앙", mind: "봉에 가슴 터치", tip: "1초간 정지", guide: "좁은 그립 사용", cue: "가슴을 봉에 최대한 붙이기" }
       ]},
-      6: { day: "토요일", type: "leg", title: "하체 + 코어", list: [
-        { name: "스쿼트", set: 4, rep: 20, rest: 60, breath: "올라올 때 호기", target: "허벅지/둔근", mind: "발바닥 지면 밀기", tip: "허리 중립", guide: "뒤꿈치 고정", cue: "낮은 의자에 앉았다가 지구를 민다" },
-        { name: "런지", set: 3, rep: 10, rest: 60, breath: "올라올 때 호기", target: "둔근", mind: "뒤꿈치로 밀기", tip: "상체 약간 숙이기", guide: "무릎 안정", cue: "앞발 뒤꿈치로 강력하게 밀기" },
-        { name: "플랭크", set: 3, rep: 60, rest: 60, breath: "리듬 유지", target: "코어", mind: "배를 안으로 당기기", tip: "엉덩이 수축", guide: "일직선 유지", cue: "강철 판자처럼 버티기" }
+      6: { day: "토요일", type: "leg", title: "하체 & 코어", list: [
+        { name: "스쿼트", set: 4, rep: 20, rest: 60, breath: "올라올 때 호기", target: "허벅지/둔근", mind: "발바닥 지면 밀기", tip: "허리 중립 유지", guide: "뒤꿈치 고정", cue: "낮은 의자에 앉았다가 지구를 민다" },
+        { name: "런지", set: 3, rep: 10, rest: 60, breath: "올라올 때 호기", target: "엉덩이", mind: "뒤꿈치에 힘 전달", tip: "상체 살짝 숙이기", guide: "무릎 안정성 유의", cue: "앞발 뒤꿈치로 강력하게 밀기" },
+        { name: "플랭크", set: 3, rep: 60, rest: 60, breath: "일정하게 유지", target: "코어", mind: "배를 안으로 당기기", tip: "엉덩이 수축", guide: "일직선 유지", cue: "강철 판자처럼 버티기" }
       ]},
-      0: { day: "일요일", type: "rest", title: "회복 & 호흡", list: [
-        { name: "스트레칭 + 복식호흡", set: 1, rep: 15, rest: 0, breath: "깊고 길게", target: "전신 이완", mind: "근육 이완", tip: "어깨/광배", guide: "수면 권장", cue: "강도보다 호흡을 길게" }
+      0: { day: "일요일", type: "rest", title: "회복", list: [
+        { name: "스트레칭", set: 1, rep: 15, rest: 0, breath: "깊고 길게", target: "전신 이완", mind: "근육 이완 느끼기", tip: "어깨/광배 집중", guide: "충분한 수면 권장", cue: "부드럽게 길게, 강도보다 호흡" }
       ]}
     };
 
     /* ---------- STORAGE KEYS ---------- */
-    const KEY_LOGS = 'dk_os_logs';
-    const KEY_SETS = 'dk_os_sets';
-    const KEY_REPS = 'dk_os_reps';
-    const KEY_PROGRESS_BY_DATE = 'dk_os_progress_by_date';  // ✅ 날짜별 진행 상태
-    const KEY_PRO = 'dk_os_pro';
-    const KEY_SPLASH = 'dk_os_splash';
+    const KEY_LOGS = 'dk_os_v11_logs';
+    const KEY_SETS = 'dk_os_v11_sets';
+    const KEY_REPS = 'dk_os_v11_reps';
+    const KEY_PROGRESS_BY_DATE = 'dk_os_v11_progress_by_date';
+    const KEY_PRO = 'dk_os_v11_pro';
+    const KEY_SPLASH = 'dk_os_v11_splash_shown';
 
+    /* ---------- LOAD ---------- */
+    function safeParse(raw, fallback){ try { return raw ? JSON.parse(raw) : fallback; } catch(e){ return fallback; } }
     let logs = safeParse(localStorage.getItem(KEY_LOGS), []);
     let customSets = safeParse(localStorage.getItem(KEY_SETS), {});
     let customReps = safeParse(localStorage.getItem(KEY_REPS), {});
-    let progressByDate = safeParse(localStorage.getItem(KEY_PROGRESS_BY_DATE), {}); // {date: {exerciseId: boolean[]}}
-    let proData = safeParse(localStorage.getItem(KEY_PRO), {});
+    let progressByDate = safeParse(localStorage.getItem(KEY_PROGRESS_BY_DATE), {}); // {date:{exerciseId:[bool...]}}
+    let proData = safeParse(localStorage.getItem(KEY_PRO), {}); // {date:{exerciseId:{setIndex:{repActual,rpe}}}}
 
     /* ---------- STATE ---------- */
     let timerInt = null;
-    let restRemaining = 0;
     let totalSec = 0;
     let currentDayIdx = new Date().getDay();
     let currentYear = new Date().getFullYear();
     let currentMonth = new Date().getMonth();
-    let selectedDate = todayStr();
+    let selectedDate = new Date().toISOString().split('T')[0];
+    let restRemaining = 0;
+
     let currentSlideIndex = 0;
-    let summaryShownForDate = safeParse(localStorage.getItem("dk_os_summary_shown") || "{}", {});
-    let proCtx = { exerciseId:null, setIndex:null, name:null, defaultRep:null };
+    let proCtx = { date:null, exerciseId:null, setIndex:null, name:null, defaultRep:null, rpeTemp:null };
 
     /* ---------- UTILS ---------- */
-    function safeParse(raw, fallback){ try { return raw ? JSON.parse(raw) : fallback; } catch(e){ return fallback; } }
     function haptic(ms=18){ if(navigator.vibrate) navigator.vibrate(ms); }
     function nowISO(){ return new Date().toISOString(); }
     function todayStr(){ return new Date().toISOString().split('T')[0]; }
     function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
     function exId(dayIdx, exIdx){ return `${dayIdx}-${exIdx}`; }
-    function saveAll(){
-      localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
-      localStorage.setItem(KEY_SETS, JSON.stringify(customSets));
-      localStorage.setItem(KEY_REPS, JSON.stringify(customReps));
-      localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
-      localStorage.setItem(KEY_PRO, JSON.stringify(proData));
-    }
 
-    /* ---------- Splash ---------- */
+    /* ---------- SPLASH ---------- */
     function initIntro(){
       const shown = localStorage.getItem(KEY_SPLASH) === '1';
       const splash = document.getElementById('splash-screen');
-      if(shown){ splash.style.display='none'; return; }
-      setTimeout(()=> {
-        splash.style.opacity='0';
-        splash.style.transform='scale(1.08)';
-        setTimeout(()=> splash.style.display='none', 900);
-        localStorage.setItem(KEY_SPLASH,'1');
-      }, 2200);
+      if(shown){ splash.style.display = 'none'; return; }
+      setTimeout(() => {
+        splash.style.opacity = '0';
+        splash.style.transform = 'scale(1.08)';
+        setTimeout(()=> splash.style.display='none', 1000);
+        localStorage.setItem(KEY_SPLASH, '1');
+      }, 1800);
     }
 
-    /* ---------- 탭 ---------- */
+    /* ---------- TOAST ---------- */
+    let toastTimer=null;
+    function toast(msg){
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      if(toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(()=> el.classList.remove('show'), 1600);
+    }
+
+    /* ---------- TABS ---------- */
     function showTab(name, btn){
       document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
       document.getElementById(`tab-${name}`).classList.add('active');
+
       document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 
       if(name === 'stats') renderStats();
       if(name === 'history') renderCalendar();
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      revealDayNav();
     }
 
-    /* ---------- 요일 드로어 ---------- */
-    function toggleDayDrawer(open){
-      const el = document.getElementById('day-drawer');
-      if(open) el.classList.remove('modal-hidden');
-      else el.classList.add('modal-hidden');
+    /* ---------- DAY NAV (AUTO SHOW/HIDE) ---------- */
+    let dayNavHideTimer=null;
+    function revealDayNav(){
+      const wrap = document.getElementById('day-nav-wrap');
+      wrap.classList.remove('hide');
+      if(dayNavHideTimer) clearTimeout(dayNavHideTimer);
+      dayNavHideTimer = setTimeout(()=> wrap.classList.add('hide'), 2600);
+    }
+    ['touchstart','scroll','mousemove'].forEach(evt=>{
+      window.addEventListener(evt, ()=>{
+        const activeTab = document.querySelector('.tab-content.active')?.id;
+        if(activeTab === 'tab-session') revealDayNav();
+      }, {passive:true});
+    });
+
+    function updateDayNav(){
+      const nav = document.getElementById('day-nav');
+      nav.innerHTML = '';
+      ['월','화','수','목','금','토','일'].forEach((d, i) => {
+        const dm = (i === 6) ? 0 : i + 1;
+        const b = document.createElement('button');
+        b.className = `day-chip ${dm === currentDayIdx ? 'active' : ''}`;
+        b.innerText = d;
+        b.onclick = () => changeDay(dm);
+        nav.appendChild(b);
+      });
     }
 
-    /* ---------- 날짜별 진행 상태 ---------- */
-    function getTodayProgressMap(){
-      const d = todayStr();
-      if(!progressByDate[d]) progressByDate[d] = {};
-      return progressByDate[d];
-    }
-
-    function getProgressArrForDate(dateStr, exerciseId, setTotal){
-      if(!progressByDate[dateStr]) progressByDate[dateStr] = {};
-      if(!Array.isArray(progressByDate[dateStr][exerciseId])){
-        progressByDate[dateStr][exerciseId] = new Array(setTotal).fill(false);
-        saveAll();
-        return progressByDate[dateStr][exerciseId];
+    /* ---------- DATE-BASED PROGRESS ---------- */
+    function getProgressArr(date, exerciseId, setTotal){
+      if(!progressByDate[date]) progressByDate[date] = {};
+      let arr = progressByDate[date][exerciseId];
+      if(!Array.isArray(arr)){
+        arr = new Array(setTotal).fill(false);
+        progressByDate[date][exerciseId] = arr;
+        localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
+        return arr;
       }
-      // resize
-      const arr = progressByDate[dateStr][exerciseId];
       if(arr.length !== setTotal){
         const next = new Array(setTotal).fill(false);
-        for(let i=0;i<Math.min(arr.length,setTotal);i++) next[i] = !!arr[i];
-        progressByDate[dateStr][exerciseId] = next;
-        saveAll();
+        for(let i=0;i<Math.min(arr.length,setTotal);i++) next[i]=!!arr[i];
+        progressByDate[date][exerciseId] = next;
+        localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
+        return next;
       }
-      return progressByDate[dateStr][exerciseId];
+      return arr;
     }
 
-    function computeProgressForDate(dateStr, dayIdx){
+    function computeProgressForDay(date, dayIdx){
       let total = 0, done = 0;
       workoutData[dayIdx].list.forEach((w, idx) => {
         const id = exId(dayIdx, idx);
         const setTotal = customSets[id] || w.set;
         total += setTotal;
-        const arr = getProgressArrForDate(dateStr, id, setTotal);
+        const arr = getProgressArr(date, id, setTotal);
         done += arr.filter(Boolean).length;
       });
       return { total, done, pct: Math.round((done/total)*100) || 0 };
     }
 
-    function updateProgress(){
-      const p = computeProgressForDate(todayStr(), currentDayIdx);
+    function updateProgressUI(){
+      const p = computeProgressForDay(todayStr(), currentDayIdx);
       document.getElementById('progress-bar').style.width = p.pct + '%';
       document.getElementById('progress-percent').innerText = p.pct + '%';
-      maybeShowSummaryIfComplete(p);
     }
 
-    /* ---------- 하루 완료 요약 ---------- */
-    function maybeShowSummaryIfComplete(p){
-      const date = todayStr();
-      if(p.total === 0) return;
-      if(p.done < p.total) return;
-
-      // 오늘 요약을 이미 띄웠으면 다시 안띄움
-      if(summaryShownForDate[date]) return;
-      summaryShownForDate[date] = true;
-      localStorage.setItem("dk_os_summary_shown", JSON.stringify(summaryShownForDate));
-
-      openSummaryModal(date);
-    }
-
-    function openSummaryModal(dateStr){
-      // 오늘 로그만
-      const todayLogs = logs.filter(l => l.date === dateStr);
-
-      // 완료 세트
-      document.getElementById('sum-sets').innerText = todayLogs.length;
-
-      // 평균 RPE
-      const rpeArr = todayLogs.map(x => x.rpe).filter(v => v != null);
-      const avgRpe = rpeArr.length ? (rpeArr.reduce((a,b)=>a+b,0)/rpeArr.length).toFixed(1) : "-";
-      document.getElementById('sum-rpe').innerText = avgRpe;
-
-      // 하이라이트: 가장 많이 수행한 운동
-      const group = todayLogs.reduce((acc,o)=>{ acc[o.name]=(acc[o.name]||0)+1; return acc; },{});
-      let highlight = "-";
-      if(Object.keys(group).length){
-        const top = Object.entries(group).sort((a,b)=>b[1]-a[1])[0];
-        highlight = `가장 많이 수행한 운동은 “${top[0]}” (${top[1]}세트) 입니다.`;
-      }
-      document.getElementById('sum-highlight').innerText = highlight;
-      document.getElementById('summary-date').innerText = dateStr + " · 오늘의 요약";
-
-      document.getElementById('summary-modal').classList.remove('modal-hidden');
-      haptic(25);
-    }
-
-    function closeSummaryModal(){
-      document.getElementById('summary-modal').classList.add('modal-hidden');
-    }
-
-    function goHistoryFromSummary(){
-      closeSummaryModal();
-      selectedDate = todayStr();
-      showTab('history', document.querySelectorAll('.nav-item')[2]);
-      renderCalendar();
-    }
-
-    /* ---------- Change Day ---------- */
+    /* ---------- CHANGE DAY ---------- */
     function changeDay(d){
       currentDayIdx = d;
       currentSlideIndex = 0;
@@ -830,111 +765,156 @@
       document.getElementById('view-title').innerText = data.title;
 
       const cueMap = {
-        push: "밀기 — 템포 컨트롤 + 코어 고정",
-        pull: "당기기 — 숄더패킹 + 광배 수축",
-        leg:  "하체 — 발바닥 전체로 지면 밀기",
-        rest: "회복 — 호흡 길게 + 가동성 회복"
+        push: "푸쉬 데이 — 템포 제어 & 코어 고정",
+        pull: "풀 데이 — 숄더 패킹 & 광배 수축",
+        leg:  "하체 데이 — 발 전체로 밀기",
+        rest: "회복 — 호흡 & 리셋"
       };
       document.getElementById('view-subcue').innerText = cueMap[data.type] || "훈련 모드";
 
-      document.getElementById('session-date-pill').innerText = `오늘: ${todayStr()}`;
       renderCarousel();
-      updateProgress();
+      updateProgressUI();
+      updateDayNav();
+      revealDayNav();
     }
 
-    /* ---------- Carousel Render ---------- */
+    /* ---------- CAROUSEL ---------- */
     function renderCarousel(){
+      const date = todayStr();
       const data = workoutData[currentDayIdx];
-      const carousel = document.getElementById('workout-carousel');
+      const carousel = document.getElementById('session-carousel');
       carousel.innerHTML = '';
-
-      const dateStr = todayStr();
 
       data.list.forEach((w, idx) => {
         const id = exId(currentDayIdx, idx);
         const setTotal = customSets[id] || w.set;
         const repTotal = customReps[id] || w.rep;
-        const doneArr = getProgressArrForDate(dateStr, id, setTotal);
+        const doneArr = getProgressArr(date, id, setTotal);
+        const doneCount = doneArr.filter(Boolean).length;
 
         const slide = document.createElement('div');
-        slide.className = "slide glass neo p-7";
+        slide.className = 'slide';
+        slide.setAttribute('data-slide', idx);
 
         slide.innerHTML = `
-          <div class="flex items-start justify-between gap-5 mb-6">
-            <div class="min-w-0">
-              <div class="flex items-center gap-2">
-                <h3 class="text-2xl font-black italic text-white truncate">${w.name}</h3>
-                <button onclick="resetExercise('${id}')" class="text-white/30 hover:text-cyan-300 transition" title="이 운동만 초기화">
-                  <i class="fa-solid fa-arrow-rotate-left"></i>
+          <div class="glass slideCard p-6 md:p-7">
+            <div>
+              <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                  <h3 class="text-3xl md:text-4xl font-black italic text-white tracking-tight truncate">${w.name}</h3>
+                  <div class="mt-3 flex items-center gap-2 flex-wrap">
+                    <span class="pill cyan">${w.target}</span>
+                    <span class="pill">휴식 ${w.rest}s</span>
+                    <span class="pill">진행 ${doneCount}/${setTotal}</span>
+                  </div>
+                </div>
+                <button onclick="resetExercise('${id}')" class="pill" title="이 운동(오늘) 초기화">
+                  <i class="fa-solid fa-rotate-left"></i>
                 </button>
               </div>
-              <div class="flex items-center gap-2 mt-3 flex-wrap">
-                <span class="pill">${w.target}</span>
-                <span class="pill cyan">휴식 ${w.rest}초</span>
-                <span class="pill">목표 ${repTotal}회</span>
-              </div>
-              <p class="hint mt-4">코어 큐</p>
-              <p class="text-[14px] font-black text-white/75 mt-1 leading-relaxed">${w.cue || w.tip || ""}</p>
-            </div>
 
-            <div class="flex flex-col gap-3 flex-shrink-0">
-              <div class="glass rounded-2xl px-4 py-2">
-                <p class="hint">세트</p>
-                <div class="flex items-center gap-3 mt-2">
-                  <button onclick="adjust('set','${id}',-1)" class="text-white/60 hover:text-cyan-300 transition"><i class="fa-solid fa-minus"></i></button>
-                  <span class="text-lg font-black">${setTotal}</span>
-                  <button onclick="adjust('set','${id}',1)" class="text-white/60 hover:text-cyan-300 transition"><i class="fa-solid fa-plus"></i></button>
+              <div class="mt-5 grid md:grid-cols-2 gap-4">
+                <!-- LEFT: info -->
+                <div class="space-y-3">
+                  <div class="glass rounded-2xl p-4 border-white/5">
+                    <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45 mb-2">핵심 큐</p>
+                    <p class="text-base md:text-lg font-black text-white/80 leading-relaxed">${w.cue || w.tip || ''}</p>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-white/[0.02] p-4 rounded-2xl border border-white/5">
+                      <p class="text-[10px] font-black tracking-[0.18em] uppercase text-indigo-300 mb-2">호흡</p>
+                      <p class="text-[13px] font-bold text-white/70">${w.breath}</p>
+                    </div>
+                    <div class="bg-white/[0.02] p-4 rounded-2xl border border-white/5">
+                      <p class="text-[10px] font-black tracking-[0.18em] uppercase text-indigo-300 mb-2">의식</p>
+                      <p class="text-[13px] font-bold text-white/70">${w.mind}</p>
+                    </div>
+                    <div class="bg-cyan-400/[0.04] p-4 rounded-2xl border border-cyan-400/10 col-span-2">
+                      <p class="text-[10px] font-black tracking-[0.18em] uppercase text-cyan-300 mb-2">엘리트 가이드</p>
+                      <p class="text-[13px] font-bold text-white/75">${w.tip} · <span class="text-white/45">${w.guide}</span></p>
+                    </div>
+                  </div>
+
+                  <p class="text-[11px] font-black text-white/35">* 좌우로 넘겨 다음/이전 운동으로 이동</p>
+                </div>
+
+                <!-- RIGHT: huge controls + set buttons -->
+                <div class="rightPanel space-y-3">
+                  <div class="glass rounded-2xl p-4 border-white/5">
+                    <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45">세트/횟수 설정</p>
+                    <p class="text-[11px] mt-2 font-bold text-white/45">* 세트 버튼 길게 누르면 REP/RPE 입력</p>
+                  </div>
+
+                  <div class="stepper">
+                    <div>
+                      <div class="stepperLabel">SET</div>
+                      <div class="stepperValue">${setTotal}</div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <button class="stepperBtn" onclick="adjust('set','${id}',-1)"><i class="fa-solid fa-minus"></i></button>
+                      <button class="stepperBtn" onclick="adjust('set','${id}',1)"><i class="fa-solid fa-plus"></i></button>
+                    </div>
+                  </div>
+
+                  <div class="stepper">
+                    <div>
+                      <div class="stepperLabel">REP</div>
+                      <div class="stepperValue">${repTotal}</div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <button class="stepperBtn" onclick="adjust('rep','${id}',-1)"><i class="fa-solid fa-minus"></i></button>
+                      <button class="stepperBtn" onclick="adjust('rep','${id}',1)"><i class="fa-solid fa-plus"></i></button>
+                    </div>
+                  </div>
+
+                  <button class="bigBtn" onclick="resetSetRepToDefault('${id}')">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    세트/횟수 기본값
+                  </button>
+
+                  <div class="grid grid-cols-2 gap-3">
+                    ${Array.from({length:setTotal}).map((_, s)=>{
+                      const done = !!doneArr[s];
+                      return `<button class="setBtn ${done?'done':''}" data-date="${date}" data-ex="${id}" data-set="${s}">
+                        ${done ? `<i class='fa-solid fa-check'></i>` : ''}
+                        ${s+1} 세트
+                      </button>`;
+                    }).join('')}
+                  </div>
                 </div>
               </div>
-              <div class="glass rounded-2xl px-4 py-2">
-                <p class="hint">반복</p>
-                <div class="flex items-center gap-3 mt-2">
-                  <button onclick="adjust('rep','${id}',-1)" class="text-white/60 hover:text-cyan-300 transition"><i class="fa-solid fa-minus"></i></button>
-                  <span class="text-lg font-black">${repTotal}</span>
-                  <button onclick="adjust('rep','${id}',1)" class="text-white/60 hover:text-cyan-300 transition"><i class="fa-solid fa-plus"></i></button>
-                </div>
+            </div>
+
+            <div class="mt-5 flex items-center justify-between gap-2 flex-wrap">
+              <div class="flex items-center gap-2">
+                <span class="pill cyan">${idx+1} / ${data.list.length}</span>
+                <span class="pill">${w.name}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <button class="pill" onclick="carouselPrev()"><i class="fa-solid fa-chevron-left"></i> 이전</button>
+                <button class="pill cyan" onclick="carouselNext()">다음 <i class="fa-solid fa-chevron-right"></i></button>
               </div>
             </div>
-          </div>
-
-          <div class="grid grid-cols-2 gap-4 text-[12px] leading-relaxed mb-6">
-            <div class="glass rounded-2xl p-4">
-              <p class="hint mb-2">호흡</p>
-              <p class="font-bold text-white/70">${w.breath}</p>
-            </div>
-            <div class="glass rounded-2xl p-4">
-              <p class="hint mb-2">이미지/자극</p>
-              <p class="font-bold text-white/70">${w.mind}</p>
-            </div>
-            <div class="glass rounded-2xl p-4 col-span-2 border border-cyan-400/10 bg-cyan-400/[0.05]">
-              <p class="hint mb-2 text-cyan-300">전문가 가이드</p>
-              <p class="font-bold text-white/80">${w.tip} · <span class="text-white/40">${w.guide}</span></p>
-              <p class="text-[11px] font-black text-white/35 mt-3">* 세트 버튼 길게 누르면 실제 REP/RPE 입력 가능</p>
-            </div>
-          </div>
-
-          <div class="flex gap-4 overflow-x-auto pb-2 scroll-hide">
-            ${Array.from({length:setTotal}).map((_, s) => {
-              const done = !!doneArr[s];
-              return `<button class="set-pill ${done ? 'complete' : ''}" data-ex="${id}" data-set="${s}">${s+1}</button>`;
-            }).join('')}
           </div>
         `;
+
         carousel.appendChild(slide);
       });
 
       bindSetButtons();
       bindCarouselEvents();
       updateSlideHUD();
+      requestAnimationFrame(()=> scrollToSlide(0,false));
     }
 
     function bindCarouselEvents(){
-      const carousel = document.getElementById('workout-carousel');
+      const carousel = document.getElementById('session-carousel');
       carousel.onscroll = () => {
         const slides = Array.from(carousel.children);
         if(!slides.length) return;
-        const w = slides[0].getBoundingClientRect().width + 18;
-        const idx = Math.round(carousel.scrollLeft / w);
+        const slideWidth = slides[0].getBoundingClientRect().width + 18;
+        const idx = Math.round(carousel.scrollLeft / slideWidth);
         if(idx !== currentSlideIndex){
           currentSlideIndex = clamp(idx, 0, slides.length-1);
           updateSlideHUD();
@@ -947,35 +927,39 @@
       const total = data.list.length;
       const idx = clamp(currentSlideIndex, 0, total-1);
       document.getElementById('slide-indicator').innerText = `${idx+1} / ${total}`;
-      document.getElementById('slide-name').innerText = data.list[idx]?.name || "운동";
+      document.getElementById('slide-name').innerText = data.list[idx]?.name || '운동';
+    }
+
+    function scrollToSlide(idx, smooth=true){
+      const carousel = document.getElementById('session-carousel');
+      const slides = Array.from(carousel.children);
+      if(!slides.length) return;
+      idx = clamp(idx, 0, slides.length-1);
+      const slideWidth = slides[0].getBoundingClientRect().width + 18;
+      carousel.scrollTo({ left: slideWidth * idx, behavior: smooth ? 'smooth' : 'auto' });
     }
 
     function carouselNext(){
-      const total = workoutData[currentDayIdx].list.length;
-      currentSlideIndex = clamp(currentSlideIndex + 1, 0, total-1);
-      scrollToSlide(currentSlideIndex);
+      const data = workoutData[currentDayIdx];
+      currentSlideIndex = clamp(currentSlideIndex + 1, 0, data.list.length-1);
+      scrollToSlide(currentSlideIndex, true);
       updateSlideHUD();
       haptic(10);
-    }
-    function carouselPrev(){
-      const total = workoutData[currentDayIdx].list.length;
-      currentSlideIndex = clamp(currentSlideIndex - 1, 0, total-1);
-      scrollToSlide(currentSlideIndex);
-      updateSlideHUD();
-      haptic(10);
-    }
-    function scrollToSlide(idx){
-      const carousel = document.getElementById('workout-carousel');
-      const slides = Array.from(carousel.children);
-      if(!slides.length) return;
-      const w = slides[0].getBoundingClientRect().width + 18;
-      carousel.scrollTo({ left: w * idx, behavior: 'smooth' });
     }
 
-    /* ---------- Set Buttons (토글 + 롱프레스) ---------- */
+    function carouselPrev(){
+      const data = workoutData[currentDayIdx];
+      currentSlideIndex = clamp(currentSlideIndex - 1, 0, data.list.length-1);
+      scrollToSlide(currentSlideIndex, true);
+      updateSlideHUD();
+      haptic(10);
+    }
+
+    /* ---------- SET BUTTONS (tap toggle + long press) ---------- */
     function bindSetButtons(){
-      const buttons = document.querySelectorAll('.set-pill[data-ex]');
+      const buttons = document.querySelectorAll('.setBtn[data-ex]');
       buttons.forEach(btn => {
+        const date = btn.getAttribute('data-date');
         const ex = btn.getAttribute('data-ex');
         const setIndex = Number(btn.getAttribute('data-set'));
 
@@ -989,12 +973,13 @@
           longPressed = false;
           pressTimer = setTimeout(() => {
             longPressed = true;
-            openProModal(ex, setIndex);
+            openProModal(date, ex, setIndex);
             haptic(20);
           }, 420);
         };
+
         const onUp = () => { if(pressTimer) clearTimeout(pressTimer); };
-        const onClick = () => { if(longPressed) return; toggleSetComplete(ex, setIndex); };
+        const onClick = () => { if(longPressed) return; toggleSetComplete(date, ex, setIndex); };
 
         clone.addEventListener('pointerdown', onDown);
         clone.addEventListener('pointerup', onUp);
@@ -1003,8 +988,8 @@
       });
     }
 
-    function toggleSetComplete(exerciseId, setIndex){
-      const dateStr = todayStr();
+    /* ---------- TOGGLE COMPLETE + LOG ---------- */
+    function toggleSetComplete(date, exerciseId, setIndex){
       const [dayIdx, exIdx] = exerciseId.split('-').map(Number);
       const w = workoutData[dayIdx]?.list?.[exIdx];
       if(!w) return;
@@ -1012,26 +997,23 @@
       const setTotal = customSets[exerciseId] || w.set;
       const repTotal = customReps[exerciseId] || w.rep;
 
-      const arr = getProgressArrForDate(dateStr, exerciseId, setTotal);
-      arr[setIndex] = !arr[setIndex];
-      progressByDate[dateStr][exerciseId] = arr;
+      const doneArr = getProgressArr(date, exerciseId, setTotal);
+      doneArr[setIndex] = !doneArr[setIndex];
+      progressByDate[date][exerciseId] = doneArr;
+      localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
 
-      // UI
-      const pill = document.querySelector(`.set-pill[data-ex="${exerciseId}"][data-set="${setIndex}"]`);
-      if(pill) pill.classList.toggle('complete', arr[setIndex]);
-
+      // logKey
       const setNo = setIndex + 1;
-      const logKey = `${dateStr}|${exerciseId}|${setNo}`;
+      const logKey = `${date}|${exerciseId}|${setNo}`;
 
-      if(arr[setIndex]){
+      if(doneArr[setIndex]){
         if(!logs.some(l => l.logKey === logKey)){
-          const repActual = getRepActual(exerciseId, setIndex);
-          const rpe = getRpe(exerciseId, setIndex);
-
+          const repActual = getRepActual(date, exerciseId, setIndex);
+          const rpe = getRpe(date, exerciseId, setIndex);
           logs.push({
             id: Date.now(),
             logKey,
-            date: dateStr,
+            date,
             ts: nowISO(),
             exerciseId,
             name: w.name,
@@ -1041,37 +1023,32 @@
             repActual: repActual ?? null,
             rpe: rpe ?? null,
             restPlanned: w.rest,
+            restUsed: w.rest,
             type: workoutData[currentDayIdx].type
           });
+          localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
         }
-        // 타이머
+
+        // auto timer
         if(w.rest > 0) startTimer(w.rest);
-        autoFocusNext(exerciseId, setIndex, setTotal);
+
+        // ✅ 마지막 세트면 다음 운동으로 자동 이동
+        if(setNo === setTotal){
+          setTimeout(()=> carouselNext(), 250);
+        }
+
+        haptic(16);
       }else{
         logs = logs.filter(l => l.logKey !== logKey);
+        localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+        haptic(12);
       }
 
-      saveAll();
-      haptic(16);
-      updateProgress();
+      updateProgressUI();
+      renderCarousel();
     }
 
-    function autoFocusNext(exerciseId, setIndex, setTotal){
-      if(setIndex + 1 < setTotal){
-        const nextPill = document.querySelector(`.set-pill[data-ex="${exerciseId}"][data-set="${setIndex+1}"]`);
-        if(nextPill){
-          nextPill.animate([
-            { transform:'scale(1)', boxShadow:'0 0 0 rgba(34,211,238,0)' },
-            { transform:'scale(1.05)', boxShadow:'0 0 24px rgba(34,211,238,0.25)' },
-            { transform:'scale(1)', boxShadow:'0 0 0 rgba(34,211,238,0)' }
-          ], { duration:520, easing:'ease-out' });
-        }
-        return;
-      }
-      carouselNext();
-    }
-
-    /* ---------- adjust set/rep ---------- */
+    /* ---------- ADJUST SET/REP ---------- */
     function adjust(type, key, val){
       const [d, idx] = key.split('-').map(Number);
       const w = workoutData[d]?.list?.[idx];
@@ -1079,68 +1056,121 @@
 
       if(type === 'set'){
         const cur = customSets[key] || w.set;
-        customSets[key] = clamp(cur + val, 1, 12);
+        const next = clamp(cur + val, 1, 12);
+        customSets[key] = next;
+        localStorage.setItem(KEY_SETS, JSON.stringify(customSets));
+        getProgressArr(todayStr(), key, next);
       }else{
         const cur = customReps[key] || w.rep;
         customReps[key] = clamp(cur + val, 1, 100);
+        localStorage.setItem(KEY_REPS, JSON.stringify(customReps));
       }
-      saveAll();
+
       renderCarousel();
-      updateProgress();
+      updateProgressUI();
+      toast('설정 저장됨');
     }
 
+    function resetSetRepToDefault(exerciseId){
+      const [d, idx] = exerciseId.split('-').map(Number);
+      const w = workoutData[d]?.list?.[idx];
+      if(!w) return;
+
+      if(customSets[exerciseId] !== undefined) delete customSets[exerciseId];
+      if(customReps[exerciseId] !== undefined) delete customReps[exerciseId];
+      localStorage.setItem(KEY_SETS, JSON.stringify(customSets));
+      localStorage.setItem(KEY_REPS, JSON.stringify(customReps));
+
+      getProgressArr(todayStr(), exerciseId, w.set);
+
+      renderCarousel();
+      updateProgressUI();
+      toast('기본값으로 복원');
+      haptic(18);
+    }
+
+    /* ---------- RESET TODAY / EXERCISE ---------- */
     function resetExercise(exerciseId){
-      if(!confirm("이 운동의 오늘 세션 체크/기록을 초기화할까요?")) return;
-      const dateStr = todayStr();
+      if(!confirm('이 운동의 오늘 기록을 초기화할까요?')) return;
+      const date = todayStr();
 
-      // progress reset
-      const [dayIdx, exIdx] = exerciseId.split('-').map(Number);
-      const w = workoutData[dayIdx]?.list?.[exIdx];
+      logs = logs.filter(l => !(l.date === date && l.exerciseId === exerciseId));
+      localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+
+      const [d, idx] = exerciseId.split('-').map(Number);
+      const w = workoutData[d]?.list?.[idx];
       const setTotal = customSets[exerciseId] || w.set;
+      if(progressByDate[date] && progressByDate[date][exerciseId]){
+        progressByDate[date][exerciseId] = new Array(setTotal).fill(false);
+        localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
+      }
 
-      if(!progressByDate[dateStr]) progressByDate[dateStr] = {};
-      progressByDate[dateStr][exerciseId] = new Array(setTotal).fill(false);
-
-      // logs remove
-      logs = logs.filter(l => !(l.date === dateStr && l.exerciseId === exerciseId));
-      saveAll();
+      if(proData?.[date]?.[exerciseId]){
+        delete proData[date][exerciseId];
+        localStorage.setItem(KEY_PRO, JSON.stringify(proData));
+      }
 
       renderCarousel();
-      updateProgress();
-      haptic(20);
+      updateProgressUI();
+      toast('운동 초기화 완료');
+      haptic(22);
     }
 
-    /* ---------- Timer ---------- */
+    function resetToday(){
+      if(!confirm('오늘 진행/기록을 모두 초기화할까요?')) return;
+      const date = todayStr();
+
+      logs = logs.filter(l => l.date !== date);
+      localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+
+      if(progressByDate[date]){ delete progressByDate[date]; localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate)); }
+      if(proData[date]){ delete proData[date]; localStorage.setItem(KEY_PRO, JSON.stringify(proData)); }
+
+      renderCarousel();
+      updateProgressUI();
+      toast('오늘 초기화 완료');
+      haptic(25);
+    }
+
+    /* ---------- TIMER (10s step) ---------- */
     function startTimer(sec){
       restRemaining = sec;
-      document.getElementById('timer-sec').innerText = restRemaining;
-      document.getElementById('timer-modal').classList.remove('modal-hidden');
+      const modal = document.getElementById('timer-modal');
+      const display = document.getElementById('timer-sec');
+      modal.classList.remove('hidden');
+      requestAnimationFrame(()=> modal.classList.add('opacity-100'));
+      display.innerText = restRemaining;
 
       clearInterval(timerInt);
-      timerInt = setInterval(()=> {
+      timerInt = setInterval(() => {
         restRemaining--;
-        document.getElementById('timer-sec').innerText = restRemaining;
+        display.innerText = restRemaining;
         if(restRemaining <= 0) closeTimer(true);
       }, 1000);
     }
+
     function adjustRest(delta){
       if(!timerInt) return;
       restRemaining = clamp(restRemaining + delta, 5, 600);
       document.getElementById('timer-sec').innerText = restRemaining;
-      haptic(8);
+      haptic(10);
     }
+
     function closeTimer(finished=false){
       clearInterval(timerInt);
       timerInt = null;
-      document.getElementById('timer-modal').classList.add('modal-hidden');
+      const modal = document.getElementById('timer-modal');
+      modal.classList.remove('opacity-100');
+      setTimeout(()=> modal.classList.add('hidden'), 450);
+
       if(finished){
-        haptic(25);
+        haptic(30);
         try{
           const ctx = new (window.AudioContext || window.webkitAudioContext)();
           const o = ctx.createOscillator();
           const g = ctx.createGain();
           o.connect(g); g.connect(ctx.destination);
-          o.type='sine'; o.frequency.value=880;
+          o.type = 'sine'; o.frequency.value = 880;
           g.gain.setValueAtTime(0.0001, ctx.currentTime);
           g.gain.exponentialRampToValueAtTime(0.06, ctx.currentTime + 0.02);
           g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.12);
@@ -1149,100 +1179,96 @@
       }
     }
 
-    /* ---------- Pro Modal (Rep/RPE) ---------- */
-    function openProModal(exerciseId, setIndex){
-      const [dayIdx, exIdx] = exerciseId.split('-').map(Number);
-      const w = workoutData[dayIdx]?.list?.[exIdx];
+    /* ---------- PRO MODAL ---------- */
+    function openProModal(date, exerciseId, setIndex){
+      const [d, idx] = exerciseId.split('-').map(Number);
+      const w = workoutData[d]?.list?.[idx];
       if(!w) return;
-
       const repTotal = customReps[exerciseId] || w.rep;
-      proCtx = { exerciseId, setIndex, name: w.name, defaultRep: repTotal };
+
+      proCtx = { date, exerciseId, setIndex, name: w.name, defaultRep: repTotal, rpeTemp:null };
 
       document.getElementById('pro-ex-name').innerText = w.name;
-      document.getElementById('pro-ex-meta').innerText = `세트 ${setIndex+1} · 현재 목표 ${repTotal}회`;
+      document.getElementById('pro-ex-meta').innerText = `세트 ${setIndex+1} · 목표 REP ${repTotal}`;
 
       const repInput = document.getElementById('pro-rep');
-      repInput.value = (getRepActual(exerciseId,setIndex) ?? "");
+      const stored = getRepActual(date, exerciseId, setIndex);
+      repInput.value = (stored !== null && stored !== undefined) ? stored : "";
 
-      // rpe
       const row = document.getElementById('rpe-row');
       row.innerHTML = "";
       for(let r=6;r<=10;r++){
         const b = document.createElement('button');
-        b.className = "glass rounded-2xl py-3 font-black text-white/70";
+        b.className = "chipBtn";
         b.innerText = r;
         b.onclick = () => setRpeUI(r);
         row.appendChild(b);
       }
-      const storedRpe = getRpe(exerciseId,setIndex);
+
+      const storedRpe = getRpe(date, exerciseId, setIndex);
       if(storedRpe) setRpeUI(storedRpe);
 
-      document.getElementById('pro-modal').classList.remove('modal-hidden');
+      document.getElementById('pro-modal').classList.remove('hidden');
     }
 
-    function closeProModal(){
-      document.getElementById('pro-modal').classList.add('modal-hidden');
-    }
+    function closeProModal(){ document.getElementById('pro-modal').classList.add('hidden'); }
 
     function bumpRep(delta){
-      const input = document.getElementById('pro-rep');
-      const cur = input.value === "" ? proCtx.defaultRep : Number(input.value);
-      input.value = clamp(cur + delta, 0, 999);
+      const repInput = document.getElementById('pro-rep');
+      const cur = repInput.value === "" ? proCtx.defaultRep : Number(repInput.value);
+      repInput.value = clamp(cur + delta, 0, 999);
       haptic(8);
     }
 
     function setRpeUI(r){
       const row = document.getElementById('rpe-row');
-      Array.from(row.children).forEach(btn => {
-        btn.style.borderColor = "rgba(255,255,255,0.08)";
-        btn.style.background = "rgba(255,255,255,0.03)";
-        btn.style.color = "rgba(255,255,255,0.70)";
-        if(Number(btn.innerText) === r){
-          btn.style.borderColor = "rgba(34,211,238,0.35)";
-          btn.style.background = "rgba(34,211,238,0.12)";
-          btn.style.color = "rgba(34,211,238,0.95)";
-        }
-      });
+      Array.from(row.children).forEach(btn => btn.classList.toggle('active', Number(btn.innerText) === r));
       proCtx.rpeTemp = r;
       haptic(10);
     }
 
     function saveProModal(){
-      const {exerciseId, setIndex} = proCtx;
-      if(!exerciseId && exerciseId !== "0-0") return;
+      const {date, exerciseId, setIndex} = proCtx;
+      if(!exerciseId && exerciseId !== 0) return;
 
       const repValRaw = document.getElementById('pro-rep').value;
       const repActual = repValRaw === "" ? null : Number(repValRaw);
-      const rpe = proCtx.rpeTemp ?? getRpe(exerciseId,setIndex) ?? null;
+      const rpe = proCtx.rpeTemp ?? getRpe(date, exerciseId, setIndex) ?? null;
 
-      if(!proData[exerciseId]) proData[exerciseId] = {};
-      proData[exerciseId][setIndex] = { repActual, rpe };
+      if(!proData[date]) proData[date] = {};
+      if(!proData[date][exerciseId]) proData[date][exerciseId] = {};
+      proData[date][exerciseId][setIndex] = { repActual, rpe };
+      localStorage.setItem(KEY_PRO, JSON.stringify(proData));
 
-      // log patch if exists
-      const dateStr = todayStr();
+      // patch log if exists
       const setNo = setIndex + 1;
-      const logKey = `${dateStr}|${exerciseId}|${setNo}`;
+      const logKey = `${date}|${exerciseId}|${setNo}`;
       const i = logs.findIndex(l => l.logKey === logKey);
       if(i >= 0){
         logs[i].repActual = repActual;
         logs[i].rpe = rpe;
         logs[i].ts = nowISO();
+        localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
       }
 
-      saveAll();
       closeProModal();
-      haptic(20);
+      toast('입력 저장');
+      haptic(25);
+      renderCarousel();
     }
 
-    function getRepActual(exerciseId,setIndex){ return proData?.[exerciseId]?.[setIndex]?.repActual ?? null; }
-    function getRpe(exerciseId,setIndex){ return proData?.[exerciseId]?.[setIndex]?.rpe ?? null; }
+    function getRepActual(date, exerciseId, setIndex){
+      return proData?.[date]?.[exerciseId]?.[setIndex]?.repActual ?? null;
+    }
+    function getRpe(date, exerciseId, setIndex){
+      return proData?.[date]?.[exerciseId]?.[setIndex]?.rpe ?? null;
+    }
 
-    /* ---------- Calendar ---------- */
+    /* ---------- CALENDAR ---------- */
     function renderCalendar(){
-      document.getElementById('calendar-month').innerText = `${currentYear}.${String(currentMonth+1).padStart(2,'0')}`;
-
+      document.getElementById('calendar-month').innerText = `${currentYear}.${String(currentMonth + 1).padStart(2,'0')}`;
       const first = new Date(currentYear, currentMonth, 1).getDay();
-      const last = new Date(currentYear, currentMonth+1, 0).getDate();
+      const last = new Date(currentYear, currentMonth + 1, 0).getDate();
       const body = document.getElementById('calendar-body');
       body.innerHTML = '';
 
@@ -1253,7 +1279,8 @@
         const hasLog = logs.some(l => l.date === dStr);
 
         const el = document.createElement('div');
-        el.className = `calendar-day ${dStr===todayStr() ? 'today':''} ${hasLog?'has-log':''} ${dStr===selectedDate?'selected':''}`;
+        el.className = `calendar-day cursor-pointer ${dStr===todayStr()?'today':''} ${hasLog?'has-log':''}`;
+        if(dStr === selectedDate) el.classList.add('selected');
         el.innerText = d;
         el.onclick = () => { selectedDate = dStr; renderCalendar(); };
         body.appendChild(el);
@@ -1268,76 +1295,69 @@
         .filter(l => l.date === selectedDate)
         .sort((a,b)=> (a.exerciseId > b.exerciseId ? 1 : -1) || (a.set - b.set));
 
-      area.innerHTML = `
-        <div class="glass neo p-7">
-          <div class="flex items-start justify-between gap-4">
-            <div>
-              <p class="text-xl font-black italic text-white">선택한 날짜</p>
-              <p class="hint mt-2">${selectedDate}</p>
-            </div>
-            <button onclick="selectedDate=todayStr(); renderCalendar();" class="glass px-4 py-2 rounded-xl font-black text-xs tracking-[0.2em] uppercase text-white/70 hover:text-cyan-300 transition">
-              오늘로
-            </button>
-          </div>
+      area.innerHTML = `<p class="text-[10px] font-black text-gray-400 tracking-widest uppercase px-2">${selectedDate} 리포트</p>`;
 
-          <div class="mt-6">
-            ${dayLogs.length === 0
-              ? `<div class="glass rounded-2xl p-10 text-center text-white/35 font-black italic">기록이 없습니다.</div>`
-              : renderHistoryCards(dayLogs)
-            }
-          </div>
-        </div>
-      `;
-    }
+      if(dayLogs.length === 0){
+        area.innerHTML += `<div class="glass rounded-[28px] p-12 text-center text-gray-500 italic text-xs">기록이 없습니다</div>`;
+        return;
+      }
 
-    function renderHistoryCards(dayLogs){
-      const groups = dayLogs.reduce((acc,o)=>{
-        if(!acc[o.exerciseId]) acc[o.exerciseId]=[];
+      const groups = dayLogs.reduce((acc, o) => {
+        if(!acc[o.exerciseId]) acc[o.exerciseId] = [];
         acc[o.exerciseId].push(o);
         return acc;
       }, {});
 
-      return Object.entries(groups).map(([exerciseId, data])=>{
+      Object.entries(groups).forEach(([exerciseId, data]) => {
         const name = data[0].name;
         const plannedRep = data[0].plannedRep ?? "-";
         const totalSets = data.length;
-        const rpeArr = data.map(x => x.rpe).filter(v => v != null);
-        const avgRpe = rpeArr.length ? (rpeArr.reduce((a,b)=>a+b,0)/rpeArr.length).toFixed(1) : "-";
 
-        return `
-          <div class="glass rounded-2xl p-6 mb-5 border-l-4 border-cyan-400">
-            <div class="flex items-start justify-between gap-4">
-              <div>
-                <p class="text-lg font-black italic text-white">${name}</p>
-                <div class="flex flex-wrap gap-2 mt-3">
-                  <span class="pill cyan">${totalSets}세트</span>
-                  <span class="pill">목표 ${plannedRep}회</span>
-                  <span class="pill">평균 RPE ${avgRpe}</span>
-                </div>
+        const avgRpeArr = data.map(x => x.rpe).filter(v => v != null);
+        const avgRpe = avgRpeArr.length ? (avgRpeArr.reduce((a,b)=>a+b,0)/avgRpeArr.length).toFixed(1) : "-";
+
+        area.innerHTML += `
+          <div class="glass rounded-[28px] p-6 border-l-4 border-cyan-400">
+            <div>
+              <h4 class="font-black text-white italic">${name}</h4>
+              <div class="flex items-center gap-2 mt-3 flex-wrap">
+                <span class="pill cyan">${totalSets} 세트</span>
+                <span class="pill">목표 REP: ${plannedRep}</span>
+                <span class="pill">평균 RPE: ${avgRpe}</span>
               </div>
             </div>
 
-            <div class="mt-5 grid gap-2">
-              ${data.map(row=>{
-                const repText = row.repActual != null
-                  ? `<span class="pill cyan">실제 ${row.repActual}회</span> <span class="pill">목표 ${row.plannedRep ?? '-' }회</span>`
-                  : `<span class="pill">목표 ${row.plannedRep ?? '-' }회</span>`;
-                const rpeText = row.rpe != null ? `<span class="pill cyan">RPE ${row.rpe}</span>` : `<span class="pill">RPE -</span>`;
-                return `
-                  <div class="glass rounded-2xl p-4 flex items-center justify-between gap-3">
-                    <div class="flex items-center gap-2 flex-wrap">
-                      <span class="pill">세트 ${row.set}</span>
-                      ${repText}
-                      ${rpeText}
-                    </div>
-                    <span class="hint">${(row.ts||"").slice(11,16)}</span>
-                  </div>
-                `;
-              }).join('')}
+            <div class="mt-6">
+              <table class="log-table">
+                <thead>
+                  <tr>
+                    <th style="width:60px;">세트</th>
+                    <th>REP</th>
+                    <th style="width:70px;">RPE</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${data.map(row => {
+                    const repDisplay = (row.repActual != null)
+                      ? `<span class="pill cyan">${row.repActual}</span> <span class="text-white/35 font-black">/ 목표 ${row.plannedRep ?? "-"}</span>`
+                      : `<span class="pill">${row.plannedRep ?? "-"}</span> <span class="text-white/35 font-black">(목표)</span>`;
+
+                    const rpeDisplay = row.rpe != null ? `<span class="pill cyan">${row.rpe}</span>` : `<span class="pill">-</span>`;
+
+                    return `
+                      <tr class="log-row">
+                        <td><span class="pill">${row.set}</span></td>
+                        <td>${repDisplay}</td>
+                        <td>${rpeDisplay}</td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
             </div>
           </div>
         `;
-      }).join('');
+      });
     }
 
     function changeMonth(dir){
@@ -1346,96 +1366,97 @@
       if(currentMonth > 11){ currentMonth = 0; currentYear++; }
       renderCalendar();
     }
-    function goToday(){
-      selectedDate = todayStr();
+
+    function resetSelectedDate(){
+      if(!confirm('선택한 날짜의 기록을 초기화할까요?')) return;
+      const date = selectedDate;
+
+      logs = logs.filter(l => l.date !== date);
+      localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+
+      if(progressByDate[date]){ delete progressByDate[date]; localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate)); }
+      if(proData[date]){ delete proData[date]; localStorage.setItem(KEY_PRO, JSON.stringify(proData)); }
+
+      toast('선택 날짜 초기화');
       renderCalendar();
+      haptic(25);
     }
 
-    /* ---------- Stats ---------- */
+    /* ---------- STATS ---------- */
     function renderStats(){
       const counts = { push:0, pull:0, leg:0, rest:0 };
       logs.forEach(l => counts[l.type] !== undefined && counts[l.type]++);
 
-      document.getElementById('stat-total-logs').innerText = logs.length;
-      document.getElementById('stat-active-days').innerText = new Set(logs.map(l => l.date)).size;
-
-      const now = new Date();
-      const yyyy = now.getFullYear();
-      const mm = String(now.getMonth()+1).padStart(2,'0');
-      const thisMonth = `${yyyy}-${mm}`;
-
-      const thisMonthLogs = logs.filter(l => l.date.startsWith(thisMonth)).length;
-      document.getElementById('stat-this-month').innerText = thisMonthLogs;
-
-      // this week (simple: last 7 days)
-      const from = new Date(Date.now() - 6*24*60*60*1000);
-      const fromStr = from.toISOString().split('T')[0];
-      const thisWeekLogs = logs.filter(l => l.date >= fromStr).length;
-      document.getElementById('stat-this-week').innerText = thisWeekLogs;
+      document.getElementById('stat-total-sets').innerText = logs.length;
+      document.getElementById('stat-week-count').innerText = new Set(logs.map(l => l.date)).size;
 
       const ctx = document.getElementById('radarChart').getContext('2d');
       if(window.myRadar) window.myRadar.destroy();
 
       window.myRadar = new Chart(ctx, {
-        type:'radar',
-        data:{
-          labels:['밀기','당기기','하체','회복'],
-          datasets:[{
-            data:[counts.push, counts.pull, counts.leg, counts.rest],
-            backgroundColor:'rgba(34,211,238,0.10)',
-            borderColor:'#22d3ee',
-            borderWidth:2,
-            pointRadius:0
+        type: 'radar',
+        data: {
+          labels: ['PUSH','PULL','LEGS','REST'],
+          datasets: [{
+            data: [counts.push, counts.pull, counts.leg, counts.rest],
+            backgroundColor: 'rgba(34,211,238,0.10)',
+            borderColor: '#22d3ee',
+            borderWidth: 2,
+            pointRadius: 0
           }]
         },
-        options:{
-          scales:{
-            r:{
-              grid:{ color:'rgba(255,255,255,0.05)' },
-              angleLines:{ color:'rgba(255,255,255,0.05)' },
-              pointLabels:{ color:'#777', font:{ weight:'900' } },
-              ticks:{ display:false }
+        options: {
+          scales: {
+            r: {
+              grid: { color: 'rgba(255,255,255,0.05)' },
+              angleLines: { color: 'rgba(255,255,255,0.05)' },
+              pointLabels: { color: '#777', font: { weight: '800' } },
+              ticks: { display: false }
             }
           },
-          plugins:{ legend:{ display:false } }
+          plugins: { legend: { display: false } }
         }
       });
     }
 
-    /* ---------- Reset ---------- */
-    function openResetModal(){ document.getElementById('reset-modal').classList.remove('modal-hidden'); }
-    function closeResetModal(){ document.getElementById('reset-modal').classList.add('modal-hidden'); }
+    /* ---------- BACKUP / RESET ALL ---------- */
+    function backupJSON(){
+      const payload = {
+        version: 'v11.2',
+        exportedAt: nowISO(),
+        logs, customSets, customReps, progressByDate, proData
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `dk_master_os_backup_${todayStr()}.json`;
+      a.click();
+      toast('백업 다운로드');
+      haptic(18);
+    }
 
-    function resetTodaySession(){
-      if(!confirm("오늘 세션 체크 상태를 초기화할까요? (기록은 남음)")) return;
-      const dateStr = todayStr();
-      progressByDate[dateStr] = {}; // 오늘 진행 상태만 제거
-      saveAll();
+    function resetAll(){
+      if(!confirm('⚠️ 모든 데이터(기록/설정/진행)를 초기화할까요?')) return;
+      localStorage.removeItem(KEY_LOGS);
+      localStorage.removeItem(KEY_SETS);
+      localStorage.removeItem(KEY_REPS);
+      localStorage.removeItem(KEY_PROGRESS_BY_DATE);
+      localStorage.removeItem(KEY_PRO);
+      logs = []; customSets = {}; customReps = {}; progressByDate = {}; proData = {};
       renderCarousel();
-      updateProgress();
-      closeResetModal();
-      haptic(20);
-      alert("오늘 세션 체크 상태가 초기화되었습니다.");
+      updateProgressUI();
+      renderCalendar();
+      toast('전체 초기화 완료');
+      haptic(30);
     }
 
-    function resetAllDataConfirm(){
-      const ok = prompt("전체 데이터 삭제를 진행하려면 '삭제' 를 입력하세요.");
-      if(ok !== "삭제") return;
-      localStorage.clear();
-      alert("전체 데이터가 삭제되었습니다. 새로고침합니다.");
-      location.reload();
-    }
-
-    /* ---------- Boot / Init ---------- */
+    /* ---------- INIT ---------- */
     window.onload = () => {
       initIntro();
-      // 오늘 배지
-      document.getElementById('today-badge').innerText = `오늘 ${todayStr()}`;
-
+      updateDayNav();
       changeDay(new Date().getDay());
       renderCalendar();
 
-      // stopwatch
       const start = Date.now();
       setInterval(()=> {
         totalSec = Math.floor((Date.now() - start)/1000);
@@ -1445,16 +1466,12 @@
       }, 1000);
     };
 
-    document.addEventListener('keydown', (e)=>{
+    document.addEventListener('keydown', (e) => {
       if(e.key === 'Escape'){
         closeTimer(false);
         closeProModal();
-        closeSummaryModal();
-        closeResetModal();
-        toggleDayDrawer(false);
       }
     });
   </script>
-
 </body>
 </html>
