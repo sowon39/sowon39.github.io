@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-  <title>DK MASTER OS v11.3 (Stable+)</title>
+  <title>DK MASTER OS v11.3 (Stable+ ScrollFix)</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -28,12 +28,17 @@
       touch-action: manipulation;
       -webkit-text-size-adjust: 100%;
     }
+
+    /* ✅ 스크롤 복구: 가장 중요한 수정 */
     body{
       font-family:'Pretendard',sans-serif;
       background-color:var(--bg);
       color:#e4e4e7;
       margin:0;
-      overflow:hidden; /* ✅ body 스크롤 제거 (앱처럼) */
+      overflow-x:hidden;
+      overflow-y:auto;
+      -webkit-overflow-scrolling:touch;
+      padding-bottom: env(safe-area-inset-bottom);
 
       background-image:
         radial-gradient(1200px 700px at 15% -10%, rgba(34,211,238,0.18), transparent 55%),
@@ -45,8 +50,6 @@
 
     ::-webkit-scrollbar{ display:none; }
     .scroll-hide{ -ms-overflow-style:none; scrollbar-width:none; }
-    .innerScroll{ overflow:auto; -webkit-overflow-scrolling:touch; }
-    .innerScroll::-webkit-scrollbar{ display:none; }
 
     .glass{
       background:var(--card);
@@ -55,7 +58,7 @@
       border:1px solid rgba(255,255,255,0.10);
     }
 
-    /* ✅ NEW: 전체 폭 레이아웃 컨테이너 (중앙만 쓰는 느낌 제거) */
+    /* ✅ 전체 폭 레이아웃 컨테이너 */
     .layoutWrap{
       width:100%;
       max-width: 1100px; /* 데스크탑 과확장 방지 */
@@ -112,16 +115,13 @@
     }
     .pill.cyan{ border-color:rgba(34,211,238,0.25); background:rgba(34,211,238,0.10); color:rgba(34,211,238,0.95); }
 
-    /* ✅ MAIN: 앱처럼 고정 높이 + 내부 스크롤 */
+    /* ✅ Main: fixed 제거 / 자연 스크롤 */
     main{
-      position:fixed;
-      top: var(--headerH);
-      left:0; right:0;
-      bottom: calc(var(--dockH) + env(safe-area-inset-bottom));
-      overflow:hidden;
+      padding-top: calc(var(--headerH) + 18px);
+      padding-bottom: calc(var(--dockH) + env(safe-area-inset-bottom) + 28px);
     }
 
-    /* ✅ Carousel: Fullscreen + Strong Peek (UPGRADED) */
+    /* ✅ Carousel: Fullscreen + Strong Peek */
     .carousel{
       display:flex;
       gap:18px;
@@ -130,22 +130,21 @@
       -webkit-overflow-scrolling:touch;
       padding: 0 22px 18px;
       margin: 0 -22px;
+
+      /* ✅ 세로 스크롤과 충돌 최소화 */
+      touch-action: pan-y;
     }
     .carousel::before,.carousel::after{ content:''; flex:0 0 22px; }
 
-    /* ✅ 핵심: 양옆 미리보기 확실히 보이게 폭 조정 */
     .carousel > .slide{
       scroll-snap-align:center;
-      flex: 0 0 calc(100% - 120px); /* ✅ 이전/다음이 강하게 peek */
-      min-height: calc(100% - 10px);
+      flex: 0 0 calc(100% - 120px); /* ✅ 강한 peek */
+      min-height: auto;
       transition: opacity .22s ease, transform .22s ease, filter .22s ease;
     }
-
-    /* ✅ peek 더 세련되게 */
     .slide.peek{ opacity:.60; transform:scale(.965); filter:blur(.6px); }
     .slide.focus{ opacity:1; transform:scale(1); filter:none; }
 
-    /* ✅ 태블릿/데스크탑에서는 조금 더 크게 */
     @media (min-width: 860px){
       .carousel > .slide{ flex:0 0 calc(100% - 160px); }
       .slide.peek{ opacity:.62; transform:scale(.97); filter:blur(.45px); }
@@ -226,9 +225,7 @@
     .nav-active-dot{ position:absolute; bottom:1px; width:4px; height:4px; background:var(--primary); border-radius:50%; box-shadow:0 0 12px var(--primary); opacity:0; transition:all .25s; }
     .nav-item.active .nav-active-dot{ opacity:1; transform:scale(1.6); }
 
-    /* Day quick nav */
-    #day-nav-wrap{ transition: all .35s ease; }
-    #day-nav-wrap.hide{ transform:translateY(18px); opacity:0; pointer-events:none; }
+    /* Day chips */
     .day-chip{ width:44px; height:44px; border-radius:18px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:12px; color:rgba(255,255,255,0.55); border:1px solid rgba(255,255,255,0.10); background:rgba(255,255,255,0.04); flex:0 0 auto; user-select:none;}
     .day-chip.active{ background:var(--primary); color:#000; border-color:rgba(34,211,238,0.25); box-shadow:0 10px 24px rgba(34,211,238,0.25); }
 
@@ -236,7 +233,7 @@
     #timer-modal{ transition:all .65s ease; }
     #timer-sec{ letter-spacing:-0.08em; }
 
-    /* ✅ Timer HUD (업그레이드) */
+    /* ✅ Timer HUD */
     #timer-hud{
       position:fixed;
       top: calc(var(--headerH) + 10px);
@@ -290,7 +287,7 @@
     }
     .hudBtn:active{ transform:scale(.98); }
 
-    /* ✅ Summary modal */
+    /* Summary modal */
     #summary-modal{ position:fixed; inset:0; z-index:220; display:none; align-items:center; justify-content:center; }
     #summary-modal.show{ display:flex; }
 
@@ -298,7 +295,7 @@
     #toast{ position:fixed; left:50%; bottom:130px; transform:translateX(-50%); z-index:250; opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; }
     #toast.show{ opacity:1; transform:translateX(-50%) translateY(-6px); }
 
-    /* ✅ 기록 탭: 좌 캘린더 / 우 상세 */
+    /* History layout */
     .historyLayout{
       display:grid;
       grid-template-columns: 1fr;
@@ -307,10 +304,7 @@
     @media(min-width: 900px){
       .historyLayout{
         grid-template-columns: 360px 1fr;
-        height: 100%;
       }
-      .historyCalWrap{ height: 100%; }
-      .historyDetailWrap{ height: 100%; }
     }
 
     /* Calendar */
@@ -341,7 +335,6 @@
 
   <!-- Header -->
   <header>
-    <!-- ✅ layoutWrap 적용 -->
     <div class="layoutWrap flex justify-between items-end">
       <div>
         <h2 id="stopwatch" class="text-3xl font-black font-mono tracking-tighter text-white">00:00</h2>
@@ -359,7 +352,7 @@
     </div>
   </header>
 
-  <!-- ✅ Timer HUD (업그레이드) -->
+  <!-- Timer HUD -->
   <div id="timer-hud">
     <div class="hudCard">
       <div class="min-w-[70px]">
@@ -376,117 +369,114 @@
 
   <!-- Main -->
   <main>
-    <!-- ✅ layoutWrap 적용 + 좌우 여백을 충분히 -->
     <div class="layoutWrap px-4">
-      <div class="innerScroll h-full pb-10">
 
-        <!-- Session -->
-        <section id="tab-session" class="tab-content active">
-          <div class="mb-4 mt-2 px-2 flex justify-between items-start">
+      <!-- Session -->
+      <section id="tab-session" class="tab-content active">
+        <div class="mb-4 mt-2 px-2 flex justify-between items-start">
+          <div>
+            <h1 id="view-day" class="text-5xl font-black italic text-white uppercase tracking-tighter">DAY</h1>
+            <p id="view-title" class="text-gray-300 font-black mt-1 text-sm tracking-wide"></p>
+            <p id="view-subcue" class="text-[10px] font-black text-white/50 mt-2 tracking-[0.18em] uppercase"></p>
+          </div>
+          <button onclick="resetToday()" class="pill" title="오늘 기록 초기화">
+            <i class="fa-solid fa-rotate-left"></i> 오늘 초기화
+          </button>
+        </div>
+
+        <!-- ✅ 훈련 탭에서만 요일칩 표시 -->
+        <div id="day-nav-wrap" class="mb-3">
+          <div id="day-nav" class="flex justify-center gap-2 overflow-x-auto pb-2 scroll-hide"></div>
+        </div>
+
+        <div class="flex items-center justify-between px-2 mb-4">
+          <div class="flex items-center gap-2">
+            <span class="pill cyan" id="slide-indicator">1 / 1</span>
+            <span class="pill" id="slide-name">운동</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="carouselPrev()" class="pill"><i class="fa-solid fa-chevron-left"></i></button>
+            <button onclick="carouselNext()" class="pill"><i class="fa-solid fa-chevron-right"></i></button>
+          </div>
+        </div>
+
+        <div id="session-carousel" class="carousel scroll-hide"></div>
+      </section>
+
+      <!-- Stats -->
+      <section id="tab-stats" class="tab-content">
+        <div class="mb-8 px-2">
+          <h2 class="text-3xl font-black italic uppercase tracking-tight">분석</h2>
+          <p class="text-[11px] font-black text-white/45 mt-2 tracking-[0.18em] uppercase">
+            훈련의 편향/밸런스를 확인합니다
+          </p>
+        </div>
+
+        <div class="glass rounded-[28px] p-8 mb-6">
+          <canvas id="radarChart" class="max-h-[320px]"></canvas>
+        </div>
+
+        <div class="grid grid-cols-2 gap-5 mb-6">
+          <div class="glass rounded-[28px] p-6">
+            <p class="text-[9px] text-gray-400 font-black uppercase mb-2 tracking-widest">총 기록(세트)</p>
+            <p id="stat-total-sets" class="text-4xl font-black text-white">0</p>
+          </div>
+          <div class="glass rounded-[28px] p-6">
+            <p class="text-[9px] text-gray-400 font-black uppercase mb-2 tracking-widest">활동 일수</p>
+            <p id="stat-week-count" class="text-4xl font-black text-indigo-300">0</p>
+          </div>
+        </div>
+
+        <div class="glass rounded-[28px] p-6 mb-6">
+          <div class="flex items-center justify-between">
             <div>
-              <h1 id="view-day" class="text-5xl font-black italic text-white uppercase tracking-tighter">DAY</h1>
-              <p id="view-title" class="text-gray-300 font-black mt-1 text-sm tracking-wide"></p>
-              <p id="view-subcue" class="text-[10px] font-black text-white/50 mt-2 tracking-[0.18em] uppercase"></p>
+              <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45">휴식 타이머 알림</p>
+              <p class="text-sm font-black text-white/70 mt-2">타이머 종료 시 소리/진동</p>
             </div>
-            <button onclick="resetToday()" class="pill" title="오늘 기록 초기화">
-              <i class="fa-solid fa-rotate-left"></i> 오늘 초기화
+            <button id="notif-toggle" class="pill cyan" onclick="toggleNotif()">ON</button>
+          </div>
+          <p class="text-[11px] font-black text-white/35 mt-3">
+            * iOS는 무음모드에서 소리가 제한될 수 있습니다. 진동은 대부분 동작합니다.
+          </p>
+        </div>
+
+        <div class="grid gap-3">
+          <button onclick="backupJSON()" class="bigBtn"><i class="fa-solid fa-download"></i> 백업(JSON)</button>
+          <button onclick="resetAll()" class="bigBtn" style="border-color: rgba(255,255,255,0.18);"><i class="fa-solid fa-triangle-exclamation"></i> 전체 초기화</button>
+        </div>
+      </section>
+
+      <!-- History -->
+      <section id="tab-history" class="tab-content">
+        <div class="mb-6 px-2 flex justify-between items-end">
+          <h2 class="text-3xl font-black italic uppercase">기록</h2>
+          <div class="flex items-center gap-4 glass rounded-2xl px-5 py-2.5">
+            <button onclick="changeMonth(-1)" class="p-1 hover:text-cyan-300 transition-colors"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+            <span id="calendar-month" class="text-xs font-black w-20 text-center tracking-widest">2026.01</span>
+            <button onclick="changeMonth(1)" class="p-1 hover:text-cyan-300 transition-colors"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+          </div>
+        </div>
+
+        <div class="historyLayout">
+          <div>
+            <div class="glass rounded-[28px] p-6 mb-4 shadow-2xl">
+              <div class="grid grid-cols-7 text-center text-[9px] font-black text-gray-500 mb-5 uppercase tracking-[0.2em]">
+                <div class="text-red-600">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div class="text-blue-600">토</div>
+              </div>
+              <div id="calendar-body" class="grid grid-cols-7 gap-3"></div>
+            </div>
+
+            <button onclick="resetSelectedDate()" class="pill w-full justify-center">
+              <i class="fa-solid fa-eraser"></i> 선택 날짜 초기화
             </button>
           </div>
 
-          <!-- ✅ 훈련 탭에서만 요일 항상 보이게 -->
-          <div id="day-nav-wrap" class="mb-3">
-            <div id="day-nav" class="flex justify-center gap-2 overflow-x-auto pb-2 scroll-hide"></div>
+          <div>
+            <div id="history-detail" class="space-y-6"></div>
           </div>
+        </div>
+      </section>
 
-          <div class="flex items-center justify-between px-2 mb-4">
-            <div class="flex items-center gap-2">
-              <span class="pill cyan" id="slide-indicator">1 / 1</span>
-              <span class="pill" id="slide-name">운동</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <button onclick="carouselPrev()" class="pill"><i class="fa-solid fa-chevron-left"></i></button>
-              <button onclick="carouselNext()" class="pill"><i class="fa-solid fa-chevron-right"></i></button>
-            </div>
-          </div>
-
-          <div id="session-carousel" class="carousel scroll-hide"></div>
-        </section>
-
-        <!-- Stats / Insights -->
-        <section id="tab-stats" class="tab-content">
-          <div class="mb-8 px-2">
-            <h2 class="text-3xl font-black italic uppercase tracking-tight">분석</h2>
-            <p class="text-[11px] font-black text-white/45 mt-2 tracking-[0.18em] uppercase">
-              훈련의 편향/밸런스를 확인합니다
-            </p>
-          </div>
-
-          <div class="glass rounded-[28px] p-8 mb-6">
-            <canvas id="radarChart" class="max-h-[320px]"></canvas>
-          </div>
-
-          <div class="grid grid-cols-2 gap-5 mb-6">
-            <div class="glass rounded-[28px] p-6">
-              <p class="text-[9px] text-gray-400 font-black uppercase mb-2 tracking-widest">총 기록(세트)</p>
-              <p id="stat-total-sets" class="text-4xl font-black text-white">0</p>
-            </div>
-            <div class="glass rounded-[28px] p-6">
-              <p class="text-[9px] text-gray-400 font-black uppercase mb-2 tracking-widest">활동 일수</p>
-              <p id="stat-week-count" class="text-4xl font-black text-indigo-300">0</p>
-            </div>
-          </div>
-
-          <div class="glass rounded-[28px] p-6 mb-6">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45">휴식 타이머 알림</p>
-                <p class="text-sm font-black text-white/70 mt-2">타이머 종료 시 소리/진동</p>
-              </div>
-              <button id="notif-toggle" class="pill cyan" onclick="toggleNotif()">ON</button>
-            </div>
-            <p class="text-[11px] font-black text-white/35 mt-3">
-              * iOS는 무음모드에서 소리가 제한될 수 있습니다. 진동은 대부분 동작합니다.
-            </p>
-          </div>
-
-          <div class="grid gap-3">
-            <button onclick="backupJSON()" class="bigBtn"><i class="fa-solid fa-download"></i> 백업(JSON)</button>
-            <button onclick="resetAll()" class="bigBtn" style="border-color: rgba(255,255,255,0.18);"><i class="fa-solid fa-triangle-exclamation"></i> 전체 초기화</button>
-          </div>
-        </section>
-
-        <!-- History -->
-        <section id="tab-history" class="tab-content">
-          <div class="mb-6 px-2 flex justify-between items-end">
-            <h2 class="text-3xl font-black italic uppercase">기록</h2>
-            <div class="flex items-center gap-4 glass rounded-2xl px-5 py-2.5">
-              <button onclick="changeMonth(-1)" class="p-1 hover:text-cyan-300 transition-colors"><i class="fa-solid fa-chevron-left text-xs"></i></button>
-              <span id="calendar-month" class="text-xs font-black w-20 text-center tracking-widest">2026.01</span>
-              <button onclick="changeMonth(1)" class="p-1 hover:text-cyan-300 transition-colors"><i class="fa-solid fa-chevron-right text-xs"></i></button>
-            </div>
-          </div>
-
-          <div class="historyLayout">
-            <div class="historyCalWrap">
-              <div class="glass rounded-[28px] p-6 mb-4 shadow-2xl">
-                <div class="grid grid-cols-7 text-center text-[9px] font-black text-gray-500 mb-5 uppercase tracking-[0.2em]">
-                  <div class="text-red-600">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div class="text-blue-600">토</div>
-                </div>
-                <div id="calendar-body" class="grid grid-cols-7 gap-3"></div>
-              </div>
-
-              <button onclick="resetSelectedDate()" class="pill w-full justify-center">
-                <i class="fa-solid fa-eraser"></i> 선택 날짜 초기화
-              </button>
-            </div>
-
-            <div class="historyDetailWrap">
-              <div id="history-detail" class="space-y-6"></div>
-            </div>
-          </div>
-        </section>
-
-      </div>
     </div>
   </main>
 
@@ -534,7 +524,7 @@
     </div>
   </div>
 
-  <!-- ✅ SUMMARY MODAL -->
+  <!-- SUMMARY MODAL -->
   <div id="summary-modal">
     <div class="absolute inset-0 bg-black/85 backdrop-blur-xl" onclick="closeSummary()"></div>
     <div class="relative glass rounded-[28px] p-7 w-[min(520px,calc(100vw-44px))]">
@@ -575,13 +565,14 @@
 
   <script>
     /* =========================================================
-      DK MASTER OS v11.3 (Stable+)
-      ✅ 기존 기능 유지
-      ✅ Timer 업그레이드: HUD + 최소화 + 알림 옵션
-      ✅ 기록: 좌 캘린더 / 우 상세 + 세트별 restUsed 표시
-      ✅ body 스크롤 제거, 탭 내부 스크롤
-      ✅ zoom 방지
-      ✅ NEW: 슬라이딩 배너 peek 강화 + 전체 폭 레이아웃
+      DK MASTER OS v11.3 (Stable+ ScrollFix)
+      ✅ 로직/기능 유지
+      ✅ 스크롤 정상화 (body scroll)
+      ✅ 하단 네비가 본문을 가리지 않게 main padding-bottom
+      ✅ 슬라이딩 배너 peek 유지
+      ✅ Timer HUD/최소화/알림 유지
+      ✅ 기록: 좌 캘린더 / 우 상세 유지
+      ✅ 세트 클릭 시 슬라이드 튕김 버그 방지 유지
     ========================================================= */
 
     /* ---------- DATA ---------- */
@@ -633,7 +624,7 @@
     let logs = safeParse(localStorage.getItem(KEY_LOGS), []);
     let customSets = safeParse(localStorage.getItem(KEY_SETS), {});
     let customReps = safeParse(localStorage.getItem(KEY_REPS), {});
-    let progressByDate = safeParse(localStorage.getItem(KEY_PROGRESS_BY_DATE), {}); // {date:{exerciseId:[bool...]}}
+    let progressByDate = safeParse(localStorage.getItem(KEY_PROGRESS_BY_DATE), {});
 
     /* ---------- STATE ---------- */
     let timerInt = null;
@@ -695,12 +686,13 @@
       document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 
-      // ✅ 요일칩: 훈련 탭에서만 표시
       const dayWrap = document.getElementById('day-nav-wrap');
       if(dayWrap) dayWrap.style.display = (name === 'session') ? 'block' : 'none';
 
       if(name === 'stats') renderStats();
       if(name === 'history') renderCalendar();
+
+      window.scrollTo({top:0, behavior:'smooth'});
     }
 
     /* ---------- DAY NAV ---------- */
@@ -852,7 +844,6 @@
               </div>
 
               <div class="mt-5 grid md:grid-cols-2 gap-4">
-                <!-- LEFT -->
                 <div class="space-y-3">
                   <div class="glass rounded-2xl p-4 border-white/5">
                     <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45 mb-2">핵심 큐</p>
@@ -875,7 +866,6 @@
                   </div>
                 </div>
 
-                <!-- RIGHT -->
                 <div class="rightPanel space-y-3">
                   <div class="glass rounded-2xl p-4 border-white/5">
                     <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45">세트/횟수 설정</p>
@@ -934,7 +924,6 @@
             </div>
           </div>
         `;
-
         carousel.appendChild(slide);
       });
 
@@ -997,7 +986,6 @@
       haptic(10);
     }
 
-    /* ---------- SET BUTTONS ---------- */
     function bindSetButtons(){
       const buttons = document.querySelectorAll('.setBtn[data-ex]');
       buttons.forEach(btn => {
@@ -1010,7 +998,6 @@
       });
     }
 
-    /* ---------- TOGGLE COMPLETE + LOG ---------- */
     function toggleSetComplete(date, exerciseId, setIndex){
       const [dayIdx, exIdx] = exerciseId.split('-').map(Number);
       const w = workoutData[dayIdx]?.list?.[exIdx];
@@ -1047,13 +1034,10 @@
           });
           localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
         }
-
         if(w.rest > 0) startTimer(w.rest);
-
         if(setNo === setTotal){
           setTimeout(()=> carouselNext(), 250);
         }
-
         haptic(16);
       }else{
         logs = logs.filter(l => l.logKey !== logKey);
@@ -1063,7 +1047,6 @@
 
       updateProgressUI();
 
-      // ✅ 버그 방지: 현재 슬라이드 유지
       const keep = currentSlideIndex;
       renderCarousel();
       currentSlideIndex = keep;
@@ -1071,7 +1054,6 @@
       updateSlideHUD();
     }
 
-    /* ---------- ADJUST SET/REP ---------- */
     function adjust(type, key, val){
       const [d, idx] = key.split('-').map(Number);
       const w = workoutData[d]?.list?.[idx];
@@ -1111,7 +1093,6 @@
       haptic(18);
     }
 
-    /* ---------- RESET TODAY / EXERCISE ---------- */
     function resetExercise(exerciseId){
       if(!confirm('이 운동의 오늘 기록을 초기화할까요?')) return;
       const date = todayStr();
@@ -1149,7 +1130,7 @@
       haptic(25);
     }
 
-    /* ---------- TIMER (업그레이드: HUD + 최소화) ---------- */
+    /* ---------- TIMER ---------- */
     function showHUD(on){
       const hud = document.getElementById('timer-hud');
       if(!hud) return;
@@ -1447,7 +1428,6 @@
       changeDay(new Date().getDay());
       renderCalendar();
 
-      // notif toggle init
       const btn = document.getElementById('notif-toggle');
       if(btn){
         btn.textContent = restNotifEnabled ? 'ON' : 'OFF';
