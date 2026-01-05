@@ -28,10 +28,6 @@
       --card:rgba(255,255,255,0.04);
       --dockH: 110px;
       --headerH: 92px;
-
-      /* ✅ Safe Area */
-      --safeTop: env(safe-area-inset-top);
-      --safeBottom: env(safe-area-inset-bottom);
     }
 
     html,body{ height:100%; }
@@ -52,7 +48,7 @@
       overflow-x:hidden;
       overflow-y:auto;
       -webkit-overflow-scrolling:touch;
-      padding-bottom: var(--safeBottom);
+      padding-bottom: env(safe-area-inset-bottom);
       overscroll-behavior: none;
 
       background-image:
@@ -145,19 +141,19 @@
     }
 
     #splash-screen.splashA .splash-logo{
-      font-size: 4.1rem;
+      font-size: 4.3rem;
       font-weight: 950;
       font-style: italic;
-      line-height: 1.1;
-      padding: 6px 12px;
+      line-height: 1.1 !important;
       letter-spacing: -0.09em;
       background: linear-gradient(180deg, #fff 45%, rgba(34,211,238,0.95));
       -webkit-background-clip:text;
       -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 26px rgba(34,211,238,0.28));
+      filter: drop-shadow(0 0 26px rgba(34,211,238,0.28)) !important;
       position:relative;
       display:inline-block;
       overflow: visible !important;
+      padding: 6px 12px !important;
     }
 
     #splash-screen.splashA .splash-logo::after{
@@ -242,15 +238,16 @@
     }
     #splash-screen.splashA .splash-auth b{ color: rgba(34,211,238,0.95); }
 
-    /* ✅ iOS Safe Area Header Fix */
+    /* Header */
     header{
       position:fixed; top:0; left:0; right:0; z-index:50;
-      padding: calc(18px + var(--safeTop)) 18px 14px;
+      padding: 18px 18px 14px;
       border-bottom:1px solid rgba(255,255,255,0.06);
       backdrop-filter: blur(18px);
       background: rgba(10,10,12,0.62);
-      height: calc(var(--headerH) + var(--safeTop));
+      height: var(--headerH);
       box-sizing:border-box;
+      padding-top: calc(14px + env(safe-area-inset-top)); /* ✅ 노치 안전영역 대응 */
     }
 
     .tab-content{ display:none; animation:fadeInContent 0.45s ease-out; }
@@ -272,8 +269,8 @@
 
     /* ✅ Main */
     main{
-      padding-top: calc(var(--headerH) + var(--safeTop) + 18px);
-      padding-bottom: calc(var(--dockH) + var(--safeBottom) + 28px);
+      padding-top: calc(var(--headerH) + 18px + env(safe-area-inset-top)); /* ✅ 노치 안전영역 */
+      padding-bottom: calc(var(--dockH) + env(safe-area-inset-bottom) + 28px);
     }
 
     /* ✅ Carousel */
@@ -310,6 +307,7 @@
       justify-content:space-between;
       border-radius:32px;
       box-shadow: 0 30px 80px rgba(0,0,0,0.55);
+      overflow:hidden; /* ✅ 라운드 잘림 정리 */
     }
 
     /* Right Panel */
@@ -355,10 +353,12 @@
       background:rgba(255,255,255,0.05);
       border:1px solid rgba(255,255,255,0.10);
       user-select:none;
+      overflow:hidden; /* ✅ 삐져나오는 색상 방지 */
     }
     .setBtn:active{ transform:scale(0.985); }
     .setBtn.done{ background:linear-gradient(135deg,var(--primary),var(--accent)); color:#000; box-shadow:0 18px 34px rgba(34,211,238,0.24); border:none; }
 
+    /* ✅ 세트 순서 잠금 */
     .setBtn.locked{
       opacity: .35;
       filter: saturate(.6);
@@ -400,23 +400,29 @@
       pointer-events: auto;
     }
 
-    /* ✅ Day chips — iOS 클립 문제 해결 */
+    /* Day chips */
     .day-chip{
-      width:44px; height:44px; border-radius:18px;
-      display:flex; align-items:center; justify-content:center;
-      font-weight:900; font-size:12px;
+      width:44px; height:44px;
+      border-radius:18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:900;
+      font-size:12px;
       color:rgba(255,255,255,0.55);
       border:1px solid rgba(255,255,255,0.10);
       background:rgba(255,255,255,0.04);
-      flex:0 0 auto; user-select:none;
+      flex:0 0 auto;
+      user-select:none;
+      overflow:hidden; /* ✅ 삐져나오는 배경/색상 방지 */
       position:relative;
-      overflow:hidden;        /* ✅ 삐져나감 제거 */
-      isolation:isolate;      /* ✅ iOS 렌더 안정화 */
+      isolation:isolate; /* ✅ iOS 레이어 안정 */
     }
     .day-chip.active{
-      background:var(--primary); color:#000;
+      background:var(--primary);
+      color:#000;
       border-color:rgba(34,211,238,0.25);
-      box-shadow: 0 10px 22px rgba(34,211,238,0.18);
+      box-shadow:0 10px 24px rgba(34,211,238,0.25);
     }
 
     /* Timer Modal */
@@ -426,7 +432,7 @@
     /* ✅ Timer HUD */
     #timer-hud{
       position:fixed;
-      top: calc(var(--headerH) + var(--safeTop) + 10px);
+      top: calc(var(--headerH) + 10px + env(safe-area-inset-top));
       right: 14px;
       z-index: 210;
       display:none;
@@ -509,299 +515,233 @@
     .log-row{ background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:16px; overflow:hidden; }
     .log-row td{ padding:12px 10px; font-weight:800; font-size:12px; color:rgba(255,255,255,0.78); }
 
-
     /* =========================================================
-      ✅ Option 2: Mobile 전용 최신 UX (Bottom Sheet + Fixed Set Bar)
+       ✅ Bottom Sheet (운동 상세) — iOS 터치/레이어 문제 해결 포함
     ========================================================= */
-    .mobileOnly{ display:none; }
-    .desktopOnly{ display:block; }
+    #detail-sheet{
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none;
+      pointer-events: none;
+    }
+    #detail-sheet.show{
+      display: block;
+      pointer-events: auto;
+    }
+    .sheet-backdrop{
+      position:absolute;
+      inset:0;
+      background: rgba(0,0,0,0.72);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      z-index: 1;
+      pointer-events: auto;
+    }
+    .sheet{
+      position:absolute;
+      left:0;
+      right:0;
+      bottom:0;
+      border-radius: 26px 26px 0 0;
+      background: rgba(10,10,12,0.92);
+      border: 1px solid rgba(255,255,255,0.10);
+      box-shadow: 0 -24px 80px rgba(0,0,0,0.75);
+      transform: translateY(100%);
+      transition: transform .45s cubic-bezier(0.22,1,0.36,1);
+      z-index: 2;
+      pointer-events: auto;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 16px);
+      isolation: isolate;
+      max-height: 88vh;
+      overflow: hidden;
+    }
+    #detail-sheet.show .sheet{
+      transform: translateY(0%);
+    }
+    .sheetHeader{
+      padding: 16px 18px 12px;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .sheetTitle{
+      font-weight: 950;
+      font-size: 18px;
+      letter-spacing: -0.03em;
+      color: white;
+    }
+    .sheetSub{
+      margin-top: 4px;
+      font-size: 10px;
+      letter-spacing: .22em;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.40);
+    }
+    .sheetClose{
+      width:44px; height:44px;
+      border-radius: 16px;
+      display:flex; align-items:center; justify-content:center;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.14);
+      color: rgba(255,255,255,0.85);
+      z-index: 3;
+      pointer-events: auto;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .sheetClose:active{ transform: scale(.98); }
 
-    /* Mobile Mode */
+    .sheetBody{
+      padding: 16px 18px 18px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      max-height: calc(88vh - 90px);
+    }
+
+    .sheetTabs{
+      display:flex;
+      gap:10px;
+      padding: 0 0 14px;
+      overflow-x:auto;
+    }
+    .sheetTab{
+      flex: 0 0 auto;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 900;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      color: rgba(255,255,255,0.75);
+      -webkit-tap-highlight-color:transparent;
+    }
+    .sheetTab.active{
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color:#000;
+      border: none;
+      box-shadow: 0 14px 32px rgba(34,211,238,0.18);
+    }
+
+    .sheetBox{
+      border-radius: 22px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 14px 14px;
+      margin-bottom: 12px;
+    }
+    .sheetLabel{
+      font-size: 10px;
+      letter-spacing: .20em;
+      font-weight: 950;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.42);
+    }
+    .sheetText{
+      margin-top: 10px;
+      font-size: 14px;
+      line-height: 1.55;
+      font-weight: 800;
+      color: rgba(255,255,255,0.88);
+      letter-spacing: -0.01em;
+    }
+    .sheetHint{
+      margin-top: 10px;
+      font-size: 11px;
+      font-weight: 800;
+      color: rgba(255,255,255,0.45);
+      line-height: 1.4;
+    }
+    .sheetGif{
+      width: 100%;
+      border-radius: 18px;
+      margin-top: 12px;
+      border: 1px solid rgba(255,255,255,0.10);
+      box-shadow: 0 22px 55px rgba(0,0,0,0.65);
+      display:block;
+      object-fit: cover;
+      background: rgba(255,255,255,0.03);
+    }
+
+    /* ✅ Mobile Layout Optimization */
     @media (max-width: 520px){
-      .desktopOnly{ display:none !important; }
-      .mobileOnly{ display:block !important; }
-
       .layoutWrap{ padding-left: 0; padding-right: 0; }
       main .layoutWrap.px-4{ padding-left: 14px !important; padding-right: 14px !important; }
 
       header{
-        padding: calc(12px + var(--safeTop)) 14px 10px !important;
-        height: calc(84px + var(--safeTop));
+        padding: 14px 14px 10px !important;
+        height: 88px;
+        padding-top: calc(10px + env(safe-area-inset-top)) !important;
       }
-      :root{ --headerH: 84px; --dockH: 92px; }
+      :root{ --headerH: 88px; --dockH: 92px; }
 
+      /* ✅ (요청) DAY 타이틀 공간 압박 해결 */
+      #view-day{
+        font-size: 1.38rem !important;
+        letter-spacing: -0.02em !important;
+      }
+      #view-title{
+        font-size: 0.95rem !important;
+        margin-top: 2px !important;
+        opacity: 0.9;
+      }
+      #view-subcue{
+        margin-top: 6px !important;
+        font-size: 9px !important;
+      }
+
+      /* ✅ (요청) 진행률 KPI 크게 */
+      #progress-percent{
+        font-size: 16px !important;
+        font-weight: 950 !important;
+        margin-bottom: 6px !important;
+        letter-spacing: -0.02em;
+      }
+      header .w-28{
+        width: 140px !important;
+        height: 8px !important;
+      }
+
+      .slideCard{ border-radius: 24px; }
+      .slideCard .p-6{ padding: 14px !important; }
+      .slideCard h3{ font-size: 1.55rem !important; }
+
+      /* ✅ 카드 내부 2단(grid) → 1단 */
+      .slideCard .md\:grid-cols-2{ grid-template-columns: 1fr !important; }
+
+      .rightPanel{
+        padding: 14px !important;
+        border-radius: 22px !important;
+      }
+
+      .stepperBtn{
+        width: 44px !important;
+        height: 44px !important;
+        border-radius: 16px !important;
+      }
+      .stepperValue{ font-size: 20px !important; }
+
+      /* ✅ 세트 버튼: 2열 → 3열 */
+      .rightPanel .grid.grid-cols-2{
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      }
+      .setBtn{
+        height: 54px !important;
+        font-size: 15px !important;
+        border-radius: 18px !important;
+      }
+
+      /* ✅ 캐러셀 peek: 폰에서 과하게 넓어지는 것 방지 */
       .carousel > .slide{
         flex: 0 0 calc(100% - 70px) !important;
       }
 
-      .slideCard{ border-radius: 26px; }
-      .slideCard h3{ font-size: 1.55rem !important; }
-
-      /* ✅ Mobile Summary Card */
-      .mCard{
-        border-radius: 26px;
-        padding: 16px;
-        box-shadow: 0 26px 70px rgba(0,0,0,0.55);
-      }
-
-      .mSub{
-        font-size: 10px;
-        font-weight: 900;
-        letter-spacing: .16em;
-        text-transform: uppercase;
-        color: rgba(255,255,255,0.42);
-      }
-
-      .mCue{
-        margin-top: 10px;
-        padding: 14px;
-        border-radius: 20px;
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.09);
-      }
-
-      .mCue p{
-        font-size: 15px;
-        line-height: 1.4;
-        font-weight: 900;
-        color: rgba(255,255,255,0.86);
-        letter-spacing: -0.02em;
-      }
-
-      /* ✅ Fixed Action Bar for sets (iOS style) */
-      .mSetBarWrap{
-        position: fixed;
-        left: 0; right: 0;
-        bottom: calc(var(--dockH) + var(--safeBottom) + 10px);
-        z-index: 120;
-        padding: 0 14px;
-        pointer-events: none;
-      }
-      .mSetBar{
-        pointer-events: auto;
-        background: rgba(10,10,12,0.76);
-        border: 1px solid rgba(255,255,255,0.12);
-        backdrop-filter: blur(22px);
-        -webkit-backdrop-filter: blur(22px);
-        border-radius: 24px;
-        padding: 12px;
-        box-shadow: 0 22px 60px rgba(0,0,0,0.70);
-      }
-      .mSetRow{
-        display:flex;
-        gap:10px;
-        overflow-x:auto;
-        padding-bottom: 6px;
-        -webkit-overflow-scrolling: touch;
-      }
-      .mSetRow::-webkit-scrollbar{ display:none; }
-
-      .mSetBtn{
-        flex: 0 0 auto;
-        width: 56px;
-        height: 48px;
-        border-radius: 18px;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        font-weight: 950;
-        font-size: 14px;
-        background: rgba(255,255,255,0.05);
-        border: 1px solid rgba(255,255,255,0.12);
-        color: rgba(255,255,255,0.85);
-        -webkit-tap-highlight-color:transparent;
-        user-select:none;
-      }
-      .mSetBtn:active{ transform: scale(.98); }
-
-      .mSetBtn.done{
-        background: linear-gradient(135deg, var(--primary), var(--accent));
-        color:#000;
-        border: none;
-        box-shadow: 0 18px 34px rgba(34,211,238,0.22);
-      }
-      .mSetBtn.locked{
-        opacity: .35;
-        filter: saturate(.6);
-        pointer-events: none;
-      }
-
-      .mBarTop{
-        display:flex;
-        align-items:center;
-        justify-content:space-between;
-        gap:10px;
-        margin-bottom: 10px;
-      }
-
-      .mBarTop .mMeta{
-        display:flex;
-        flex-direction:column;
-        gap:3px;
-        min-width: 0;
-      }
-      .mBarTop .mMeta strong{
-        font-size: 13px;
-        font-weight: 950;
-        color: rgba(255,255,255,0.92);
-        letter-spacing:-0.03em;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-      .mBarTop .mMeta span{
-        font-size: 10px;
-        font-weight: 900;
-        color: rgba(255,255,255,0.42);
-        letter-spacing: .14em;
-        text-transform: uppercase;
-      }
-
-      .mBarTop .mActions{
-        display:flex;
-        gap:8px;
-      }
-      .mActionBtn{
-        width: 44px; height: 44px;
-        border-radius: 18px;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        background: rgba(255,255,255,0.06);
-        border: 1px solid rgba(255,255,255,0.12);
-        color: rgba(255,255,255,0.85);
-      }
-      .mActionBtn:active{ transform: scale(.98); }
-
-      /* ✅ Bottom Sheet */
-      #detail-sheet{
-        position: fixed;
-        inset: 0;
-        z-index: 240;
-        display: none;
-        align-items: flex-end;
-        justify-content:center;
-      }
-      #detail-sheet.show{ display:flex; }
-
-      .sheet-backdrop{
-        position:absolute;
-        inset:0;
-        background: rgba(0,0,0,0.62);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-      }
-      .sheet{
-        position:relative;
-        width: 100%;
-        max-width: 520px;
-        border-radius: 30px 30px 0 0;
-        padding: 14px 14px calc(18px + var(--safeBottom));
-        background: rgba(12,12,16,0.92);
-        border: 1px solid rgba(255,255,255,0.10);
-        box-shadow: 0 -30px 80px rgba(0,0,0,0.75);
-        transform: translateY(100%);
-        animation: sheetUp .35s cubic-bezier(.2,.9,.2,1) forwards;
-      }
-      @keyframes sheetUp{ to{ transform: translateY(0%); } }
-
-      .sheetHandle{
-        width: 44px; height: 5px;
-        border-radius: 999px;
-        background: rgba(255,255,255,0.16);
-        margin: 6px auto 10px;
-      }
-
-      .sheetHead{
-        display:flex;
-        align-items:flex-start;
-        justify-content:space-between;
-        gap:10px;
-        padding: 6px 6px 10px;
-      }
-      .sheetHead h3{
-        font-size: 18px;
-        font-weight: 950;
-        letter-spacing: -0.04em;
-        color: white;
-      }
-      .sheetHead p{
-        margin-top: 6px;
-        font-size: 10px;
-        font-weight: 900;
-        letter-spacing: .14em;
-        text-transform: uppercase;
-        color: rgba(255,255,255,0.45);
-      }
-
-      .sheetClose{
-        width: 42px; height: 42px;
-        border-radius: 18px;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        background: rgba(255,255,255,0.06);
-        border: 1px solid rgba(255,255,255,0.12);
-        color: rgba(255,255,255,0.85);
-      }
-
-      .sheetTabs{
-        display:flex;
-        gap:8px;
-        overflow-x:auto;
-        padding: 6px 6px 12px;
-      }
-      .sheetTabs::-webkit-scrollbar{ display:none; }
-
-      .sheetTab{
-        flex: 0 0 auto;
-        padding: 10px 12px;
-        border-radius: 999px;
-        font-size: 11px;
-        font-weight: 950;
-        letter-spacing: .14em;
-        text-transform: uppercase;
-        color: rgba(255,255,255,0.58);
-        background: rgba(255,255,255,0.05);
-        border: 1px solid rgba(255,255,255,0.10);
-      }
-      .sheetTab.active{
-        background: rgba(34,211,238,0.14);
-        border-color: rgba(34,211,238,0.25);
-        color: rgba(34,211,238,0.95);
-      }
-
-      .sheetBody{
-        padding: 0 6px 8px;
-      }
-      .sheetBox{
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.10);
-        border-radius: 22px;
-        padding: 16px;
-        margin-bottom: 12px;
-      }
-      .sheetLabel{
-        font-size: 10px;
-        font-weight: 950;
-        letter-spacing: .18em;
-        text-transform: uppercase;
-        color: rgba(255,255,255,0.42);
-      }
-      .sheetText{
-        margin-top: 10px;
-        font-size: 15px;
-        line-height: 1.55;
-        font-weight: 850;
-        letter-spacing: -0.02em;
-        color: rgba(255,255,255,0.86);
-      }
-      .sheetHint{
-        margin-top: 10px;
-        font-size: 12px;
-        font-weight: 800;
-        color: rgba(255,255,255,0.45);
-      }
+      /* ✅ Dock 조금 더 컴팩트 */
+      .navDockWrap{ padding: 14px !important; }
+      .nav-dock{ border-radius: 30px !important; padding: 9px !important; }
+      .nav-item{ padding: 10px 0 !important; }
+      .nav-item i{ font-size: 1.15rem !important; }
     }
   </style>
 </head>
@@ -826,6 +766,27 @@
       <div class="splash-foot">
         <div class="splash-auth">AUTHORIZED ACCESS · <b>GRANTED</b></div>
         <div class="splash-ver">v11.3 · Stable</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ Bottom Sheet (운동 상세) -->
+  <div id="detail-sheet">
+    <div class="sheet-backdrop" onclick="closeDetailSheet()"></div>
+    <div class="sheet" role="dialog" aria-modal="true">
+      <div class="sheetHeader">
+        <div>
+          <div class="sheetTitle" id="sheet-title">운동 상세</div>
+          <div class="sheetSub" id="sheet-sub">DETAIL</div>
+        </div>
+        <button class="sheetClose" onclick="closeDetailSheet()" aria-label="닫기">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="sheetBody">
+        <div class="sheetTabs" id="sheet-tabs"></div>
+        <div id="sheet-body"></div>
       </div>
     </div>
   </div>
@@ -861,42 +822,6 @@
         <button class="hudBtn" onclick="openTimerFromHUD()" title="타이머 보기"><i class="fa-solid fa-expand"></i></button>
         <button class="hudBtn" onclick="closeTimer(false)" title="스킵"><i class="fa-solid fa-forward"></i></button>
       </div>
-    </div>
-  </div>
-
-  <!-- ✅ Mobile Bottom Sheet (옵션2 핵심) -->
-  <div id="detail-sheet" class="mobileOnly">
-    <div class="sheet-backdrop" onclick="closeDetailSheet()"></div>
-    <div class="sheet">
-      <div class="sheetHandle"></div>
-      <div class="sheetHead">
-        <div>
-          <h3 id="sheet-title">운동 상세</h3>
-          <p id="sheet-sub">DETAIL</p>
-        </div>
-        <button class="sheetClose" onclick="closeDetailSheet()"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-
-      <div class="sheetTabs" id="sheet-tabs"></div>
-      <div class="sheetBody" id="sheet-body"></div>
-    </div>
-  </div>
-
-  <!-- ✅ Mobile Fixed Set Bar -->
-  <div class="mSetBarWrap mobileOnly">
-    <div class="mSetBar">
-      <div class="mBarTop">
-        <div class="mMeta">
-          <strong id="mbar-exName">운동</strong>
-          <span id="mbar-meta">target · rest</span>
-        </div>
-        <div class="mActions">
-          <button class="mActionBtn" onclick="openDetailSheet()" title="자세히 보기"><i class="fa-solid fa-circle-info"></i></button>
-          <button class="mActionBtn" onclick="mobileResetExercise()" title="이 운동 초기화"><i class="fa-solid fa-rotate-left"></i></button>
-        </div>
-      </div>
-
-      <div class="mSetRow" id="mbar-sets"></div>
     </div>
   </div>
 
@@ -1015,7 +940,7 @@
   <!-- Bottom Dock -->
   <div class="navDockWrap">
     <div class="layoutWrap">
-      <nav class="nav-dock" style="margin-bottom: calc(var(--safeBottom) + 6px);">
+      <nav class="nav-dock" style="margin-bottom: calc(env(safe-area-inset-bottom) + 6px);">
         <button onclick="showTab('session', this)" class="nav-item active">
           <i class="fa-solid fa-bolt-lightning"></i>
           <span class="text-[8px] font-black uppercase tracking-tighter">훈련</span>
@@ -1105,41 +1030,41 @@
       ✅ 휴식 알림 강화(4회 패턴 + 화면 플래시)
       ✅ Dock: 작동할 때만 등장 + 자동 숨김
       ✅ Mobile: 폰에서 레이아웃 최적화
-      ✅ Option 2: Mobile 최신 UX (Bottom Sheet + Fixed Set Bar)
+      ✅ (추가) 운동 상세 Bottom Sheet + GIF 가이드
     ========================================================= */
 
     /* ---------- DATA ---------- */
     const workoutData = {
       1: { day: "월요일", type: "push", title: "가슴 & 삼두", list: [
-        { name: "체스트 딥스", set: 4, rep: 10, rest: 90, breath: "내려갈 때 흡기 / 올라올 때 호기", target: "가슴 하부", mind: "바닥을 가슴으로 밀어내기", tip: "상체 15도 숙이기", guide: "발을 대고 무게 조절 가능", cue: "시선 바닥 1~2m + 팔 95%만 펴 긴장 유지" },
-        { name: "스탠다드 푸쉬업", set: 4, rep: 15, rest: 75, breath: "내릴 때 흡기 / 밀 때 호기", target: "가슴 전체", mind: "지면을 가슴으로 누르기", tip: "손바닥 전체 접지", guide: "무릎 대고 수행 가능", cue: "겨드랑이를 붙이며 밀어 올리기" },
-        { name: "내로우 딥스", set: 3, rep: 10, rest: 60, breath: "팔 펼 때 호기", target: "삼두근", mind: "팔 뒷면의 힘으로 잠금", tip: "상체 수직 유지", guide: "팔꿈치를 몸에 밀착", cue: "상체 수직 + 팔꿈치 뒤로 모으기" }
+        { name: "체스트 딥스", gif:"gifs/dips.gif", set: 4, rep: 10, rest: 90, breath: "내려갈 때 흡기 / 올라올 때 호기", target: "가슴 하부", mind: "바닥을 가슴으로 밀어내기", tip: "상체 15도 숙이기", guide: "발을 대고 무게 조절 가능", cue: "시선 바닥 1~2m + 팔 95%만 펴 긴장 유지" },
+        { name: "스탠다드 푸쉬업", gif:"gifs/pushup.gif", set: 4, rep: 15, rest: 75, breath: "내릴 때 흡기 / 밀 때 호기", target: "가슴 전체", mind: "지면을 가슴으로 누르기", tip: "손바닥 전체 접지", guide: "무릎 대고 수행 가능", cue: "겨드랑이를 붙이며 밀어 올리기" },
+        { name: "내로우 딥스", gif:"gifs/triceps_dips.gif", set: 3, rep: 10, rest: 60, breath: "팔 펼 때 호기", target: "삼두근", mind: "팔 뒷면의 힘으로 잠금", tip: "상체 수직 유지", guide: "팔꿈치를 몸에 밀착", cue: "상체 수직 + 팔꿈치 뒤로 모으기" }
       ]},
       2: { day: "화요일", type: "pull", title: "등 두께", list: [
-        { name: "풀업 (밴드)", set: 4, rep: 8, rest: 120, breath: "당길 때 호기", target: "광배 바깥", mind: "팔꿈치를 옆구리로 꽂기", tip: "숄더 패킹 필수", guide: "밴드 강도 조절", cue: "숄더패킹 → 팔꿈치로 옆구리 찍기" },
-        { name: "인버티드 로우", set: 4, rep: 12, rest: 90, breath: "당길 때 호기", target: "등 중앙", mind: "날개뼈를 뒤로 모으기", tip: "가슴을 바로 마중", guide: "발 위치로 난이도 조절", cue: "몸 일직선 + 날개뼈를 레몬 짜듯 조이기" },
-        { name: "친업 (밴드)", set: 3, rep: 8, rest: 90, breath: "올라갈 때 호기", target: "등 & 이두", mind: "가슴을 봉에 붙이기", tip: "가슴 높이까지 올리기", guide: "언더그립 사용", cue: "가슴을 봉 쪽으로 접어 넣기" }
+        { name: "풀업 (밴드)", gif:"gifs/pullup_band.gif", set: 4, rep: 8, rest: 120, breath: "당길 때 호기", target: "광배 바깥", mind: "팔꿈치를 옆구리로 꽂기", tip: "숄더 패킹 필수", guide: "밴드 강도 조절", cue: "숄더패킹 → 팔꿈치로 옆구리 찍기" },
+        { name: "인버티드 로우", gif:"gifs/inverted_row.gif", set: 4, rep: 12, rest: 90, breath: "당길 때 호기", target: "등 중앙", mind: "날개뼈를 뒤로 모으기", tip: "가슴을 바로 마중", guide: "발 위치로 난이도 조절", cue: "몸 일직선 + 날개뼈를 레몬 짜듯 조이기" },
+        { name: "친업 (밴드)", gif:"gifs/chinup_band.gif", set: 3, rep: 8, rest: 90, breath: "올라갈 때 호기", target: "등 & 이두", mind: "가슴을 봉에 붙이기", tip: "가슴 높이까지 올리기", guide: "언더그립 사용", cue: "가슴을 봉 쪽으로 접어 넣기" }
       ]},
       3: { day: "수요일", type: "push", title: "측면 어깨", list: [
-        { name: "사이드 레이즈", set: 5, rep: 20, rest: 60, breath: "올릴 때 호기", target: "측면 삼각근", mind: "팔꿈치를 양옆으로 던짐", tip: "날개뼈 고정", guide: "저중량 고반복 권장", cue: "위가 아니라 ‘멀리 던진다’" }
+        { name: "사이드 레이즈", gif:"gifs/side_raise.gif", set: 5, rep: 20, rest: 60, breath: "올릴 때 호기", target: "측면 삼각근", mind: "팔꿈치를 양옆으로 던짐", tip: "날개뼈 고정", guide: "저중량 고반복 권장", cue: "위가 아니라 ‘멀리 던진다’" }
       ]},
       4: { day: "목요일", type: "push", title: "어깨 & 삼두", list: [
-        { name: "파이크 푸쉬업", set: 4, rep: 10, rest: 90, breath: "밀 때 호기", target: "전면 어깨", mind: "어깨로 천장 밀기", tip: "엉덩이 높이 유지", guide: "머리를 손보다 앞으로", cue: "정수리가 바닥에 닿듯 내려갔다가 로켓처럼 밀기" },
-        { name: "디클라인 푸쉬업", set: 4, rep: 12, rest: 90, breath: "밀 때 호기", target: "상부 가슴", mind: "상부 가슴 집중", tip: "발 위치 높게", guide: "가슴 위쪽에 자극 집중", cue: "쇄골 아래로 바닥을 민다" },
-        { name: "삼두 딥스", set: 4, rep: 8, rest: 90, breath: "밀 때 호기", target: "삼두근", mind: "삼두로 펴서 잠금", tip: "팔꿈치 뒤로 모으기", guide: "의자 사용 가능", cue: "팔꿈치 벌어지지 않게 뒤로 모아 삼두 타격" }
+        { name: "파이크 푸쉬업", gif:"gifs/pike_pushup.gif", set: 4, rep: 10, rest: 90, breath: "밀 때 호기", target: "전면 어깨", mind: "어깨로 천장 밀기", tip: "엉덩이 높이 유지", guide: "머리를 손보다 앞으로", cue: "정수리가 바닥에 닿듯 내려갔다가 로켓처럼 밀기" },
+        { name: "디클라인 푸쉬업", gif:"gifs/decline_pushup.gif", set: 4, rep: 12, rest: 90, breath: "밀 때 호기", target: "상부 가슴", mind: "상부 가슴 집중", tip: "발 위치 높게", guide: "가슴 위쪽에 자극 집중", cue: "쇄골 아래로 바닥을 민다" },
+        { name: "삼두 딥스", gif:"gifs/triceps_dips.gif", set: 4, rep: 8, rest: 90, breath: "밀 때 호기", target: "삼두근", mind: "삼두로 펴서 잠금", tip: "팔꿈치 뒤로 모으기", guide: "의자 사용 가능", cue: "팔꿈치 벌어지지 않게 뒤로 모아 삼두 타격" }
       ]},
       5: { day: "금요일", type: "pull", title: "등 넓이", list: [
-        { name: "와이드 풀업", set: 4, rep: 6, rest: 120, breath: "올라갈 때 호기", target: "광배 외곽", mind: "등을 넓게 펼치기", tip: "넓은 그립 사용", guide: "상부 광배 자극 집중", cue: "팔꿈치를 아래로 찍어 광배 옆선 타격" },
-        { name: "인버티드 로우", set: 4, rep: 12, rest: 90, breath: "당길 때 호기", target: "등 안정성", mind: "몸을 일직선으로", tip: "템포 일정하게", guide: "코어 단단히 고정", cue: "둔근/복부 고정 + 날개뼈 조이기" },
-        { name: "내로우 풀업", set: 3, rep: 8, rest: 90, breath: "올라갈 때 호기", target: "등 중앙", mind: "봉에 가슴 터치", tip: "1초간 정지", guide: "좁은 그립 사용", cue: "가슴을 봉에 최대한 붙이기" }
+        { name: "와이드 풀업", gif:"gifs/wide_pullup.gif", set: 4, rep: 6, rest: 120, breath: "올라갈 때 호기", target: "광배 외곽", mind: "등을 넓게 펼치기", tip: "넓은 그립 사용", guide: "상부 광배 자극 집중", cue: "팔꿈치를 아래로 찍어 광배 옆선 타격" },
+        { name: "인버티드 로우", gif:"gifs/inverted_row.gif", set: 4, rep: 12, rest: 90, breath: "당길 때 호기", target: "등 안정성", mind: "몸을 일직선으로", tip: "템포 일정하게", guide: "코어 단단히 고정", cue: "둔근/복부 고정 + 날개뼈 조이기" },
+        { name: "내로우 풀업", gif:"gifs/narrow_pullup.gif", set: 3, rep: 8, rest: 90, breath: "올라갈 때 호기", target: "등 중앙", mind: "봉에 가슴 터치", tip: "1초간 정지", guide: "좁은 그립 사용", cue: "가슴을 봉에 최대한 붙이기" }
       ]},
       6: { day: "토요일", type: "leg", title: "하체 & 코어", list: [
-        { name: "스쿼트", set: 4, rep: 20, rest: 60, breath: "올라올 때 호기", target: "허벅지/둔근", mind: "발바닥 지면 밀기", tip: "허리 중립 유지", guide: "뒤꿈치 고정", cue: "낮은 의자에 앉았다가 지구를 민다" },
-        { name: "런지", set: 3, rep: 10, rest: 60, breath: "올라올 때 호기", target: "엉덩이", mind: "뒤꿈치에 힘 전달", tip: "상체 살짝 숙이기", guide: "무릎 안정성 유의", cue: "앞발 뒤꿈치로 강력하게 밀기" },
-        { name: "플랭크", set: 3, rep: 60, rest: 60, breath: "일정하게 유지", target: "코어", mind: "배를 안으로 당기기", tip: "엉덩이 수축", guide: "일직선 유지", cue: "강철 판자처럼 버티기" }
+        { name: "스쿼트", gif:"gifs/squat.gif", set: 4, rep: 20, rest: 60, breath: "올라올 때 호기", target: "허벅지/둔근", mind: "발바닥 지면 밀기", tip: "허리 중립 유지", guide: "뒤꿈치 고정", cue: "낮은 의자에 앉았다가 지구를 민다" },
+        { name: "런지", gif:"gifs/lunge.gif", set: 3, rep: 10, rest: 60, breath: "올라올 때 호기", target: "엉덩이", mind: "뒤꿈치에 힘 전달", tip: "상체 살짝 숙이기", guide: "무릎 안정성 유의", cue: "앞발 뒤꿈치로 강력하게 밀기" },
+        { name: "플랭크", gif:"gifs/plank.gif", set: 3, rep: 60, rest: 60, breath: "일정하게 유지", target: "코어", mind: "배를 안으로 당기기", tip: "엉덩이 수축", guide: "일직선 유지", cue: "강철 판자처럼 버티기" }
       ]},
       0: { day: "일요일", type: "rest", title: "회복", list: [
-        { name: "스트레칭", set: 1, rep: 15, rest: 0, breath: "깊고 길게", target: "전신 이완", mind: "근육 이완 느끼기", tip: "어깨/광배 집중", guide: "충분한 수면 권장", cue: "부드럽게 길게, 강도보다 호흡" }
+        { name: "스트레칭", gif:"gifs/stretch.gif", set: 1, rep: 15, rest: 0, breath: "깊고 길게", target: "전신 이완", mind: "근육 이완 느끼기", tip: "어깨/광배 집중", guide: "충분한 수면 권장", cue: "부드럽게 길게, 강도보다 호흡" }
       ]}
     };
 
@@ -1197,6 +1122,7 @@
 
     /* ---------- SPLASH ---------- */
     function initIntro(){
+      /* ✅ 앱을 백그라운드에서 끄고 다시 키면 다시 뜨게: sessionStorage */
       const shown = sessionStorage.getItem(KEY_SPLASH) === '1';
       const splash = document.getElementById('splash-screen');
       if(shown){ splash.style.display = 'none'; return; }
@@ -1244,6 +1170,7 @@
       if(name === 'history') renderCalendar();
 
       window.scrollTo({top:0, behavior:'smooth'});
+
       showDockTemporarily();
     }
 
@@ -1358,64 +1285,29 @@
       renderCarousel();
       updateProgressUI();
       updateDayNav();
+
       showDockTemporarily();
     }
 
     /* =========================================================
-      ✅ Option 2: Mobile Bottom Sheet / Set Bar State
+      ✅ Bottom Sheet 로직 (추가)
+      - 카드의 "핵심큐/호흡/의식/엘리트 가이드"를 탭으로 보기
+      - GIF 동작 가이드 표시
+      - iOS에서 터치 안먹는 문제 해결(레이어/포인터)
     ========================================================= */
-    let mobileActive = {
-      exerciseId: null,
-      w: null,
-      setTotal: 0,
-      repTotal: 0,
-      doneArr: [],
-      doneCount: 0,
-      idx: 0
-    };
+    let mobileActive = { w:null };
 
-    function updateMobileBar(){
-      const isMobile = window.innerWidth <= 520;
-      if(!isMobile) return;
+    function openDetailSheet(w){
+      mobileActive.w = w;
 
-      if(!mobileActive.exerciseId || !mobileActive.w) return;
-      document.getElementById('mbar-exName').textContent = mobileActive.w.name;
-      document.getElementById('mbar-meta').textContent = `${mobileActive.w.target} · REST ${mobileActive.w.rest}s · ${mobileActive.doneCount}/${mobileActive.setTotal}`;
-
-      const wrap = document.getElementById('mbar-sets');
-      wrap.innerHTML = '';
-
-      const date = todayStr();
-      const exerciseId = mobileActive.exerciseId;
-      const doneArr = mobileActive.doneArr;
-      const setTotal = mobileActive.setTotal;
-
-      Array.from({length:setTotal}).forEach((_, s)=>{
-        const done = !!doneArr[s];
-        const nextIndex = doneArr.indexOf(false);
-        const isLocked = (!done && nextIndex !== -1 && s !== nextIndex);
-
-        const btn = document.createElement('button');
-        btn.className = `mSetBtn ${done?'done':''} ${isLocked?'locked':''}`;
-        btn.textContent = s+1;
-        btn.onclick = () => toggleSetComplete(date, exerciseId, s);
-        wrap.appendChild(btn);
-      });
-    }
-
-    function openDetailSheet(){
-      if(!mobileActive.w) return;
-      const sheet = document.getElementById('detail-sheet');
-      sheet.classList.add('show');
-
-      document.getElementById('sheet-title').textContent = mobileActive.w.name;
-      document.getElementById('sheet-sub').textContent = `${mobileActive.w.target} · REST ${mobileActive.w.rest}s`;
+      document.getElementById('sheet-title').textContent = w.name;
+      document.getElementById('sheet-sub').textContent = `${w.target || 'DETAIL'}`;
 
       const tabs = [
-        { key:'cue', label:'핵심 큐', text: mobileActive.w.cue || mobileActive.w.tip || '' },
-        { key:'breath', label:'호흡', text: mobileActive.w.breath || '' },
-        { key:'mind', label:'의식', text: mobileActive.w.mind || '' },
-        { key:'guide', label:'엘리트 가이드', text: `${mobileActive.w.tip} · ${mobileActive.w.guide}` }
+        { key:'cue',   label:'핵심 큐',    text: expandCue(w) },
+        { key:'breath',label:'호흡',      text: expandBreath(w) },
+        { key:'mind',  label:'의식',      text: expandMind(w) },
+        { key:'elite', label:'엘리트 가이드', text: expandElite(w) },
       ];
 
       const tabWrap = document.getElementById('sheet-tabs');
@@ -1430,32 +1322,107 @@
       });
 
       setSheetTab(tabs[0], tabWrap.querySelector('.sheetTab'));
-      haptic(12);
+
+      const sheetWrap = document.getElementById('detail-sheet');
+      sheetWrap.classList.add('show');
+      haptic(14);
+      showDockTemporarily();
+    }
+
+    function closeDetailSheet(){
+      const sheetWrap = document.getElementById('detail-sheet');
+      sheetWrap.classList.remove('show');
+
+      /* ✅ iOS 애니메이션 꼬임 방지 */
+      const sheet = sheetWrap.querySelector('.sheet');
+      if(sheet){
+        sheet.style.transform = 'translateY(100%)';
+        setTimeout(()=> sheet.style.transform = '', 120);
+      }
+
+      haptic(10);
     }
 
     function setSheetTab(tab, btn){
       document.querySelectorAll('.sheetTab').forEach(x=> x.classList.remove('active'));
       btn.classList.add('active');
 
+      const w = mobileActive.w;
+
+      const gifBlock = (w.gif) ? `
+        <div class="sheetBox">
+          <div class="sheetLabel">동작 가이드</div>
+          <img src="${w.gif}" class="sheetGif" loading="lazy" alt="exercise guide"
+               onerror="this.style.display='none';" />
+          <div class="sheetHint">* GIF는 동작의 핵심 흐름만 참고하세요. 자세가 흔들리면 횟수보다 폼이 우선입니다.</div>
+        </div>
+      ` : '';
+
       const body = document.getElementById('sheet-body');
       body.innerHTML = `
+        ${gifBlock}
         <div class="sheetBox">
           <div class="sheetLabel">${tab.label}</div>
           <div class="sheetText">${tab.text}</div>
-          <div class="sheetHint">* 처음엔 천천히, 정확하게. 자세를 유지하는 것이 가장 중요합니다.</div>
+          <div class="sheetHint">* 처음엔 <b>천천히</b>, 정확하게. 다음 단계는 “범위”와 “호흡”을 유지하는 것입니다.</div>
         </div>
       `;
     }
 
-    function closeDetailSheet(){
-      const sheet = document.getElementById('detail-sheet');
-      sheet.classList.remove('show');
-      haptic(10);
+    /* ✅ 초보자도 혼자 할 수 있게: 자연어 확장 함수 */
+    function expandCue(w){
+      const base = (w.cue || w.tip || '').trim();
+      return `
+        ${base ? `• ${base}<br><br>` : ''}
+        <b>초보자 기준 핵심은 “폼이 무너지지 않는 범위”</b>입니다.<br>
+        1) 힘이 들어가는 부위(타겟)를 느끼고<br>
+        2) 흔들리면 “속도를 줄이고”<br>
+        3) 반동 없이 “정확한 동작”으로만 진행하세요.<br><br>
+        ✅ <b>체크 포인트</b><br>
+        • 어깨가 귀 쪽으로 올라가면 → 어깨 내리고 가슴 열기<br>
+        • 허리가 꺾이면 → 배에 힘(코어) 주기<br>
+        • 반동이 생기면 → 속도 20% 줄이기
+      `.trim();
     }
 
-    function mobileResetExercise(){
-      if(!mobileActive.exerciseId) return;
-      resetExercise(mobileActive.exerciseId);
+    function expandBreath(w){
+      return `
+        <b>호흡은 “힘을 쓰는 순간에 내쉬기”가 원칙</b>입니다.<br><br>
+        • 기본: <b>${w.breath}</b><br><br>
+        ✅ <b>초보용 요령</b><br>
+        1) 내려갈 때(힘 모으는 구간) → 코로 짧게 들이마시기<br>
+        2) 올라올 때(힘 쓰는 구간) → 입으로 길게 내쉬기<br><br>
+        ✅ <b>호흡이 무너지면</b><br>
+        • 바로 자세가 무너지고 힘이 분산됩니다.<br>
+        • “내쉬는 타이밍”만 맞춰도 기록이 안정됩니다.
+      `.trim();
+    }
+
+    function expandMind(w){
+      return `
+        <b>${w.mind}</b><br><br>
+        ✅ <b>초보자가 흔히 하는 실수</b><br>
+        • “팔로만” 하려는 것 → 타겟이 안 잡힘<br>
+        • 동작이 빨라짐 → 반동으로 바뀜<br><br>
+        ✅ <b>바로 적용하는 의식 포인트</b><br>
+        1) 타겟 부위를 “수축/늘어남”으로 느끼기<br>
+        2) 동작 중간에 잠깐 멈춰서(0.5초) 정확도 확보<br>
+        3) 힘이 들어가는 부위가 바뀌면 → 그 즉시 속도 ↓
+      `.trim();
+    }
+
+    function expandElite(w){
+      return `
+        <b>${w.tip}</b><br>
+        <span style="opacity:.75;">${w.guide || ''}</span><br><br>
+        ✅ <b>엘리트 체크리스트</b><br>
+        1) 시작 자세에서 몸이 흔들리지 않는다<br>
+        2) “아래-위” 전 구간에서 긴장이 유지된다<br>
+        3) 마지막 2회는 느리게(컨트롤) 수행한다<br><br>
+        ✅ <b>강화 루틴</b><br>
+        • 세트 마지막 3회는 속도를 느리게(2초 내려가고 1초 올라오기)<br>
+        • 쉬운 경우는 “정지(1초)”를 추가해 난이도를 올리세요
+      `.trim();
     }
 
     /* ---------- CAROUSEL ---------- */
@@ -1464,8 +1431,6 @@
       const data = workoutData[currentDayIdx];
       const carousel = document.getElementById('session-carousel');
       carousel.innerHTML = '';
-
-      const isMobile = window.innerWidth <= 520;
 
       data.list.forEach((w, idx) => {
         const id = exId(currentDayIdx, idx);
@@ -1478,33 +1443,7 @@
         slide.className = 'slide';
         slide.setAttribute('data-slide', idx);
 
-        // ✅ Mobile Template: 요약 카드만 표시 (Set Bar로 조작)
-        const mobileTemplate = `
-          <div class="glass mCard">
-            <div class="flex items-start justify-between gap-3">
-              <div class="min-w-0">
-                <div class="mSub">${w.target} · REST ${w.rest}s · ${doneCount}/${setTotal}</div>
-                <h3 class="mt-2 font-black italic text-white tracking-tight truncate">${w.name}</h3>
-              </div>
-              <button onclick="resetExercise('${id}')" class="pill" title="이 운동(오늘) 초기화">
-                <i class="fa-solid fa-rotate-left"></i>
-              </button>
-            </div>
-
-            <div class="mCue">
-              <div class="mSub mb-2">핵심 큐</div>
-              <p>${w.cue || w.tip || ''}</p>
-            </div>
-
-            <div class="mt-4 flex items-center justify-between gap-2">
-              <button class="pill cyan" onclick="openDetailSheetFrom('${id}', ${idx})"><i class="fa-solid fa-circle-info"></i> 자세히</button>
-              <button class="pill" onclick="carouselNext()"><i class="fa-solid fa-chevron-right"></i> 다음</button>
-            </div>
-          </div>
-        `;
-
-        // ✅ Desktop Template: 기존 그대로 유지
-        const desktopTemplate = `
+        slide.innerHTML = `
           <div class="glass slideCard p-6 md:p-7">
             <div>
               <div class="flex items-start justify-between gap-3">
@@ -1518,6 +1457,12 @@
                 </div>
                 <button onclick="resetExercise('${id}')" class="pill" title="이 운동(오늘) 초기화">
                   <i class="fa-solid fa-rotate-left"></i>
+                </button>
+              </div>
+
+              <div class="mt-4 flex items-center justify-between gap-2">
+                <button class="pill cyan" onclick='openDetailSheet(${JSON.stringify(w).replace(/'/g,"&#39;")})'>
+                  <i class="fa-solid fa-circle-info"></i> 운동 상세 보기
                 </button>
               </div>
 
@@ -1607,8 +1552,6 @@
             </div>
           </div>
         `;
-
-        slide.innerHTML = isMobile ? mobileTemplate : desktopTemplate;
         carousel.appendChild(slide);
       });
 
@@ -1616,43 +1559,6 @@
       bindCarouselEvents();
       updateSlideHUD();
       requestAnimationFrame(()=> scrollToSlide(currentSlideIndex,false));
-
-      // ✅ mobile bar 자동 동기화
-      updateMobileActiveFromSlide();
-    }
-
-    function openDetailSheetFrom(exId, idx){
-      const date = todayStr();
-      const [d, ex] = exId.split('-').map(Number);
-      const w = workoutData[d]?.list?.[ex];
-      if(!w) return;
-      const setTotal = customSets[exId] || w.set;
-      const repTotal = customReps[exId] || w.rep;
-      const doneArr = getProgressArr(date, exId, setTotal);
-      const doneCount = doneArr.filter(Boolean).length;
-
-      mobileActive = { exerciseId: exId, w, setTotal, repTotal, doneArr, doneCount, idx };
-      updateMobileBar();
-      openDetailSheet();
-    }
-
-    function updateMobileActiveFromSlide(){
-      const isMobile = window.innerWidth <= 520;
-      if(!isMobile) return;
-
-      const date = todayStr();
-      const idx = clamp(currentSlideIndex, 0, workoutData[currentDayIdx].list.length - 1);
-      const exIdKey = exId(currentDayIdx, idx);
-      const w = workoutData[currentDayIdx].list[idx];
-      if(!w) return;
-
-      const setTotal = customSets[exIdKey] || w.set;
-      const repTotal = customReps[exIdKey] || w.rep;
-      const doneArr = getProgressArr(date, exIdKey, setTotal);
-      const doneCount = doneArr.filter(Boolean).length;
-
-      mobileActive = { exerciseId: exIdKey, w, setTotal, repTotal, doneArr, doneCount, idx };
-      updateMobileBar();
     }
 
     function bindCarouselEvents(){
@@ -1665,7 +1571,6 @@
         if(idx !== currentSlideIndex){
           currentSlideIndex = clamp(idx, 0, slides.length-1);
           updateSlideHUD();
-          updateMobileActiveFromSlide();
         }
         showDockTemporarily();
       };
@@ -1699,7 +1604,6 @@
       currentSlideIndex = clamp(currentSlideIndex + 1, 0, data.list.length-1);
       scrollToSlide(currentSlideIndex, true);
       updateSlideHUD();
-      updateMobileActiveFromSlide();
       haptic(10);
       showDockTemporarily();
     }
@@ -1709,7 +1613,6 @@
       currentSlideIndex = clamp(currentSlideIndex - 1, 0, data.list.length-1);
       scrollToSlide(currentSlideIndex, true);
       updateSlideHUD();
-      updateMobileActiveFromSlide();
       haptic(10);
       showDockTemporarily();
     }
@@ -1792,7 +1695,6 @@
       currentSlideIndex = keep;
       scrollToSlide(currentSlideIndex,false);
       updateSlideHUD();
-      updateMobileActiveFromSlide();
     }
 
     function adjust(type, key, val){
@@ -1856,7 +1758,6 @@
 
       renderCarousel();
       updateProgressUI();
-      updateMobileActiveFromSlide();
       toast('운동 초기화 완료');
       haptic(22);
     }
@@ -1874,7 +1775,6 @@
 
       renderCarousel();
       updateProgressUI();
-      updateMobileActiveFromSlide();
       toast('오늘 초기화 완료');
       haptic(25);
     }
@@ -1958,7 +1858,6 @@
 
       showHUD(false);
 
-      // ✅ 실제 휴식시간 기록
       if(restStartedAt && restCurrentLogKey){
         const used = clamp(Math.round((Date.now() - restStartedAt) / 1000), 0, restTotal);
         const idx = logs.findIndex(l => l.logKey === restCurrentLogKey);
@@ -1977,7 +1876,6 @@
       }
     }
 
-    /* ✅ 알림 강화: 4회 패턴 + 플래시 */
     function restDoneNotify(){
       try{ if(navigator.vibrate) navigator.vibrate([120,80,200,80,220]); }catch(e){}
       try{
@@ -2271,7 +2169,6 @@
         document.getElementById('stopwatch').innerText = `${m}:${s}`;
       }, 1000);
 
-      // ✅ 시작 후 잠깐 보였다가 자동 숨김 (앱 느낌)
       setTimeout(()=> {
         const dock = document.querySelector('.navDockWrap');
         dock && dock.classList.add('dock-hide');
