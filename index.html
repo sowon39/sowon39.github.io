@@ -32,14 +32,12 @@
 
     html,body{ height:100%; }
 
-    /* ✅ 확대/줌 방지 (best effort) */
     html{
       touch-action: manipulation;
       -webkit-text-size-adjust: 100%;
       overscroll-behavior: none;
     }
 
-    /* ✅ 스크롤 복구: 가장 중요한 수정 */
     body{
       font-family:'Pretendard',sans-serif;
       background-color:var(--bg);
@@ -69,7 +67,6 @@
       border:1px solid rgba(255,255,255,0.10);
     }
 
-    /* ✅ 전체 폭 레이아웃 컨테이너 */
     .layoutWrap{
       width:100%;
       max-width: 1100px;
@@ -78,8 +75,6 @@
 
     /* =========================================================
        ✅ Splash — PRESET A (LUXURY AURORA)
-       ✅ 기존 로직(initIntro) / KEY_SPLASH 방식 유지
-       ✅ HTML/CSS만 교체
     ========================================================= */
     #splash-screen.splashA{
       position:fixed; inset:0; z-index:10000;
@@ -89,7 +84,6 @@
       transition:all 1s cubic-bezier(0.65,0,0.35,1);
     }
 
-    /* Aurora Layer */
     #splash-screen.splashA::before{
       content:"";
       position:absolute; inset:-45%;
@@ -103,7 +97,6 @@
       opacity:1;
     }
 
-    /* Noise Layer */
     #splash-screen.splashA::after{
       content:"";
       position:absolute; inset:0;
@@ -238,7 +231,6 @@
     }
     #splash-screen.splashA .splash-auth b{ color: rgba(34,211,238,0.95); }
 
-    /* Header */
     header{
       position:fixed; top:0; left:0; right:0; z-index:50;
       padding: 18px 18px 14px;
@@ -247,14 +239,13 @@
       background: rgba(10,10,12,0.62);
       height: var(--headerH);
       box-sizing:border-box;
-      padding-top: calc(14px + env(safe-area-inset-top)); /* ✅ 노치 안전영역 대응 */
+      padding-top: calc(14px + env(safe-area-inset-top));
     }
 
     .tab-content{ display:none; animation:fadeInContent 0.45s ease-out; }
     .tab-content.active{ display:block; }
     @keyframes fadeInContent{ from{opacity:0; transform:translateY(6px) scale(0.985);} to{opacity:1; transform:translateY(0) scale(1);} }
 
-    /* Pills */
     .pill{
       display:inline-flex; align-items:center; gap:6px;
       padding:6px 10px; border-radius:999px;
@@ -267,13 +258,11 @@
     }
     .pill.cyan{ border-color:rgba(34,211,238,0.25); background:rgba(34,211,238,0.10); color:rgba(34,211,238,0.95); }
 
-    /* ✅ Main */
     main{
-      padding-top: calc(var(--headerH) + 18px + env(safe-area-inset-top)); /* ✅ 노치 안전영역 */
+      padding-top: calc(var(--headerH) + 18px + env(safe-area-inset-top));
       padding-bottom: calc(var(--dockH) + env(safe-area-inset-bottom) + 28px);
     }
 
-    /* ✅ Carousel */
     .carousel{
       display:flex;
       gap:18px;
@@ -307,10 +296,29 @@
       justify-content:space-between;
       border-radius:32px;
       box-shadow: 0 30px 80px rgba(0,0,0,0.55);
-      overflow:hidden; /* ✅ 라운드 잘림 정리 */
+      overflow:hidden;
     }
 
-    /* Right Panel */
+    /* ✅ GIF Preview (카드 내부 미리보기) */
+    .slideGifWrap{
+      border-radius: 22px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.03);
+      box-shadow: 0 22px 55px rgba(0,0,0,0.60);
+    }
+    .slideGifPreview{
+      width:100%;
+      object-fit: cover;
+      display:block;
+      max-height: 240px;
+    }
+    @media (max-width:520px){
+      .slideGifPreview{
+        max-height: 170px !important;
+      }
+    }
+
     .rightPanel{ border-radius:26px; padding:18px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); }
 
     .stepper{
@@ -353,19 +361,17 @@
       background:rgba(255,255,255,0.05);
       border:1px solid rgba(255,255,255,0.10);
       user-select:none;
-      overflow:hidden; /* ✅ 삐져나오는 색상 방지 */
+      overflow:hidden;
     }
     .setBtn:active{ transform:scale(0.985); }
     .setBtn.done{ background:linear-gradient(135deg,var(--primary),var(--accent)); color:#000; box-shadow:0 18px 34px rgba(34,211,238,0.24); border:none; }
 
-    /* ✅ 세트 순서 잠금 */
     .setBtn.locked{
       opacity: .35;
       filter: saturate(.6);
       pointer-events: none;
     }
 
-    /* ✅ Floating Dock */
     .navDockWrap{ position:fixed; left:0; right:0; bottom:0; padding: 18px; z-index:60; }
     .nav-dock{
       background:rgba(10,10,12,0.78);
@@ -384,7 +390,6 @@
     .nav-active-dot{ position:absolute; bottom:1px; width:4px; height:4px; background:var(--primary); border-radius:50%; box-shadow:0 0 12px var(--primary); opacity:0; transition:all .25s; }
     .nav-item.active .nav-active-dot{ opacity:1; transform:scale(1.6); }
 
-    /* ✅ Dock Auto Hide */
     .navDockWrap{
       transition: transform .45s cubic-bezier(0.22, 1, 0.36, 1), opacity .35s ease;
       will-change: transform, opacity;
@@ -400,7 +405,6 @@
       pointer-events: auto;
     }
 
-    /* Day chips */
     .day-chip{
       width:44px; height:44px;
       border-radius:18px;
@@ -414,9 +418,9 @@
       background:rgba(255,255,255,0.04);
       flex:0 0 auto;
       user-select:none;
-      overflow:hidden; /* ✅ 삐져나오는 배경/색상 방지 */
+      overflow:hidden;
       position:relative;
-      isolation:isolate; /* ✅ iOS 레이어 안정 */
+      isolation:isolate;
     }
     .day-chip.active{
       background:var(--primary);
@@ -425,11 +429,9 @@
       box-shadow:0 10px 24px rgba(34,211,238,0.25);
     }
 
-    /* Timer Modal */
     #timer-modal{ transition:all .65s ease; }
     #timer-sec{ letter-spacing:-0.08em; }
 
-    /* ✅ Timer HUD */
     #timer-hud{
       position:fixed;
       top: calc(var(--headerH) + 10px + env(safe-area-inset-top));
@@ -483,15 +485,12 @@
     }
     .hudBtn:active{ transform:scale(.98); }
 
-    /* Summary modal */
     #summary-modal{ position:fixed; inset:0; z-index:220; display:none; align-items:center; justify-content:center; }
     #summary-modal.show{ display:flex; }
 
-    /* Toast */
     #toast{ position:fixed; left:50%; bottom:130px; transform:translateX(-50%); z-index:250; opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; }
     #toast.show{ opacity:1; transform:translateX(-50%) translateY(-6px); }
 
-    /* History layout */
     .historyLayout{
       display:grid;
       grid-template-columns: 1fr;
@@ -503,20 +502,18 @@
       }
     }
 
-    /* Calendar */
     .calendar-day{ aspect-ratio:1; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:13px; position:relative; transition:all .18s; font-weight:800; color:rgba(255,255,255,0.75); background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); user-select:none;}
     .has-log::after{ content:''; width:6px; height:6px; background:rgba(34,211,238,0.90); border-radius:50%; position:absolute; bottom:8px; box-shadow:0 0 12px rgba(34,211,238,0.35); }
     .calendar-day.selected{ background:rgba(34,211,238,0.14); border:1px solid rgba(34,211,238,0.35); box-shadow:0 0 0 2px rgba(34,211,238,0.18), 0 0 30px rgba(34,211,238,0.12); color:#eaffff; font-weight:900; transform:translateY(-2px); }
     .calendar-day.today{ border:1px solid rgba(255,255,255,0.12); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08); color:rgba(255,255,255,0.95); font-weight:900; }
 
-    /* History table */
     .log-table{ width:100%; border-collapse:separate; border-spacing:0 10px; }
     .log-table th{ font-size:10px; text-transform:uppercase; letter-spacing:.18em; color:rgba(255,255,255,0.35); font-weight:900; text-align:left; padding:0 10px 6px; }
     .log-row{ background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:16px; overflow:hidden; }
     .log-row td{ padding:12px 10px; font-weight:800; font-size:12px; color:rgba(255,255,255,0.78); }
 
     /* =========================================================
-       ✅ Bottom Sheet (운동 상세) — iOS 터치/레이어 문제 해결 포함
+       ✅ Bottom Sheet
     ========================================================= */
     #detail-sheet{
       position: fixed;
@@ -676,7 +673,6 @@
       }
       :root{ --headerH: 88px; --dockH: 92px; }
 
-      /* ✅ (요청) DAY 타이틀 공간 압박 해결 */
       #view-day{
         font-size: 1.38rem !important;
         letter-spacing: -0.02em !important;
@@ -691,7 +687,6 @@
         font-size: 9px !important;
       }
 
-      /* ✅ (요청) 진행률 KPI 크게 */
       #progress-percent{
         font-size: 16px !important;
         font-weight: 950 !important;
@@ -707,7 +702,6 @@
       .slideCard .p-6{ padding: 14px !important; }
       .slideCard h3{ font-size: 1.55rem !important; }
 
-      /* ✅ 카드 내부 2단(grid) → 1단 */
       .slideCard .md\:grid-cols-2{ grid-template-columns: 1fr !important; }
 
       .rightPanel{
@@ -722,7 +716,6 @@
       }
       .stepperValue{ font-size: 20px !important; }
 
-      /* ✅ 세트 버튼: 2열 → 3열 */
       .rightPanel .grid.grid-cols-2{
         grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
       }
@@ -732,12 +725,10 @@
         border-radius: 18px !important;
       }
 
-      /* ✅ 캐러셀 peek: 폰에서 과하게 넓어지는 것 방지 */
       .carousel > .slide{
         flex: 0 0 calc(100% - 70px) !important;
       }
 
-      /* ✅ Dock 조금 더 컴팩트 */
       .navDockWrap{ padding: 14px !important; }
       .nav-dock{ border-radius: 30px !important; padding: 9px !important; }
       .nav-item{ padding: 10px 0 !important; }
@@ -748,7 +739,7 @@
 
 <body>
 
-  <!-- ✅ Splash (PRESET A 적용, DK Fit 노출) -->
+  <!-- ✅ Splash -->
   <div id="splash-screen" class="splashA">
     <div class="splash-inner">
       <div class="splash-brand">
@@ -770,7 +761,7 @@
     </div>
   </div>
 
-  <!-- ✅ Bottom Sheet (운동 상세) -->
+  <!-- ✅ Bottom Sheet -->
   <div id="detail-sheet">
     <div class="sheet-backdrop" onclick="closeDetailSheet()"></div>
     <div class="sheet" role="dialog" aria-modal="true">
@@ -1023,48 +1014,77 @@
   <script>
     /* =========================================================
       DK MASTER OS v11.3
-      ✅ 로직/기능 유지
-      ✅ 실제 휴식시간(restUsed) 기록
-      ✅ 세트 순서 클릭
-      ✅ iOS/iPadOS 사운드 Unlock 적용
-      ✅ 휴식 알림 강화(4회 패턴 + 화면 플래시)
-      ✅ Dock: 작동할 때만 등장 + 자동 숨김
-      ✅ Mobile: 폰에서 레이아웃 최적화
-      ✅ (추가) 운동 상세 Bottom Sheet + GIF 가이드
+      ✅ 운동별 GIF 자동 매칭 (대문자 파일 / index.html 동일 폴더)
+      ✅ 카드 내부에도 GIF 미리보기 노출
+      ✅ 상세 Bottom Sheet에서도 GIF 노출
     ========================================================= */
+
+    /* ✅ GIF 자동 매핑: 파일명은 루트에 있는 대문자 GIF로 연결 */
+    function autoGif(name){
+      const n = (name || "").toLowerCase();
+
+      // dips
+      if(n.includes("딥")) return "DIPS.gif";
+
+      // push up
+      if(n.includes("푸쉬업")) return "PUSH_UP.gif";
+
+      // pull up
+      if(n.includes("풀업") && !n.includes("친업")) return "PULL_UP.gif";
+
+      // chin up
+      if(n.includes("친업")) return "CHIN_UP.gif";
+
+      // inverted row
+      if(n.includes("인버티드") || n.includes("로우")) return "INVT_ROW.gif";
+
+      // db lateral raise
+      if(n.includes("레이즈")) return "DB_LAT_RAISE.gif";
+
+      // squat
+      if(n.includes("스쿼트")) return "AIR_SQT.gif";
+
+      // lunge
+      if(n.includes("런지")) return "LUNGE.gif";
+
+      // plank
+      if(n.includes("플랭크")) return "PLANK.gif";
+
+      return "";
+    }
 
     /* ---------- DATA ---------- */
     const workoutData = {
       1: { day: "월요일", type: "push", title: "가슴 & 삼두", list: [
-        { name: "체스트 딥스", gif:"gifs/dips.gif", set: 4, rep: 10, rest: 90, breath: "내려갈 때 흡기 / 올라올 때 호기", target: "가슴 하부", mind: "바닥을 가슴으로 밀어내기", tip: "상체 15도 숙이기", guide: "발을 대고 무게 조절 가능", cue: "시선 바닥 1~2m + 팔 95%만 펴 긴장 유지" },
-        { name: "스탠다드 푸쉬업", gif:"gifs/pushup.gif", set: 4, rep: 15, rest: 75, breath: "내릴 때 흡기 / 밀 때 호기", target: "가슴 전체", mind: "지면을 가슴으로 누르기", tip: "손바닥 전체 접지", guide: "무릎 대고 수행 가능", cue: "겨드랑이를 붙이며 밀어 올리기" },
-        { name: "내로우 딥스", gif:"gifs/triceps_dips.gif", set: 3, rep: 10, rest: 60, breath: "팔 펼 때 호기", target: "삼두근", mind: "팔 뒷면의 힘으로 잠금", tip: "상체 수직 유지", guide: "팔꿈치를 몸에 밀착", cue: "상체 수직 + 팔꿈치 뒤로 모으기" }
+        { name: "체스트 딥스", set: 4, rep: 10, rest: 90, breath: "내려갈 때 흡기 / 올라올 때 호기", target: "가슴 하부", mind: "바닥을 가슴으로 밀어내기", tip: "상체 15도 숙이기", guide: "발을 대고 무게 조절 가능", cue: "시선 바닥 1~2m + 팔 95%만 펴 긴장 유지" },
+        { name: "스탠다드 푸쉬업", set: 4, rep: 15, rest: 75, breath: "내릴 때 흡기 / 밀 때 호기", target: "가슴 전체", mind: "지면을 가슴으로 누르기", tip: "손바닥 전체 접지", guide: "무릎 대고 수행 가능", cue: "겨드랑이를 붙이며 밀어 올리기" },
+        { name: "내로우 딥스", set: 3, rep: 10, rest: 60, breath: "팔 펼 때 호기", target: "삼두근", mind: "팔 뒷면의 힘으로 잠금", tip: "상체 수직 유지", guide: "팔꿈치를 몸에 밀착", cue: "상체 수직 + 팔꿈치 뒤로 모으기" }
       ]},
       2: { day: "화요일", type: "pull", title: "등 두께", list: [
-        { name: "풀업 (밴드)", gif:"gifs/pullup_band.gif", set: 4, rep: 8, rest: 120, breath: "당길 때 호기", target: "광배 바깥", mind: "팔꿈치를 옆구리로 꽂기", tip: "숄더 패킹 필수", guide: "밴드 강도 조절", cue: "숄더패킹 → 팔꿈치로 옆구리 찍기" },
-        { name: "인버티드 로우", gif:"gifs/inverted_row.gif", set: 4, rep: 12, rest: 90, breath: "당길 때 호기", target: "등 중앙", mind: "날개뼈를 뒤로 모으기", tip: "가슴을 바로 마중", guide: "발 위치로 난이도 조절", cue: "몸 일직선 + 날개뼈를 레몬 짜듯 조이기" },
-        { name: "친업 (밴드)", gif:"gifs/chinup_band.gif", set: 3, rep: 8, rest: 90, breath: "올라갈 때 호기", target: "등 & 이두", mind: "가슴을 봉에 붙이기", tip: "가슴 높이까지 올리기", guide: "언더그립 사용", cue: "가슴을 봉 쪽으로 접어 넣기" }
+        { name: "풀업 (밴드)", set: 4, rep: 8, rest: 120, breath: "당길 때 호기", target: "광배 바깥", mind: "팔꿈치를 옆구리로 꽂기", tip: "숄더 패킹 필수", guide: "밴드 강도 조절", cue: "숄더패킹 → 팔꿈치로 옆구리 찍기" },
+        { name: "인버티드 로우", set: 4, rep: 12, rest: 90, breath: "당길 때 호기", target: "등 중앙", mind: "날개뼈를 뒤로 모으기", tip: "가슴을 바로 마중", guide: "발 위치로 난이도 조절", cue: "몸 일직선 + 날개뼈를 레몬 짜듯 조이기" },
+        { name: "친업 (밴드)", set: 3, rep: 8, rest: 90, breath: "올라갈 때 호기", target: "등 & 이두", mind: "가슴을 봉에 붙이기", tip: "가슴 높이까지 올리기", guide: "언더그립 사용", cue: "가슴을 봉 쪽으로 접어 넣기" }
       ]},
       3: { day: "수요일", type: "push", title: "측면 어깨", list: [
-        { name: "사이드 레이즈", gif:"gifs/side_raise.gif", set: 5, rep: 20, rest: 60, breath: "올릴 때 호기", target: "측면 삼각근", mind: "팔꿈치를 양옆으로 던짐", tip: "날개뼈 고정", guide: "저중량 고반복 권장", cue: "위가 아니라 ‘멀리 던진다’" }
+        { name: "사이드 레이즈", set: 5, rep: 20, rest: 60, breath: "올릴 때 호기", target: "측면 삼각근", mind: "팔꿈치를 양옆으로 던짐", tip: "날개뼈 고정", guide: "저중량 고반복 권장", cue: "위가 아니라 ‘멀리 던진다’" }
       ]},
       4: { day: "목요일", type: "push", title: "어깨 & 삼두", list: [
-        { name: "파이크 푸쉬업", gif:"gifs/pike_pushup.gif", set: 4, rep: 10, rest: 90, breath: "밀 때 호기", target: "전면 어깨", mind: "어깨로 천장 밀기", tip: "엉덩이 높이 유지", guide: "머리를 손보다 앞으로", cue: "정수리가 바닥에 닿듯 내려갔다가 로켓처럼 밀기" },
-        { name: "디클라인 푸쉬업", gif:"gifs/decline_pushup.gif", set: 4, rep: 12, rest: 90, breath: "밀 때 호기", target: "상부 가슴", mind: "상부 가슴 집중", tip: "발 위치 높게", guide: "가슴 위쪽에 자극 집중", cue: "쇄골 아래로 바닥을 민다" },
-        { name: "삼두 딥스", gif:"gifs/triceps_dips.gif", set: 4, rep: 8, rest: 90, breath: "밀 때 호기", target: "삼두근", mind: "삼두로 펴서 잠금", tip: "팔꿈치 뒤로 모으기", guide: "의자 사용 가능", cue: "팔꿈치 벌어지지 않게 뒤로 모아 삼두 타격" }
+        { name: "파이크 푸쉬업", set: 4, rep: 10, rest: 90, breath: "밀 때 호기", target: "전면 어깨", mind: "어깨로 천장 밀기", tip: "엉덩이 높이 유지", guide: "머리를 손보다 앞으로", cue: "정수리가 바닥에 닿듯 내려갔다가 로켓처럼 밀기" },
+        { name: "디클라인 푸쉬업", set: 4, rep: 12, rest: 90, breath: "밀 때 호기", target: "상부 가슴", mind: "상부 가슴 집중", tip: "발 위치 높게", guide: "가슴 위쪽에 자극 집중", cue: "쇄골 아래로 바닥을 민다" },
+        { name: "삼두 딥스", set: 4, rep: 8, rest: 90, breath: "밀 때 호기", target: "삼두근", mind: "삼두로 펴서 잠금", tip: "팔꿈치 뒤로 모으기", guide: "의자 사용 가능", cue: "팔꿈치 벌어지지 않게 뒤로 모아 삼두 타격" }
       ]},
       5: { day: "금요일", type: "pull", title: "등 넓이", list: [
-        { name: "와이드 풀업", gif:"gifs/wide_pullup.gif", set: 4, rep: 6, rest: 120, breath: "올라갈 때 호기", target: "광배 외곽", mind: "등을 넓게 펼치기", tip: "넓은 그립 사용", guide: "상부 광배 자극 집중", cue: "팔꿈치를 아래로 찍어 광배 옆선 타격" },
-        { name: "인버티드 로우", gif:"gifs/inverted_row.gif", set: 4, rep: 12, rest: 90, breath: "당길 때 호기", target: "등 안정성", mind: "몸을 일직선으로", tip: "템포 일정하게", guide: "코어 단단히 고정", cue: "둔근/복부 고정 + 날개뼈 조이기" },
-        { name: "내로우 풀업", gif:"gifs/narrow_pullup.gif", set: 3, rep: 8, rest: 90, breath: "올라갈 때 호기", target: "등 중앙", mind: "봉에 가슴 터치", tip: "1초간 정지", guide: "좁은 그립 사용", cue: "가슴을 봉에 최대한 붙이기" }
+        { name: "와이드 풀업", set: 4, rep: 6, rest: 120, breath: "올라갈 때 호기", target: "광배 외곽", mind: "등을 넓게 펼치기", tip: "넓은 그립 사용", guide: "상부 광배 자극 집중", cue: "팔꿈치를 아래로 찍어 광배 옆선 타격" },
+        { name: "인버티드 로우", set: 4, rep: 12, rest: 90, breath: "당길 때 호기", target: "등 안정성", mind: "몸을 일직선으로", tip: "템포 일정하게", guide: "코어 단단히 고정", cue: "둔근/복부 고정 + 날개뼈 조이기" },
+        { name: "내로우 풀업", set: 3, rep: 8, rest: 90, breath: "올라갈 때 호기", target: "등 중앙", mind: "봉에 가슴 터치", tip: "1초간 정지", guide: "좁은 그립 사용", cue: "가슴을 봉에 최대한 붙이기" }
       ]},
       6: { day: "토요일", type: "leg", title: "하체 & 코어", list: [
-        { name: "스쿼트", gif:"gifs/squat.gif", set: 4, rep: 20, rest: 60, breath: "올라올 때 호기", target: "허벅지/둔근", mind: "발바닥 지면 밀기", tip: "허리 중립 유지", guide: "뒤꿈치 고정", cue: "낮은 의자에 앉았다가 지구를 민다" },
-        { name: "런지", gif:"gifs/lunge.gif", set: 3, rep: 10, rest: 60, breath: "올라올 때 호기", target: "엉덩이", mind: "뒤꿈치에 힘 전달", tip: "상체 살짝 숙이기", guide: "무릎 안정성 유의", cue: "앞발 뒤꿈치로 강력하게 밀기" },
-        { name: "플랭크", gif:"gifs/plank.gif", set: 3, rep: 60, rest: 60, breath: "일정하게 유지", target: "코어", mind: "배를 안으로 당기기", tip: "엉덩이 수축", guide: "일직선 유지", cue: "강철 판자처럼 버티기" }
+        { name: "스쿼트", set: 4, rep: 20, rest: 60, breath: "올라올 때 호기", target: "허벅지/둔근", mind: "발바닥 지면 밀기", tip: "허리 중립 유지", guide: "뒤꿈치 고정", cue: "낮은 의자에 앉았다가 지구를 민다" },
+        { name: "런지", set: 3, rep: 10, rest: 60, breath: "올라올 때 호기", target: "엉덩이", mind: "뒤꿈치에 힘 전달", tip: "상체 살짝 숙이기", guide: "무릎 안정성 유의", cue: "앞발 뒤꿈치로 강력하게 밀기" },
+        { name: "플랭크", set: 3, rep: 60, rest: 60, breath: "일정하게 유지", target: "코어", mind: "배를 안으로 당기기", tip: "엉덩이 수축", guide: "일직선 유지", cue: "강철 판자처럼 버티기" }
       ]},
       0: { day: "일요일", type: "rest", title: "회복", list: [
-        { name: "스트레칭", gif:"gifs/stretch.gif", set: 1, rep: 15, rest: 0, breath: "깊고 길게", target: "전신 이완", mind: "근육 이완 느끼기", tip: "어깨/광배 집중", guide: "충분한 수면 권장", cue: "부드럽게 길게, 강도보다 호흡" }
+        { name: "스트레칭", set: 1, rep: 15, rest: 0, breath: "깊고 길게", target: "전신 이완", mind: "근육 이완 느끼기", tip: "어깨/광배 집중", guide: "충분한 수면 권장", cue: "부드럽게 길게, 강도보다 호흡" }
       ]}
     };
 
@@ -1122,7 +1142,6 @@
 
     /* ---------- SPLASH ---------- */
     function initIntro(){
-      /* ✅ 앱을 백그라운드에서 끄고 다시 키면 다시 뜨게: sessionStorage */
       const shown = sessionStorage.getItem(KEY_SPLASH) === '1';
       const splash = document.getElementById('splash-screen');
       if(shown){ splash.style.display = 'none'; return; }
@@ -1170,7 +1189,6 @@
       if(name === 'history') renderCalendar();
 
       window.scrollTo({top:0, behavior:'smooth'});
-
       showDockTemporarily();
     }
 
@@ -1285,15 +1303,11 @@
       renderCarousel();
       updateProgressUI();
       updateDayNav();
-
       showDockTemporarily();
     }
 
     /* =========================================================
-      ✅ Bottom Sheet 로직 (추가)
-      - 카드의 "핵심큐/호흡/의식/엘리트 가이드"를 탭으로 보기
-      - GIF 동작 가이드 표시
-      - iOS에서 터치 안먹는 문제 해결(레이어/포인터)
+      ✅ Bottom Sheet 로직
     ========================================================= */
     let mobileActive = { w:null };
 
@@ -1333,7 +1347,6 @@
       const sheetWrap = document.getElementById('detail-sheet');
       sheetWrap.classList.remove('show');
 
-      /* ✅ iOS 애니메이션 꼬임 방지 */
       const sheet = sheetWrap.querySelector('.sheet');
       if(sheet){
         sheet.style.transform = 'translateY(100%)';
@@ -1348,11 +1361,12 @@
       btn.classList.add('active');
 
       const w = mobileActive.w;
+      const gifPath = w.gif || autoGif(w.name);
 
-      const gifBlock = (w.gif) ? `
+      const gifBlock = (gifPath) ? `
         <div class="sheetBox">
           <div class="sheetLabel">동작 가이드</div>
-          <img src="${w.gif}" class="sheetGif" loading="lazy" alt="exercise guide"
+          <img src="${gifPath}" class="sheetGif" loading="lazy" alt="exercise guide"
                onerror="this.style.display='none';" />
           <div class="sheetHint">* GIF는 동작의 핵심 흐름만 참고하세요. 자세가 흔들리면 횟수보다 폼이 우선입니다.</div>
         </div>
@@ -1369,7 +1383,6 @@
       `;
     }
 
-    /* ✅ 초보자도 혼자 할 수 있게: 자연어 확장 함수 */
     function expandCue(w){
       const base = (w.cue || w.tip || '').trim();
       return `
@@ -1439,6 +1452,8 @@
         const doneArr = getProgressArr(date, id, setTotal);
         const doneCount = doneArr.filter(Boolean).length;
 
+        const gifPath = w.gif || autoGif(w.name); // ✅ 여기서 자동 매핑
+
         const slide = document.createElement('div');
         slide.className = 'slide';
         slide.setAttribute('data-slide', idx);
@@ -1459,6 +1474,14 @@
                   <i class="fa-solid fa-rotate-left"></i>
                 </button>
               </div>
+
+              <!-- ✅ 카드 내부 GIF 미리보기: 운동 이름에 맞게 자동 매칭 -->
+              ${gifPath ? `
+                <div class="mt-5 slideGifWrap">
+                  <img src="${gifPath}" class="slideGifPreview" loading="lazy" alt="${w.name} gif"
+                       onerror="this.closest('.slideGifWrap').style.display='none';" />
+                </div>
+              ` : ''}
 
               <div class="mt-4 flex items-center justify-between gap-2">
                 <button class="pill cyan" onclick='openDetailSheet(${JSON.stringify(w).replace(/'/g,"&#39;")})'>
@@ -1647,7 +1670,6 @@
       }
 
       const repTotal = customReps[exerciseId] || w.rep;
-
       doneArr[setIndex] = !doneArr[setIndex];
       progressByDate[date][exerciseId] = doneArr;
       localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
@@ -2143,7 +2165,6 @@
       }, 1800);
     }
 
-    /* ✅ 유저 작동 감지: 스크롤/터치/클릭 모두 포함 */
     ['scroll','touchstart','touchmove','click'].forEach(ev=>{
       window.addEventListener(ev, showDockTemporarily, {passive:true});
     });
