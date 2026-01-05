@@ -235,6 +235,26 @@
       color: rgba(255,255,255,0.35);
     }
     #splash-screen.splashA .splash-auth b{ color: rgba(34,211,238,0.95); }
+      
+      /* ✅ 로고 잘림 방지 (iOS Safari/필터 렌더링 대응) */
+#splash-screen.splashA .splash-inner{
+  overflow: visible !important;
+  padding-top: 42px !important;
+  padding-bottom: 40px !important;
+}
+
+#splash-screen.splashA .splash-logo{
+  line-height: 1.1 !important;
+  padding: 6px 12px !important;
+  display: inline-block !important;
+  overflow: visible !important;
+}
+
+/* ✅ drop-shadow 렌더링 잘림 방지 */
+#splash-screen.splashA .splash-logo{
+  filter: drop-shadow(0 0 26px rgba(34,211,238,0.28)) !important;
+}
+
 
     /* Header */
     header{
@@ -894,15 +914,16 @@
 
     /* ---------- SPLASH ---------- */
     function initIntro(){
-      const shown = localStorage.getItem(KEY_SPLASH) === '1';
+      const shown = sessionStorage.getItem(KEY_SPLASH) === '1';
       const splash = document.getElementById('splash-screen');
       if(shown){ splash.style.display = 'none'; return; }
+
       setTimeout(() => {
         splash.style.opacity = '0';
         splash.style.transform = 'scale(1.08)';
         setTimeout(()=> splash.style.display='none', 1000);
-        localStorage.setItem(KEY_SPLASH, '1');
-      }, 1600);
+        sessionStorage.setItem(KEY_SPLASH, '1');
+      }, 3000);
     }
 
     /* ---------- TOAST ---------- */
