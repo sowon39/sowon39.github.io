@@ -28,6 +28,10 @@
       --card:rgba(255,255,255,0.04);
       --dockH: 110px;
       --headerH: 92px;
+
+      /* ✅ Safe Area */
+      --safeTop: env(safe-area-inset-top);
+      --safeBottom: env(safe-area-inset-bottom);
     }
 
     html,body{ height:100%; }
@@ -48,7 +52,7 @@
       overflow-x:hidden;
       overflow-y:auto;
       -webkit-overflow-scrolling:touch;
-      padding-bottom: env(safe-area-inset-bottom);
+      padding-bottom: var(--safeBottom);
       overscroll-behavior: none;
 
       background-image:
@@ -120,7 +124,7 @@
 
     #splash-screen.splashA .splash-inner{
       width:min(520px, calc(100vw - 48px));
-      padding: 34px 26px;
+      padding: 42px 26px 40px;
       border-radius: 34px;
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.10);
@@ -133,6 +137,7 @@
       transform: translateY(12px) scale(.98);
       opacity:0;
       animation: splashIn 1.1s cubic-bezier(.2,.9,.2,1) forwards;
+      overflow: visible !important;
     }
 
     @keyframes splashIn{
@@ -140,18 +145,19 @@
     }
 
     #splash-screen.splashA .splash-logo{
-      font-size: 4.3rem;
+      font-size: 4.1rem;
       font-weight: 950;
       font-style: italic;
-      line-height: 1;
+      line-height: 1.1;
+      padding: 6px 12px;
       letter-spacing: -0.09em;
       background: linear-gradient(180deg, #fff 45%, rgba(34,211,238,0.95));
       -webkit-background-clip:text;
       -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 20px rgba(34,211,238,0.22));
+      filter: drop-shadow(0 0 26px rgba(34,211,238,0.28));
       position:relative;
       display:inline-block;
-      overflow:hidden;
+      overflow: visible !important;
     }
 
     #splash-screen.splashA .splash-logo::after{
@@ -235,35 +241,15 @@
       color: rgba(255,255,255,0.35);
     }
     #splash-screen.splashA .splash-auth b{ color: rgba(34,211,238,0.95); }
-      
-      /* ✅ 로고 잘림 방지 (iOS Safari/필터 렌더링 대응) */
-#splash-screen.splashA .splash-inner{
-  overflow: visible !important;
-  padding-top: 42px !important;
-  padding-bottom: 40px !important;
-}
 
-#splash-screen.splashA .splash-logo{
-  line-height: 1.1 !important;
-  padding: 6px 12px !important;
-  display: inline-block !important;
-  overflow: visible !important;
-}
-
-/* ✅ drop-shadow 렌더링 잘림 방지 */
-#splash-screen.splashA .splash-logo{
-  filter: drop-shadow(0 0 26px rgba(34,211,238,0.28)) !important;
-}
-
-
-    /* Header */
+    /* ✅ iOS Safe Area Header Fix */
     header{
       position:fixed; top:0; left:0; right:0; z-index:50;
-      padding: 18px 18px 14px;
+      padding: calc(18px + var(--safeTop)) 18px 14px;
       border-bottom:1px solid rgba(255,255,255,0.06);
       backdrop-filter: blur(18px);
       background: rgba(10,10,12,0.62);
-      height: var(--headerH);
+      height: calc(var(--headerH) + var(--safeTop));
       box-sizing:border-box;
     }
 
@@ -286,8 +272,8 @@
 
     /* ✅ Main */
     main{
-      padding-top: calc(var(--headerH) + 18px);
-      padding-bottom: calc(var(--dockH) + env(safe-area-inset-bottom) + 28px);
+      padding-top: calc(var(--headerH) + var(--safeTop) + 18px);
+      padding-bottom: calc(var(--dockH) + var(--safeBottom) + 28px);
     }
 
     /* ✅ Carousel */
@@ -373,7 +359,6 @@
     .setBtn:active{ transform:scale(0.985); }
     .setBtn.done{ background:linear-gradient(135deg,var(--primary),var(--accent)); color:#000; box-shadow:0 18px 34px rgba(34,211,238,0.24); border:none; }
 
-    /* ✅ 세트 순서 잠금 */
     .setBtn.locked{
       opacity: .35;
       filter: saturate(.6);
@@ -415,9 +400,24 @@
       pointer-events: auto;
     }
 
-    /* Day chips */
-    .day-chip{ width:44px; height:44px; border-radius:18px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:12px; color:rgba(255,255,255,0.55); border:1px solid rgba(255,255,255,0.10); background:rgba(255,255,255,0.04); flex:0 0 auto; user-select:none;}
-    .day-chip.active{ background:var(--primary); color:#000; border-color:rgba(34,211,238,0.25); box-shadow:0 10px 24px rgba(34,211,238,0.25); }
+    /* ✅ Day chips — iOS 클립 문제 해결 */
+    .day-chip{
+      width:44px; height:44px; border-radius:18px;
+      display:flex; align-items:center; justify-content:center;
+      font-weight:900; font-size:12px;
+      color:rgba(255,255,255,0.55);
+      border:1px solid rgba(255,255,255,0.10);
+      background:rgba(255,255,255,0.04);
+      flex:0 0 auto; user-select:none;
+      position:relative;
+      overflow:hidden;        /* ✅ 삐져나감 제거 */
+      isolation:isolate;      /* ✅ iOS 렌더 안정화 */
+    }
+    .day-chip.active{
+      background:var(--primary); color:#000;
+      border-color:rgba(34,211,238,0.25);
+      box-shadow: 0 10px 22px rgba(34,211,238,0.18);
+    }
 
     /* Timer Modal */
     #timer-modal{ transition:all .65s ease; }
@@ -426,7 +426,7 @@
     /* ✅ Timer HUD */
     #timer-hud{
       position:fixed;
-      top: calc(var(--headerH) + 10px);
+      top: calc(var(--headerH) + var(--safeTop) + 10px);
       right: 14px;
       z-index: 210;
       display:none;
@@ -509,53 +509,299 @@
     .log-row{ background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:16px; overflow:hidden; }
     .log-row td{ padding:12px 10px; font-weight:800; font-size:12px; color:rgba(255,255,255,0.78); }
 
-    /* ✅ Mobile Layout Optimization */
+
+    /* =========================================================
+      ✅ Option 2: Mobile 전용 최신 UX (Bottom Sheet + Fixed Set Bar)
+    ========================================================= */
+    .mobileOnly{ display:none; }
+    .desktopOnly{ display:block; }
+
+    /* Mobile Mode */
     @media (max-width: 520px){
+      .desktopOnly{ display:none !important; }
+      .mobileOnly{ display:block !important; }
+
       .layoutWrap{ padding-left: 0; padding-right: 0; }
       main .layoutWrap.px-4{ padding-left: 14px !important; padding-right: 14px !important; }
 
-      header{ padding: 14px 14px 10px !important; height: 84px; }
+      header{
+        padding: calc(12px + var(--safeTop)) 14px 10px !important;
+        height: calc(84px + var(--safeTop));
+      }
       :root{ --headerH: 84px; --dockH: 92px; }
 
-      .slideCard{ border-radius: 26px; }
-      .slideCard .p-6{ padding: 16px !important; }
-      .slideCard h3{ font-size: 1.85rem !important; }
-
-      /* ✅ 카드 내부 2단(grid) → 1단 */
-      .slideCard .md\:grid-cols-2{ grid-template-columns: 1fr !important; }
-
-      .rightPanel{
-        padding: 14px !important;
-        border-radius: 22px !important;
-      }
-
-      .stepperBtn{
-        width: 44px !important;
-        height: 44px !important;
-        border-radius: 16px !important;
-      }
-      .stepperValue{ font-size: 20px !important; }
-
-      /* ✅ 세트 버튼: 2열 → 3열 */
-      .rightPanel .grid.grid-cols-2{
-        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-      }
-      .setBtn{
-        height: 54px !important;
-        font-size: 15px !important;
-        border-radius: 18px !important;
-      }
-
-      /* ✅ 캐러셀 peek: 폰에서 과하게 넓어지는 것 방지 */
       .carousel > .slide{
         flex: 0 0 calc(100% - 70px) !important;
       }
 
-      /* ✅ Dock 조금 더 컴팩트 */
-      .navDockWrap{ padding: 14px !important; }
-      .nav-dock{ border-radius: 30px !important; padding: 9px !important; }
-      .nav-item{ padding: 10px 0 !important; }
-      .nav-item i{ font-size: 1.15rem !important; }
+      .slideCard{ border-radius: 26px; }
+      .slideCard h3{ font-size: 1.55rem !important; }
+
+      /* ✅ Mobile Summary Card */
+      .mCard{
+        border-radius: 26px;
+        padding: 16px;
+        box-shadow: 0 26px 70px rgba(0,0,0,0.55);
+      }
+
+      .mSub{
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: .16em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.42);
+      }
+
+      .mCue{
+        margin-top: 10px;
+        padding: 14px;
+        border-radius: 20px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.09);
+      }
+
+      .mCue p{
+        font-size: 15px;
+        line-height: 1.4;
+        font-weight: 900;
+        color: rgba(255,255,255,0.86);
+        letter-spacing: -0.02em;
+      }
+
+      /* ✅ Fixed Action Bar for sets (iOS style) */
+      .mSetBarWrap{
+        position: fixed;
+        left: 0; right: 0;
+        bottom: calc(var(--dockH) + var(--safeBottom) + 10px);
+        z-index: 120;
+        padding: 0 14px;
+        pointer-events: none;
+      }
+      .mSetBar{
+        pointer-events: auto;
+        background: rgba(10,10,12,0.76);
+        border: 1px solid rgba(255,255,255,0.12);
+        backdrop-filter: blur(22px);
+        -webkit-backdrop-filter: blur(22px);
+        border-radius: 24px;
+        padding: 12px;
+        box-shadow: 0 22px 60px rgba(0,0,0,0.70);
+      }
+      .mSetRow{
+        display:flex;
+        gap:10px;
+        overflow-x:auto;
+        padding-bottom: 6px;
+        -webkit-overflow-scrolling: touch;
+      }
+      .mSetRow::-webkit-scrollbar{ display:none; }
+
+      .mSetBtn{
+        flex: 0 0 auto;
+        width: 56px;
+        height: 48px;
+        border-radius: 18px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-weight: 950;
+        font-size: 14px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.12);
+        color: rgba(255,255,255,0.85);
+        -webkit-tap-highlight-color:transparent;
+        user-select:none;
+      }
+      .mSetBtn:active{ transform: scale(.98); }
+
+      .mSetBtn.done{
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        color:#000;
+        border: none;
+        box-shadow: 0 18px 34px rgba(34,211,238,0.22);
+      }
+      .mSetBtn.locked{
+        opacity: .35;
+        filter: saturate(.6);
+        pointer-events: none;
+      }
+
+      .mBarTop{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:10px;
+        margin-bottom: 10px;
+      }
+
+      .mBarTop .mMeta{
+        display:flex;
+        flex-direction:column;
+        gap:3px;
+        min-width: 0;
+      }
+      .mBarTop .mMeta strong{
+        font-size: 13px;
+        font-weight: 950;
+        color: rgba(255,255,255,0.92);
+        letter-spacing:-0.03em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .mBarTop .mMeta span{
+        font-size: 10px;
+        font-weight: 900;
+        color: rgba(255,255,255,0.42);
+        letter-spacing: .14em;
+        text-transform: uppercase;
+      }
+
+      .mBarTop .mActions{
+        display:flex;
+        gap:8px;
+      }
+      .mActionBtn{
+        width: 44px; height: 44px;
+        border-radius: 18px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.12);
+        color: rgba(255,255,255,0.85);
+      }
+      .mActionBtn:active{ transform: scale(.98); }
+
+      /* ✅ Bottom Sheet */
+      #detail-sheet{
+        position: fixed;
+        inset: 0;
+        z-index: 240;
+        display: none;
+        align-items: flex-end;
+        justify-content:center;
+      }
+      #detail-sheet.show{ display:flex; }
+
+      .sheet-backdrop{
+        position:absolute;
+        inset:0;
+        background: rgba(0,0,0,0.62);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+      .sheet{
+        position:relative;
+        width: 100%;
+        max-width: 520px;
+        border-radius: 30px 30px 0 0;
+        padding: 14px 14px calc(18px + var(--safeBottom));
+        background: rgba(12,12,16,0.92);
+        border: 1px solid rgba(255,255,255,0.10);
+        box-shadow: 0 -30px 80px rgba(0,0,0,0.75);
+        transform: translateY(100%);
+        animation: sheetUp .35s cubic-bezier(.2,.9,.2,1) forwards;
+      }
+      @keyframes sheetUp{ to{ transform: translateY(0%); } }
+
+      .sheetHandle{
+        width: 44px; height: 5px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.16);
+        margin: 6px auto 10px;
+      }
+
+      .sheetHead{
+        display:flex;
+        align-items:flex-start;
+        justify-content:space-between;
+        gap:10px;
+        padding: 6px 6px 10px;
+      }
+      .sheetHead h3{
+        font-size: 18px;
+        font-weight: 950;
+        letter-spacing: -0.04em;
+        color: white;
+      }
+      .sheetHead p{
+        margin-top: 6px;
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.45);
+      }
+
+      .sheetClose{
+        width: 42px; height: 42px;
+        border-radius: 18px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.12);
+        color: rgba(255,255,255,0.85);
+      }
+
+      .sheetTabs{
+        display:flex;
+        gap:8px;
+        overflow-x:auto;
+        padding: 6px 6px 12px;
+      }
+      .sheetTabs::-webkit-scrollbar{ display:none; }
+
+      .sheetTab{
+        flex: 0 0 auto;
+        padding: 10px 12px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 950;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.58);
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.10);
+      }
+      .sheetTab.active{
+        background: rgba(34,211,238,0.14);
+        border-color: rgba(34,211,238,0.25);
+        color: rgba(34,211,238,0.95);
+      }
+
+      .sheetBody{
+        padding: 0 6px 8px;
+      }
+      .sheetBox{
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.10);
+        border-radius: 22px;
+        padding: 16px;
+        margin-bottom: 12px;
+      }
+      .sheetLabel{
+        font-size: 10px;
+        font-weight: 950;
+        letter-spacing: .18em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.42);
+      }
+      .sheetText{
+        margin-top: 10px;
+        font-size: 15px;
+        line-height: 1.55;
+        font-weight: 850;
+        letter-spacing: -0.02em;
+        color: rgba(255,255,255,0.86);
+      }
+      .sheetHint{
+        margin-top: 10px;
+        font-size: 12px;
+        font-weight: 800;
+        color: rgba(255,255,255,0.45);
+      }
     }
   </style>
 </head>
@@ -615,6 +861,42 @@
         <button class="hudBtn" onclick="openTimerFromHUD()" title="타이머 보기"><i class="fa-solid fa-expand"></i></button>
         <button class="hudBtn" onclick="closeTimer(false)" title="스킵"><i class="fa-solid fa-forward"></i></button>
       </div>
+    </div>
+  </div>
+
+  <!-- ✅ Mobile Bottom Sheet (옵션2 핵심) -->
+  <div id="detail-sheet" class="mobileOnly">
+    <div class="sheet-backdrop" onclick="closeDetailSheet()"></div>
+    <div class="sheet">
+      <div class="sheetHandle"></div>
+      <div class="sheetHead">
+        <div>
+          <h3 id="sheet-title">운동 상세</h3>
+          <p id="sheet-sub">DETAIL</p>
+        </div>
+        <button class="sheetClose" onclick="closeDetailSheet()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="sheetTabs" id="sheet-tabs"></div>
+      <div class="sheetBody" id="sheet-body"></div>
+    </div>
+  </div>
+
+  <!-- ✅ Mobile Fixed Set Bar -->
+  <div class="mSetBarWrap mobileOnly">
+    <div class="mSetBar">
+      <div class="mBarTop">
+        <div class="mMeta">
+          <strong id="mbar-exName">운동</strong>
+          <span id="mbar-meta">target · rest</span>
+        </div>
+        <div class="mActions">
+          <button class="mActionBtn" onclick="openDetailSheet()" title="자세히 보기"><i class="fa-solid fa-circle-info"></i></button>
+          <button class="mActionBtn" onclick="mobileResetExercise()" title="이 운동 초기화"><i class="fa-solid fa-rotate-left"></i></button>
+        </div>
+      </div>
+
+      <div class="mSetRow" id="mbar-sets"></div>
     </div>
   </div>
 
@@ -733,7 +1015,7 @@
   <!-- Bottom Dock -->
   <div class="navDockWrap">
     <div class="layoutWrap">
-      <nav class="nav-dock" style="margin-bottom: calc(env(safe-area-inset-bottom) + 6px);">
+      <nav class="nav-dock" style="margin-bottom: calc(var(--safeBottom) + 6px);">
         <button onclick="showTab('session', this)" class="nav-item active">
           <i class="fa-solid fa-bolt-lightning"></i>
           <span class="text-[8px] font-black uppercase tracking-tighter">훈련</span>
@@ -823,6 +1105,7 @@
       ✅ 휴식 알림 강화(4회 패턴 + 화면 플래시)
       ✅ Dock: 작동할 때만 등장 + 자동 숨김
       ✅ Mobile: 폰에서 레이아웃 최적화
+      ✅ Option 2: Mobile 최신 UX (Bottom Sheet + Fixed Set Bar)
     ========================================================= */
 
     /* ---------- DATA ---------- */
@@ -961,8 +1244,6 @@
       if(name === 'history') renderCalendar();
 
       window.scrollTo({top:0, behavior:'smooth'});
-
-      // ✅ 탭 전환 자체도 "작동"이므로 Dock 표시
       showDockTemporarily();
     }
 
@@ -1077,9 +1358,104 @@
       renderCarousel();
       updateProgressUI();
       updateDayNav();
-
-      // ✅ 요일 변경은 작동이므로 Dock 표시
       showDockTemporarily();
+    }
+
+    /* =========================================================
+      ✅ Option 2: Mobile Bottom Sheet / Set Bar State
+    ========================================================= */
+    let mobileActive = {
+      exerciseId: null,
+      w: null,
+      setTotal: 0,
+      repTotal: 0,
+      doneArr: [],
+      doneCount: 0,
+      idx: 0
+    };
+
+    function updateMobileBar(){
+      const isMobile = window.innerWidth <= 520;
+      if(!isMobile) return;
+
+      if(!mobileActive.exerciseId || !mobileActive.w) return;
+      document.getElementById('mbar-exName').textContent = mobileActive.w.name;
+      document.getElementById('mbar-meta').textContent = `${mobileActive.w.target} · REST ${mobileActive.w.rest}s · ${mobileActive.doneCount}/${mobileActive.setTotal}`;
+
+      const wrap = document.getElementById('mbar-sets');
+      wrap.innerHTML = '';
+
+      const date = todayStr();
+      const exerciseId = mobileActive.exerciseId;
+      const doneArr = mobileActive.doneArr;
+      const setTotal = mobileActive.setTotal;
+
+      Array.from({length:setTotal}).forEach((_, s)=>{
+        const done = !!doneArr[s];
+        const nextIndex = doneArr.indexOf(false);
+        const isLocked = (!done && nextIndex !== -1 && s !== nextIndex);
+
+        const btn = document.createElement('button');
+        btn.className = `mSetBtn ${done?'done':''} ${isLocked?'locked':''}`;
+        btn.textContent = s+1;
+        btn.onclick = () => toggleSetComplete(date, exerciseId, s);
+        wrap.appendChild(btn);
+      });
+    }
+
+    function openDetailSheet(){
+      if(!mobileActive.w) return;
+      const sheet = document.getElementById('detail-sheet');
+      sheet.classList.add('show');
+
+      document.getElementById('sheet-title').textContent = mobileActive.w.name;
+      document.getElementById('sheet-sub').textContent = `${mobileActive.w.target} · REST ${mobileActive.w.rest}s`;
+
+      const tabs = [
+        { key:'cue', label:'핵심 큐', text: mobileActive.w.cue || mobileActive.w.tip || '' },
+        { key:'breath', label:'호흡', text: mobileActive.w.breath || '' },
+        { key:'mind', label:'의식', text: mobileActive.w.mind || '' },
+        { key:'guide', label:'엘리트 가이드', text: `${mobileActive.w.tip} · ${mobileActive.w.guide}` }
+      ];
+
+      const tabWrap = document.getElementById('sheet-tabs');
+      tabWrap.innerHTML = '';
+
+      tabs.forEach((t, i)=>{
+        const b = document.createElement('button');
+        b.className = `sheetTab ${i===0?'active':''}`;
+        b.textContent = t.label;
+        b.onclick = ()=> setSheetTab(t, b);
+        tabWrap.appendChild(b);
+      });
+
+      setSheetTab(tabs[0], tabWrap.querySelector('.sheetTab'));
+      haptic(12);
+    }
+
+    function setSheetTab(tab, btn){
+      document.querySelectorAll('.sheetTab').forEach(x=> x.classList.remove('active'));
+      btn.classList.add('active');
+
+      const body = document.getElementById('sheet-body');
+      body.innerHTML = `
+        <div class="sheetBox">
+          <div class="sheetLabel">${tab.label}</div>
+          <div class="sheetText">${tab.text}</div>
+          <div class="sheetHint">* 처음엔 천천히, 정확하게. 자세를 유지하는 것이 가장 중요합니다.</div>
+        </div>
+      `;
+    }
+
+    function closeDetailSheet(){
+      const sheet = document.getElementById('detail-sheet');
+      sheet.classList.remove('show');
+      haptic(10);
+    }
+
+    function mobileResetExercise(){
+      if(!mobileActive.exerciseId) return;
+      resetExercise(mobileActive.exerciseId);
     }
 
     /* ---------- CAROUSEL ---------- */
@@ -1088,6 +1464,8 @@
       const data = workoutData[currentDayIdx];
       const carousel = document.getElementById('session-carousel');
       carousel.innerHTML = '';
+
+      const isMobile = window.innerWidth <= 520;
 
       data.list.forEach((w, idx) => {
         const id = exId(currentDayIdx, idx);
@@ -1100,7 +1478,33 @@
         slide.className = 'slide';
         slide.setAttribute('data-slide', idx);
 
-        slide.innerHTML = `
+        // ✅ Mobile Template: 요약 카드만 표시 (Set Bar로 조작)
+        const mobileTemplate = `
+          <div class="glass mCard">
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <div class="mSub">${w.target} · REST ${w.rest}s · ${doneCount}/${setTotal}</div>
+                <h3 class="mt-2 font-black italic text-white tracking-tight truncate">${w.name}</h3>
+              </div>
+              <button onclick="resetExercise('${id}')" class="pill" title="이 운동(오늘) 초기화">
+                <i class="fa-solid fa-rotate-left"></i>
+              </button>
+            </div>
+
+            <div class="mCue">
+              <div class="mSub mb-2">핵심 큐</div>
+              <p>${w.cue || w.tip || ''}</p>
+            </div>
+
+            <div class="mt-4 flex items-center justify-between gap-2">
+              <button class="pill cyan" onclick="openDetailSheetFrom('${id}', ${idx})"><i class="fa-solid fa-circle-info"></i> 자세히</button>
+              <button class="pill" onclick="carouselNext()"><i class="fa-solid fa-chevron-right"></i> 다음</button>
+            </div>
+          </div>
+        `;
+
+        // ✅ Desktop Template: 기존 그대로 유지
+        const desktopTemplate = `
           <div class="glass slideCard p-6 md:p-7">
             <div>
               <div class="flex items-start justify-between gap-3">
@@ -1203,6 +1607,8 @@
             </div>
           </div>
         `;
+
+        slide.innerHTML = isMobile ? mobileTemplate : desktopTemplate;
         carousel.appendChild(slide);
       });
 
@@ -1210,6 +1616,43 @@
       bindCarouselEvents();
       updateSlideHUD();
       requestAnimationFrame(()=> scrollToSlide(currentSlideIndex,false));
+
+      // ✅ mobile bar 자동 동기화
+      updateMobileActiveFromSlide();
+    }
+
+    function openDetailSheetFrom(exId, idx){
+      const date = todayStr();
+      const [d, ex] = exId.split('-').map(Number);
+      const w = workoutData[d]?.list?.[ex];
+      if(!w) return;
+      const setTotal = customSets[exId] || w.set;
+      const repTotal = customReps[exId] || w.rep;
+      const doneArr = getProgressArr(date, exId, setTotal);
+      const doneCount = doneArr.filter(Boolean).length;
+
+      mobileActive = { exerciseId: exId, w, setTotal, repTotal, doneArr, doneCount, idx };
+      updateMobileBar();
+      openDetailSheet();
+    }
+
+    function updateMobileActiveFromSlide(){
+      const isMobile = window.innerWidth <= 520;
+      if(!isMobile) return;
+
+      const date = todayStr();
+      const idx = clamp(currentSlideIndex, 0, workoutData[currentDayIdx].list.length - 1);
+      const exIdKey = exId(currentDayIdx, idx);
+      const w = workoutData[currentDayIdx].list[idx];
+      if(!w) return;
+
+      const setTotal = customSets[exIdKey] || w.set;
+      const repTotal = customReps[exIdKey] || w.rep;
+      const doneArr = getProgressArr(date, exIdKey, setTotal);
+      const doneCount = doneArr.filter(Boolean).length;
+
+      mobileActive = { exerciseId: exIdKey, w, setTotal, repTotal, doneArr, doneCount, idx };
+      updateMobileBar();
     }
 
     function bindCarouselEvents(){
@@ -1222,8 +1665,8 @@
         if(idx !== currentSlideIndex){
           currentSlideIndex = clamp(idx, 0, slides.length-1);
           updateSlideHUD();
+          updateMobileActiveFromSlide();
         }
-        // ✅ 슬라이딩 자체도 작동이므로 Dock 표시
         showDockTemporarily();
       };
     }
@@ -1256,6 +1699,7 @@
       currentSlideIndex = clamp(currentSlideIndex + 1, 0, data.list.length-1);
       scrollToSlide(currentSlideIndex, true);
       updateSlideHUD();
+      updateMobileActiveFromSlide();
       haptic(10);
       showDockTemporarily();
     }
@@ -1265,6 +1709,7 @@
       currentSlideIndex = clamp(currentSlideIndex - 1, 0, data.list.length-1);
       scrollToSlide(currentSlideIndex, true);
       updateSlideHUD();
+      updateMobileActiveFromSlide();
       haptic(10);
       showDockTemporarily();
     }
@@ -1282,7 +1727,7 @@
     }
 
     function toggleSetComplete(date, exerciseId, setIndex){
-      unlockAudio(); // ✅ iOS/iPadOS 사운드 unlock
+      unlockAudio();
       showDockTemporarily();
 
       const [dayIdx, exIdx] = exerciseId.split('-').map(Number);
@@ -1347,6 +1792,7 @@
       currentSlideIndex = keep;
       scrollToSlide(currentSlideIndex,false);
       updateSlideHUD();
+      updateMobileActiveFromSlide();
     }
 
     function adjust(type, key, val){
@@ -1410,6 +1856,7 @@
 
       renderCarousel();
       updateProgressUI();
+      updateMobileActiveFromSlide();
       toast('운동 초기화 완료');
       haptic(22);
     }
@@ -1427,6 +1874,7 @@
 
       renderCarousel();
       updateProgressUI();
+      updateMobileActiveFromSlide();
       toast('오늘 초기화 완료');
       haptic(25);
     }
