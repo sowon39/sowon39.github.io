@@ -32,12 +32,14 @@
 
     html,body{ height:100%; }
 
+    /* ✅ 확대/줌 방지 (best effort) */
     html{
       touch-action: manipulation;
       -webkit-text-size-adjust: 100%;
       overscroll-behavior: none;
     }
 
+    /* ✅ 스크롤 복구 */
     body{
       font-family:'Pretendard',sans-serif;
       background-color:var(--bg);
@@ -67,6 +69,7 @@
       border:1px solid rgba(255,255,255,0.10);
     }
 
+    /* ✅ 전체 폭 레이아웃 컨테이너 */
     .layoutWrap{
       width:100%;
       max-width: 1100px;
@@ -84,6 +87,7 @@
       transition:all 1s cubic-bezier(0.65,0,0.35,1);
     }
 
+    /* Aurora Layer */
     #splash-screen.splashA::before{
       content:"";
       position:absolute; inset:-45%;
@@ -97,6 +101,7 @@
       opacity:1;
     }
 
+    /* Noise Layer */
     #splash-screen.splashA::after{
       content:"";
       position:absolute; inset:0;
@@ -231,6 +236,7 @@
     }
     #splash-screen.splashA .splash-auth b{ color: rgba(34,211,238,0.95); }
 
+    /* Header */
     header{
       position:fixed; top:0; left:0; right:0; z-index:50;
       padding: 18px 18px 14px;
@@ -246,6 +252,7 @@
     .tab-content.active{ display:block; }
     @keyframes fadeInContent{ from{opacity:0; transform:translateY(6px) scale(0.985);} to{opacity:1; transform:translateY(0) scale(1);} }
 
+    /* Pills */
     .pill{
       display:inline-flex; align-items:center; gap:6px;
       padding:6px 10px; border-radius:999px;
@@ -258,11 +265,13 @@
     }
     .pill.cyan{ border-color:rgba(34,211,238,0.25); background:rgba(34,211,238,0.10); color:rgba(34,211,238,0.95); }
 
+    /* ✅ Main */
     main{
       padding-top: calc(var(--headerH) + 18px + env(safe-area-inset-top));
       padding-bottom: calc(var(--dockH) + env(safe-area-inset-bottom) + 28px);
     }
 
+    /* ✅ Carousel */
     .carousel{
       display:flex;
       gap:18px;
@@ -299,26 +308,7 @@
       overflow:hidden;
     }
 
-    /* ✅ GIF Preview (카드 내부 미리보기) */
-    .slideGifWrap{
-      border-radius: 22px;
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,0.10);
-      background: rgba(255,255,255,0.03);
-      box-shadow: 0 22px 55px rgba(0,0,0,0.60);
-    }
-    .slideGifPreview{
-      width:100%;
-      object-fit: cover;
-      display:block;
-      max-height: 240px;
-    }
-    @media (max-width:520px){
-      .slideGifPreview{
-        max-height: 170px !important;
-      }
-    }
-
+    /* Right Panel */
     .rightPanel{ border-radius:26px; padding:18px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); }
 
     .stepper{
@@ -366,12 +356,14 @@
     .setBtn:active{ transform:scale(0.985); }
     .setBtn.done{ background:linear-gradient(135deg,var(--primary),var(--accent)); color:#000; box-shadow:0 18px 34px rgba(34,211,238,0.24); border:none; }
 
+    /* ✅ 세트 순서 잠금 */
     .setBtn.locked{
       opacity: .35;
       filter: saturate(.6);
       pointer-events: none;
     }
 
+    /* ✅ Floating Dock */
     .navDockWrap{ position:fixed; left:0; right:0; bottom:0; padding: 18px; z-index:60; }
     .nav-dock{
       background:rgba(10,10,12,0.78);
@@ -390,6 +382,7 @@
     .nav-active-dot{ position:absolute; bottom:1px; width:4px; height:4px; background:var(--primary); border-radius:50%; box-shadow:0 0 12px var(--primary); opacity:0; transition:all .25s; }
     .nav-item.active .nav-active-dot{ opacity:1; transform:scale(1.6); }
 
+    /* ✅ Dock Auto Hide */
     .navDockWrap{
       transition: transform .45s cubic-bezier(0.22, 1, 0.36, 1), opacity .35s ease;
       will-change: transform, opacity;
@@ -405,6 +398,7 @@
       pointer-events: auto;
     }
 
+    /* Day chips */
     .day-chip{
       width:44px; height:44px;
       border-radius:18px;
@@ -429,9 +423,11 @@
       box-shadow:0 10px 24px rgba(34,211,238,0.25);
     }
 
+    /* Timer Modal */
     #timer-modal{ transition:all .65s ease; }
     #timer-sec{ letter-spacing:-0.08em; }
 
+    /* ✅ Timer HUD */
     #timer-hud{
       position:fixed;
       top: calc(var(--headerH) + 10px + env(safe-area-inset-top));
@@ -485,12 +481,15 @@
     }
     .hudBtn:active{ transform:scale(.98); }
 
+    /* Summary modal */
     #summary-modal{ position:fixed; inset:0; z-index:220; display:none; align-items:center; justify-content:center; }
     #summary-modal.show{ display:flex; }
 
+    /* Toast */
     #toast{ position:fixed; left:50%; bottom:130px; transform:translateX(-50%); z-index:250; opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; }
     #toast.show{ opacity:1; transform:translateX(-50%) translateY(-6px); }
 
+    /* History layout */
     .historyLayout{
       display:grid;
       grid-template-columns: 1fr;
@@ -502,18 +501,20 @@
       }
     }
 
+    /* Calendar */
     .calendar-day{ aspect-ratio:1; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:13px; position:relative; transition:all .18s; font-weight:800; color:rgba(255,255,255,0.75); background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); user-select:none;}
     .has-log::after{ content:''; width:6px; height:6px; background:rgba(34,211,238,0.90); border-radius:50%; position:absolute; bottom:8px; box-shadow:0 0 12px rgba(34,211,238,0.35); }
     .calendar-day.selected{ background:rgba(34,211,238,0.14); border:1px solid rgba(34,211,238,0.35); box-shadow:0 0 0 2px rgba(34,211,238,0.18), 0 0 30px rgba(34,211,238,0.12); color:#eaffff; font-weight:900; transform:translateY(-2px); }
     .calendar-day.today{ border:1px solid rgba(255,255,255,0.12); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08); color:rgba(255,255,255,0.95); font-weight:900; }
 
+    /* History table */
     .log-table{ width:100%; border-collapse:separate; border-spacing:0 10px; }
     .log-table th{ font-size:10px; text-transform:uppercase; letter-spacing:.18em; color:rgba(255,255,255,0.35); font-weight:900; text-align:left; padding:0 10px 6px; }
     .log-row{ background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:16px; overflow:hidden; }
     .log-row td{ padding:12px 10px; font-weight:800; font-size:12px; color:rgba(255,255,255,0.78); }
 
     /* =========================================================
-       ✅ Bottom Sheet
+       ✅ Bottom Sheet (운동 상세)
     ========================================================= */
     #detail-sheet{
       position: fixed;
@@ -661,6 +662,28 @@
       background: rgba(255,255,255,0.03);
     }
 
+    /* ✅ 카드에서 정사각 GIF 노출 (태블릿/PC에서도 안 잘림) */
+    .cardGifSquareWrap{
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 22px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.03);
+      box-shadow: 0 22px 55px rgba(0,0,0,0.55);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform .12s ease;
+    }
+    .cardGifSquareWrap:active{ transform: scale(0.99); }
+    .cardGifSquare{
+      width: 100%;
+      height: 100%;
+      object-fit: contain; /* ✅ 핵심: 절대 안 잘림 */
+      display: block;
+      background: rgba(0,0,0,0.15);
+    }
+
     /* ✅ Mobile Layout Optimization */
     @media (max-width: 520px){
       .layoutWrap{ padding-left: 0; padding-right: 0; }
@@ -761,7 +784,7 @@
     </div>
   </div>
 
-  <!-- ✅ Bottom Sheet -->
+  <!-- ✅ Bottom Sheet (운동 상세) -->
   <div id="detail-sheet">
     <div class="sheet-backdrop" onclick="closeDetailSheet()"></div>
     <div class="sheet" role="dialog" aria-modal="true">
@@ -1014,43 +1037,30 @@
   <script>
     /* =========================================================
       DK MASTER OS v11.3
-      ✅ 운동별 GIF 자동 매칭 (대문자 파일 / index.html 동일 폴더)
-      ✅ 카드 내부에도 GIF 미리보기 노출
-      ✅ 상세 Bottom Sheet에서도 GIF 노출
+      ✅ GIF: 대문자 파일명, index.html과 같은 경로로 매칭
+      ✅ 카드: 엘리트 가이드 밑 정사각 GIF 노출 + 클릭하면 상세 열림
+      ✅ GIF 없으면 기존 상세 버튼 노출
     ========================================================= */
 
-    /* ✅ GIF 자동 매핑: 파일명은 루트에 있는 대문자 GIF로 연결 */
-    function autoGif(name){
-      const n = (name || "").toLowerCase();
+    /* ---------- GIF 매칭 헬퍼 ---------- */
+    function getGifByExerciseName(name){
+      const n = (name || '').toLowerCase();
 
-      // dips
-      if(n.includes("딥")) return "DIPS.gif";
+      // ✅ 너가 제공한 파일 목록 기반 매핑
+      // AIR_SQT.gif, CHIN_UP.gif, DB_LAT_RAISE.gif, DIPS.gif, INVT_ROW.gif,
+      // LUNGE.gif, PIKE_PUSH_UP.gif, PLANK.gif, PULL_UP.gif, PUSH_UP.gif
+      if(n.includes('스쿼트') || n.includes('squat')) return 'AIR_SQT.gif';
+      if(n.includes('친업') || n.includes('chin')) return 'CHIN_UP.gif';
+      if(n.includes('사이드 레이즈') || n.includes('side raise') || n.includes('레터럴') || n.includes('lateral')) return 'DB_LAT_RAISE.gif';
+      if(n.includes('딥스') || n.includes('dips')) return 'DIPS.gif';
+      if(n.includes('인버티드 로우') || n.includes('inverted row') || n.includes('invt')) return 'INVT_ROW.gif';
+      if(n.includes('런지') || n.includes('lunge')) return 'LUNGE.gif';
+      if(n.includes('파이크 푸쉬업') || n.includes('pike')) return 'PIKE_PUSH_UP.gif';
+      if(n.includes('플랭크') || n.includes('plank')) return 'PLANK.gif';
+      if(n.includes('풀업') || n.includes('pull up') || n.includes('pullup')) return 'PULL_UP.gif';
+      if(n.includes('푸쉬업') || n.includes('push up') || n.includes('pushup')) return 'PUSH_UP.gif';
 
-      // push up
-      if(n.includes("푸쉬업")) return "PUSH_UP.gif";
-
-      // pull up
-      if(n.includes("풀업") && !n.includes("친업")) return "PULL_UP.gif";
-
-      // chin up
-      if(n.includes("친업")) return "CHIN_UP.gif";
-
-      // inverted row
-      if(n.includes("인버티드") || n.includes("로우")) return "INVT_ROW.gif";
-
-      // db lateral raise
-      if(n.includes("레이즈")) return "DB_LAT_RAISE.gif";
-
-      // squat
-      if(n.includes("스쿼트")) return "AIR_SQT.gif";
-
-      // lunge
-      if(n.includes("런지")) return "LUNGE.gif";
-
-      // plank
-      if(n.includes("플랭크")) return "PLANK.gif";
-
-      return "";
+      return ''; // 매칭 없으면 빈값
     }
 
     /* ---------- DATA ---------- */
@@ -1189,6 +1199,7 @@
       if(name === 'history') renderCalendar();
 
       window.scrollTo({top:0, behavior:'smooth'});
+
       showDockTemporarily();
     }
 
@@ -1303,6 +1314,7 @@
       renderCarousel();
       updateProgressUI();
       updateDayNav();
+
       showDockTemporarily();
     }
 
@@ -1352,7 +1364,6 @@
         sheet.style.transform = 'translateY(100%)';
         setTimeout(()=> sheet.style.transform = '', 120);
       }
-
       haptic(10);
     }
 
@@ -1361,12 +1372,11 @@
       btn.classList.add('active');
 
       const w = mobileActive.w;
-      const gifPath = w.gif || autoGif(w.name);
 
-      const gifBlock = (gifPath) ? `
+      const gifBlock = (w.gif) ? `
         <div class="sheetBox">
           <div class="sheetLabel">동작 가이드</div>
-          <img src="${gifPath}" class="sheetGif" loading="lazy" alt="exercise guide"
+          <img src="${w.gif}" class="sheetGif" loading="lazy" alt="exercise guide"
                onerror="this.style.display='none';" />
           <div class="sheetHint">* GIF는 동작의 핵심 흐름만 참고하세요. 자세가 흔들리면 횟수보다 폼이 우선입니다.</div>
         </div>
@@ -1447,16 +1457,30 @@
 
       data.list.forEach((w, idx) => {
         const id = exId(currentDayIdx, idx);
+
+        // ✅ GIF 자동 매칭 (대문자 파일명, index.html과 같은 경로)
+        const gif = getGifByExerciseName(w.name);
+        w.gif = gif || ''; // 상세에서도 사용
+
         const setTotal = customSets[id] || w.set;
         const repTotal = customReps[id] || w.rep;
         const doneArr = getProgressArr(date, id, setTotal);
         const doneCount = doneArr.filter(Boolean).length;
 
-        const gifPath = w.gif || autoGif(w.name); // ✅ 여기서 자동 매핑
-
         const slide = document.createElement('div');
         slide.className = 'slide';
         slide.setAttribute('data-slide', idx);
+
+        // ✅ gif 있으면 버튼 대신 "GIF 터치로 상세" 안내
+        const detailAction = gif ? `
+          <span class="pill cyan">
+            <i class="fa-solid fa-hand-pointer"></i> GIF 터치로 상세 보기
+          </span>
+        ` : `
+          <button class="pill cyan" onclick='openDetailSheet(${JSON.stringify(w).replace(/'/g,"&#39;")})'>
+            <i class="fa-solid fa-circle-info"></i> 운동 상세 보기
+          </button>
+        `;
 
         slide.innerHTML = `
           <div class="glass slideCard p-6 md:p-7">
@@ -1475,18 +1499,8 @@
                 </button>
               </div>
 
-              <!-- ✅ 카드 내부 GIF 미리보기: 운동 이름에 맞게 자동 매칭 -->
-              ${gifPath ? `
-                <div class="mt-5 slideGifWrap">
-                  <img src="${gifPath}" class="slideGifPreview" loading="lazy" alt="${w.name} gif"
-                       onerror="this.closest('.slideGifWrap').style.display='none';" />
-                </div>
-              ` : ''}
-
               <div class="mt-4 flex items-center justify-between gap-2">
-                <button class="pill cyan" onclick='openDetailSheet(${JSON.stringify(w).replace(/'/g,"&#39;")})'>
-                  <i class="fa-solid fa-circle-info"></i> 운동 상세 보기
-                </button>
+                ${detailAction}
               </div>
 
               <div class="mt-5 grid md:grid-cols-2 gap-4">
@@ -1505,10 +1519,24 @@
                       <p class="text-[10px] font-black tracking-[0.18em] uppercase text-indigo-300 mb-2">의식</p>
                       <p class="text-[13px] font-bold text-white/70">${w.mind}</p>
                     </div>
+
                     <div class="bg-cyan-400/[0.04] p-4 rounded-2xl border border-cyan-400/10 col-span-2">
                       <p class="text-[10px] font-black tracking-[0.18em] uppercase text-cyan-300 mb-2">엘리트 가이드</p>
                       <p class="text-[13px] font-bold text-white/75">${w.tip} · <span class="text-white/45">${w.guide}</span></p>
                     </div>
+
+                    <!-- ✅ GIF는 엘리트 가이드 밑 정사각형 공간에 노출 -->
+                    ${gif ? `
+                      <div class="mt-2 col-span-2">
+                        <div class="cardGifSquareWrap" onclick='openDetailSheet(${JSON.stringify(w).replace(/'/g,"&#39;")})'>
+                          <img src="${gif}" class="cardGifSquare" loading="lazy" alt="exercise guide"
+                               onerror="this.parentElement.style.display='none';" />
+                        </div>
+                        <div class="mt-2 text-[10px] font-black tracking-[0.18em] uppercase text-white/35">
+                          GIF 터치하면 운동 상세보기
+                        </div>
+                      </div>
+                    ` : ''}
                   </div>
                 </div>
 
@@ -1670,6 +1698,7 @@
       }
 
       const repTotal = customReps[exerciseId] || w.rep;
+
       doneArr[setIndex] = !doneArr[setIndex];
       progressByDate[date][exerciseId] = doneArr;
       localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
