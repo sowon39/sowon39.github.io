@@ -3,16 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-  <title>DK Fit OS v12.1 (WakeLock + Rep AI Buttons + History Pro)</title>
+  <title>DK FIT NEXT · Elite Fitness OS</title>
 
-  <!-- ✅ PWA / iOS Standalone -->
+  <!-- PWA (optional) -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="DK Fit">
+  <meta name="apple-mobile-web-app-title" content="DK FIT">
   <meta name="theme-color" content="#050507">
   <meta name="mobile-web-app-capable" content="yes">
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icon-192.png">
+  <!-- manifest.json / icons are optional -->
+  <!-- <link rel="manifest" href="manifest.json"> -->
+  <!-- <link rel="apple-touch-icon" href="icon-192.png"> -->
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -20,28 +21,32 @@
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800;900&display=swap');
-
     :root{
+      --bg:#050507;
+      --card: rgba(255,255,255,0.045);
+      --stroke: rgba(255,255,255,0.10);
+      --text: rgba(255,255,255,0.86);
+      --muted: rgba(255,255,255,0.45);
       --primary:#22d3ee;
       --accent:#6366f1;
-      --bg:#050507;
-      --card:rgba(255,255,255,0.04);
-      --dockH: 110px;
-      --headerH: 92px;
+      --danger:#fb7185;
+      --good:#34d399;
+
+      --dockH: 106px;
+      --headerH: 88px;
+      --radius: 30px;
     }
 
     html,body{ height:100%; }
-
     html{
       touch-action: manipulation;
       -webkit-text-size-adjust: 100%;
       overscroll-behavior: none;
     }
-
     body{
-      font-family:'Pretendard',sans-serif;
-      background-color:var(--bg);
-      color:#e4e4e7;
+      font-family:'Pretendard',system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
       margin:0;
       overflow-x:hidden;
       overflow-y:auto;
@@ -49,182 +54,267 @@
       padding-bottom: env(safe-area-inset-bottom);
       overscroll-behavior: none;
 
+      /* Liquid Glass bg */
       background-image:
         radial-gradient(1200px 700px at 15% -10%, rgba(34,211,238,0.18), transparent 55%),
         radial-gradient(1200px 700px at 100% 10%, rgba(99,102,241,0.22), transparent 55%),
         radial-gradient(900px 600px at 15% 110%, rgba(12,74,110,0.25), transparent 55%),
-        linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.00));
+        linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.00));
       background-attachment: fixed;
     }
-
     ::-webkit-scrollbar{ display:none; }
     .scroll-hide{ -ms-overflow-style:none; scrollbar-width:none; }
 
+    /* glass */
     .glass{
-      background:var(--card);
-      backdrop-filter:blur(22px);
-      -webkit-backdrop-filter:blur(22px);
-      border:1px solid rgba(255,255,255,0.10);
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      box-shadow: 0 30px 90px rgba(0,0,0,0.55);
     }
 
-    .layoutWrap{
+    .layout{
       width:100%;
       max-width: 1100px;
       margin: 0 auto;
     }
 
-    /* =========================================================
-       ✅ NEW Splash (Apple Liquid Glass Style)
-    ========================================================= */
-    #splash-screen{
-      position:fixed; inset:0; z-index:10000;
+    /* =====================================
+      Splash (Ultra modern)
+    ===================================== */
+    #splash{
+      position:fixed; inset:0;
+      z-index:10000;
       display:flex; align-items:center; justify-content:center;
       background:#050507;
+      transition: all .85s cubic-bezier(.22,1,.36,1);
       overflow:hidden;
-      transition:all 1s cubic-bezier(0.65,0,0.35,1);
     }
-
-    #splash-screen::before{
+    #splash::before{
       content:"";
-      position:absolute; inset:-30%;
+      position:absolute; inset:-40%;
       background:
-        radial-gradient(1000px 600px at 30% 10%, rgba(34,211,238,0.35), transparent 60%),
-        radial-gradient(900px 650px at 80% 20%, rgba(99,102,241,0.35), transparent 62%),
-        radial-gradient(900px 600px at 20% 90%, rgba(34,211,238,0.25), transparent 65%),
+        radial-gradient(1200px 800px at 25% 0%, rgba(34,211,238,0.32), transparent 58%),
+        radial-gradient(1000px 900px at 90% 15%, rgba(99,102,241,0.35), transparent 62%),
+        radial-gradient(900px 600px at 15% 95%, rgba(34,211,238,0.22), transparent 62%),
         linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,1));
-      animation: liquidFloat 5.5s ease-in-out infinite alternate;
-      filter:saturate(1.2);
-      opacity:1;
+      filter:saturate(1.25);
+      animation: floatBG 6s ease-in-out infinite alternate;
     }
-
-    #splash-screen::after{
-      content:"";
-      position:absolute; inset:0;
-      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.20'/%3E%3C/svg%3E");
-      mix-blend-mode: overlay;
-      opacity:.13;
-      pointer-events:none;
-    }
-
-    @keyframes liquidFloat{
+    @keyframes floatBG{
       0%{ transform: translateY(0) scale(1); }
       100%{ transform: translateY(-22px) scale(1.05); }
     }
-
-    .splash-inner{
-      width:min(540px, calc(100vw - 56px));
-      padding: 56px 26px 46px;
-      border-radius: 38px;
+    #splash .card{
+      width:min(560px, calc(100vw - 56px));
+      padding: 56px 28px 44px;
+      border-radius: 42px;
       background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.12);
       backdrop-filter: blur(30px);
-      -webkit-backdrop-filter: blur(30px);
-      box-shadow: 0 50px 160px rgba(0,0,0,0.6);
-      position:relative;
-      z-index:2;
+      box-shadow: 0 60px 190px rgba(0,0,0,0.7);
       text-align:center;
-      transform: translateY(14px) scale(.98);
+      position:relative;
+      overflow:hidden;
       opacity:0;
+      transform: translateY(14px) scale(.985);
       animation: splashIn 1.1s cubic-bezier(.2,.9,.2,1) forwards;
-      overflow: hidden;
-      isolation:isolate;
     }
-
-    .splash-inner .shine{
-      position:absolute;
-      inset:-30%;
+    @keyframes splashIn{ to{ opacity:1; transform: translateY(0) scale(1);} }
+    #splash .card .shine{
+      position:absolute; inset:-30%;
       background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.35), transparent 40%);
       filter: blur(10px);
       opacity:.35;
       animation: shineMove 3.2s ease-in-out infinite alternate;
       pointer-events:none;
-      z-index:0;
     }
     @keyframes shineMove{
       0%{ transform: translate(-10px, 10px); }
       100%{ transform: translate(18px, -18px); }
     }
-
-    @keyframes splashIn{
-      to{ transform: translateY(0) scale(1); opacity:1; }
-    }
-
-    .splash-logo{
-      font-size: 4.5rem;
+    #splash .logo{
+      font-size: 4.8rem;
       font-weight: 950;
       letter-spacing: -0.08em;
       background: linear-gradient(180deg, rgba(255,255,255,1), rgba(34,211,238,0.95));
       -webkit-background-clip:text;
       -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 24px rgba(34,211,238,0.20));
-      position:relative;
-      z-index:2;
+      filter: drop-shadow(0 0 28px rgba(34,211,238,0.25));
       display:inline-block;
-      padding: 6px 14px;
     }
-
-    .splash-loader{
+    #splash .sub{
+      margin-top: 12px;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing:.28em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.45);
+    }
+    #splash .loader{
       margin-top: 26px;
-      position:relative;
-      z-index:2;
-    }
-
-    .splash-line{
-      height: 4px;
-      border-radius: 999px;
+      height: 5px;
       background: rgba(255,255,255,0.10);
+      border-radius: 999px;
       overflow:hidden;
       position:relative;
     }
-
-    .splash-line span{
+    #splash .loader span{
       position:absolute; inset:0;
-      width:45%;
+      width:42%;
       background: linear-gradient(90deg, rgba(34,211,238,0), rgba(34,211,238,1), rgba(99,102,241,1), rgba(34,211,238,0));
-      animation: splashScan 1.15s ease-in-out infinite;
       filter: drop-shadow(0 0 14px rgba(34,211,238,0.35));
+      animation: scan 1.15s ease-in-out infinite;
     }
-
-    @keyframes splashScan{
+    @keyframes scan{
       0%{ transform: translateX(-70%); }
       100%{ transform: translateX(170%); }
     }
 
-    /* Header */
+    /* =====================================
+      Header (modern minimal)
+    ===================================== */
     header{
-      position:fixed; top:0; left:0; right:0; z-index:50;
-      padding: 18px 18px 14px;
-      border-bottom:1px solid rgba(255,255,255,0.06);
+      position:fixed; left:0; right:0; top:0;
+      z-index:80;
+      height: var(--headerH);
+      padding-top: calc(10px + env(safe-area-inset-top));
+      padding-left: 16px;
+      padding-right: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
       backdrop-filter: blur(18px);
       background: rgba(10,10,12,0.62);
-      height: var(--headerH);
       box-sizing:border-box;
-      padding-top: calc(14px + env(safe-area-inset-top));
     }
-
-    .tab-content{ display:none; animation:fadeInContent 0.45s ease-out; }
-    .tab-content.active{ display:block; }
-    @keyframes fadeInContent{ from{opacity:0; transform:translateY(6px) scale(0.985);} to{opacity:1; transform:translateY(0) scale(1);} }
-
-    /* Pills */
     .pill{
       display:inline-flex; align-items:center; gap:6px;
-      padding:6px 10px; border-radius:999px;
+      padding:6px 10px;
+      border-radius:999px;
       border:1px solid rgba(255,255,255,0.10);
-      background:rgba(255,255,255,0.04);
-      font-size:11px; font-weight:900;
-      color:rgba(255,255,255,0.82);
-      white-space:nowrap;
+      background: rgba(255,255,255,0.04);
+      font-size:11px;
+      font-weight:900;
+      color: rgba(255,255,255,0.80);
       user-select:none;
+      white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
     }
-    .pill.cyan{ border-color:rgba(34,211,238,0.25); background:rgba(34,211,238,0.10); color:rgba(34,211,238,0.95); }
+    .pill.cyan{
+      border-color: rgba(34,211,238,0.22);
+      background: rgba(34,211,238,0.10);
+      color: rgba(34,211,238,0.95);
+      box-shadow: 0 12px 24px rgba(34,211,238,0.08);
+    }
+    .pill.danger{
+      border-color: rgba(251,113,133,0.25);
+      background: rgba(251,113,133,0.10);
+      color: rgba(251,113,133,0.95);
+    }
 
     main{
       padding-top: calc(var(--headerH) + 18px + env(safe-area-inset-top));
       padding-bottom: calc(var(--dockH) + env(safe-area-inset-bottom) + 28px);
     }
 
-    /* Carousel */
+    /* =====================================
+      Dock (Auto hide)
+    ===================================== */
+    .dockWrap{ position:fixed; left:0; right:0; bottom:0; z-index:95; padding: 16px; }
+    .dock{
+      border-radius: 36px;
+      background: rgba(10,10,12,0.78);
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(22px);
+      box-shadow: 0 25px 60px rgba(0,0,0,0.72);
+      padding: 10px;
+      display:flex;
+      justify-content: space-around;
+      align-items:center;
+    }
+    .dockBtn{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:6px;
+      padding: 10px 0;
+      color:#777;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform .22s, color .22s;
+      position:relative;
+    }
+    .dockBtn.active{
+      color: var(--primary);
+      transform: translateY(-3px);
+    }
+    .dockBtn i{ font-size: 1.2rem; }
+    .dot{
+      position:absolute;
+      bottom: 3px;
+      width: 4px; height: 4px;
+      border-radius: 999px;
+      background: var(--primary);
+      box-shadow: 0 0 12px var(--primary);
+      opacity:0;
+      transform: scale(.6);
+      transition: opacity .22s, transform .22s;
+    }
+    .dockBtn.active .dot{ opacity:1; transform: scale(1.6); }
+
+    .dockWrap{
+      transition: transform .45s cubic-bezier(0.22, 1, 0.36, 1), opacity .35s ease;
+      will-change: transform, opacity;
+    }
+    .dockWrap.hide{
+      transform: translateY(120%);
+      opacity: 0;
+      pointer-events: none;
+    }
+    .dockWrap.show{
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* =====================================
+      Home / Cards
+    ===================================== */
+    .heroTitle{
+      font-size: 44px;
+      font-weight: 950;
+      letter-spacing: -0.05em;
+      line-height: 1;
+      color:white;
+    }
+    .heroTitle em{
+      font-style: italic;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 28px rgba(34,211,238,0.18);
+    }
+
+    .segBar{
+      width: 100%;
+      height: 8px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 999px;
+      overflow:hidden;
+    }
+    .segFill{
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      box-shadow: 0 0 16px rgba(34,211,238,0.35);
+      transition: width .6s ease;
+    }
+
+    /* =====================================
+      Workout carousel
+    ===================================== */
     .carousel{
       display:flex;
       gap:18px;
@@ -236,817 +326,540 @@
       touch-action: pan-x pan-y;
     }
     .carousel::before,.carousel::after{ content:''; flex:0 0 22px; }
+    .slide{ scroll-snap-align:center; flex:0 0 calc(100% - 110px); transition: opacity .22s, transform .22s, filter .22s; }
+    .slide.peek{ opacity:.60; transform: scale(.965); filter: blur(.6px); }
+    .slide.focus{ opacity:1; transform: scale(1); filter:none; }
 
-    .carousel > .slide{
-      scroll-snap-align:center;
-      flex: 0 0 calc(100% - 120px);
-      min-height: auto;
-      transition: opacity .22s ease, transform .22s ease, filter .22s ease;
-    }
-    .slide.peek{ opacity:.60; transform:scale(.965); filter:blur(.6px); }
-    .slide.focus{ opacity:1; transform:scale(1); filter:none; }
-
-    @media (min-width: 860px){
-      .carousel > .slide{ flex:0 0 calc(100% - 160px); }
-      .slide.peek{ opacity:.62; transform:scale(.97); filter:blur(.45px); }
+    @media(min-width: 860px){
+      .slide{ flex:0 0 calc(100% - 160px); }
+      .slide.peek{ opacity:.62; transform: scale(.97); filter: blur(.45px); }
     }
 
-    .slideCard{
-      height:100%;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-      border-radius:32px;
-      box-shadow: 0 30px 80px rgba(0,0,0,0.55);
-      overflow:hidden;
-    }
-
-    .rightPanel{ border-radius:26px; padding:18px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); }
-
-    .stepper{
-      display:flex; gap:10px; align-items:center; justify-content:space-between;
-      padding:14px 14px; border-radius:22px;
-      background:rgba(255,255,255,0.04);
-      border:1px solid rgba(255,255,255,0.10);
-    }
-    .stepperLabel{ font-size:10px; font-weight:900; letter-spacing:.18em; text-transform:uppercase; color:rgba(255,255,255,0.50); }
-    .stepperValue{ font-size:22px; font-weight:950; color:white; }
-    .stepperBtn{
-      width:48px; height:48px; border-radius:18px;
-      display:flex; align-items:center; justify-content:center;
-      font-weight:900;
-      background:rgba(255,255,255,0.05);
-      border:1px solid rgba(255,255,255,0.12);
-      color:rgba(255,255,255,0.9);
-      -webkit-tap-highlight-color:transparent;
-      user-select:none;
-      transition: transform .08s ease;
-    }
-    .stepperBtn:active{ transform:scale(.98); }
-
-    .bigBtn{
-      width:100%; height:60px; border-radius:20px;
-      font-weight:900; font-size:15px;
-      display:flex; align-items:center; justify-content:center; gap:10px;
-      transition: transform .12s ease;
-      -webkit-tap-highlight-color:transparent;
-      user-select:none;
-      background:rgba(255,255,255,0.05);
-      border:1px solid rgba(255,255,255,0.10);
-    }
-    .bigBtn:active{ transform:scale(0.985); }
+    .cardRound{ border-radius: var(--radius); overflow:hidden; }
 
     .setBtn{
-      width:100%; height:66px; border-radius:20px;
-      font-weight:950; font-size:18px;
+      height: 62px;
+      border-radius: 20px;
+      font-weight: 950;
+      font-size: 16px;
       display:flex; align-items:center; justify-content:center; gap:10px;
-      transition: transform .12s ease;
-      -webkit-tap-highlight-color:transparent;
-      background:rgba(255,255,255,0.05);
-      border:1px solid rgba(255,255,255,0.10);
-      user-select:none;
-      overflow:hidden;
-    }
-    .setBtn:active{ transform:scale(0.985); }
-    .setBtn.done{ background:linear-gradient(135deg,var(--primary),var(--accent)); color:#000; box-shadow:0 18px 34px rgba(34,211,238,0.24); border:none; }
-
-    .setBtn.locked{
-      opacity: .35;
-      filter: saturate(.6);
-      pointer-events: none;
-    }
-
-    /* Floating Dock */
-    .navDockWrap{ position:fixed; left:0; right:0; bottom:0; padding: 18px; z-index:60; }
-    .nav-dock{
-      background:rgba(10,10,12,0.78);
-      border:1px solid rgba(255,255,255,0.12);
-      backdrop-filter:blur(22px);
-      border-radius:34px;
-      padding:10px;
-      display:flex;
-      justify-content:space-around;
-      align-items:center;
-      box-shadow:0 25px 50px -12px rgba(0,0,0,0.7);
-    }
-    .nav-item{ position:relative; padding:12px 0; flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; transition:all .25s; color:#777; -webkit-tap-highlight-color:transparent; user-select:none; }
-    .nav-item.active{ color:var(--primary); transform:translateY(-3px); }
-    .nav-item i{ font-size:1.25rem; }
-    .nav-active-dot{ position:absolute; bottom:1px; width:4px; height:4px; background:var(--primary); border-radius:50%; box-shadow:0 0 12px var(--primary); opacity:0; transition:all .25s; }
-    .nav-item.active .nav-active-dot{ opacity:1; transform:scale(1.6); }
-
-    /* Dock Auto Hide */
-    .navDockWrap{
-      transition: transform .45s cubic-bezier(0.22, 1, 0.36, 1), opacity .35s ease;
-      will-change: transform, opacity;
-    }
-    .navDockWrap.dock-hide{
-      transform: translateY(120%);
-      opacity: 0;
-      pointer-events: none;
-    }
-    .navDockWrap.dock-show{
-      transform: translateY(0%);
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    /* Day chips */
-    .day-chip{
-      width:44px; height:44px;
-      border-radius:18px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:900;
-      font-size:12px;
-      color:rgba(255,255,255,0.55);
-      border:1px solid rgba(255,255,255,0.10);
-      background:rgba(255,255,255,0.04);
-      flex:0 0 auto;
-      user-select:none;
-      overflow:hidden;
-      position:relative;
-      isolation:isolate;
-    }
-    .day-chip.active{
-      background:var(--primary);
-      color:#000;
-      border-color:rgba(34,211,238,0.25);
-      box-shadow:0 10px 24px rgba(34,211,238,0.25);
-    }
-
-    /* Timer Modal */
-    #timer-modal{ transition:all .65s ease; }
-    #timer-sec{ letter-spacing:-0.08em; }
-
-    /* Timer HUD */
-    #timer-hud{
-      position:fixed;
-      top: calc(var(--headerH) + 10px + env(safe-area-inset-top));
-      right: 14px;
-      z-index: 210;
-      display:none;
-    }
-    #timer-hud.show{ display:block; }
-    .hudCard{
-      border-radius: 22px;
-      padding: 12px 14px;
-      display:flex;
-      align-items:center;
-      gap:12px;
-      background:rgba(10,10,12,0.72);
-      border:1px solid rgba(255,255,255,0.14);
-      backdrop-filter: blur(22px);
-      box-shadow:0 20px 40px rgba(0,0,0,0.55);
-      min-width: 170px;
-      user-select:none;
-    }
-    .hudTime{
-      font-weight: 950;
-      font-size: 22px;
-      letter-spacing: -0.06em;
-      color:white;
-      line-height:1;
-    }
-    .hudLabel{ font-size: 9px; font-weight: 900; letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,0.45); }
-    .hudBarWrap{
-      width:100%;
-      height:6px;
-      border-radius:999px;
-      background: rgba(255,255,255,0.08);
-      overflow:hidden;
-      margin-top:8px;
-    }
-    .hudBar{
-      height:100%;
-      width:0%;
-      background: linear-gradient(90deg, var(--primary), var(--accent));
-      border-radius:999px;
-      box-shadow: 0 0 14px rgba(34,211,238,0.35);
-    }
-    .hudBtn{
-      width:34px;height:34px;border-radius:14px;
-      display:flex;align-items:center;justify-content:center;
-      background: rgba(255,255,255,0.06);
-      border:1px solid rgba(255,255,255,0.12);
-      color: rgba(255,255,255,0.85);
-    }
-    .hudBtn:active{ transform:scale(.98); }
-
-    /* Summary modal */
-    #summary-modal{ position:fixed; inset:0; z-index:220; display:none; align-items:center; justify-content:center; }
-    #summary-modal.show{ display:flex; }
-
-    /* Toast */
-    #toast{ position:fixed; left:50%; bottom:130px; transform:translateX(-50%); z-index:250; opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; }
-    #toast.show{ opacity:1; transform:translateX(-50%) translateY(-6px); }
-
-    /* History layout */
-    .historyLayout{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 16px;
-    }
-    @media(min-width: 900px){
-      .historyLayout{
-        grid-template-columns: 360px 1fr;
-      }
-    }
-
-    /* Calendar */
-    .calendar-day{ aspect-ratio:1; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:13px; position:relative; transition:all .18s; font-weight:800; color:rgba(255,255,255,0.75); background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); user-select:none;}
-    .has-log::after{ content:''; width:6px; height:6px; background:rgba(34,211,238,0.90); border-radius:50%; position:absolute; bottom:8px; box-shadow:0 0 12px rgba(34,211,238,0.35); }
-    .calendar-day.selected{ background:rgba(34,211,238,0.14); border:1px solid rgba(34,211,238,0.35); box-shadow:0 0 0 2px rgba(34,211,238,0.18), 0 0 30px rgba(34,211,238,0.12); color:#eaffff; font-weight:900; transform:translateY(-2px); }
-    .calendar-day.today{ border:1px solid rgba(255,255,255,0.12); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08); color:rgba(255,255,255,0.95); font-weight:900; }
-
-    /* History table */
-    .log-table{ width:100%; border-collapse:separate; border-spacing:0 10px; }
-    .log-table th{ font-size:10px; text-transform:uppercase; letter-spacing:.18em; color:rgba(255,255,255,0.35); font-weight:900; text-align:left; padding:0 10px 6px; }
-    .log-row{ background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:16px; overflow:hidden; }
-    .log-row td{ padding:12px 10px; font-weight:800; font-size:12px; color:rgba(255,255,255,0.78); }
-
-    /* Bottom Sheet (운동 상세) */
-    #detail-sheet{
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      display: none;
-      pointer-events: none;
-    }
-    #detail-sheet.show{
-      display: block;
-      pointer-events: auto;
-    }
-    .sheet-backdrop{
-      position:absolute;
-      inset:0;
-      background: rgba(0,0,0,0.72);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      z-index: 1;
-      pointer-events: auto;
-    }
-    .sheet{
-      position:absolute;
-      left:0;
-      right:0;
-      bottom:0;
-      border-radius: 26px 26px 0 0;
-      background: rgba(10,10,12,0.92);
+      background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.10);
-      box-shadow: 0 -24px 80px rgba(0,0,0,0.75);
-      transform: translateY(100%);
-      transition: transform .45s cubic-bezier(0.22,1,0.36,1);
-      z-index: 2;
-      pointer-events: auto;
-      padding-bottom: calc(env(safe-area-inset-bottom) + 16px);
-      isolation: isolate;
-      max-height: 88vh;
-      overflow: hidden;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform .12s, opacity .12s;
     }
-    #detail-sheet.show .sheet{
-      transform: translateY(0%);
-    }
-    .sheetHeader{
-      padding: 16px 18px 12px;
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
-    .sheetTitle{
-      font-weight: 950;
-      font-size: 18px;
-      letter-spacing: -0.03em;
-      color: white;
-    }
-    .sheetSub{
-      margin-top: 4px;
-      font-size: 10px;
-      letter-spacing: .22em;
-      font-weight: 900;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.40);
-    }
-    .sheetClose{
-      width:44px; height:44px;
-      border-radius: 16px;
-      display:flex; align-items:center; justify-content:center;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.14);
-      color: rgba(255,255,255,0.85);
-      z-index: 3;
-      pointer-events: auto;
-      -webkit-tap-highlight-color:transparent;
-    }
-    .sheetClose:active{ transform: scale(.98); }
-
-    .sheetBody{
-      padding: 16px 18px 18px;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      max-height: calc(88vh - 90px);
-    }
-
-    .sheetTabs{
-      display:flex;
-      gap:10px;
-      padding: 0 0 14px;
-      overflow-x:auto;
-    }
-    .sheetTab{
-      flex: 0 0 auto;
-      padding: 10px 14px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 900;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(255,255,255,0.04);
-      color: rgba(255,255,255,0.75);
-      -webkit-tap-highlight-color:transparent;
-    }
-    .sheetTab.active{
+    .setBtn:active{ transform: scale(.985); }
+    .setBtn.done{
       background: linear-gradient(135deg, var(--primary), var(--accent));
       color:#000;
-      border: none;
-      box-shadow: 0 14px 32px rgba(34,211,238,0.18);
+      border:none;
+      box-shadow: 0 18px 34px rgba(34,211,238,0.24);
+    }
+    .setBtn.locked{
+      opacity:.30;
+      pointer-events:none;
+      filter:saturate(.6);
     }
 
-    .sheetBox{
+    .stepper{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 14px 14px;
       border-radius: 22px;
       background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      padding: 14px 14px;
-      margin-bottom: 12px;
+      border: 1px solid rgba(255,255,255,0.10);
     }
-    .sheetLabel{
-      font-size: 10px;
-      letter-spacing: .20em;
+    .stepperLabel{
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      color: rgba(255,255,255,0.48);
+    }
+    .stepperValue{
+      font-size: 22px;
       font-weight: 950;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.42);
+      color:white;
+      letter-spacing: -0.02em;
     }
-    .sheetText{
-      margin-top: 10px;
-      font-size: 14px;
-      line-height: 1.55;
-      font-weight: 800;
-      color: rgba(255,255,255,0.88);
-      letter-spacing: -0.01em;
-    }
-    .sheetHint{
-      margin-top: 10px;
-      font-size: 11px;
-      font-weight: 800;
-      color: rgba(255,255,255,0.45);
-      line-height: 1.4;
-    }
-
-    /* ✅ 상세 GIF: 너무 크지 않게 적정 사이즈 + 화면에서 탭/내용 같이 보이도록 */
-    .sheetGif{
-      width: 100%;
-      max-height: 220px;
+    .stepperBtn{
+      width:48px; height:48px;
       border-radius: 18px;
-      margin-top: 12px;
-      border: 1px solid rgba(255,255,255,0.10);
-      box-shadow: 0 18px 40px rgba(0,0,0,0.55);
-      display:block;
-      object-fit: contain;
-      background: rgba(255,255,255,0.03);
-    }
-
-    /* 카드 GIF */
-    .cardGifSquareWrap{
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      border-radius: 22px;
-      overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(255,255,255,0.03);
-      box-shadow: 0 22px 55px rgba(0,0,0,0.55);
-      cursor: pointer;
+      display:flex; align-items:center; justify-content:center;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.9);
       -webkit-tap-highlight-color: transparent;
-      transition: transform .12s ease;
+      user-select:none;
+      transition: transform .08s;
     }
-    .cardGifSquareWrap:active{ transform: scale(0.99); }
-    .cardGifSquare{
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: block;
-      background: rgba(0,0,0,0.15);
-    }
+    .stepperBtn:active{ transform: scale(.98); }
 
-    /* ✅ REP 입력 모달 */
-    #rep-modal{
-      position:fixed; inset:0;
-      z-index: 260;
+    /* =====================================
+      Modals / sheets
+    ===================================== */
+    .modalWrap{
+      position:fixed; inset:0; z-index:250;
       display:none;
-      align-items:center;
-      justify-content:center;
+      align-items:center; justify-content:center;
     }
-    #rep-modal.show{ display:flex; }
-    .repCard{
-      width:min(520px, calc(100vw - 44px));
-      border-radius: 28px;
+    .modalWrap.show{ display:flex; }
+    .modalBack{
+      position:absolute; inset:0;
+      background: rgba(0,0,0,0.78);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .modalCard{
+      width:min(560px, calc(100vw - 44px));
+      border-radius: 30px;
       padding: 18px;
       background: rgba(10,10,12,0.92);
       border: 1px solid rgba(255,255,255,0.10);
       backdrop-filter: blur(22px);
       -webkit-backdrop-filter: blur(22px);
-      box-shadow: 0 40px 140px rgba(0,0,0,0.70);
+      box-shadow: 0 40px 160px rgba(0,0,0,0.75);
+      position:relative;
+      z-index:2;
     }
-    .repBtn{
-      height: 54px;
-      border-radius: 18px;
+
+    /* toast */
+    #toast{
+      position:fixed;
+      left:50%;
+      transform: translateX(-50%);
+      bottom: 128px;
+      z-index:300;
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .25s, transform .25s;
+    }
+    #toast.show{
+      opacity:1;
+      transform: translateX(-50%) translateY(-6px);
+    }
+
+    /* timer modal */
+    #timerModal{
+      position:fixed; inset:0; z-index:220;
+      display:none;
+      align-items:center; justify-content:center;
+    }
+    #timerModal.show{ display:flex; }
+    #timerSec{
+      font-size: 11rem;
+      line-height: 1;
       font-weight: 950;
-      border: 1px solid rgba(255,255,255,0.12);
+      letter-spacing: -0.08em;
+      font-style: italic;
+      color:white;
+      text-shadow: 0 0 30px rgba(255,255,255,0.15);
+    }
+
+    /* Timer HUD */
+    #timerHud{
+      position:fixed;
+      top: calc(var(--headerH) + 10px + env(safe-area-inset-top));
+      right: 14px;
+      z-index: 230;
+      display:none;
+    }
+    #timerHud.show{ display:block; }
+    .hudCard{
+      border-radius: 24px;
+      padding: 12px 14px;
+      display:flex; gap:12px; align-items:center;
+      background: rgba(10,10,12,0.75);
+      border: 1px solid rgba(255,255,255,0.14);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.60);
+      min-width: 178px;
+      user-select:none;
+    }
+    .hudLabel{
+      font-size: 9px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      font-weight: 900;
+      color: rgba(255,255,255,0.45);
+    }
+    .hudTime{
+      font-size: 22px;
+      font-weight: 950;
+      letter-spacing: -0.06em;
+      color:white;
+      line-height: 1;
+    }
+    .hudBarWrap{
+      margin-top: 8px;
+      height: 6px;
+      background: rgba(255,255,255,0.10);
+      border-radius: 999px;
+      overflow:hidden;
+    }
+    .hudBar{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      box-shadow: 0 0 14px rgba(34,211,238,0.35);
+      border-radius: 999px;
+    }
+    .hudBtn{
+      width:34px; height:34px;
+      border-radius: 14px;
+      display:flex; align-items:center; justify-content:center;
       background: rgba(255,255,255,0.06);
-      color: rgba(255,255,255,0.92);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.9);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .hudBtn:active{ transform: scale(.98); }
+
+    /* calendar */
+    .calendar-day{
+      aspect-ratio: 1;
+      border-radius: 16px;
       display:flex;
       align-items:center;
       justify-content:center;
-      gap:10px;
-      transition: transform .08s ease;
+      font-size: 13px;
+      font-weight: 900;
+      color: rgba(255,255,255,0.75);
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
       user-select:none;
-      -webkit-tap-highlight-color:transparent;
+      position:relative;
+      transition: transform .14s, border .14s, box-shadow .14s;
     }
-    .repBtn:active{ transform: scale(.985); }
-    .repBtn.primary{
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      border: none;
-      color:#000;
-      box-shadow: 0 18px 34px rgba(34,211,238,0.22);
+    .calendar-day:active{ transform: scale(.985); }
+    .calendar-day.today{
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.95);
+    }
+    .calendar-day.has-log::after{
+      content:"";
+      width: 6px; height: 6px;
+      background: rgba(34,211,238,0.95);
+      border-radius: 999px;
+      position:absolute;
+      bottom: 8px;
+      box-shadow: 0 0 12px rgba(34,211,238,0.35);
+    }
+    .calendar-day.selected{
+      background: rgba(34,211,238,0.14);
+      border: 1px solid rgba(34,211,238,0.35);
+      box-shadow: 0 0 0 2px rgba(34,211,238,0.18), 0 0 32px rgba(34,211,238,0.12);
+      transform: translateY(-2px);
+      color: #eaffff;
     }
 
-    /* Mobile Layout Optimization */
-    @media (max-width: 520px){
-      .layoutWrap{ padding-left: 0; padding-right: 0; }
-      main .layoutWrap.px-4{ padding-left: 14px !important; padding-right: 14px !important; }
-
-      header{
-        padding: 14px 14px 10px !important;
-        height: 88px;
-        padding-top: calc(10px + env(safe-area-inset-top)) !important;
-      }
-      :root{ --headerH: 88px; --dockH: 92px; }
-
-      #view-day{
-        font-size: 1.38rem !important;
-        letter-spacing: -0.02em !important;
-      }
-      #view-title{
-        font-size: 0.95rem !important;
-        margin-top: 2px !important;
-        opacity: 0.9;
-      }
-      #view-subcue{
-        margin-top: 6px !important;
-        font-size: 9px !important;
-      }
-
-      #progress-percent{
-        font-size: 16px !important;
-        font-weight: 950 !important;
-        margin-bottom: 4px !important;
-        letter-spacing: -0.02em;
-      }
-      #progress-text{
-        font-size: 10px !important;
-      }
-      header .w-28{
-        width: 140px !important;
-        height: 8px !important;
-      }
-
-      .slideCard{ border-radius: 24px; }
-      .slideCard .p-6{ padding: 14px !important; }
-      .slideCard h3{ font-size: 1.55rem !important; }
-
-      .slideCard .md\:grid-cols-2{ grid-template-columns: 1fr !important; }
-
-      .rightPanel{
-        padding: 14px !important;
-        border-radius: 22px !important;
-      }
-
-      .stepperBtn{
-        width: 44px !important;
-        height: 44px !important;
-        border-radius: 16px !important;
-      }
-      .stepperValue{ font-size: 20px !important; }
-
-      .rightPanel .grid.grid-cols-2{
-        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-      }
-      .setBtn{
-        height: 54px !important;
-        font-size: 15px !important;
-        border-radius: 18px !important;
-      }
-
-      .carousel > .slide{
-        flex: 0 0 calc(100% - 70px) !important;
-      }
-
-      .navDockWrap{ padding: 14px !important; }
-      .nav-dock{ border-radius: 30px !important; padding: 9px !important; }
-      .nav-item{ padding: 10px 0 !important; }
-      .nav-item i{ font-size: 1.15rem !important; }
+    /* mobile optimize */
+    @media(max-width: 520px){
+      :root{ --dockH: 94px; --headerH: 86px; --radius: 26px; }
+      header{ padding-left: 14px; padding-right: 14px; }
+      .heroTitle{ font-size: 40px; }
+      #timerSec{ font-size: 9.3rem; }
+      .slide{ flex:0 0 calc(100% - 70px); }
+      .setBtn{ height: 54px; font-size: 15px; border-radius: 18px; }
+      .stepperBtn{ width: 44px; height: 44px; border-radius: 16px; }
     }
   </style>
 </head>
 
 <body>
 
-  <!-- ✅ Splash -->
-  <div id="splash-screen">
-    <div class="splash-inner">
+  <!-- Splash -->
+  <div id="splash">
+    <div class="card">
       <div class="shine"></div>
-      <div class="splash-logo">DK Fit</div>
-      <div class="splash-loader">
-        <div class="splash-line"><span></span></div>
-      </div>
+      <div class="logo">DK FIT</div>
+      <div class="sub">Elite Fitness OS · Next</div>
+      <div class="loader"><span></span></div>
     </div>
   </div>
 
-  <!-- ✅ REP 입력 모달 -->
-  <div id="rep-modal">
-    <div class="absolute inset-0 bg-black/80 backdrop-blur-xl" onclick="closeRepModal(false)"></div>
-    <div class="relative repCard">
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <p class="text-[10px] font-black tracking-[0.2em] uppercase text-white/45">REP 입력</p>
-          <h3 id="rep-title" class="text-2xl font-black italic text-white mt-1">운동</h3>
-          <p id="rep-sub" class="text-[10px] font-black tracking-[0.2em] uppercase text-white/35 mt-2">1 SET</p>
-        </div>
-        <button class="pill" onclick="closeRepModal(false)"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-
-      <div class="mt-5 glass rounded-2xl p-5">
-        <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/40">기본 REP</p>
-        <div class="flex items-end justify-between mt-2">
-          <div id="rep-base" class="text-5xl font-black text-white tracking-tighter">20</div>
-          <div class="text-[10px] font-black tracking-[0.18em] uppercase text-white/35 text-right">
-            추천 입력<br>버튼 클릭만
-          </div>
-        </div>
-      </div>
-
-      <!-- ✅ AI 추천 + 숫자 그리드 -->
-      <div class="mt-4 glass rounded-2xl p-4">
-        <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45">AI 추천</p>
-        <div id="rep-ai-reco" class="mt-3 grid grid-cols-3 gap-2"></div>
-
-        <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/35 mt-5">추천 숫자</p>
-        <div id="rep-number-grid" class="mt-3 grid grid-cols-5 gap-2"></div>
-      </div>
-
-      <div class="mt-4 grid grid-cols-2 gap-3">
-        <button class="repBtn" onclick="closeRepModal(false)">
-          <i class="fa-solid fa-ban"></i> 취소
-        </button>
-        <button class="repBtn primary" onclick="repSkip()">
-          <i class="fa-solid fa-check"></i> 기본 REP 기록
-        </button>
-      </div>
-
-      <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/30 mt-4">
-        * 입력 완료 후 지난주 동일 요일/운동과 비교 결과를 토스트로 표시합니다
-      </p>
-    </div>
-  </div>
-
-  <!-- ✅ Bottom Sheet (운동 상세) -->
-  <div id="detail-sheet">
-    <div class="sheet-backdrop" onclick="closeDetailSheet()"></div>
-    <div class="sheet" role="dialog" aria-modal="true">
-      <div class="sheetHeader">
-        <div>
-          <div class="sheetTitle" id="sheet-title">운동 상세</div>
-          <div class="sheetSub" id="sheet-sub">DETAIL</div>
-        </div>
-        <button class="sheetClose" onclick="closeDetailSheet()" aria-label="닫기">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-
-      <div class="sheetBody">
-        <div class="sheetTabs" id="sheet-tabs"></div>
-        <div id="sheet-body"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Header -->
+  <!-- HEADER -->
   <header>
-    <div class="layoutWrap flex justify-between items-end">
-      <div>
+    <div class="layout flex items-end justify-between gap-3">
+      <div class="min-w-0">
         <div class="flex items-center gap-2">
-          <h2 id="stopwatch" class="text-3xl font-black font-mono tracking-tighter text-white">00:00</h2>
-
-          <!-- ✅ 일시정지 버튼 -->
-          <button onclick="toggleStopwatchPause()" class="pill cyan" style="padding:6px 10px;" title="총 운동시간 일시정지">
-            <i id="pause-icon" class="fa-solid fa-pause"></i>
+          <div id="stopwatch" class="text-3xl font-black font-mono tracking-tighter text-white">00:00</div>
+          <button class="pill cyan" onclick="toggleStopwatchPause()" title="총 운동시간 일시정지">
+            <i id="pauseIcon" class="fa-solid fa-pause"></i>
           </button>
         </div>
-
         <div class="flex items-center gap-2 mt-1">
-          <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-          <p class="text-[9px] font-black text-gray-300 tracking-widest uppercase">ELITE MODE · DK</p>
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <p class="text-[9px] font-black tracking-[0.26em] uppercase text-white/55">ELITE MODE · DK</p>
         </div>
       </div>
 
-      <div class="flex flex-col items-end">
-        <span id="progress-percent" class="text-[10px] font-black mb-0.5 text-cyan-300">0%</span>
-        <span id="progress-text" class="text-[9px] font-black text-white/40 tracking-widest uppercase">현재 0% 완료!</span>
-        <div class="w-28 h-1.5 bg-white/5 rounded-full overflow-hidden mt-2">
-          <div id="progress-bar" class="h-full bg-cyan-400 shadow-[0_0_12px_#22d3ee] transition-all duration-700" style="width:0%"></div>
+      <div class="min-w-[150px]">
+        <div class="flex items-center justify-end gap-2">
+          <span id="progressPct" class="text-[10px] font-black text-cyan-300">0%</span>
+          <span id="progressText" class="text-[9px] font-black tracking-[0.22em] uppercase text-white/40">현재 0% 완료!</span>
+        </div>
+        <div class="segBar mt-2">
+          <div id="progressBar" class="segFill"></div>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- Timer HUD -->
-  <div id="timer-hud">
+  <!-- TIMER HUD -->
+  <div id="timerHud">
     <div class="hudCard">
-      <div class="min-w-[70px]">
+      <div class="min-w-[72px]">
         <div class="hudLabel">REST</div>
-        <div id="hud-time" class="hudTime">60</div>
-        <div class="hudBarWrap"><div id="hud-bar" class="hudBar"></div></div>
+        <div id="hudTime" class="hudTime">60</div>
+        <div class="hudBarWrap"><div id="hudBar" class="hudBar"></div></div>
       </div>
       <div class="flex items-center gap-2">
-        <button class="hudBtn" onclick="openTimerFromHUD()" title="타이머 보기"><i class="fa-solid fa-expand"></i></button>
+        <button class="hudBtn" onclick="openTimer()" title="타이머 보기"><i class="fa-solid fa-expand"></i></button>
         <button class="hudBtn" onclick="closeTimer(false)" title="스킵"><i class="fa-solid fa-forward"></i></button>
       </div>
     </div>
   </div>
 
-  <!-- Main -->
+  <!-- MAIN -->
   <main>
-    <div class="layoutWrap px-4">
+    <div class="layout px-4">
 
-      <!-- Session -->
-      <section id="tab-session" class="tab-content active">
-        <div class="mb-4 mt-2 px-2 flex justify-between items-start">
-          <div>
-            <h1 id="view-day" class="text-5xl font-black italic text-white uppercase tracking-tighter">DAY</h1>
-            <p id="view-title" class="text-gray-300 font-black mt-1 text-sm tracking-wide"></p>
-            <p id="view-subcue" class="text-[10px] font-black text-white/50 mt-2 tracking-[0.18em] uppercase"></p>
+      <!-- TAB: HOME -->
+      <section id="tab-home" class="tab active">
+        <div class="mt-2 px-2">
+          <div class="flex items-start justify-between gap-4">
+            <div class="min-w-0">
+              <div class="heroTitle">
+                <span id="homeDay">DAY</span>
+                <em class="ml-1" id="homeType">PUSH</em>
+              </div>
+              <p class="mt-2 text-sm font-black text-white/75" id="homeTitle"></p>
+              <p class="mt-3 text-[10px] font-black tracking-[0.22em] uppercase text-white/45" id="homeCue"></p>
+            </div>
+
+            <div class="flex flex-col items-end gap-2">
+              <button class="pill" onclick="resetToday()" title="오늘 진행/기록 초기화">
+                <i class="fa-solid fa-rotate-left"></i> 오늘 초기화
+              </button>
+              <button class="pill cyan" onclick="openQuickStart()" title="빠른 시작">
+                <i class="fa-solid fa-bolt"></i> Quick Start
+              </button>
+            </div>
           </div>
-          <button onclick="resetToday()" class="pill" title="오늘 기록 초기화">
-            <i class="fa-solid fa-rotate-left"></i> 오늘 초기화
-          </button>
+
+          <!-- day chips -->
+          <div class="mt-5 flex items-center justify-between gap-3">
+            <div class="flex gap-2 overflow-x-auto scroll-hide py-1" id="dayChips"></div>
+            <div class="flex items-center gap-2">
+              <span class="pill cyan" id="slideIndicator">1 / 1</span>
+              <button class="pill" onclick="prevSlide()"><i class="fa-solid fa-chevron-left"></i></button>
+              <button class="pill" onclick="nextSlide()"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+          </div>
         </div>
 
-        <div id="day-nav-wrap" class="mb-3">
-          <div id="day-nav" class="flex justify-center gap-2 overflow-x-auto pb-2 scroll-hide"></div>
-        </div>
-
-        <div class="flex items-center justify-between px-2 mb-4">
-          <div class="flex items-center gap-2">
-            <span class="pill cyan" id="slide-indicator">1 / 1</span>
-            <span class="pill" id="slide-name">운동</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <button onclick="carouselPrev()" class="pill"><i class="fa-solid fa-chevron-left"></i></button>
-            <button onclick="carouselNext()" class="pill"><i class="fa-solid fa-chevron-right"></i></button>
-          </div>
-        </div>
-
-        <div id="session-carousel" class="carousel scroll-hide"></div>
+        <!-- carousel -->
+        <div class="mt-5" id="carousel" class="carousel scroll-hide"></div>
       </section>
 
-      <!-- Stats -->
-      <section id="tab-stats" class="tab-content">
+      <!-- TAB: INSIGHTS -->
+      <section id="tab-insights" class="tab hidden">
         <div class="mb-8 px-2">
-          <h2 class="text-3xl font-black italic uppercase tracking-tight">분석</h2>
-          <p class="text-[11px] font-black text-white/45 mt-2 tracking-[0.18em] uppercase">
-            훈련의 편향/밸런스를 확인합니다
+          <h2 class="text-3xl font-black italic uppercase tracking-tight text-white">Insights</h2>
+          <p class="text-[11px] font-black tracking-[0.22em] uppercase text-white/45 mt-2">
+            컨디션 · 밸런스 · 누적 볼륨을 시각화합니다
           </p>
         </div>
 
-        <div class="glass rounded-[28px] p-8 mb-6">
-          <canvas id="radarChart" class="max-h-[320px]"></canvas>
-        </div>
-
-        <div class="grid grid-cols-2 gap-5 mb-6">
-          <div class="glass rounded-[28px] p-6">
-            <p class="text-[9px] text-gray-400 font-black uppercase mb-2 tracking-widest">총 기록(세트)</p>
-            <p id="stat-total-sets" class="text-4xl font-black text-white">0</p>
+        <div class="glass cardRound p-7 mb-6">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="text-[10px] font-black tracking-[0.22em] uppercase text-white/45">Muscle Balance</p>
+              <p class="text-sm font-black text-white/70 mt-2">Push / Pull / Legs / Rest</p>
+            </div>
+            <button class="pill cyan" onclick="renderCharts(true)"><i class="fa-solid fa-rotate"></i> Refresh</button>
           </div>
-          <div class="glass rounded-[28px] p-6">
-            <p class="text-[9px] text-gray-400 font-black uppercase mb-2 tracking-widest">활동 일수</p>
-            <p id="stat-week-count" class="text-4xl font-black text-indigo-300">0</p>
+          <div class="mt-6">
+            <canvas id="radar" class="max-h-[320px]"></canvas>
           </div>
         </div>
 
-        <div class="glass rounded-[28px] p-6 mb-6">
+        <div class="grid md:grid-cols-2 gap-5 mb-6">
+          <div class="glass cardRound p-6">
+            <p class="text-[9px] font-black tracking-[0.22em] uppercase text-white/45 mb-2">Total Sets</p>
+            <p id="statSets" class="text-4xl font-black text-white">0</p>
+            <p class="text-[11px] font-black text-white/35 mt-3">누적 기록 세트 수</p>
+          </div>
+          <div class="glass cardRound p-6">
+            <p class="text-[9px] font-black tracking-[0.22em] uppercase text-white/45 mb-2">Active Days</p>
+            <p id="statDays" class="text-4xl font-black text-indigo-300">0</p>
+            <p class="text-[11px] font-black text-white/35 mt-3">운동한 날짜 수</p>
+          </div>
+        </div>
+
+        <div class="glass cardRound p-7 mb-6">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="text-[10px] font-black tracking-[0.22em] uppercase text-white/45">Weekly Volume</p>
+              <p class="text-sm font-black text-white/70 mt-2">최근 7일 세트 수</p>
+            </div>
+          </div>
+          <div class="mt-6">
+            <canvas id="weekly" class="max-h-[260px]"></canvas>
+          </div>
+        </div>
+
+        <div class="glass cardRound p-6 mb-6">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45">휴식 타이머 알림</p>
+              <p class="text-[10px] font-black tracking-[0.22em] uppercase text-white/45">Rest Notification</p>
               <p class="text-sm font-black text-white/70 mt-2">타이머 종료 시 소리/진동</p>
             </div>
-            <button id="notif-toggle" class="pill cyan" onclick="toggleNotif()">ON</button>
+            <button id="notifToggle" class="pill cyan" onclick="toggleNotif()">ON</button>
           </div>
           <p class="text-[11px] font-black text-white/35 mt-3">
-            * iOS는 무음모드에서 소리가 제한될 수 있습니다. iPad는 진동이 지원되지 않을 수 있습니다.
+            * iOS 무음모드에서는 소리가 제한될 수 있습니다.
           </p>
         </div>
 
         <div class="grid gap-3">
-          <button onclick="backupJSON()" class="bigBtn"><i class="fa-solid fa-download"></i> 백업(JSON)</button>
-          <button onclick="resetAll()" class="bigBtn" style="border-color: rgba(255,255,255,0.18);"><i class="fa-solid fa-triangle-exclamation"></i> 전체 초기화</button>
+          <button class="pill w-full justify-center py-4" onclick="backupJSON()"><i class="fa-solid fa-download"></i> 백업(JSON)</button>
+          <button class="pill danger w-full justify-center py-4" onclick="exportCSV()"><i class="fa-solid fa-file-csv"></i> 기록 CSV 내보내기</button>
+          <button class="pill danger w-full justify-center py-4" onclick="resetAll()"><i class="fa-solid fa-triangle-exclamation"></i> 전체 초기화</button>
         </div>
       </section>
 
-      <!-- History -->
-      <section id="tab-history" class="tab-content">
-        <div class="mb-6 px-2 flex justify-between items-end">
-          <h2 class="text-3xl font-black italic uppercase">기록</h2>
+      <!-- TAB: HISTORY -->
+      <section id="tab-history" class="tab hidden">
+        <div class="mb-6 px-2 flex items-end justify-between">
+          <h2 class="text-3xl font-black italic uppercase text-white">History</h2>
           <div class="flex items-center gap-4 glass rounded-2xl px-5 py-2.5">
             <button onclick="changeMonth(-1)" class="p-1 hover:text-cyan-300 transition-colors"><i class="fa-solid fa-chevron-left text-xs"></i></button>
-            <span id="calendar-month" class="text-xs font-black w-20 text-center tracking-widest">2026.01</span>
+            <span id="monthLabel" class="text-xs font-black w-20 text-center tracking-widest">2026.01</span>
             <button onclick="changeMonth(1)" class="p-1 hover:text-cyan-300 transition-colors"><i class="fa-solid fa-chevron-right text-xs"></i></button>
           </div>
         </div>
 
-        <div class="historyLayout">
+        <div class="grid gap-4 md:grid-cols-[360px_1fr]">
           <div>
-            <div class="glass rounded-[28px] p-6 mb-4 shadow-2xl">
+            <div class="glass cardRound p-6 shadow-2xl">
               <div class="grid grid-cols-7 text-center text-[9px] font-black text-gray-500 mb-5 uppercase tracking-[0.2em]">
-                <div class="text-red-600">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div class="text-blue-600">토</div>
+                <div class="text-rose-500">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div class="text-indigo-400">토</div>
               </div>
-              <div id="calendar-body" class="grid grid-cols-7 gap-3"></div>
+              <div id="calendar" class="grid grid-cols-7 gap-3"></div>
             </div>
 
-            <button onclick="resetSelectedDate()" class="pill w-full justify-center">
+            <button class="pill w-full justify-center mt-4" onclick="resetSelectedDate()">
               <i class="fa-solid fa-eraser"></i> 선택 날짜 초기화
             </button>
           </div>
 
-          <div>
-            <div id="history-detail" class="space-y-6"></div>
-          </div>
+          <div id="historyDetail" class="space-y-5"></div>
         </div>
       </section>
 
     </div>
   </main>
 
-  <!-- Bottom Dock -->
-  <div class="navDockWrap">
-    <div class="layoutWrap">
-      <nav class="nav-dock" style="margin-bottom: calc(env(safe-area-inset-bottom) + 6px);">
-        <button onclick="showTab('session', this)" class="nav-item active">
+  <!-- DOCK -->
+  <div class="dockWrap show" id="dockWrap">
+    <div class="layout">
+      <nav class="dock" style="margin-bottom: calc(env(safe-area-inset-bottom) + 6px);">
+        <button class="dockBtn active" onclick="showTab('home', this)">
           <i class="fa-solid fa-bolt-lightning"></i>
-          <span class="text-[8px] font-black uppercase tracking-tighter">훈련</span>
-          <div class="nav-active-dot"></div>
+          <span class="text-[8px] font-black uppercase tracking-tighter">HOME</span>
+          <div class="dot"></div>
         </button>
-        <button onclick="showTab('stats', this)" class="nav-item">
+        <button class="dockBtn" onclick="showTab('insights', this)">
           <i class="fa-solid fa-chart-simple"></i>
-          <span class="text-[8px] font-black uppercase tracking-tighter">분석</span>
-          <div class="nav-active-dot"></div>
+          <span class="text-[8px] font-black uppercase tracking-tighter">INSIGHTS</span>
+          <div class="dot"></div>
         </button>
-        <button onclick="showTab('history', this)" class="nav-item">
+        <button class="dockBtn" onclick="showTab('history', this)">
           <i class="fa-solid fa-calendar-days"></i>
-          <span class="text-[8px] font-black uppercase tracking-tighter">기록</span>
-          <div class="nav-active-dot"></div>
+          <span class="text-[8px] font-black uppercase tracking-tighter">HISTORY</span>
+          <div class="dot"></div>
         </button>
       </nav>
     </div>
   </div>
 
-  <!-- REST TIMER MODAL -->
-  <div id="timer-modal" class="fixed inset-0 z-[200] flex items-center justify-center hidden opacity-0">
-    <div class="absolute inset-0 bg-black/95 backdrop-blur-2xl"></div>
-    <div class="relative text-center">
-      <div class="miniHint mb-3 text-[10px] font-black tracking-[0.2em] uppercase text-white/35">휴식</div>
-      <div id="timer-sec" class="text-[14rem] font-black text-white italic tracking-tighter leading-none mb-6 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">00</div>
+  <!-- REP MODAL -->
+  <div id="repModal" class="modalWrap">
+    <div class="modalBack" onclick="closeRep(false)"></div>
+    <div class="modalCard">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <p class="text-[10px] font-black tracking-[0.22em] uppercase text-white/45">REP 입력</p>
+          <h3 id="repTitle" class="text-2xl font-black italic text-white mt-1">운동</h3>
+          <p id="repSub" class="text-[10px] font-black tracking-[0.22em] uppercase text-white/35 mt-2">1 SET</p>
+        </div>
+        <button class="pill" onclick="closeRep(false)"><i class="fa-solid fa-xmark"></i></button>
+      </div>
 
-      <div class="flex items-center justify-center gap-3">
-        <button onclick="adjustRest(-10)" class="glass px-7 py-4 rounded-full font-black text-white text-xs uppercase tracking-[0.25em] hover:bg-white/10 transition-all">-10</button>
-        <button onclick="minimizeTimer()" class="glass px-10 py-4 rounded-full font-black text-white text-xs uppercase tracking-[0.25em] hover:bg-white/10 transition-all">최소화</button>
-        <button onclick="adjustRest(10)" class="glass px-7 py-4 rounded-full font-black text-white text-xs uppercase tracking-[0.25em] hover:bg-white/10 transition-all">+10</button>
+      <div class="mt-5 glass rounded-2xl p-5">
+        <p class="text-[10px] font-black tracking-[0.22em] uppercase text-white/40">기본 REP</p>
+        <div class="flex items-end justify-between mt-2">
+          <div id="repBase" class="text-5xl font-black text-white tracking-tighter">20</div>
+          <div class="text-[10px] font-black tracking-[0.18em] uppercase text-white/35 text-right">
+            추천 입력<br>버튼만 클릭
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 glass rounded-2xl p-4">
+        <p class="text-[10px] font-black tracking-[0.22em] uppercase text-white/45">AI 추천</p>
+        <div id="repAI" class="mt-3 grid grid-cols-3 gap-2"></div>
+
+        <p class="text-[10px] font-black tracking-[0.22em] uppercase text-white/35 mt-5">추천 숫자</p>
+        <div id="repGrid" class="mt-3 grid grid-cols-5 gap-2"></div>
+      </div>
+
+      <div class="mt-4 grid grid-cols-2 gap-3">
+        <button class="pill w-full justify-center py-4" onclick="closeRep(false)">
+          <i class="fa-solid fa-ban"></i> 취소
+        </button>
+        <button class="pill cyan w-full justify-center py-4" onclick="repSkip()">
+          <i class="fa-solid fa-check"></i> 기본 REP 기록
+        </button>
+      </div>
+
+      <p class="text-[10px] font-black tracking-[0.22em] uppercase text-white/30 mt-4">
+        * 입력 후 지난주 동일 요일과 비교 결과가 토스트로 표시됩니다
+      </p>
+    </div>
+  </div>
+
+  <!-- TIMER MODAL -->
+  <div id="timerModal">
+    <div class="absolute inset-0 bg-black/95 backdrop-blur-2xl" onclick="minimizeTimer()"></div>
+    <div class="relative text-center">
+      <div class="text-[10px] font-black tracking-[0.24em] uppercase text-white/40 mb-3">REST</div>
+      <div id="timerSec">60</div>
+
+      <div class="mt-6 flex items-center justify-center gap-3">
+        <button class="pill px-7 py-4" onclick="adjustRest(-10)">-10</button>
+        <button class="pill cyan px-10 py-4" onclick="minimizeTimer()">MINIMIZE</button>
+        <button class="pill px-7 py-4" onclick="adjustRest(10)">+10</button>
       </div>
 
       <div class="mt-4 flex items-center justify-center gap-3">
-        <button onclick="closeTimer(false)" class="pill"><i class="fa-solid fa-forward"></i> 스킵</button>
+        <button class="pill" onclick="closeTimer(false)"><i class="fa-solid fa-forward"></i> 스킵</button>
       </div>
 
-      <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/40 mt-6">최소 방해 · 최대 집중</p>
+      <p class="text-[10px] font-black tracking-[0.22em] uppercase text-white/35 mt-6">최소 방해 · 최대 집중</p>
     </div>
   </div>
 
   <!-- SUMMARY MODAL -->
-  <div id="summary-modal">
-    <div class="absolute inset-0 bg-black/85 backdrop-blur-xl" onclick="closeSummary()"></div>
-    <div class="relative glass rounded-[28px] p-7 w-[min(520px,calc(100vw-44px))]">
+  <div id="summaryModal" class="modalWrap">
+    <div class="modalBack" onclick="closeSummary()"></div>
+    <div class="modalCard">
       <div class="flex items-start justify-between gap-4">
         <div>
-          <p class="text-[10px] font-black tracking-[0.2em] uppercase text-white/45">오늘 요약</p>
+          <p class="text-[10px] font-black tracking-[0.22em] uppercase text-white/45">오늘 요약</p>
           <h3 class="text-2xl font-black italic text-white mt-1">완료 🎉</h3>
         </div>
         <button class="pill" onclick="closeSummary()"><i class="fa-solid fa-xmark"></i></button>
@@ -1054,147 +867,206 @@
 
       <div class="mt-5 grid grid-cols-2 gap-3">
         <div class="glass rounded-2xl p-4">
-          <p class="text-[9px] font-black tracking-[0.18em] uppercase text-white/40">완료 세트</p>
-          <p id="sum-sets" class="text-3xl font-black text-white mt-2">0</p>
+          <p class="text-[9px] font-black tracking-[0.22em] uppercase text-white/40">완료 세트</p>
+          <p id="sumSets" class="text-3xl font-black text-white mt-2">0</p>
         </div>
         <div class="glass rounded-2xl p-4">
-          <p class="text-[9px] font-black tracking-[0.18em] uppercase text-white/40">완료 운동</p>
-          <p id="sum-ex" class="text-3xl font-black text-white mt-2">0</p>
+          <p class="text-[9px] font-black tracking-[0.22em] uppercase text-white/40">완료 운동</p>
+          <p id="sumEx" class="text-3xl font-black text-white mt-2">0</p>
         </div>
         <div class="glass rounded-2xl p-4 col-span-2">
-          <p class="text-[9px] font-black tracking-[0.18em] uppercase text-white/40">오늘 한마디</p>
-          <p id="sum-msg" class="text-base font-black text-white/80 mt-2">좋은 훈련이었습니다.</p>
+          <p class="text-[9px] font-black tracking-[0.22em] uppercase text-white/40">오늘 한마디</p>
+          <p id="sumMsg" class="text-base font-black text-white/85 mt-2">좋은 훈련이었습니다.</p>
         </div>
       </div>
 
       <div class="mt-6 flex gap-3">
-        <button class="bigBtn" onclick="closeSummary()" style="background:linear-gradient(135deg,var(--primary),var(--accent)); color:#000; border:none;">
+        <button class="pill cyan w-full justify-center py-4" onclick="closeSummary()">
           <i class="fa-solid fa-check"></i> 확인
         </button>
-        <button class="bigBtn" onclick="showTab('history', document.querySelectorAll('.nav-item')[2]); closeSummary();">기록 보기</button>
+        <button class="pill w-full justify-center py-4" onclick="showTab('history', document.querySelectorAll('.dockBtn')[2]); closeSummary();">
+          기록 보기
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- Toast -->
+  <!-- TOAST -->
   <div id="toast" class="pill cyan"></div>
 
   <script>
-    /* =========================================================
-      DK Fit OS v12.1
-      ✅ Wake Lock (screen on)
-      ✅ Stopwatch Pause
-      ✅ Set tap -> instant done UI + REP modal appears
-      ✅ REP modal: previous week based number buttons (no mental math)
-      ✅ Rest sound: notification-like melody (no flash)
-      ✅ Progress percent + "현재 XX% 완료!"
-      ✅ History: daily summary with duration / avg rest / detail
-      ✅ GIF blink fix: avoid full re-render when stepper changes
-    ========================================================= */
+    /**
+     * DK FIT NEXT
+     * - 최신 Fit App UI/UX
+     * - Smart Set Flow (Set -> Rep modal -> Rest timer)
+     * - Insights charts
+     * - History calendar + daily report
+     * - Minimal rerender + flicker-free
+     */
 
-    /* ---------- GIF 매칭 ---------- */
-    function getGifByExerciseName(name){
-      const n = (name || '').toLowerCase();
-      if(n.includes('스쿼트') || n.includes('squat')) return 'AIR_SQT.gif';
-      if(n.includes('친업') || n.includes('chin')) return 'CHIN_UP.gif';
-      if(n.includes('사이드 레이즈') || n.includes('side raise') || n.includes('레터럴') || n.includes('lateral')) return 'DB_LAT_RAISE.gif';
-      if(n.includes('딥스') || n.includes('dips')) return 'DIPS.gif';
-      if(n.includes('인버티드 로우') || n.includes('inverted row') || n.includes('invt')) return 'INVT_ROW.gif';
-      if(n.includes('런지') || n.includes('lunge')) return 'LUNGE.gif';
-      if(n.includes('파이크 푸쉬업') || n.includes('pike')) return 'PIKE_PUSH_UP.gif';
-      if(n.includes('플랭크') || n.includes('plank')) return 'PLANK.gif';
-      if(n.includes('풀업') || n.includes('pull up') || n.includes('pullup')) return 'PULL_UP.gif';
-      if(n.includes('푸쉬업') || n.includes('push up') || n.includes('pushup')) return 'PUSH_UP.gif';
-      return '';
-    }
-
-    /* ---------- DATA ---------- */
+    /* =========================
+      DATA (You can expand)
+    ========================= */
     const workoutData = {
       1: { day: "월요일", type: "push", title: "가슴 & 삼두", list: [
-        { name: "체스트 딥스", set: 4, rep: 10, rest: 90, breath: "내려갈 때 흡기 / 올라올 때 호기", target: "가슴 하부", mind: "바닥을 가슴으로 밀어내기", tip: "상체 15도 숙이기", guide: "발을 대고 무게 조절 가능", cue: "시선 바닥 1~2m + 팔 95%만 펴 긴장 유지" },
-        { name: "스탠다드 푸쉬업", set: 4, rep: 15, rest: 75, breath: "내릴 때 흡기 / 밀 때 호기", target: "가슴 전체", mind: "지면을 가슴으로 누르기", tip: "손바닥 전체 접지", guide: "무릎 대고 수행 가능", cue: "겨드랑이를 붙이며 밀어 올리기" },
-        { name: "내로우 딥스", set: 3, rep: 10, rest: 60, breath: "팔 펼 때 호기", target: "삼두근", mind: "팔 뒷면의 힘으로 잠금", tip: "상체 수직 유지", guide: "팔꿈치를 몸에 밀착", cue: "상체 수직 + 팔꿈치 뒤로 모으기" }
+        { name:"체스트 딥스", set:4, rep:10, rest:90, target:"가슴 하부", cue:"시선 바닥 1~2m · 팔 95%만 펴 긴장 유지", breath:"내려갈 때 흡기 / 올라올 때 호기", mind:"바닥을 가슴으로 밀기", tip:"상체 15도 숙이기", guide:"발을 대고 무게 조절 가능" },
+        { name:"스탠다드 푸쉬업", set:4, rep:15, rest:75, target:"가슴 전체", cue:"겨드랑이를 붙이며 밀어 올리기", breath:"내릴 때 흡기 / 밀 때 호기", mind:"지면을 가슴으로 누르기", tip:"손바닥 전체 접지", guide:"무릎 대고 수행 가능" },
+        { name:"내로우 딥스", set:3, rep:10, rest:60, target:"삼두근", cue:"상체 수직 · 팔꿈치 뒤로 모으기", breath:"팔 펼 때 호기", mind:"팔 뒷면 힘으로 잠금", tip:"상체 수직 유지", guide:"팔꿈치 몸에 밀착" }
       ]},
-      2: { day: "화요일", type: "pull", title: "등 두께", list: [
-        { name: "풀업 (밴드)", set: 4, rep: 8, rest: 120, breath: "당길 때 호기", target: "광배 바깥", mind: "팔꿈치를 옆구리로 꽂기", tip: "숄더 패킹 필수", guide: "밴드 강도 조절", cue: "숄더패킹 → 팔꿈치로 옆구리 찍기" },
-        { name: "인버티드 로우", set: 4, rep: 12, rest: 90, breath: "당길 때 호기", target: "등 중앙", mind: "날개뼈를 뒤로 모으기", tip: "가슴을 바로 마중", guide: "발 위치로 난이도 조절", cue: "몸 일직선 + 날개뼈를 레몬 짜듯 조이기" },
-        { name: "친업 (밴드)", set: 3, rep: 8, rest: 90, breath: "올라갈 때 호기", target: "등 & 이두", mind: "가슴을 봉에 붙이기", tip: "가슴 높이까지 올리기", guide: "언더그립 사용", cue: "가슴을 봉 쪽으로 접어 넣기" }
+      2: { day:"화요일", type:"pull", title:"등 두께", list:[
+        { name:"풀업 (밴드)", set:4, rep:8, rest:120, target:"광배 바깥", cue:"숄더패킹 → 팔꿈치로 옆구리 찍기", breath:"당길 때 호기", mind:"팔꿈치를 옆구리로 꽂기", tip:"숄더 패킹 필수", guide:"밴드 강도 조절" },
+        { name:"인버티드 로우", set:4, rep:12, rest:90, target:"등 중앙", cue:"몸 일직선 · 날개뼈 레몬 짜듯", breath:"당길 때 호기", mind:"날개뼈를 뒤로 모으기", tip:"가슴을 바로 마중", guide:"발 위치로 난이도 조절" },
+        { name:"친업 (밴드)", set:3, rep:8, rest:90, target:"등 & 이두", cue:"가슴을 봉 쪽으로 접어 넣기", breath:"올라갈 때 호기", mind:"가슴을 봉에 붙이기", tip:"가슴 높이까지 올리기", guide:"언더그립 사용" }
       ]},
-      3: { day: "수요일", type: "push", title: "측면 어깨", list: [
-        { name: "사이드 레이즈", set: 5, rep: 20, rest: 60, breath: "올릴 때 호기", target: "측면 삼각근", mind: "팔꿈치를 양옆으로 던짐", tip: "날개뼈 고정", guide: "저중량 고반복 권장", cue: "위가 아니라 ‘멀리 던진다’" }
+      3: { day:"수요일", type:"push", title:"측면 어깨", list:[
+        { name:"사이드 레이즈", set:5, rep:20, rest:60, target:"측면 삼각근", cue:"위가 아니라 ‘멀리 던진다’", breath:"올릴 때 호기", mind:"팔꿈치를 양옆으로 던짐", tip:"날개뼈 고정", guide:"저중량 고반복 권장" }
       ]},
-      4: { day: "목요일", type: "push", title: "어깨 & 삼두", list: [
-        { name: "파이크 푸쉬업", set: 4, rep: 10, rest: 90, breath: "밀 때 호기", target: "전면 어깨", mind: "어깨로 천장 밀기", tip: "엉덩이 높이 유지", guide: "머리를 손보다 앞으로", cue: "정수리가 바닥에 닿듯 내려갔다가 로켓처럼 밀기" },
-        { name: "디클라인 푸쉬업", set: 4, rep: 12, rest: 90, breath: "밀 때 호기", target: "상부 가슴", mind: "상부 가슴 집중", tip: "발 위치 높게", guide: "가슴 위쪽에 자극 집중", cue: "쇄골 아래로 바닥을 민다" },
-        { name: "삼두 딥스", set: 4, rep: 8, rest: 90, breath: "밀 때 호기", target: "삼두근", mind: "삼두로 펴서 잠금", tip: "팔꿈치 뒤로 모으기", guide: "의자 사용 가능", cue: "팔꿈치 벌어지지 않게 뒤로 모아 삼두 타격" }
+      4: { day:"목요일", type:"push", title:"어깨 & 삼두", list:[
+        { name:"파이크 푸쉬업", set:4, rep:10, rest:90, target:"전면 어깨", cue:"정수리가 바닥에 닿듯", breath:"밀 때 호기", mind:"어깨로 천장 밀기", tip:"엉덩이 높이 유지", guide:"머리를 손보다 앞으로" },
+        { name:"디클라인 푸쉬업", set:4, rep:12, rest:90, target:"상부 가슴", cue:"쇄골 아래로 바닥을 민다", breath:"밀 때 호기", mind:"상부 가슴 집중", tip:"발 위치 높게", guide:"가슴 위쪽 자극 집중" },
+        { name:"삼두 딥스", set:4, rep:8, rest:90, target:"삼두근", cue:"팔꿈치 벌어지지 않게", breath:"밀 때 호기", mind:"삼두로 펴서 잠금", tip:"팔꿈치 뒤로 모으기", guide:"의자 사용 가능" }
       ]},
-      5: { day: "금요일", type: "pull", title: "등 넓이", list: [
-        { name: "와이드 풀업", set: 4, rep: 6, rest: 120, breath: "올라갈 때 호기", target: "광배 외곽", mind: "등을 넓게 펼치기", tip: "넓은 그립 사용", guide: "상부 광배 자극 집중", cue: "팔꿈치를 아래로 찍어 광배 옆선 타격" },
-        { name: "인버티드 로우", set: 4, rep: 12, rest: 90, breath: "당길 때 호기", target: "등 안정성", mind: "몸을 일직선으로", tip: "템포 일정하게", guide: "코어 단단히 고정", cue: "둔근/복부 고정 + 날개뼈 조이기" },
-        { name: "내로우 풀업", set: 3, rep: 8, rest: 90, breath: "올라갈 때 호기", target: "등 중앙", mind: "봉에 가슴 터치", tip: "1초간 정지", guide: "좁은 그립 사용", cue: "가슴을 봉에 최대한 붙이기" }
+      5: { day:"금요일", type:"pull", title:"등 넓이", list:[
+        { name:"와이드 풀업", set:4, rep:6, rest:120, target:"광배 외곽", cue:"팔꿈치를 아래로 찍어 광배", breath:"올라갈 때 호기", mind:"등을 넓게 펼치기", tip:"넓은 그립 사용", guide:"상부 광배 집중" },
+        { name:"인버티드 로우", set:4, rep:12, rest:90, target:"등 안정성", cue:"둔근/복부 고정 + 날개뼈 조이기", breath:"당길 때 호기", mind:"몸을 일직선으로", tip:"템포 일정하게", guide:"코어 단단히 고정" },
+        { name:"내로우 풀업", set:3, rep:8, rest:90, target:"등 중앙", cue:"가슴을 봉에 최대한 붙이기", breath:"올라갈 때 호기", mind:"봉에 가슴 터치", tip:"1초간 정지", guide:"좁은 그립" }
       ]},
-      6: { day: "토요일", type: "leg", title: "하체 & 코어", list: [
-        { name: "스쿼트", set: 4, rep: 20, rest: 60, breath: "올라올 때 호기", target: "허벅지/둔근", mind: "발바닥 지면 밀기", tip: "허리 중립 유지", guide: "뒤꿈치 고정", cue: "낮은 의자에 앉았다가 지구를 민다" },
-        { name: "런지", set: 3, rep: 10, rest: 60, breath: "올라올 때 호기", target: "엉덩이", mind: "뒤꿈치에 힘 전달", tip: "상체 살짝 숙이기", guide: "무릎 안정성 유의", cue: "앞발 뒤꿈치로 강력하게 밀기" },
-        { name: "플랭크", set: 3, rep: 60, rest: 60, breath: "일정하게 유지", target: "코어", mind: "배를 안으로 당기기", tip: "엉덩이 수축", guide: "일직선 유지", cue: "강철 판자처럼 버티기" }
+      6: { day:"토요일", type:"leg", title:"하체 & 코어", list:[
+        { name:"스쿼트", set:4, rep:20, rest:60, target:"허벅지/둔근", cue:"낮은 의자에 앉았다가 지구를 민다", breath:"올라올 때 호기", mind:"발바닥 지면 밀기", tip:"허리 중립 유지", guide:"뒤꿈치 고정" },
+        { name:"런지", set:3, rep:10, rest:60, target:"엉덩이", cue:"앞발 뒤꿈치로 강력하게 밀기", breath:"올라올 때 호기", mind:"뒤꿈치 힘 전달", tip:"상체 살짝 숙이기", guide:"무릎 안정성 유의" },
+        { name:"플랭크", set:3, rep:60, rest:60, target:"코어", cue:"강철 판자처럼 버티기", breath:"일정하게 유지", mind:"배를 안으로 당기기", tip:"엉덩이 수축", guide:"일직선 유지" }
       ]},
-      0: { day: "일요일", type: "rest", title: "회복", list: [
-        { name: "스트레칭", set: 1, rep: 15, rest: 0, breath: "깊고 길게", target: "전신 이완", mind: "근육 이완 느끼기", tip: "어깨/광배 집중", guide: "충분한 수면 권장", cue: "부드럽게 길게, 강도보다 호흡" }
+      0: { day:"일요일", type:"rest", title:"회복", list:[
+        { name:"스트레칭", set:1, rep:15, rest:0, target:"전신 이완", cue:"부드럽게 길게, 강도보다 호흡", breath:"깊고 길게", mind:"근육 이완 느끼기", tip:"어깨/광배 집중", guide:"충분한 수면 권장" }
       ]}
     };
 
-    /* ---------- STORAGE KEYS ---------- */
-    const KEY_LOGS = 'dk_os_v121_logs';
-    const KEY_SETS = 'dk_os_v121_sets';
-    const KEY_REPS = 'dk_os_v121_reps';
-    const KEY_PROGRESS_BY_DATE = 'dk_os_v121_progress_by_date';
-    const KEY_SPLASH = 'dk_os_v121_splash_shown';
-    const KEY_SUMMARY_SHOWN = 'dk_os_v121_summary_shown';
-    const KEY_NOTIF = 'dk_os_v121_rest_notif';
-
-    /* ---------- LOAD ---------- */
-    function safeParse(raw, fallback){ try { return raw ? JSON.parse(raw) : fallback; } catch(e){ return fallback; } }
-    let logs = safeParse(localStorage.getItem(KEY_LOGS), []);
-    let customSets = safeParse(localStorage.getItem(KEY_SETS), {});
-    let customReps = safeParse(localStorage.getItem(KEY_REPS), {});
-    let progressByDate = safeParse(localStorage.getItem(KEY_PROGRESS_BY_DATE), {});
-
-    /* ---------- STATE ---------- */
-    let timerInt = null;
-    let currentDayIdx = new Date().getDay();
-    let currentYear = new Date().getFullYear();
-    let currentMonth = new Date().getMonth();
-    let selectedDate = new Date().toISOString().split('T')[0];
-    let restRemaining = 0;
-    let restTotal = 0;
-    let currentSlideIndex = 0;
-    let restNotifEnabled = (localStorage.getItem(KEY_NOTIF) ?? '1') === '1';
-
-    /* 휴식 기록 */
-    let restStartedAt = null;
-    let restCurrentLogKey = null;
-
-    /* Audio unlock */
-    let audioCtx = null;
-    function unlockAudio(){
-      try{
-        if(!audioCtx){
-          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if(audioCtx.state === 'suspended'){
-          audioCtx.resume();
-        }
-      }catch(e){}
+    /* =========================
+      GIF mapping (optional)
+    ========================= */
+    function getGifByExerciseName(name){
+      const n = (name||'').toLowerCase();
+      if(n.includes('스쿼트')||n.includes('squat')) return 'AIR_SQT.gif';
+      if(n.includes('친업')||n.includes('chin')) return 'CHIN_UP.gif';
+      if(n.includes('사이드')||n.includes('lateral')||n.includes('raise')) return 'DB_LAT_RAISE.gif';
+      if(n.includes('딥스')||n.includes('dips')) return 'DIPS.gif';
+      if(n.includes('인버티드')||n.includes('inverted')) return 'INVT_ROW.gif';
+      if(n.includes('런지')||n.includes('lunge')) return 'LUNGE.gif';
+      if(n.includes('파이크')||n.includes('pike')) return 'PIKE_PUSH_UP.gif';
+      if(n.includes('플랭크')||n.includes('plank')) return 'PLANK.gif';
+      if(n.includes('풀업')||n.includes('pull')) return 'PULL_UP.gif';
+      if(n.includes('푸쉬업')||n.includes('push')) return 'PUSH_UP.gif';
+      return '';
     }
 
-    /* Stopwatch (pause support) */
+    /* =========================
+      Storage Keys
+    ========================= */
+    const KEY = {
+      LOGS: 'dk_next_logs',
+      SETS: 'dk_next_sets',
+      REPS: 'dk_next_reps',
+      PROGRESS: 'dk_next_progress',
+      SPLASH: 'dk_next_splash',
+      SUMMARY: 'dk_next_summary',
+      NOTIF: 'dk_next_notif'
+    };
+
+    /* =========================
+      Load
+    ========================= */
+    function safeParse(raw, fallback){ try{ return raw ? JSON.parse(raw) : fallback; }catch(e){ return fallback; } }
+    let logs = safeParse(localStorage.getItem(KEY.LOGS), []);
+    let customSets = safeParse(localStorage.getItem(KEY.SETS), {});
+    let customReps = safeParse(localStorage.getItem(KEY.REPS), {});
+    let progressByDate = safeParse(localStorage.getItem(KEY.PROGRESS), {});
+    let restNotifEnabled = (localStorage.getItem(KEY.NOTIF) ?? '1') === '1';
+
+    /* =========================
+      State
+    ========================= */
+    let currentDayIdx = new Date().getDay();
+    let slideIndex = 0;
+
+    let selectedDate = new Date().toISOString().split('T')[0];
+    let currentYear = new Date().getFullYear();
+    let currentMonth = new Date().getMonth();
+
+    // Stopwatch
     let workoutStartAt = Date.now();
     let stopwatchPaused = false;
     let pauseStartedAt = null;
     let pausedTotalMs = 0;
 
-    /* Wake Lock */
+    // Rest timer
+    let timerInt = null;
+    let restRemaining = 0;
+    let restTotal = 0;
+    let restStartedAt = null;
+    let restCurrentLogKey = null;
+
+    // Rep modal
+    let repModalState = null;
+
+    // Charts
+    let radarChart = null;
+    let weeklyChart = null;
+
+    /* WakeLock */
     let wakeLock = null;
+
+    /* Audio */
+    let audioCtx = null;
+
+    /* =========================
+      Utils
+    ========================= */
+    const $ = (q)=> document.querySelector(q);
+    const $$ = (q)=> Array.from(document.querySelectorAll(q));
+    const clamp = (n,min,max)=> Math.max(min, Math.min(max, n));
+    const todayStr = ()=> new Date().toISOString().split('T')[0];
+    const nowISO = ()=> new Date().toISOString();
+    const exId = (dayIdx, exIdx)=> `${dayIdx}-${exIdx}`;
+    const haptic = (ms=18)=> { try{ navigator.vibrate && navigator.vibrate(ms);}catch(e){} };
+
+    function toast(msg){
+      const el = $('#toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(toast._t);
+      toast._t = setTimeout(()=> el.classList.remove('show'), 1850);
+    }
+
+    function showDock(){
+      const d = $('#dockWrap');
+      d.classList.remove('hide');
+      d.classList.add('show');
+      clearTimeout(showDock._t);
+      showDock._t = setTimeout(()=> {
+        d.classList.remove('show');
+        d.classList.add('hide');
+      }, 1700);
+    }
+    ['scroll','touchstart','touchmove','click'].forEach(ev=> window.addEventListener(ev, showDock, {passive:true}));
+
+    /* =========================
+      Splash
+    ========================= */
+    function initSplash(){
+      const shown = sessionStorage.getItem(KEY.SPLASH) === '1';
+      if(shown){ $('#splash').style.display='none'; return; }
+      setTimeout(()=> {
+        const s = $('#splash');
+        s.style.opacity='0';
+        s.style.transform='scale(1.08)';
+        setTimeout(()=> s.style.display='none', 880);
+        sessionStorage.setItem(KEY.SPLASH,'1');
+      }, 1800);
+    }
+
+    /* =========================
+      Wake Lock
+    ========================= */
     async function requestWakeLock(){
       try{
         if('wakeLock' in navigator){
@@ -1202,127 +1074,104 @@
         }
       }catch(e){}
     }
-    function releaseWakeLock(){
-      try{ wakeLock && wakeLock.release(); }catch(e){}
-      wakeLock = null;
-    }
     document.addEventListener("visibilitychange", () => {
       if(document.visibilityState === 'visible') requestWakeLock();
     });
 
-    /* REP modal state */
-    let repModalState = null;
-
-    /* ---------- UTILS ---------- */
-    function haptic(ms=18){ if(navigator.vibrate) navigator.vibrate(ms); }
-    function nowISO(){ return new Date().toISOString(); }
-    function todayStr(){ return new Date().toISOString().split('T')[0]; }
-    function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
-    function exId(dayIdx, exIdx){ return `${dayIdx}-${exIdx}`; }
-
-    /* ---------- SPLASH ---------- */
-    function initIntro(){
-      const shown = sessionStorage.getItem(KEY_SPLASH) === '1';
-      const splash = document.getElementById('splash-screen');
-      if(shown){ splash.style.display = 'none'; return; }
-
-      setTimeout(() => {
-        splash.style.opacity = '0';
-        splash.style.transform = 'scale(1.08)';
-        setTimeout(()=> splash.style.display='none', 900);
-        sessionStorage.setItem(KEY_SPLASH, '1');
-      }, 2200);
+    /* =========================
+      Audio unlock
+    ========================= */
+    function unlockAudio(){
+      try{
+        if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if(audioCtx.state === 'suspended') audioCtx.resume();
+      }catch(e){}
     }
 
-    /* ---------- TOAST ---------- */
-    let toastTimer=null;
-    function toast(msg){
-      const el = document.getElementById('toast');
-      el.textContent = msg;
-      el.classList.add('show');
-      if(toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(()=> el.classList.remove('show'), 1800);
+    /* =========================
+      Stopwatch
+    ========================= */
+    function toggleStopwatchPause(){
+      stopwatchPaused = !stopwatchPaused;
+      const icon = $('#pauseIcon');
+      if(stopwatchPaused){
+        pauseStartedAt = Date.now();
+        icon.className = "fa-solid fa-play";
+        toast("총 운동시간 일시정지");
+      }else{
+        if(pauseStartedAt) pausedTotalMs += (Date.now() - pauseStartedAt);
+        pauseStartedAt = null;
+        icon.className = "fa-solid fa-pause";
+        toast("총 운동시간 재시작");
+      }
+      haptic(14);
+      showDock();
     }
 
-    /* ---------- SUMMARY MODAL ---------- */
-    function openSummary(stats){
-      document.getElementById('sum-sets').textContent = stats.sets;
-      document.getElementById('sum-ex').textContent = stats.exercises;
-      document.getElementById('sum-msg').textContent = stats.msg;
-      document.getElementById('summary-modal').classList.add('show');
-    }
-    function closeSummary(){
-      document.getElementById('summary-modal').classList.remove('show');
+    function getWorkoutElapsedSec(){
+      const now = Date.now();
+      const paused = stopwatchPaused && pauseStartedAt ? (now - pauseStartedAt) : 0;
+      const elapsedMs = (now - workoutStartAt) - pausedTotalMs - paused;
+      return Math.max(0, Math.floor(elapsedMs / 1000));
     }
 
-    /* ---------- TABS ---------- */
+    /* =========================
+      Tabs
+    ========================= */
     function showTab(name, btn){
-      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-      document.getElementById(`tab-${name}`).classList.add('active');
-      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+      $$('.tab').forEach(t => t.classList.add('hidden'));
+      $(`#tab-${name}`).classList.remove('hidden');
+
+      $$('.dockBtn').forEach(b=> b.classList.remove('active'));
       btn.classList.add('active');
 
-      const dayWrap = document.getElementById('day-nav-wrap');
-      if(dayWrap) dayWrap.style.display = (name === 'session') ? 'block' : 'none';
-
-      if(name === 'stats') renderStats();
+      if(name === 'insights') renderCharts();
       if(name === 'history') renderCalendar();
 
       window.scrollTo({top:0, behavior:'smooth'});
-      showDockTemporarily();
+      showDock();
     }
 
-    /* ---------- DAY NAV ---------- */
-    function updateDayNav(){
-      const nav = document.getElementById('day-nav');
-      nav.innerHTML = '';
-      ['월','화','수','목','금','토','일'].forEach((d, i) => {
-        const dm = (i === 6) ? 0 : i + 1;
-        const b = document.createElement('button');
-        b.className = `day-chip ${dm === currentDayIdx ? 'active' : ''}`;
-        b.innerText = d;
-        b.onclick = () => changeDay(dm);
-        nav.appendChild(b);
-      });
-    }
-
-    /* ---------- DATE-BASED PROGRESS ---------- */
-    function getProgressArr(date, exerciseId, setTotal){
+    /* =========================
+      Progress per date
+    ========================= */
+    function ensureProgressArr(date, exerciseId, setTotal){
       if(!progressByDate[date]) progressByDate[date] = {};
       let arr = progressByDate[date][exerciseId];
       if(!Array.isArray(arr)){
         arr = new Array(setTotal).fill(false);
         progressByDate[date][exerciseId] = arr;
-        localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
+        localStorage.setItem(KEY.PROGRESS, JSON.stringify(progressByDate));
         return arr;
       }
       if(arr.length !== setTotal){
         const next = new Array(setTotal).fill(false);
-        for(let i=0;i<Math.min(arr.length,setTotal);i++) next[i]=!!arr[i];
+        for(let i=0;i<Math.min(arr.length, setTotal);i++) next[i]=!!arr[i];
         progressByDate[date][exerciseId] = next;
-        localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
+        localStorage.setItem(KEY.PROGRESS, JSON.stringify(progressByDate));
         return next;
       }
       return arr;
     }
 
-    function computeProgressForDay(date, dayIdx){
-      let total = 0, done = 0;
-      workoutData[dayIdx].list.forEach((w, idx) => {
+    function computeProgress(date, dayIdx){
+      let total=0, done=0;
+      workoutData[dayIdx].list.forEach((w, idx)=>{
         const id = exId(dayIdx, idx);
         const setTotal = customSets[id] || w.set;
         total += setTotal;
-        const arr = getProgressArr(date, id, setTotal);
+        const arr = ensureProgressArr(date, id, setTotal);
         done += arr.filter(Boolean).length;
       });
-      return { total, done, pct: Math.round((done/total)*100) || 0 };
+      const pct = Math.round((done/total)*100) || 0;
+      return { total, done, pct };
     }
 
     function updateProgressUI(){
-      const p = computeProgressForDay(todayStr(), currentDayIdx);
-      document.getElementById('progress-bar').style.width = p.pct + '%';
-      document.getElementById('progress-percent').innerText = p.pct + '%';
-      document.getElementById('progress-text').innerText = `현재 ${p.pct}% 완료!`;
+      const p = computeProgress(todayStr(), currentDayIdx);
+      $('#progressPct').textContent = p.pct + '%';
+      $('#progressText').textContent = `현재 ${p.pct}% 완료!`;
+      $('#progressBar').style.width = p.pct + '%';
 
       if(p.pct === 100) maybeShowSummary();
     }
@@ -1330,23 +1179,30 @@
     function maybeShowSummary(){
       const date = todayStr();
       const key = `${date}|${currentDayIdx}`;
-      if(localStorage.getItem(KEY_SUMMARY_SHOWN) === key) return;
+      if(localStorage.getItem(KEY.SUMMARY) === key) return;
 
       const stats = getTodaySummaryStats();
-      localStorage.setItem(KEY_SUMMARY_SHOWN, key);
-      openSummary(stats);
+      localStorage.setItem(KEY.SUMMARY, key);
+
+      $('#sumSets').textContent = stats.sets;
+      $('#sumEx').textContent = stats.exercises;
+      $('#sumMsg').textContent = stats.msg;
+      $('#summaryModal').classList.add('show');
       haptic(30);
+    }
+
+    function closeSummary(){
+      $('#summaryModal').classList.remove('show');
     }
 
     function getTodaySummaryStats(){
       const date = todayStr();
       const data = workoutData[currentDayIdx];
-      let setsDone = 0;
-      let exDone = 0;
+      let setsDone=0, exDone=0;
       data.list.forEach((w, idx)=>{
         const id = exId(currentDayIdx, idx);
         const setTotal = customSets[id] || w.set;
-        const arr = getProgressArr(date, id, setTotal);
+        const arr = ensureProgressArr(date, id, setTotal);
         const done = arr.filter(Boolean).length;
         setsDone += done;
         if(done === setTotal) exDone++;
@@ -1358,49 +1214,17 @@
         "규칙은 배신하지 않는다. 계속 간다.",
         "오늘은 성공. 다음은 진짜 레벨업."
       ];
-      return {
-        sets: setsDone,
-        exercises: exDone,
-        msg: msgPool[Math.floor(Math.random()*msgPool.length)]
-      };
+      return { sets: setsDone, exercises: exDone, msg: msgPool[Math.floor(Math.random()*msgPool.length)] };
     }
 
-    /* ---------- STOPWATCH ---------- */
-    function toggleStopwatchPause(){
-      stopwatchPaused = !stopwatchPaused;
-
-      const icon = document.getElementById('pause-icon');
-      if(stopwatchPaused){
-        pauseStartedAt = Date.now();
-        icon.className = "fa-solid fa-play";
-        toast("총 운동시간 일시정지");
-      }else{
-        if(pauseStartedAt){
-          pausedTotalMs += (Date.now() - pauseStartedAt);
-        }
-        pauseStartedAt = null;
-        icon.className = "fa-solid fa-pause";
-        toast("총 운동시간 재시작");
-      }
-      haptic(14);
-      showDockTemporarily();
-    }
-
-    function getWorkoutElapsedSec(){
-      const now = Date.now();
-      const paused = stopwatchPaused && pauseStartedAt ? (now - pauseStartedAt) : 0;
-      const elapsedMs = (now - workoutStartAt) - pausedTotalMs - paused;
-      return Math.max(0, Math.floor(elapsedMs / 1000));
-    }
-
-    /* ---------- CHANGE DAY ---------- */
-    function changeDay(d){
-      currentDayIdx = d;
-      currentSlideIndex = 0;
-
-      const data = workoutData[d];
-      document.getElementById('view-day').innerText = data.day;
-      document.getElementById('view-title').innerText = data.title;
+    /* =========================
+      Home UI (Day + chips)
+    ========================= */
+    function updateHomeHeader(){
+      const data = workoutData[currentDayIdx];
+      $('#homeDay').textContent = data.day;
+      $('#homeType').textContent = data.type.toUpperCase();
+      $('#homeTitle').textContent = data.title;
 
       const cueMap = {
         push: "푸쉬 데이 — 템포 제어 & 코어 고정",
@@ -1408,271 +1232,145 @@
         leg:  "하체 데이 — 발 전체로 밀기",
         rest: "회복 — 호흡 & 리셋"
       };
-      document.getElementById('view-subcue').innerText = cueMap[data.type] || "훈련 모드";
+      $('#homeCue').textContent = cueMap[data.type] || "훈련 모드";
+    }
 
+    function renderDayChips(){
+      const wrap = $('#dayChips');
+      wrap.innerHTML='';
+      const days = ['월','화','수','목','금','토','일'];
+      days.forEach((d, i)=>{
+        const dm = (i===6)?0:(i+1);
+        const b = document.createElement('button');
+        b.className = `pill ${dm===currentDayIdx ? 'cyan' : ''}`;
+        b.textContent = d;
+        b.onclick = ()=> changeDay(dm);
+        wrap.appendChild(b);
+      });
+    }
+
+    function changeDay(dayIdx){
+      currentDayIdx = dayIdx;
+      slideIndex = 0;
+      updateHomeHeader();
+      renderDayChips();
       renderCarousel(true);
       updateProgressUI();
-      updateDayNav();
-      showDockTemporarily();
+      showDock();
     }
 
-    /* =========================================================
-      ✅ Bottom Sheet (운동 상세)
-    ========================================================= */
-    let mobileActive = { w:null };
-
-    function openDetailSheet(w){
-      mobileActive.w = w;
-
-      document.getElementById('sheet-title').textContent = w.name;
-      document.getElementById('sheet-sub').textContent = `${w.target || 'DETAIL'}`;
-
-      const tabs = [
-        { key:'cue',   label:'핵심 큐',    text: expandCue(w) },
-        { key:'breath',label:'호흡',      text: expandBreath(w) },
-        { key:'mind',  label:'의식',      text: expandMind(w) },
-        { key:'elite', label:'엘리트 가이드', text: expandElite(w) },
-      ];
-
-      const tabWrap = document.getElementById('sheet-tabs');
-      tabWrap.innerHTML = '';
-
-      tabs.forEach((t, i)=>{
-        const b = document.createElement('button');
-        b.className = `sheetTab ${i===0?'active':''}`;
-        b.textContent = t.label;
-        b.onclick = ()=> setSheetTab(t, b);
-        tabWrap.appendChild(b);
-      });
-
-      setSheetTab(tabs[0], tabWrap.querySelector('.sheetTab'));
-
-      document.getElementById('detail-sheet').classList.add('show');
-      haptic(14);
-      showDockTemporarily();
-    }
-
-    function closeDetailSheet(){
-      document.getElementById('detail-sheet').classList.remove('show');
-      haptic(10);
-    }
-
-    function setSheetTab(tab, btn){
-      document.querySelectorAll('.sheetTab').forEach(x=> x.classList.remove('active'));
-      btn.classList.add('active');
-
-      const w = mobileActive.w;
-      const gifBlock = (w.gif) ? `
-        <div class="sheetBox">
-          <div class="sheetLabel">동작 가이드</div>
-          <img src="${w.gif}" class="sheetGif" loading="lazy" alt="exercise guide"
-               onerror="this.style.display='none';" />
-          <div class="sheetHint">* GIF는 동작의 핵심 흐름만 참고하세요. 자세가 흔들리면 횟수보다 폼이 우선입니다.</div>
-        </div>
-      ` : '';
-
-      const body = document.getElementById('sheet-body');
-      body.innerHTML = `
-        ${gifBlock}
-        <div class="sheetBox">
-          <div class="sheetLabel">${tab.label}</div>
-          <div class="sheetText">${tab.text}</div>
-          <div class="sheetHint">* 처음엔 <b>천천히</b>, 정확하게. 다음 단계는 “범위”와 “호흡”을 유지하는 것입니다.</div>
-        </div>
-      `;
-    }
-
-    function expandCue(w){
-      const base = (w.cue || w.tip || '').trim();
-      return `
-        ${base ? `• ${base}<br><br>` : ''}
-        <b>초보자 기준 핵심은 “폼이 무너지지 않는 범위”</b>입니다.<br>
-        1) 타겟을 느끼고<br>
-        2) 흔들리면 속도를 줄이고<br>
-        3) 반동 없이 정확한 동작으로만 진행하세요.<br><br>
-        ✅ <b>체크 포인트</b><br>
-        • 어깨가 귀 쪽으로 올라가면 → 어깨 내리고 가슴 열기<br>
-        • 허리가 꺾이면 → 코어 고정<br>
-        • 반동이 생기면 → 속도 20% 줄이기
-      `.trim();
-    }
-
-    function expandBreath(w){
-      return `
-        <b>호흡은 “힘을 쓰는 순간에 내쉬기”</b>가 원칙입니다.<br><br>
-        • 기본: <b>${w.breath}</b><br><br>
-        ✅ <b>요령</b><br>
-        1) 내려갈 때 → 코로 들이마시기<br>
-        2) 올라올 때 → 입으로 길게 내쉬기
-      `.trim();
-    }
-
-    function expandMind(w){
-      return `
-        <b>${w.mind}</b><br><br>
-        ✅ <b>실수</b><br>
-        • 팔로만 하려는 것 → 자극이 흐트러짐<br>
-        • 너무 빠른 템포 → 반동<br><br>
-        ✅ <b>의식 포인트</b><br>
-        1) 타겟 수축/늘어남 느끼기<br>
-        2) 0.5초 정지로 정확도 확보
-      `.trim();
-    }
-
-    function expandElite(w){
-      return `
-        <b>${w.tip}</b><br>
-        <span style="opacity:.75;">${w.guide || ''}</span><br><br>
-        ✅ <b>엘리트 체크</b><br>
-        1) 시작 자세 흔들림 없음<br>
-        2) 전 구간 긴장 유지<br>
-        3) 마지막 2회는 컨트롤
-      `.trim();
-    }
-
-    /* =========================================================
-      ✅ CAROUSEL
-      - GIF 깜빡임 방지: 필요할 때만 renderCarousel(full=true)
-      - 세트 완료 시엔 버튼 상태만 즉시 업데이트(부분 업데이트)
-    ========================================================= */
-
+    /* =========================
+      Carousel (flicker-free)
+    ========================= */
     function renderCarousel(full=true){
       const date = todayStr();
       const data = workoutData[currentDayIdx];
-      const carousel = document.getElementById('session-carousel');
+      const carousel = $('#carousel');
 
       if(full){
-        carousel.innerHTML = '';
-        data.list.forEach((w, idx) => {
+        carousel.innerHTML='';
+        data.list.forEach((w, idx)=>{
           const id = exId(currentDayIdx, idx);
           const gif = getGifByExerciseName(w.name);
           w.gif = gif || '';
 
           const setTotal = customSets[id] || w.set;
           const repTotal = customReps[id] || w.rep;
-          const doneArr = getProgressArr(date, id, setTotal);
+          const doneArr = ensureProgressArr(date, id, setTotal);
           const doneCount = doneArr.filter(Boolean).length;
 
           const slide = document.createElement('div');
-          slide.className = 'slide';
+          slide.className='slide';
           slide.setAttribute('data-slide', idx);
           slide.setAttribute('data-exid', id);
 
-          const detailAction = gif ? `
-            <span class="pill cyan">
-              <i class="fa-solid fa-hand-pointer"></i> GIF 터치로 상세 보기
-            </span>
-          ` : `
-            <button class="pill cyan" onclick='openDetailSheet(${safeStringify(w)})'>
-              <i class="fa-solid fa-circle-info"></i> 운동 상세 보기
-            </button>
-          `;
-
           slide.innerHTML = `
-            <div class="glass slideCard p-6 md:p-7">
-              <div>
-                <div class="flex items-start justify-between gap-3">
-                  <div class="min-w-0">
-                    <h3 class="text-3xl md:text-4xl font-black italic text-white tracking-tight truncate">${w.name}</h3>
-                    <div class="mt-3 flex items-center gap-2 flex-wrap">
-                      <span class="pill cyan">${w.target}</span>
-                      <span class="pill">휴식 ${w.rest}s</span>
-                      <span class="pill" data-role="progress">진행 ${doneCount}/${setTotal}</span>
-                    </div>
-                  </div>
-                  <button onclick="resetExercise('${id}')" class="pill" title="이 운동(오늘) 초기화">
-                    <i class="fa-solid fa-rotate-left"></i>
-                  </button>
-                </div>
-
-                <div class="mt-4 flex items-center justify-between gap-2">
-                  ${detailAction}
-                </div>
-
-                <div class="mt-5 grid md:grid-cols-2 gap-4">
-                  <div class="space-y-3">
-                    <div class="glass rounded-2xl p-4 border-white/5">
-                      <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45 mb-2">핵심 큐</p>
-                      <p class="text-base md:text-lg font-black text-white/80 leading-relaxed">${w.cue || w.tip || ''}</p>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                      <div class="bg-white/[0.02] p-4 rounded-2xl border border-white/5">
-                        <p class="text-[10px] font-black tracking-[0.18em] uppercase text-indigo-300 mb-2">호흡</p>
-                        <p class="text-[13px] font-bold text-white/70">${w.breath}</p>
-                      </div>
-                      <div class="bg-white/[0.02] p-4 rounded-2xl border border-white/5">
-                        <p class="text-[10px] font-black tracking-[0.18em] uppercase text-indigo-300 mb-2">의식</p>
-                        <p class="text-[13px] font-bold text-white/70">${w.mind}</p>
-                      </div>
-
-                      <div class="bg-cyan-400/[0.04] p-4 rounded-2xl border border-cyan-400/10 col-span-2">
-                        <p class="text-[10px] font-black tracking-[0.18em] uppercase text-cyan-300 mb-2">엘리트 가이드</p>
-                        <p class="text-[13px] font-bold text-white/75">${w.tip} · <span class="text-white/45">${w.guide}</span></p>
-                      </div>
-
-                      ${gif ? `
-                        <div class="mt-2 col-span-2">
-                          <div class="cardGifSquareWrap" onclick='openDetailSheet(${safeStringify(w)})'>
-                            <img src="${gif}" class="cardGifSquare" loading="lazy" alt="exercise guide"
-                                 onerror="this.parentElement.style.display='none';" />
-                          </div>
-                          <div class="mt-2 text-[10px] font-black tracking-[0.18em] uppercase text-white/35">
-                            GIF 터치하면 운동 상세보기
-                          </div>
-                        </div>
-                      ` : ''}
-                    </div>
-                  </div>
-
-                  <div class="rightPanel space-y-3">
-                    <div class="glass rounded-2xl p-4 border-white/5">
-                      <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45">세트/횟수 설정</p>
-                      <p class="text-[11px] mt-2 font-bold text-white/45">* 세트 버튼을 눌러 체크합니다</p>
-                    </div>
-
-                    <div class="stepper">
-                      <div>
-                        <div class="stepperLabel">SET</div>
-                        <div class="stepperValue" data-role="setTotal">${setTotal}</div>
-                      </div>
-                      <div class="flex items-center gap-2">
-                        <button class="stepperBtn" onclick="adjust('set','${id}',-1)"><i class="fa-solid fa-minus"></i></button>
-                        <button class="stepperBtn" onclick="adjust('set','${id}',1)"><i class="fa-solid fa-plus"></i></button>
-                      </div>
-                    </div>
-
-                    <div class="stepper">
-                      <div>
-                        <div class="stepperLabel">REP</div>
-                        <div class="stepperValue" data-role="repTotal">${repTotal}</div>
-                      </div>
-                      <div class="flex items-center gap-2">
-                        <button class="stepperBtn" onclick="adjust('rep','${id}',-1)"><i class="fa-solid fa-minus"></i></button>
-                        <button class="stepperBtn" onclick="adjust('rep','${id}',1)"><i class="fa-solid fa-plus"></i></button>
-                      </div>
-                    </div>
-
-                    <button class="bigBtn" onclick="resetSetRepToDefault('${id}')">
-                      <i class="fa-solid fa-wand-magic-sparkles"></i>
-                      세트/횟수 기본값
-                    </button>
-
-                    <div class="grid grid-cols-2 gap-3" data-role="setGrid">
-                      ${renderSetButtonsHTML(id, w, date)}
-                    </div>
+            <div class="glass cardRound p-6 md:p-7">
+              <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                  <h3 class="text-3xl md:text-4xl font-black italic text-white tracking-tight truncate">${w.name}</h3>
+                  <div class="mt-3 flex items-center gap-2 flex-wrap">
+                    <span class="pill cyan">${w.target}</span>
+                    <span class="pill">REST ${w.rest}s</span>
+                    <span class="pill" data-role="progress">진행 ${doneCount}/${setTotal}</span>
                   </div>
                 </div>
+                <button class="pill" onclick="resetExercise('${id}')" title="이 운동(오늘) 초기화">
+                  <i class="fa-solid fa-rotate-left"></i>
+                </button>
               </div>
 
-              <div class="mt-5 flex items-center justify-between gap-2 flex-wrap">
-                <div class="flex items-center gap-2">
-                  <span class="pill cyan">${idx+1} / ${data.list.length}</span>
-                  <span class="pill">${w.name}</span>
+              <div class="mt-5 grid md:grid-cols-2 gap-4">
+                <div class="space-y-3">
+                  <div class="glass rounded-2xl p-4 border-white/5">
+                    <p class="text-[10px] font-black tracking-[0.22em] uppercase text-white/45 mb-2">핵심 큐</p>
+                    <p class="text-base md:text-lg font-black text-white/80 leading-relaxed">${w.cue || w.tip || ''}</p>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-white/[0.02] p-4 rounded-2xl border border-white/5">
+                      <p class="text-[10px] font-black tracking-[0.22em] uppercase text-indigo-300 mb-2">호흡</p>
+                      <p class="text-[13px] font-bold text-white/70">${w.breath}</p>
+                    </div>
+                    <div class="bg-white/[0.02] p-4 rounded-2xl border border-white/5">
+                      <p class="text-[10px] font-black tracking-[0.22em] uppercase text-indigo-300 mb-2">의식</p>
+                      <p class="text-[13px] font-bold text-white/70">${w.mind}</p>
+                    </div>
+
+                    <div class="bg-cyan-400/[0.04] p-4 rounded-2xl border border-cyan-400/10 col-span-2">
+                      <p class="text-[10px] font-black tracking-[0.22em] uppercase text-cyan-300 mb-2">엘리트 가이드</p>
+                      <p class="text-[13px] font-bold text-white/75">${w.tip} · <span class="text-white/45">${w.guide}</span></p>
+                    </div>
+
+                    ${gif ? `
+                      <div class="col-span-2">
+                        <div class="mt-2 rounded-2xl overflow-hidden border border-white/10 bg-white/[0.03] shadow-[0_22px_55px_rgba(0,0,0,.55)] cursor-pointer"
+                             onclick="openGif('${gif}','${escapeHtml(w.name)}')">
+                          <img src="${gif}" class="w-full aspect-square object-contain bg-black/20" loading="lazy"
+                               onerror="this.parentElement.style.display='none';"/>
+                        </div>
+                        <div class="mt-2 text-[10px] font-black tracking-[0.22em] uppercase text-white/35">
+                          GIF 터치하면 크게 보기
+                        </div>
+                      </div>` : ``}
+                  </div>
                 </div>
-                <div class="flex items-center gap-2">
-                  <button class="pill" onclick="carouselPrev()"><i class="fa-solid fa-chevron-left"></i> 이전</button>
-                  <button class="pill cyan" onclick="carouselNext()">다음 <i class="fa-solid fa-chevron-right"></i></button>
+
+                <div class="space-y-3">
+                  <div class="glass rounded-2xl p-4 border-white/5">
+                    <p class="text-[10px] font-black tracking-[0.22em] uppercase text-white/45">세트/횟수 설정</p>
+                    <p class="text-[11px] mt-2 font-bold text-white/45">* 세트 버튼을 눌러 체크합니다</p>
+                  </div>
+
+                  <div class="stepper">
+                    <div>
+                      <div class="stepperLabel">SET</div>
+                      <div class="stepperValue" data-role="setTotal">${setTotal}</div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <button class="stepperBtn" onclick="adjust('set','${id}',-1)"><i class="fa-solid fa-minus"></i></button>
+                      <button class="stepperBtn" onclick="adjust('set','${id}',1)"><i class="fa-solid fa-plus"></i></button>
+                    </div>
+                  </div>
+
+                  <div class="stepper">
+                    <div>
+                      <div class="stepperLabel">REP</div>
+                      <div class="stepperValue" data-role="repTotal">${repTotal}</div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <button class="stepperBtn" onclick="adjust('rep','${id}',-1)"><i class="fa-solid fa-minus"></i></button>
+                      <button class="stepperBtn" onclick="adjust('rep','${id}',1)"><i class="fa-solid fa-plus"></i></button>
+                    </div>
+                  </div>
+
+                  <button class="pill w-full justify-center py-4" onclick="resetSetRepToDefault('${id}')">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> 기본값 복원
+                  </button>
+
+                  <div class="grid grid-cols-2 gap-3" data-role="setGrid">
+                    ${renderSetButtonsHTML(id, w, date)}
+                  </div>
                 </div>
               </div>
             </div>
@@ -1681,84 +1379,94 @@
         });
 
         bindSetButtons();
-        bindCarouselEvents();
+        bindCarouselScroll();
         updateSlideHUD();
-        requestAnimationFrame(()=> scrollToSlide(currentSlideIndex,false));
+        requestAnimationFrame(()=> scrollToSlide(slideIndex,false));
       }else{
-        // 부분 업데이트: 현재 슬라이드 세트 그리드만 갱신
-        const slide = carousel.querySelector(`.slide[data-slide="${currentSlideIndex}"]`);
+        // partial update current slide only
+        const slide = carousel.querySelector(`.slide[data-slide="${slideIndex}"]`);
         if(!slide) return;
-
-        const data = workoutData[currentDayIdx];
-        const w = data.list[currentSlideIndex];
+        const w = workoutData[currentDayIdx].list[slideIndex];
         const exid = slide.getAttribute('data-exid');
         const setTotal = customSets[exid] || w.set;
-        const doneArr = getProgressArr(date, exid, setTotal);
+        const doneArr = ensureProgressArr(date, exid, setTotal);
         const doneCount = doneArr.filter(Boolean).length;
 
         const progressTag = slide.querySelector('[data-role="progress"]');
         if(progressTag) progressTag.textContent = `진행 ${doneCount}/${setTotal}`;
 
         const setGrid = slide.querySelector('[data-role="setGrid"]');
-        if(setGrid){
-          setGrid.innerHTML = renderSetButtonsHTML(exid, w, date);
-        }
+        if(setGrid) setGrid.innerHTML = renderSetButtonsHTML(exid, w, date);
+
         const setValue = slide.querySelector('[data-role="setTotal"]');
         if(setValue) setValue.textContent = setTotal;
 
-        bindSetButtons(); // 새 버튼 바인딩
+        const repValue = slide.querySelector('[data-role="repTotal"]');
+        if(repValue) repValue.textContent = (customReps[exid] || w.rep);
+
+        bindSetButtons();
       }
     }
 
     function renderSetButtonsHTML(id, w, date){
       const setTotal = customSets[id] || w.set;
-      const doneArr = getProgressArr(date, id, setTotal);
+      const doneArr = ensureProgressArr(date, id, setTotal);
+      const nextIndex = doneArr.indexOf(false);
 
       return Array.from({length:setTotal}).map((_, s)=>{
         const done = !!doneArr[s];
-        const nextIndex = doneArr.indexOf(false);
-        const isLocked = (!done && nextIndex !== -1 && s !== nextIndex);
-
-        return `<button class="setBtn ${done?'done':''} ${isLocked?'locked':''}"
-          ${isLocked ? 'disabled' : ''}
-          data-date="${date}" data-ex="${id}" data-set="${s}">
-          ${done ? `<i class='fa-solid fa-check'></i>` : ''}
-          ${s+1} 세트
-        </button>`;
+        const locked = (!done && nextIndex !== -1 && s !== nextIndex);
+        return `
+          <button class="setBtn ${done?'done':''} ${locked?'locked':''}"
+                  ${locked?'disabled':''}
+                  data-date="${date}" data-ex="${id}" data-set="${s}">
+            ${done?`<i class="fa-solid fa-check"></i>`:''}
+            ${s+1} 세트
+          </button>
+        `;
       }).join('');
     }
 
-    function bindCarouselEvents(){
-      const carousel = document.getElementById('session-carousel');
-      carousel.onscroll = () => {
+    function bindSetButtons(){
+      $$('.setBtn[data-ex]').forEach(btn=>{
+        btn.onclick = ()=>{
+          const date = btn.getAttribute('data-date');
+          const ex = btn.getAttribute('data-ex');
+          const setIndex = Number(btn.getAttribute('data-set'));
+          toggleSetComplete(date, ex, setIndex);
+        };
+      });
+    }
+
+    function bindCarouselScroll(){
+      const carousel = $('#carousel');
+      carousel.onscroll = ()=>{
         const slides = Array.from(carousel.children);
         if(!slides.length) return;
         const slideWidth = slides[0].getBoundingClientRect().width + 18;
         const idx = Math.round(carousel.scrollLeft / slideWidth);
-        if(idx !== currentSlideIndex){
-          currentSlideIndex = clamp(idx, 0, slides.length-1);
+        if(idx !== slideIndex){
+          slideIndex = clamp(idx, 0, slides.length-1);
           updateSlideHUD();
         }
-        showDockTemporarily();
+        showDock();
       };
     }
 
     function updateSlideHUD(){
-      const data = workoutData[currentDayIdx];
-      const total = data.list.length;
-      const idx = clamp(currentSlideIndex, 0, total-1);
-      document.getElementById('slide-indicator').innerText = `${idx+1} / ${total}`;
-      document.getElementById('slide-name').innerText = data.list[idx]?.name || '운동';
+      const total = workoutData[currentDayIdx].list.length;
+      const idx = clamp(slideIndex, 0, total-1);
+      $('#slideIndicator').textContent = `${idx+1} / ${total}`;
 
-      const carousel = document.getElementById('session-carousel');
-      Array.from(carousel.children).forEach((el, i)=>{
-        el.classList.toggle('focus', i === idx);
-        el.classList.toggle('peek', i !== idx);
+      const carousel = $('#carousel');
+      Array.from(carousel.children).forEach((el,i)=>{
+        el.classList.toggle('focus', i===idx);
+        el.classList.toggle('peek', i!==idx);
       });
     }
 
     function scrollToSlide(idx, smooth=true){
-      const carousel = document.getElementById('session-carousel');
+      const carousel = $('#carousel');
       const slides = Array.from(carousel.children);
       if(!slides.length) return;
       idx = clamp(idx, 0, slides.length-1);
@@ -1766,70 +1474,55 @@
       carousel.scrollTo({ left: slideWidth * idx, behavior: smooth ? 'smooth' : 'auto' });
     }
 
-    function carouselNext(){
-      const data = workoutData[currentDayIdx];
-      currentSlideIndex = clamp(currentSlideIndex + 1, 0, data.list.length-1);
-      scrollToSlide(currentSlideIndex, true);
+    function nextSlide(){
+      const total = workoutData[currentDayIdx].list.length;
+      slideIndex = clamp(slideIndex + 1, 0, total-1);
+      scrollToSlide(slideIndex,true);
       updateSlideHUD();
       haptic(10);
-      showDockTemporarily();
+      showDock();
     }
 
-    function carouselPrev(){
-      const data = workoutData[currentDayIdx];
-      currentSlideIndex = clamp(currentSlideIndex - 1, 0, data.list.length-1);
-      scrollToSlide(currentSlideIndex, true);
+    function prevSlide(){
+      const total = workoutData[currentDayIdx].list.length;
+      slideIndex = clamp(slideIndex - 1, 0, total-1);
+      scrollToSlide(slideIndex,true);
       updateSlideHUD();
       haptic(10);
-      showDockTemporarily();
+      showDock();
     }
 
-    function safeStringify(obj){
-      return JSON.stringify(obj).replace(/'/g,"&#39;");
-    }
-
-    function bindSetButtons(){
-      const buttons = document.querySelectorAll('.setBtn[data-ex]');
-      buttons.forEach(btn => {
-        const date = btn.getAttribute('data-date');
-        const ex = btn.getAttribute('data-ex');
-        const setIndex = Number(btn.getAttribute('data-set'));
-
-        btn.onclick = () => toggleSetComplete(date, ex, setIndex);
-      });
-    }
-
-    /* =========================================================
-      ✅ 핵심: 세트 완료 → 즉시 done 반영 + REP 입력 모달
-    ========================================================= */
+    /* =========================
+      Set complete → Rep modal → Rest
+    ========================= */
     function toggleSetComplete(date, exerciseId, setIndex){
       unlockAudio();
-      showDockTemporarily();
+      showDock();
 
       const [dayIdx, exIdx] = exerciseId.split('-').map(Number);
       const w = workoutData[dayIdx]?.list?.[exIdx];
       if(!w) return;
 
       const setTotal = customSets[exerciseId] || w.set;
-      const doneArr = getProgressArr(date, exerciseId, setTotal);
+      const doneArr = ensureProgressArr(date, exerciseId, setTotal);
       const nextIndex = doneArr.indexOf(false);
 
       if(!doneArr[setIndex] && nextIndex !== -1 && setIndex !== nextIndex){
         haptic(10);
-        toast('다음 세트를 먼저 완료하세요');
+        toast("다음 세트를 먼저 완료하세요");
         return;
       }
 
       const repTotal = customReps[exerciseId] || w.rep;
       doneArr[setIndex] = !doneArr[setIndex];
       progressByDate[date][exerciseId] = doneArr;
-      localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
+      localStorage.setItem(KEY.PROGRESS, JSON.stringify(progressByDate));
 
       const setNo = setIndex + 1;
       const logKey = `${date}|${exerciseId}|${setNo}`;
 
       if(doneArr[setIndex]){
-        if(!logs.some(l => l.logKey === logKey)){
+        if(!logs.some(l=> l.logKey === logKey)){
           logs.push({
             id: Date.now(),
             logKey,
@@ -1841,31 +1534,23 @@
             plannedSetTotal: setTotal,
             plannedRep: repTotal,
             repActual: null,
-            rpe: null,
             restPlanned: w.rest,
             restUsed: w.rest,
             type: workoutData[currentDayIdx].type
           });
-          localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+          localStorage.setItem(KEY.LOGS, JSON.stringify(logs));
         }
 
-        // ✅ UI 즉시 반영 (새로고침 필요 없음)
+        // instant UI
         renderCarousel(false);
         updateProgressUI();
 
-        // ✅ REP 입력 모달 열기
-        openRepModal({
-          logKey,
-          name: w.name,
-          setNo,
-          baseRep: repTotal
-        });
+        // rep modal
+        openRep({ logKey, name: w.name, setNo, baseRep: repTotal });
 
       }else{
-        // undone
         logs = logs.filter(l => l.logKey !== logKey);
-        localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
-
+        localStorage.setItem(KEY.LOGS, JSON.stringify(logs));
         renderCarousel(false);
         updateProgressUI();
         haptic(12);
@@ -1873,52 +1558,47 @@
       }
     }
 
-    /* =========================================================
-      ✅ REP MODAL (AI 추천 + 숫자 버튼)
-    ========================================================= */
-    function openRepModal({logKey, name, setNo, baseRep}){
-      repModalState = {logKey, baseRep};
+    /* =========================
+      REP Modal
+    ========================= */
+    function openRep({logKey, name, setNo, baseRep}){
+      repModalState = { logKey, baseRep };
+      $('#repTitle').textContent = name;
+      $('#repSub').textContent = `${setNo} SET`;
+      $('#repBase').textContent = baseRep;
 
-      document.getElementById('rep-title').textContent = name;
-      document.getElementById('rep-sub').textContent = `${setNo} SET`;
-      document.getElementById('rep-base').textContent = baseRep;
-
-      const curLog = logs.find(l => l.logKey === logKey);
+      const curLog = logs.find(l=> l.logKey === logKey);
       const prevLog = curLog ? findLastWeekSameExerciseLog(curLog) : null;
       const prevRep = prevLog?.repActual ?? prevLog?.plannedRep ?? baseRep;
 
       renderRepRecommendations(baseRep, prevRep);
 
-      document.getElementById('rep-modal').classList.add('show');
+      $('#repModal').classList.add('show');
       haptic(12);
-      showDockTemporarily();
+      showDock();
     }
 
-    function closeRepModal(saved=false){
-      document.getElementById('rep-modal').classList.remove('show');
-      if(!saved){
-        // 저장 안 했으면 해당 log의 repActual null 유지 + (선택적) 취소 안내
-        toast("REP 입력 취소됨");
-      }
+    function closeRep(saved=false){
+      $('#repModal').classList.remove('show');
+      if(!saved) toast("REP 입력 취소됨");
       repModalState = null;
     }
 
     function repSkip(){
       if(!repModalState) return;
-      saveRepToLog(repModalState.logKey, repModalState.baseRep);
-      closeRepModal(true);
+      saveRep(repModalState.logKey, repModalState.baseRep);
+      closeRep(true);
     }
-
-    function repSelect(value){
+    function repSelect(v){
       if(!repModalState) return;
-      saveRepToLog(repModalState.logKey, value);
-      closeRepModal(true);
+      saveRep(repModalState.logKey, v);
+      closeRep(true);
     }
 
     function renderRepRecommendations(baseRep, prevRep){
-      // ✅ AI 추천 3개
-      const aiWrap = document.getElementById("rep-ai-reco");
-      aiWrap.innerHTML = "";
+      const ai = $('#repAI');
+      const grid = $('#repGrid');
+      ai.innerHTML=''; grid.innerHTML='';
 
       const aiList = [
         { label:"🔥 동일", value: prevRep, desc:"지난주와 동일" },
@@ -1926,56 +1606,45 @@
         { label:"⚡ -1", value: Math.max(0, prevRep - 1), desc:"조금 덜" },
       ];
 
-      aiList.forEach(item => {
-        const btn = document.createElement("button");
-        btn.className = "repBtn";
-        btn.style.height = "72px";
-        btn.innerHTML = `
+      aiList.forEach(item=>{
+        const b = document.createElement('button');
+        b.className = "pill w-full justify-center py-4";
+        b.style.height = "72px";
+        b.innerHTML = `
           <div class="flex flex-col items-center">
             <div class="text-sm font-black">${item.label}</div>
             <div class="text-xl font-black text-white mt-1">${item.value}</div>
             <div class="text-[9px] font-black text-white/35 mt-1">${item.desc}</div>
           </div>
         `;
-        btn.onclick = () => repSelect(item.value);
-        aiWrap.appendChild(btn);
+        b.onclick = ()=> repSelect(item.value);
+        ai.appendChild(b);
       });
-
-      // ✅ 숫자 추천 (prevRep 기준 ±5)
-      const grid = document.getElementById("rep-number-grid");
-      grid.innerHTML = "";
 
       const start = Math.max(0, prevRep - 5);
       const end = prevRep + 5;
 
-      for(let r = start; r <= end; r++){
-        const btn = document.createElement("button");
+      for(let r=start; r<=end; r++){
+        const b = document.createElement('button');
         const isBase = (r === baseRep);
-        btn.className = isBase ? "repBtn primary" : "repBtn";
-        btn.style.height = "46px";
-        btn.style.borderRadius = "16px";
-        btn.innerHTML = `<span class="text-lg font-black">${isBase ? "기본" : r}</span>`;
-
-        btn.onclick = () => {
-          if(isBase) repSkip();
-          else repSelect(r);
-        };
-        grid.appendChild(btn);
+        b.className = isBase ? "pill cyan w-full justify-center py-3" : "pill w-full justify-center py-3";
+        b.innerHTML = `<span class="text-lg font-black">${isBase ? "기본" : r}</span>`;
+        b.onclick = ()=> isBase ? repSkip() : repSelect(r);
+        grid.appendChild(b);
       }
     }
 
-    function saveRepToLog(logKey, value){
-      const idx = logs.findIndex(l => l.logKey === logKey);
+    function saveRep(logKey, value){
+      const idx = logs.findIndex(l=> l.logKey === logKey);
       if(idx === -1) return;
-
       logs[idx].repActual = value;
-      localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+      localStorage.setItem(KEY.LOGS, JSON.stringify(logs));
 
-      // ✅ 휴식 타이머 시작 (rep 입력 후)
+      // start rest timer after rep saved
       const restSec = logs[idx].restPlanned || 0;
       if(restSec > 0) startTimer(restSec, logKey);
 
-      // ✅ 지난주 비교 토스트
+      // toast last-week diff
       const prevLog = findLastWeekSameExerciseLog(logs[idx]);
       if(prevLog){
         const prev = prevLog.repActual ?? prevLog.plannedRep ?? null;
@@ -1986,7 +1655,7 @@
           else toast(`지난주와 동일 REP ✅`);
         }
       }else{
-        toast(`REP 기록 완료 ✅`);
+        toast("REP 기록 완료 ✅");
       }
 
       haptic(18);
@@ -1995,190 +1664,202 @@
       renderCalendar();
     }
 
-    /* ✅ 지난주 동일 요일 / 동일 운동 / 동일 세트 찾기 */
-    function findLastWeekSameExerciseLog(cur){
-      const targetDate = cur.date;
-      const prevDate = shiftDate(targetDate, -7);
-      const prevKeyPrefix = `${prevDate}|${cur.exerciseId}|${cur.set}`;
-      return logs.find(l => l.logKey.startsWith(prevKeyPrefix)) || null;
-    }
-
     function shiftDate(dateStr, deltaDays){
       const d = new Date(dateStr);
       d.setDate(d.getDate() + deltaDays);
       return d.toISOString().split('T')[0];
     }
 
-    /* ---------- adjust set/rep (딜레이 완화) ---------- */
-    function adjust(type, key, val){
-      showDockTemporarily();
+    function findLastWeekSameExerciseLog(cur){
+      const prevDate = shiftDate(cur.date, -7);
+      const prefix = `${prevDate}|${cur.exerciseId}|${cur.set}`;
+      return logs.find(l=> l.logKey.startsWith(prefix)) || null;
+    }
 
+    /* =========================
+      Adjust set/rep
+    ========================= */
+    function adjust(type, key, delta){
+      showDock();
       const [d, idx] = key.split('-').map(Number);
       const w = workoutData[d]?.list?.[idx];
       if(!w) return;
 
       if(type === 'set'){
         const cur = customSets[key] || w.set;
-        const next = clamp(cur + val, 1, 12);
+        const next = clamp(cur + delta, 1, 12);
         customSets[key] = next;
-        localStorage.setItem(KEY_SETS, JSON.stringify(customSets));
-        getProgressArr(todayStr(), key, next);
+        localStorage.setItem(KEY.SETS, JSON.stringify(customSets));
+        ensureProgressArr(todayStr(), key, next);
       }else{
         const cur = customReps[key] || w.rep;
-        customReps[key] = clamp(cur + val, 1, 100);
-        localStorage.setItem(KEY_REPS, JSON.stringify(customReps));
+        customReps[key] = clamp(cur + delta, 1, 120);
+        localStorage.setItem(KEY.REPS, JSON.stringify(customReps));
       }
 
-      // ✅ GIF 깜빡임 방지: 전체 렌더 말고 현재 슬라이드만 부분 업데이트
       renderCarousel(false);
       updateProgressUI();
-      toast('설정 저장됨');
+      toast("설정 저장됨");
       haptic(10);
     }
 
     function resetSetRepToDefault(exerciseId){
-      showDockTemporarily();
-
+      showDock();
       const [d, idx] = exerciseId.split('-').map(Number);
       const w = workoutData[d]?.list?.[idx];
       if(!w) return;
 
       if(customSets[exerciseId] !== undefined) delete customSets[exerciseId];
       if(customReps[exerciseId] !== undefined) delete customReps[exerciseId];
-      localStorage.setItem(KEY_SETS, JSON.stringify(customSets));
-      localStorage.setItem(KEY_REPS, JSON.stringify(customReps));
+      localStorage.setItem(KEY.SETS, JSON.stringify(customSets));
+      localStorage.setItem(KEY.REPS, JSON.stringify(customReps));
 
-      getProgressArr(todayStr(), exerciseId, w.set);
+      ensureProgressArr(todayStr(), exerciseId, w.set);
       renderCarousel(false);
       updateProgressUI();
-      toast('기본값으로 복원');
+      toast("기본값으로 복원");
       haptic(18);
     }
 
+    /* =========================
+      Reset / Quick Start
+    ========================= */
     function resetExercise(exerciseId){
-      showDockTemporarily();
-      if(!confirm('이 운동의 오늘 기록을 초기화할까요?')) return;
+      showDock();
+      if(!confirm("이 운동의 오늘 기록을 초기화할까요?")) return;
       const date = todayStr();
 
-      logs = logs.filter(l => !(l.date === date && l.exerciseId === exerciseId));
-      localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+      logs = logs.filter(l => !(l.date===date && l.exerciseId===exerciseId));
+      localStorage.setItem(KEY.LOGS, JSON.stringify(logs));
 
       const [d, idx] = exerciseId.split('-').map(Number);
       const w = workoutData[d]?.list?.[idx];
       const setTotal = customSets[exerciseId] || w.set;
+
       if(progressByDate[date] && progressByDate[date][exerciseId]){
         progressByDate[date][exerciseId] = new Array(setTotal).fill(false);
-        localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
+        localStorage.setItem(KEY.PROGRESS, JSON.stringify(progressByDate));
       }
 
       renderCarousel(false);
       updateProgressUI();
-      toast('운동 초기화 완료');
+      toast("운동 초기화 완료");
       haptic(22);
     }
 
     function resetToday(){
-      showDockTemporarily();
-      if(!confirm('오늘 진행/기록을 모두 초기화할까요?')) return;
+      showDock();
+      if(!confirm("오늘 진행/기록을 모두 초기화할까요?")) return;
       const date = todayStr();
 
       logs = logs.filter(l => l.date !== date);
-      localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+      localStorage.setItem(KEY.LOGS, JSON.stringify(logs));
 
-      if(progressByDate[date]){ delete progressByDate[date]; localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate)); }
-      localStorage.removeItem(KEY_SUMMARY_SHOWN);
+      if(progressByDate[date]) delete progressByDate[date];
+      localStorage.setItem(KEY.PROGRESS, JSON.stringify(progressByDate));
+
+      localStorage.removeItem(KEY.SUMMARY);
 
       renderCarousel(true);
       updateProgressUI();
-      toast('오늘 초기화 완료');
+      renderCalendar();
+      toast("오늘 초기화 완료");
       haptic(25);
     }
 
-    /* ---------- TIMER ---------- */
+    function openQuickStart(){
+      // 트렌디 UX: 현재 운동의 다음 미완료 세트로 자동 스크롤 + 안내
+      const date = todayStr();
+      const data = workoutData[currentDayIdx];
+      let bestSlide = 0;
+
+      for(let i=0;i<data.list.length;i++){
+        const id = exId(currentDayIdx, i);
+        const setTotal = customSets[id] || data.list[i].set;
+        const arr = ensureProgressArr(date, id, setTotal);
+        if(arr.includes(false)){ bestSlide = i; break; }
+      }
+      slideIndex = bestSlide;
+      scrollToSlide(slideIndex,true);
+      updateSlideHUD();
+      toast("다음 미완료 운동으로 이동 ✅");
+      haptic(14);
+      showDock();
+    }
+
+    /* =========================
+      Timer
+    ========================= */
     function showHUD(on){
-      const hud = document.getElementById('timer-hud');
-      if(!hud) return;
+      const hud = $('#timerHud');
       hud.classList.toggle('show', !!on);
     }
 
     function updateHUD(){
-      const timeEl = document.getElementById('hud-time');
-      const bar = document.getElementById('hud-bar');
-      if(!timeEl || !bar) return;
-      timeEl.textContent = String(restRemaining).padStart(2,'0');
+      $('#hudTime').textContent = String(restRemaining).padStart(2,'0');
       const pct = restTotal ? Math.round(((restTotal - restRemaining)/restTotal)*100) : 0;
-      bar.style.width = pct + '%';
+      $('#hudBar').style.width = pct + '%';
     }
 
     function startTimer(sec, logKey=null){
       restRemaining = sec;
       restTotal = sec;
-
       restStartedAt = Date.now();
       restCurrentLogKey = logKey;
 
-      const modal = document.getElementById('timer-modal');
-      const display = document.getElementById('timer-sec');
-      modal.classList.remove('hidden');
-      requestAnimationFrame(()=> modal.classList.add('opacity-100'));
-      display.innerText = restRemaining;
+      $('#timerSec').textContent = String(restRemaining).padStart(2,'0');
+      $('#timerModal').classList.add('show');
 
       showHUD(true);
       updateHUD();
 
       clearInterval(timerInt);
-      timerInt = setInterval(() => {
+      timerInt = setInterval(()=>{
         restRemaining--;
-        display.innerText = restRemaining;
+        $('#timerSec').textContent = String(restRemaining).padStart(2,'0');
         updateHUD();
         if(restRemaining <= 0) closeTimer(true);
       }, 1000);
     }
 
     function minimizeTimer(){
-      showDockTemporarily();
-      const modal = document.getElementById('timer-modal');
-      modal.classList.remove('opacity-100');
-      setTimeout(()=> modal.classList.add('hidden'), 450);
+      $('#timerModal').classList.remove('show');
       showHUD(true);
-      toast('타이머 최소화');
+      toast("타이머 최소화");
       haptic(10);
+      showDock();
     }
 
-    function openTimerFromHUD(){
-      showDockTemporarily();
-      const modal = document.getElementById('timer-modal');
-      modal.classList.remove('hidden');
-      requestAnimationFrame(()=> modal.classList.add('opacity-100'));
+    function openTimer(){
+      $('#timerModal').classList.add('show');
       haptic(10);
+      showDock();
     }
 
     function adjustRest(delta){
-      showDockTemporarily();
       if(!timerInt) return;
       restRemaining = clamp(restRemaining + delta, 5, 600);
       restTotal = Math.max(restTotal, restRemaining);
-      document.getElementById('timer-sec').innerText = restRemaining;
+      $('#timerSec').textContent = String(restRemaining).padStart(2,'0');
       updateHUD();
       haptic(10);
+      showDock();
     }
 
     function closeTimer(finished=false){
       clearInterval(timerInt);
       timerInt = null;
 
-      const modal = document.getElementById('timer-modal');
-      modal.classList.remove('opacity-100');
-      setTimeout(()=> modal.classList.add('hidden'), 450);
-
+      $('#timerModal').classList.remove('show');
       showHUD(false);
 
+      // restUsed 기록
       if(restStartedAt && restCurrentLogKey){
-        const used = clamp(Math.round((Date.now() - restStartedAt) / 1000), 0, restTotal);
-        const idx = logs.findIndex(l => l.logKey === restCurrentLogKey);
+        const used = clamp(Math.round((Date.now() - restStartedAt)/1000), 0, restTotal);
+        const idx = logs.findIndex(l=> l.logKey === restCurrentLogKey);
         if(idx !== -1){
           logs[idx].restUsed = used;
-          localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+          localStorage.setItem(KEY.LOGS, JSON.stringify(logs));
         }
       }
       restStartedAt = null;
@@ -2191,29 +1872,18 @@
       }
     }
 
-    /* ✅ 알림음: “알림 사운드 느낌” (비프 X, 짧은 멜로디) */
     function restDoneNotify(){
-      try{ if(navigator.vibrate) navigator.vibrate([120,80,200,80,220]); }catch(e){}
-
+      try{ navigator.vibrate && navigator.vibrate([120,80,200,80,220]); }catch(e){}
       try{
-        if(!audioCtx){
-          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if(audioCtx.state === 'suspended'){
-          audioCtx.resume();
-        }
-
+        unlockAudio();
         const now = audioCtx.currentTime;
-
-        // iOS/Android 알림 느낌: "딩-딩-딩"
         const pattern = [
-          { t: 0.00, dur: 0.16, freq: 1318 }, // E6
-          { t: 0.20, dur: 0.16, freq: 1567 }, // G6
-          { t: 0.40, dur: 0.18, freq: 2093 }, // C7
-          { t: 0.66, dur: 0.18, freq: 1567 }, // G6
+          { t:0.00, dur:0.16, freq:1318 },
+          { t:0.20, dur:0.16, freq:1567 },
+          { t:0.40, dur:0.18, freq:2093 },
+          { t:0.66, dur:0.18, freq:1567 },
         ];
-
-        pattern.forEach(p => {
+        pattern.forEach(p=>{
           const o = audioCtx.createOscillator();
           const g = audioCtx.createGain();
           o.connect(g);
@@ -2221,312 +1891,374 @@
           o.type = 'sine';
           o.frequency.setValueAtTime(p.freq, now + p.t);
 
-          g.gain.setValueAtTime(0.0001, now + p.t);
-          g.gain.exponentialRampToValueAtTime(0.25, now + p.t + 0.02);
-          g.gain.exponentialRampToValueAtTime(0.0001, now + p.t + p.dur);
+          g.gain.setValueAtTime(0.0001, now+p.t);
+          g.gain.exponentialRampToValueAtTime(0.25, now+p.t+0.02);
+          g.gain.exponentialRampToValueAtTime(0.0001, now+p.t+p.dur);
 
-          o.start(now + p.t);
-          o.stop(now + p.t + p.dur);
+          o.start(now+p.t);
+          o.stop(now+p.t+p.dur);
         });
-
       }catch(e){}
     }
 
     function toggleNotif(){
-      showDockTemporarily();
       restNotifEnabled = !restNotifEnabled;
-      localStorage.setItem(KEY_NOTIF, restNotifEnabled ? '1' : '0');
-      const btn = document.getElementById('notif-toggle');
-      if(btn){
-        btn.textContent = restNotifEnabled ? 'ON' : 'OFF';
-        btn.classList.toggle('cyan', restNotifEnabled);
-      }
-      toast(restNotifEnabled ? '알림 ON' : '알림 OFF');
+      localStorage.setItem(KEY.NOTIF, restNotifEnabled ? '1' : '0');
+      $('#notifToggle').textContent = restNotifEnabled ? 'ON' : 'OFF';
+      $('#notifToggle').classList.toggle('cyan', restNotifEnabled);
+      toast(restNotifEnabled ? "알림 ON" : "알림 OFF");
       haptic(14);
+      showDock();
     }
 
-    /* ---------- CALENDAR ---------- */
+    /* =========================
+      Charts (Insights)
+    ========================= */
+    function renderCharts(force=false){
+      // counts
+      const counts = { push:0, pull:0, leg:0, rest:0 };
+      logs.forEach(l=> { if(counts[l.type] !== undefined) counts[l.type]++; });
+
+      $('#statSets').textContent = logs.length;
+      $('#statDays').textContent = new Set(logs.map(l=> l.date)).size;
+
+      // radar
+      const rctx = $('#radar').getContext('2d');
+      if(radarChart) radarChart.destroy();
+      radarChart = new Chart(rctx, {
+        type:'radar',
+        data:{
+          labels:['PUSH','PULL','LEGS','REST'],
+          datasets:[{
+            data:[counts.push, counts.pull, counts.leg, counts.rest],
+            backgroundColor:'rgba(34,211,238,0.10)',
+            borderColor:'#22d3ee',
+            borderWidth:2,
+            pointRadius:0
+          }]
+        },
+        options:{
+          scales:{
+            r:{
+              grid:{ color:'rgba(255,255,255,0.06)' },
+              angleLines:{ color:'rgba(255,255,255,0.06)' },
+              pointLabels:{ color:'rgba(255,255,255,0.55)', font:{ weight:'800' } },
+              ticks:{ display:false }
+            }
+          },
+          plugins:{ legend:{ display:false } }
+        }
+      });
+
+      // weekly sets
+      const days = [];
+      for(let i=6;i>=0;i--){
+        days.push(shiftDate(todayStr(), -i));
+      }
+      const values = days.map(d=> logs.filter(l=> l.date === d).length);
+
+      const wctx = $('#weekly').getContext('2d');
+      if(weeklyChart) weeklyChart.destroy();
+      weeklyChart = new Chart(wctx, {
+        type:'bar',
+        data:{
+          labels: days.map(d=> d.slice(5)),
+          datasets:[{
+            data: values,
+            borderWidth: 0,
+            backgroundColor: 'rgba(99,102,241,0.35)',
+          }]
+        },
+        options:{
+          plugins:{ legend:{ display:false } },
+          scales:{
+            x:{ grid:{ display:false }, ticks:{ color:'rgba(255,255,255,0.55)', font:{weight:'800'} } },
+            y:{ grid:{ color:'rgba(255,255,255,0.06)' }, ticks:{ color:'rgba(255,255,255,0.45)', font:{weight:'800'} } }
+          }
+        }
+      });
+    }
+
+    /* =========================
+      Calendar / History
+    ========================= */
     function renderCalendar(){
-      document.getElementById('calendar-month').innerText = `${currentYear}.${String(currentMonth + 1).padStart(2,'0')}`;
+      $('#monthLabel').textContent = `${currentYear}.${String(currentMonth+1).padStart(2,'0')}`;
       const first = new Date(currentYear, currentMonth, 1).getDay();
-      const last = new Date(currentYear, currentMonth + 1, 0).getDate();
-      const body = document.getElementById('calendar-body');
+      const last = new Date(currentYear, currentMonth+1, 0).getDate();
+      const body = $('#calendar');
       body.innerHTML = '';
 
-      for(let i=0;i<first;i++) body.innerHTML += '<div></div>';
+      for(let i=0;i<first;i++) body.innerHTML += `<div></div>`;
 
       for(let d=1; d<=last; d++){
         const dStr = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-        const hasLog = logs.some(l => l.date === dStr);
+        const hasLog = logs.some(l=> l.date === dStr);
 
         const el = document.createElement('div');
         el.className = `calendar-day cursor-pointer ${dStr===todayStr()?'today':''} ${hasLog?'has-log':''}`;
-        if(dStr === selectedDate) el.classList.add('selected');
-        el.innerText = d;
-        el.onclick = () => { selectedDate = dStr; renderCalendar(); showDockTemporarily(); };
+        if(dStr===selectedDate) el.classList.add('selected');
+        el.textContent = d;
+        el.onclick = ()=> { selectedDate = dStr; renderCalendar(); showDock(); };
         body.appendChild(el);
       }
 
       renderHistoryDetail();
     }
 
-    /* ✅ 기록 탭 강화: 날짜 요약 + 운동별 세트/rep/휴식 + 총 시간/평균휴식 */
+    function estimateWorkoutMinutes(date){
+      const day = logs.filter(l=> l.date===date);
+      if(!day.length) return 0;
+      const avgRest = day.reduce((a,c)=> a + (c.restUsed ?? c.restPlanned ?? 0), 0) / day.length;
+      const perSet = 45 + avgRest; // simple estimate
+      return Math.max(1, Math.round((perSet * day.length) / 60));
+    }
+
     function renderHistoryDetail(){
-      const area = document.getElementById('history-detail');
+      const area = $('#historyDetail');
+
       const dayLogs = logs
         .filter(l => l.date === selectedDate)
         .sort((a,b)=> (a.exerciseId > b.exerciseId ? 1 : -1) || (a.set - b.set));
 
-      area.innerHTML = `<p class="text-[10px] font-black text-gray-400 tracking-widest uppercase px-2">${selectedDate} 리포트</p>`;
+      area.innerHTML = `<p class="text-[10px] font-black tracking-[0.22em] uppercase text-white/45 px-2">${selectedDate} 리포트</p>`;
 
       if(dayLogs.length === 0){
-        area.innerHTML += `<div class="glass rounded-[28px] p-12 text-center text-gray-500 italic text-xs">기록이 없습니다</div>`;
+        area.innerHTML += `<div class="glass cardRound p-12 text-center text-white/45 italic text-xs">기록이 없습니다</div>`;
         return;
       }
 
-      // ✅ day summary
       const totalSets = dayLogs.length;
       const avgRest = Math.round(dayLogs.reduce((a,c)=> a + (c.restUsed ?? c.restPlanned ?? 0), 0) / totalSets);
-      const approxWorkoutMin = estimateWorkoutDurationMinutes(selectedDate);
+      const approxMin = estimateWorkoutMinutes(selectedDate);
+      const exCount = new Set(dayLogs.map(l=> l.exerciseId)).size;
 
       area.innerHTML += `
-        <div class="glass rounded-[28px] p-6 mb-2">
-          <div class="flex items-center justify-between">
+        <div class="glass cardRound p-6">
+          <div class="flex items-center justify-between gap-3">
             <div>
-              <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45">요약</p>
-              <h4 class="text-2xl font-black italic text-white mt-2">${approxWorkoutMin}분</h4>
-              <p class="text-[10px] font-black text-white/35 tracking-[0.18em] uppercase mt-2">
+              <p class="text-[10px] font-black tracking-[0.22em] uppercase text-white/45">요약</p>
+              <h4 class="text-2xl font-black italic text-white mt-2">${approxMin}분</h4>
+              <p class="text-[10px] font-black tracking-[0.22em] uppercase text-white/35 mt-2">
                 총 ${totalSets}세트 · 평균 휴식 ${avgRest}s
               </p>
             </div>
             <div class="text-right">
-              <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/35">완료 운동</p>
-              <p class="text-3xl font-black text-cyan-300 mt-2">${new Set(dayLogs.map(l=>l.exerciseId)).size}</p>
+              <p class="text-[10px] font-black tracking-[0.22em] uppercase text-white/35">완료 운동</p>
+              <p class="text-3xl font-black text-cyan-300 mt-2">${exCount}</p>
             </div>
           </div>
         </div>
       `;
 
-      const groups = dayLogs.reduce((acc, o) => {
-        if(!acc[o.exerciseId]) acc[o.exerciseId] = [];
+      const groups = dayLogs.reduce((acc, o)=>{
+        if(!acc[o.exerciseId]) acc[o.exerciseId]=[];
         acc[o.exerciseId].push(o);
         return acc;
       }, {});
 
-      Object.entries(groups).forEach(([exerciseId, data]) => {
+      Object.entries(groups).forEach(([exerciseId, data])=>{
         const name = data[0].name;
         const plannedRep = data[0].plannedRep ?? "-";
         const totalSets = data.length;
 
         const prevDate = shiftDate(selectedDate, -7);
-        const prevGroup = logs.filter(l => l.date === prevDate && l.exerciseId === exerciseId);
-        const prevAvgRep = prevGroup.length ? Math.round(prevGroup.reduce((a,c)=> a + (c.repActual ?? c.plannedRep ?? 0), 0) / prevGroup.length) : null;
+        const prevGroup = logs.filter(l=> l.date===prevDate && l.exerciseId===exerciseId);
+        const prevAvgRep = prevGroup.length
+          ? Math.round(prevGroup.reduce((a,c)=> a + (c.repActual ?? c.plannedRep ?? 0), 0) / prevGroup.length)
+          : null;
         const curAvgRep = Math.round(data.reduce((a,c)=> a + (c.repActual ?? c.plannedRep ?? 0), 0) / data.length);
         const repDelta = prevAvgRep !== null ? (curAvgRep - prevAvgRep) : null;
 
         area.innerHTML += `
-          <div class="glass rounded-[28px] p-6 border-l-4 border-cyan-400">
+          <div class="glass cardRound p-6 border-l-4 border-cyan-400">
             <div>
               <h4 class="font-black text-white italic">${name}</h4>
               <div class="flex items-center gap-2 mt-3 flex-wrap">
                 <span class="pill cyan">${totalSets} 세트</span>
                 <span class="pill">목표 REP: ${plannedRep}</span>
-                ${repDelta !== null ? `<span class="pill ${repDelta>0?'cyan':''}">지난주 대비 ${repDelta>0?'+':''}${repDelta} REP</span>` : `<span class="pill">지난주 데이터 없음</span>`}
+                ${repDelta !== null
+                  ? `<span class="pill ${repDelta>0?'cyan':''}">지난주 대비 ${repDelta>0?'+':''}${repDelta} REP</span>`
+                  : `<span class="pill">지난주 데이터 없음</span>`
+                }
               </div>
             </div>
 
-            <div class="mt-6">
-              <table class="log-table">
-                <thead>
-                  <tr>
-                    <th style="width:60px;">세트</th>
-                    <th>REP</th>
-                    <th style="width:90px;">REST</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${data.map(row => {
-                    const repVal = row.repActual ?? row.plannedRep ?? "-";
-                    const repDisplay = `<span class="pill cyan">${repVal}</span>`;
-                    const restDisplay = `<span class="pill">${(row.restUsed ?? row.restPlanned ?? "-")}s</span>`;
-                    return `
-                      <tr class="log-row">
-                        <td><span class="pill">${row.set}</span></td>
-                        <td>${repDisplay}</td>
-                        <td>${restDisplay}</td>
-                      </tr>
-                    `;
-                  }).join('')}
-                </tbody>
-              </table>
+            <div class="mt-5 space-y-2">
+              ${data.map(row=>{
+                const repVal = row.repActual ?? row.plannedRep ?? "-";
+                const restVal = (row.restUsed ?? row.restPlanned ?? "-");
+                return `
+                  <div class="flex items-center justify-between glass rounded-2xl px-4 py-3">
+                    <div class="flex items-center gap-2">
+                      <span class="pill">${row.set} SET</span>
+                      <span class="pill cyan">${repVal} REP</span>
+                    </div>
+                    <span class="pill">REST ${restVal}s</span>
+                  </div>
+                `;
+              }).join('')}
             </div>
           </div>
         `;
       });
     }
 
-    function estimateWorkoutDurationMinutes(date){
-      // 간단 추정: 세트당 평균 45초 + 평균 휴식
-      const day = logs.filter(l => l.date === date);
-      if(!day.length) return 0;
-      const avgRest = day.reduce((a,c)=> a + (c.restUsed ?? c.restPlanned ?? 0), 0) / day.length;
-      const perSet = 45 + avgRest;
-      const totalSec = perSet * day.length;
-      return Math.max(1, Math.round(totalSec / 60));
-    }
-
     function changeMonth(dir){
-      showDockTemporarily();
+      showDock();
       currentMonth += dir;
-      if(currentMonth < 0){ currentMonth = 11; currentYear--; }
-      if(currentMonth > 11){ currentMonth = 0; currentYear++; }
+      if(currentMonth < 0){ currentMonth=11; currentYear--; }
+      if(currentMonth > 11){ currentMonth=0; currentYear++; }
       renderCalendar();
     }
 
     function resetSelectedDate(){
-      showDockTemporarily();
-      if(!confirm('선택한 날짜의 기록을 초기화할까요?')) return;
+      showDock();
+      if(!confirm("선택한 날짜의 기록을 초기화할까요?")) return;
       const date = selectedDate;
-      logs = logs.filter(l => l.date !== date);
-      localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
-      if(progressByDate[date]){ delete progressByDate[date]; localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate)); }
-      toast('선택 날짜 초기화');
+
+      logs = logs.filter(l=> l.date !== date);
+      localStorage.setItem(KEY.LOGS, JSON.stringify(logs));
+
+      if(progressByDate[date]) delete progressByDate[date];
+      localStorage.setItem(KEY.PROGRESS, JSON.stringify(progressByDate));
+
+      toast("선택 날짜 초기화");
       renderCalendar();
       haptic(25);
     }
 
-    /* ---------- STATS ---------- */
-    function renderStats(){
-      const counts = { push:0, pull:0, leg:0, rest:0 };
-      logs.forEach(l => counts[l.type] !== undefined && counts[l.type]++);
-
-      document.getElementById('stat-total-sets').innerText = logs.length;
-      document.getElementById('stat-week-count').innerText = new Set(logs.map(l => l.date)).size;
-
-      const ctx = document.getElementById('radarChart').getContext('2d');
-      if(window.myRadar) window.myRadar.destroy();
-
-      window.myRadar = new Chart(ctx, {
-        type: 'radar',
-        data: {
-          labels: ['PUSH','PULL','LEGS','REST'],
-          datasets: [{
-            data: [counts.push, counts.pull, counts.leg, counts.rest],
-            backgroundColor: 'rgba(34,211,238,0.10)',
-            borderColor: '#22d3ee',
-            borderWidth: 2,
-            pointRadius: 0
-          }]
-        },
-        options: {
-          scales: {
-            r: {
-              grid: { color: 'rgba(255,255,255,0.05)' },
-              angleLines: { color: 'rgba(255,255,255,0.05)' },
-              pointLabels: { color: '#777', font: { weight: '800' } },
-              ticks: { display: false }
-            }
-          },
-          plugins: { legend: { display: false } }
-        }
-      });
-    }
-
-    /* ---------- BACKUP / RESET ALL ---------- */
+    /* =========================
+      Backup / Export / Reset All
+    ========================= */
     function backupJSON(){
-      showDockTemporarily();
-      const payload = { version: 'v12.1', exportedAt: nowISO(), logs, customSets, customReps, progressByDate };
-      const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+      showDock();
+      const payload = {
+        version: 'DK_FIT_NEXT_v1',
+        exportedAt: nowISO(),
+        logs,
+        customSets,
+        customReps,
+        progressByDate
+      };
+      const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = `dk_fit_backup_${todayStr()}.json`;
+      a.download = `dk_fit_next_backup_${todayStr()}.json`;
       a.click();
-      toast('백업 다운로드');
+      toast("백업 다운로드");
+      haptic(18);
+    }
+
+    function exportCSV(){
+      showDock();
+      if(!logs.length){
+        toast("내보낼 기록이 없습니다");
+        return;
+      }
+      const header = ["date","time","type","exercise","set","plannedRep","actualRep","restPlanned","restUsed"];
+      const rows = logs.map(l=> [
+        l.date,
+        l.ts,
+        l.type,
+        `"${(l.name||'').replace(/"/g,'""')}"`,
+        l.set,
+        l.plannedRep ?? "",
+        l.repActual ?? "",
+        l.restPlanned ?? "",
+        l.restUsed ?? ""
+      ].join(","));
+      const csv = [header.join(","), ...rows].join("\n");
+      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `dk_fit_next_logs_${todayStr()}.csv`;
+      a.click();
+      toast("CSV 내보내기 완료");
       haptic(18);
     }
 
     function resetAll(){
-      showDockTemporarily();
-      if(!confirm('⚠️ 모든 데이터(기록/설정/진행)를 초기화할까요?')) return;
-      localStorage.removeItem(KEY_LOGS);
-      localStorage.removeItem(KEY_SETS);
-      localStorage.removeItem(KEY_REPS);
-      localStorage.removeItem(KEY_PROGRESS_BY_DATE);
-      localStorage.removeItem(KEY_SUMMARY_SHOWN);
-      logs = []; customSets = {}; customReps = {}; progressByDate = {};
+      showDock();
+      if(!confirm("⚠️ 모든 데이터(기록/설정/진행)를 초기화할까요?")) return;
+
+      Object.values(KEY).forEach(k=> localStorage.removeItem(k));
+      logs=[]; customSets={}; customReps={}; progressByDate={};
+
       renderCarousel(true);
       updateProgressUI();
       renderCalendar();
-      toast('전체 초기화 완료');
+      renderCharts(true);
+
+      toast("전체 초기화 완료");
       haptic(30);
     }
 
-    /* ---------- ZOOM PREVENT ---------- */
+    /* =========================
+      GIF view (simple)
+    ========================= */
+    function openGif(src, title){
+      // extremely simple: open in new tab (fast)
+      window.open(src, "_blank");
+      toast("GIF 열기");
+      haptic(10);
+    }
+
+    function escapeHtml(str){
+      return (str||'').replace(/[&<>"']/g, (m)=>({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+      }[m]));
+    }
+
+    /* =========================
+      Zoom prevent
+    ========================= */
     (function preventZoom(){
       document.addEventListener('gesturestart', (e)=> e.preventDefault(), {passive:false});
       document.addEventListener('gesturechange', (e)=> e.preventDefault(), {passive:false});
       document.addEventListener('gestureend', (e)=> e.preventDefault(), {passive:false});
-
-      let lastTouchEnd = 0;
+      let lastTouchEnd=0;
       document.addEventListener('touchend', (e)=>{
         const now = Date.now();
         if(now - lastTouchEnd <= 260) e.preventDefault();
         lastTouchEnd = now;
       }, {passive:false});
-
       document.addEventListener('dblclick', (e)=> e.preventDefault(), {passive:false});
     })();
 
-    /* Dock Auto Hide */
-    let dockTimer = null;
-    function showDockTemporarily(){
-      const dock = document.querySelector('.navDockWrap');
-      if(!dock) return;
-
-      dock.classList.remove('dock-hide');
-      dock.classList.add('dock-show');
-
-      if(dockTimer) clearTimeout(dockTimer);
-      dockTimer = setTimeout(()=>{
-        dock.classList.remove('dock-show');
-        dock.classList.add('dock-hide');
-      }, 1700);
-    }
-
-    ['scroll','touchstart','touchmove','click'].forEach(ev=>{
-      window.addEventListener(ev, showDockTemporarily, {passive:true});
-    });
-
-    /* ---------- INIT ---------- */
-    window.onload = async () => {
-      initIntro();
+    /* =========================
+      Init
+    ========================= */
+    window.onload = async ()=>{
+      initSplash();
       await requestWakeLock();
 
-      updateDayNav();
+      // notif button
+      $('#notifToggle').textContent = restNotifEnabled ? 'ON' : 'OFF';
+      $('#notifToggle').classList.toggle('cyan', restNotifEnabled);
+
+      renderDayChips();
       changeDay(new Date().getDay());
       renderCalendar();
 
-      const btn = document.getElementById('notif-toggle');
-      if(btn){
-        btn.textContent = restNotifEnabled ? 'ON' : 'OFF';
-        btn.classList.toggle('cyan', restNotifEnabled);
-      }
-
-      setInterval(()=> {
-        const totalSec = getWorkoutElapsedSec();
-        const m = Math.floor(totalSec/60).toString().padStart(2,'0');
-        const s = (totalSec%60).toString().padStart(2,'0');
-        document.getElementById('stopwatch').innerText = `${m}:${s}`;
+      // stopwatch tick
+      setInterval(()=>{
+        const total = getWorkoutElapsedSec();
+        const m = String(Math.floor(total/60)).padStart(2,'0');
+        const s = String(total%60).padStart(2,'0');
+        $('#stopwatch').textContent = `${m}:${s}`;
       }, 500);
 
-      setTimeout(()=> {
-        const dock = document.querySelector('.navDockWrap');
-        dock && dock.classList.add('dock-hide');
-      }, 1200);
+      // auto hide dock after load
+      setTimeout(()=> $('#dockWrap').classList.add('hide'), 1200);
     };
 
-    document.addEventListener('keydown', (e) => {
-      if(e.key === 'Escape') closeTimer(false);
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === "Escape"){
+        closeTimer(false);
+        closeRep(false);
+        closeSummary();
+      }
     });
   </script>
 </body>
