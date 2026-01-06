@@ -2,10 +2,11 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-  <title>DK MASTER OS v11.9 (AI REP + Weekly Compare + LiquidGlass Intro)</title>
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>DK MASTER OS v12.0 (History Pro + Weekly Compare + Rep Input + LiquidGlass Intro)</title>
 
-  <!-- PWA / iOS Standalone -->
+  <!-- ✅ PWA / iOS Standalone -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="DK Fit">
@@ -31,11 +32,13 @@
     }
 
     html,body{ height:100%; }
+
     html{
       touch-action: manipulation;
       -webkit-text-size-adjust: 100%;
       overscroll-behavior: none;
     }
+
     body{
       font-family:'Pretendard',sans-serif;
       background-color:var(--bg);
@@ -46,7 +49,6 @@
       -webkit-overflow-scrolling:touch;
       padding-bottom: env(safe-area-inset-bottom);
       overscroll-behavior: none;
-
       background-image:
         radial-gradient(1200px 700px at 15% -10%, rgba(34,211,238,0.18), transparent 55%),
         radial-gradient(1200px 700px at 100% 10%, rgba(99,102,241,0.22), transparent 55%),
@@ -54,6 +56,7 @@
         linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.00));
       background-attachment: fixed;
     }
+
     ::-webkit-scrollbar{ display:none; }
     .scroll-hide{ -ms-overflow-style:none; scrollbar-width:none; }
 
@@ -71,138 +74,108 @@
     }
 
     /* =========================================================
-       ✅ NEW INTRO — Apple LiquidGlass 느낌
+       ✅ NEW Intro — Liquid Glass (Apple style)
     ========================================================= */
     #splash-screen{
       position:fixed; inset:0; z-index:10000;
       display:flex; align-items:center; justify-content:center;
       background:#050507;
       overflow:hidden;
-      transition: opacity 0.9s cubic-bezier(0.22,1,0.36,1), transform 0.9s cubic-bezier(0.22,1,0.36,1);
+      transition: opacity 1s cubic-bezier(0.65,0,0.35,1), transform 1s cubic-bezier(0.65,0,0.35,1);
     }
+
+    /* Liquid blob background */
     #splash-screen::before{
       content:"";
-      position:absolute; inset:-60%;
+      position:absolute;
+      width: 110vmax;
+      height: 110vmax;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
       background:
-        radial-gradient(900px 700px at 25% 20%, rgba(34,211,238,0.30), transparent 60%),
-        radial-gradient(900px 700px at 80% 0%, rgba(99,102,241,0.34), transparent 60%),
-        radial-gradient(900px 700px at 60% 90%, rgba(14,165,233,0.22), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.98));
-      animation: introFlow 5.2s ease-in-out infinite alternate;
-      transform: translateZ(0);
-      opacity:1;
-      filter: blur(0px);
+        radial-gradient(circle at 30% 30%, rgba(34,211,238,0.55), transparent 40%),
+        radial-gradient(circle at 70% 60%, rgba(99,102,241,0.55), transparent 45%),
+        radial-gradient(circle at 55% 20%, rgba(255,255,255,0.12), transparent 30%),
+        radial-gradient(circle at 40% 80%, rgba(12,74,110,0.55), transparent 50%);
+      filter: blur(12px);
+      opacity: .9;
+      animation: blobMove 7s ease-in-out infinite alternate;
     }
+
+    @keyframes blobMove{
+      0%{ transform: translate(-52%, -48%) scale(1); }
+      100%{ transform: translate(-48%, -52%) scale(1.12); }
+    }
+
+    /* subtle noise */
     #splash-screen::after{
       content:"";
       position:absolute; inset:0;
-      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E");
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.25'/%3E%3C/svg%3E");
+      opacity:.12;
       mix-blend-mode: overlay;
-      opacity:.11;
       pointer-events:none;
     }
-    @keyframes introFlow{
-      0%{ transform: scale(1) translateY(0px); filter: blur(0px); }
-      100%{ transform: scale(1.08) translateY(-26px); filter: blur(0px); }
-    }
 
-    .introCard{
-      width:min(520px, calc(100vw - 44px));
-      border-radius: 40px;
-      padding: 42px 28px 38px;
-      background: rgba(255,255,255,0.045);
-      border:1px solid rgba(255,255,255,0.12);
+    #splash-screen .splash-card{
+      position:relative;
+      z-index:2;
+      width:min(520px, calc(100vw - 48px));
+      border-radius: 34px;
+      padding: 42px 26px 34px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.14);
+      box-shadow: 0 40px 120px rgba(0,0,0,0.60);
       backdrop-filter: blur(28px);
       -webkit-backdrop-filter: blur(28px);
-      box-shadow: 0 45px 140px rgba(0,0,0,0.65);
       text-align:center;
-      position:relative;
-      overflow:hidden;
-      transform: translateY(14px) scale(0.98);
+      transform: translateY(14px) scale(.98);
       opacity:0;
-      animation: introIn 1.25s cubic-bezier(.2,.9,.2,1) forwards;
+      animation: splashIn 1.1s cubic-bezier(.2,.9,.2,1) forwards;
     }
-    @keyframes introIn{
+    @keyframes splashIn{
       to{ transform: translateY(0) scale(1); opacity:1; }
     }
 
-    .introCard::before{
-      content:"";
-      position:absolute;
-      inset:-2px;
-      border-radius: 42px;
-      padding:1px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(34,211,238,0.16), rgba(99,102,241,0.12));
-      -webkit-mask:
-        linear-gradient(#000 0 0) content-box,
-        linear-gradient(#000 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      opacity:0.9;
-      pointer-events:none;
-    }
-
-    .introLogo{
-      font-size: 4.1rem;
+    .splash-logo{
+      font-size: 4.2rem;
       font-weight: 950;
-      letter-spacing: -0.10em;
-      line-height: 1.02;
-      background: linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,0.7));
-      -webkit-background-clip:text;
+      letter-spacing: -0.09em;
+      line-height: 1.0;
+      background: linear-gradient(120deg, rgba(255,255,255,1), rgba(34,211,238,0.95), rgba(99,102,241,0.9));
+      -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 22px rgba(255,255,255,0.12));
-      position:relative;
-      display:inline-block;
-      padding: 6px 10px;
+      filter: drop-shadow(0 0 26px rgba(34,211,238,0.20));
       user-select:none;
     }
 
-    .introBlob{
-      position:absolute;
-      width: 220px;
-      height: 220px;
+    .splash-pulse{
+      margin-top: 18px;
+      height: 4px;
       border-radius: 999px;
-      background: radial-gradient(circle at 30% 30%, rgba(34,211,238,0.55), rgba(99,102,241,0.15), transparent 70%);
-      filter: blur(26px);
-      opacity:0.65;
-      top:-90px;
-      right:-60px;
-      animation: blobMove 4.6s ease-in-out infinite alternate;
-    }
-    @keyframes blobMove{
-      from{ transform: translate(0,0) scale(1); }
-      to{ transform: translate(-18px, 22px) scale(1.08); }
-    }
-
-    .introBar{
-      margin-top: 26px;
-      height: 3px;
-      width: 100%;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.10);
       overflow:hidden;
+      background: rgba(255,255,255,0.08);
       position:relative;
     }
-    .introBar span{
+    .splash-pulse span{
       position:absolute; inset:0;
-      width:42%;
-      background: linear-gradient(90deg, rgba(34,211,238,0), rgba(34,211,238,1), rgba(99,102,241,1), rgba(34,211,238,0));
-      filter: drop-shadow(0 0 18px rgba(34,211,238,0.35));
-      animation: introScan 1.35s ease-in-out infinite;
+      width:45%;
+      background: linear-gradient(90deg, rgba(34,211,238,0.0), rgba(34,211,238,1), rgba(99,102,241,1), rgba(34,211,238,0.0));
+      animation: pulseScan 1.35s ease-in-out infinite;
+      filter: drop-shadow(0 0 14px rgba(34,211,238,0.35));
     }
-    @keyframes introScan{
+    @keyframes pulseScan{
       0%{ transform: translateX(-70%); }
       100%{ transform: translateX(170%); }
     }
-
-    .introHint{
-      margin-top: 14px;
+    .splash-mini{
+      margin-top: 16px;
       font-size: 10px;
       font-weight: 900;
       letter-spacing: .22em;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.42);
-      user-select:none;
+      color: rgba(255,255,255,0.45);
     }
 
     /* Header */
@@ -254,6 +227,7 @@
     .carousel > .slide{
       scroll-snap-align:center;
       flex: 0 0 calc(100% - 120px);
+      min-height: auto;
       transition: opacity .22s ease, transform .22s ease, filter .22s ease;
     }
     .slide.peek{ opacity:.60; transform:scale(.965); filter:blur(.6px); }
@@ -274,11 +248,7 @@
       overflow:hidden;
     }
 
-    .rightPanel{
-      border-radius:26px; padding:18px;
-      background:rgba(255,255,255,0.03);
-      border:1px solid rgba(255,255,255,0.08);
-    }
+    .rightPanel{ border-radius:26px; padding:18px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); }
 
     .stepper{
       display:flex; gap:10px; align-items:center; justify-content:space-between;
@@ -288,6 +258,7 @@
     }
     .stepperLabel{ font-size:10px; font-weight:900; letter-spacing:.18em; text-transform:uppercase; color:rgba(255,255,255,0.50); }
     .stepperValue{ font-size:22px; font-weight:950; color:white; }
+
     .stepperBtn{
       width:48px; height:48px; border-radius:18px;
       display:flex; align-items:center; justify-content:center;
@@ -297,9 +268,9 @@
       color:rgba(255,255,255,0.9);
       -webkit-tap-highlight-color:transparent;
       user-select:none;
-      transition: transform .05s ease;
+      transition: transform .08s ease;
     }
-    .stepperBtn:active{ transform:scale(.97); }
+    .stepperBtn:active{ transform:scale(.98); }
 
     .bigBtn{
       width:100%; height:60px; border-radius:20px;
@@ -317,14 +288,14 @@
       width:100%; height:66px; border-radius:20px;
       font-weight:950; font-size:18px;
       display:flex; align-items:center; justify-content:center; gap:10px;
-      transition: transform .10s ease;
+      transition: transform .10s ease, background .2s ease, opacity .2s ease;
       -webkit-tap-highlight-color:transparent;
       background:rgba(255,255,255,0.05);
       border:1px solid rgba(255,255,255,0.10);
       user-select:none;
       overflow:hidden;
     }
-    .setBtn:active{ transform:scale(.985); }
+    .setBtn:active{ transform:scale(0.985); }
     .setBtn.done{ background:linear-gradient(135deg,var(--primary),var(--accent)); color:#000; box-shadow:0 18px 34px rgba(34,211,238,0.24); border:none; }
     .setBtn.locked{
       opacity: .35;
@@ -475,13 +446,9 @@
     .calendar-day.selected{ background:rgba(34,211,238,0.14); border:1px solid rgba(34,211,238,0.35); box-shadow:0 0 0 2px rgba(34,211,238,0.18), 0 0 30px rgba(34,211,238,0.12); color:#eaffff; font-weight:900; transform:translateY(-2px); }
     .calendar-day.today{ border:1px solid rgba(255,255,255,0.12); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08); color:rgba(255,255,255,0.95); font-weight:900; }
 
-    /* History table */
-    .log-table{ width:100%; border-collapse:separate; border-spacing:0 10px; }
-    .log-table th{ font-size:10px; text-transform:uppercase; letter-spacing:.18em; color:rgba(255,255,255,0.35); font-weight:900; text-align:left; padding:0 10px 6px; }
-    .log-row{ background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:16px; overflow:hidden; }
-    .log-row td{ padding:12px 10px; font-weight:800; font-size:12px; color:rgba(255,255,255,0.78); }
-
-    /* Bottom Sheet (운동 상세) */
+    /* =========================================================
+       ✅ Bottom Sheet (운동 상세) - GIF size adjusted
+    ========================================================= */
     #detail-sheet{
       position: fixed;
       inset: 0;
@@ -556,12 +523,14 @@
       -webkit-tap-highlight-color:transparent;
     }
     .sheetClose:active{ transform: scale(.98); }
+
     .sheetBody{
       padding: 16px 18px 18px;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       max-height: calc(88vh - 90px);
     }
+
     .sheetTabs{
       display:flex;
       gap:10px;
@@ -585,6 +554,7 @@
       border: none;
       box-shadow: 0 14px 32px rgba(34,211,238,0.18);
     }
+
     .sheetBox{
       border-radius: 22px;
       background: rgba(255,255,255,0.04);
@@ -615,10 +585,10 @@
       line-height: 1.4;
     }
 
-    /* ✅ 상세 GIF 크기 최적화 (요청) */
+    /* ✅ FIX: 상세 GIF 너무 큰 문제 해결 */
     .sheetGif{
       width: 100%;
-      max-height: 240px;
+      max-height: 220px; /* ✅ 적정 크기 */
       border-radius: 18px;
       margin-top: 12px;
       border: 1px solid rgba(255,255,255,0.10);
@@ -628,7 +598,7 @@
       background: rgba(255,255,255,0.03);
     }
 
-    /* 카드 GIF */
+    /* Card GIF square */
     .cardGifSquareWrap{
       width: 100%;
       aspect-ratio: 1 / 1;
@@ -648,11 +618,54 @@
       object-fit: contain;
       display: block;
       background: rgba(0,0,0,0.15);
-      will-change: transform;
     }
 
-    /* Mobile optimization */
+    /* ✅ REP Input Modal */
+    #rep-modal{
+      position:fixed;
+      inset:0;
+      z-index: 9998;
+      display:none;
+      align-items:center;
+      justify-content:center;
+    }
+    #rep-modal.show{ display:flex; }
+    .repCard{
+      width:min(520px, calc(100vw - 44px));
+      border-radius: 28px;
+      padding: 20px;
+      background: rgba(12,12,14,0.92);
+      border: 1px solid rgba(255,255,255,0.10);
+      box-shadow: 0 40px 120px rgba(0,0,0,0.70);
+      backdrop-filter: blur(24px);
+    }
+    .repBtn{
+      height:54px;
+      border-radius: 18px;
+      font-weight: 950;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.10);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      transition: transform .08s ease;
+      user-select:none;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .repBtn:active{ transform:scale(.985); }
+    .repBtn.primary{
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color:#000;
+      border:none;
+      box-shadow: 0 18px 34px rgba(34,211,238,0.18);
+    }
+
+    /* Mobile tweaks */
     @media (max-width: 520px){
+      .layoutWrap{ padding-left: 0; padding-right: 0; }
+      main .layoutWrap.px-4{ padding-left: 14px !important; padding-right: 14px !important; }
+
       header{
         padding: 14px 14px 10px !important;
         height: 88px;
@@ -660,14 +673,62 @@
       }
       :root{ --headerH: 88px; --dockH: 92px; }
 
+      #view-day{
+        font-size: 1.38rem !important;
+        letter-spacing: -0.02em !important;
+      }
+      #view-title{
+        font-size: 0.95rem !important;
+        margin-top: 2px !important;
+        opacity: 0.9;
+      }
+      #view-subcue{
+        margin-top: 6px !important;
+        font-size: 9px !important;
+      }
+
+      #progress-percent{
+        font-size: 16px !important;
+        font-weight: 950 !important;
+        margin-bottom: 6px !important;
+        letter-spacing: -0.02em;
+      }
+      header .w-28{
+        width: 140px !important;
+        height: 8px !important;
+      }
+
       .slideCard{ border-radius: 24px; }
       .slideCard .p-6{ padding: 14px !important; }
       .slideCard h3{ font-size: 1.55rem !important; }
-      .rightPanel{ padding: 14px !important; border-radius: 22px !important; }
-      .stepperBtn{ width: 44px !important; height: 44px !important; border-radius: 16px !important; }
+
+      .slideCard .md\:grid-cols-2{ grid-template-columns: 1fr !important; }
+
+      .rightPanel{
+        padding: 14px !important;
+        border-radius: 22px !important;
+      }
+
+      .stepperBtn{
+        width: 44px !important;
+        height: 44px !important;
+        border-radius: 16px !important;
+      }
       .stepperValue{ font-size: 20px !important; }
-      .setBtn{ height: 54px !important; font-size: 15px !important; border-radius: 18px !important; }
-      .carousel > .slide{ flex: 0 0 calc(100% - 70px) !important; }
+
+      .rightPanel .grid.grid-cols-2{
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      }
+      .setBtn{
+        height: 54px !important;
+        font-size: 15px !important;
+        border-radius: 18px !important;
+      }
+
+      .carousel > .slide{
+        flex: 0 0 calc(100% - 70px) !important;
+      }
+
       .navDockWrap{ padding: 14px !important; }
       .nav-dock{ border-radius: 30px !important; padding: 9px !important; }
       .nav-item{ padding: 10px 0 !important; }
@@ -678,17 +739,16 @@
 
 <body>
 
-  <!-- ✅ LiquidGlass Intro -->
+  <!-- ✅ Splash (Liquid Glass) -->
   <div id="splash-screen">
-    <div class="introCard">
-      <div class="introBlob"></div>
-      <div class="introLogo">DK Fit</div>
-      <div class="introBar"><span></span></div>
-      <div class="introHint">ELITE TRAINING SYSTEM</div>
+    <div class="splash-card">
+      <div class="splash-logo">DK Fit</div>
+      <div class="splash-pulse"><span></span></div>
+      <div class="splash-mini">READY</div>
     </div>
   </div>
 
-  <!-- ✅ Bottom Sheet -->
+  <!-- ✅ Bottom Sheet (운동 상세) -->
   <div id="detail-sheet">
     <div class="sheet-backdrop" onclick="closeDetailSheet()"></div>
     <div class="sheet" role="dialog" aria-modal="true">
@@ -709,16 +769,66 @@
     </div>
   </div>
 
+  <!-- ✅ REP Input Modal -->
+  <div id="rep-modal">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-xl" onclick="closeRepModal(false)"></div>
+    <div class="repCard relative">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <p class="text-[10px] font-black tracking-[0.2em] uppercase text-white/45">REP 입력</p>
+          <h3 id="rep-title" class="text-2xl font-black italic text-white mt-1">운동</h3>
+          <p id="rep-sub" class="text-[11px] font-black text-white/45 mt-2 tracking-[0.18em] uppercase">SET</p>
+        </div>
+        <button class="pill" onclick="closeRepModal(false)">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="mt-5 glass rounded-2xl p-4">
+        <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45">기본 REP</p>
+        <div class="flex items-end justify-between mt-3">
+          <div class="text-5xl font-black italic text-white" id="rep-base">0</div>
+          <div class="text-right">
+            <div class="text-[10px] font-black text-white/45 tracking-[0.18em] uppercase">추천 입력</div>
+            <div class="text-[12px] font-black text-white/70 mt-1">버튼을 눌러 바로 기록</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 grid grid-cols-2 gap-3">
+        <button class="repBtn" onclick="repQuick(-5)"><i class="fa-solid fa-minus"></i> -5</button>
+        <button class="repBtn" onclick="repQuick(+5)"><i class="fa-solid fa-plus"></i> +5</button>
+        <button class="repBtn" onclick="repQuick(-3)"><i class="fa-solid fa-minus"></i> -3</button>
+        <button class="repBtn" onclick="repQuick(+3)"><i class="fa-solid fa-plus"></i> +3</button>
+        <button class="repBtn" onclick="repQuick(-2)"><i class="fa-solid fa-minus"></i> -2</button>
+        <button class="repBtn" onclick="repQuick(+2)"><i class="fa-solid fa-plus"></i> +2</button>
+        <button class="repBtn" onclick="repQuick(-1)"><i class="fa-solid fa-minus"></i> -1</button>
+        <button class="repBtn" onclick="repQuick(+1)"><i class="fa-solid fa-plus"></i> +1</button>
+      </div>
+
+      <div class="mt-4 grid grid-cols-2 gap-3">
+        <button class="repBtn primary" onclick="repSkip()">
+          <i class="fa-solid fa-forward"></i> 스킵(기본 REP)
+        </button>
+        <button class="repBtn" onclick="closeRepModal(false)">
+          <i class="fa-solid fa-ban"></i> 취소
+        </button>
+      </div>
+
+      <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/35 mt-5">
+        * 기록 후 지난주 동일 요일/동일 운동과 비교 결과가 토스트로 표시됩니다.
+      </p>
+    </div>
+  </div>
+
   <!-- Header -->
   <header>
     <div class="layoutWrap flex justify-between items-end">
       <div>
-        <div class="flex items-center gap-2">
+        <div class="flex items-end gap-3">
           <h2 id="stopwatch" class="text-3xl font-black font-mono tracking-tighter text-white">00:00</h2>
-
-          <!-- ✅ Stopwatch Pause Button -->
-          <button id="sw-toggle" onclick="toggleStopwatch()" class="pill cyan" style="padding:6px 10px; font-size:10px;">
-            <i class="fa-solid fa-pause"></i> PAUSE
+          <button id="sw-toggle" class="pill cyan" onclick="toggleStopwatch()">
+            <i class="fa-solid fa-pause"></i> 일시정지
           </button>
         </div>
         <div class="flex items-center gap-2 mt-1">
@@ -731,8 +841,7 @@
         <div class="w-28 h-1.5 bg-white/5 rounded-full overflow-hidden">
           <div id="progress-bar" class="h-full bg-cyan-400 shadow-[0_0_12px_#22d3ee] transition-all duration-700" style="width:0%"></div>
         </div>
-        <!-- ✅ Progress text -->
-        <div id="progress-text" class="text-[9px] font-black text-white/45 mt-2 tracking-[0.18em] uppercase">
+        <div id="progress-text" class="text-[10px] font-black text-white/55 mt-2 tracking-[0.18em] uppercase">
           0% 완료!
         </div>
       </div>
@@ -949,54 +1058,41 @@
   <!-- Toast -->
   <div id="toast" class="pill cyan"></div>
 
-  <!-- ✅ REP INPUT MODAL -->
-  <div id="rep-modal" class="fixed inset-0 z-[300] hidden items-center justify-center">
-    <div class="absolute inset-0 bg-black/80 backdrop-blur-xl" onclick="closeRepModal(true)"></div>
-
-    <div class="relative glass rounded-[28px] w-[min(520px,calc(100vw-44px))] p-7">
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <p class="text-[10px] font-black tracking-[0.2em] uppercase text-white/45">REP 입력</p>
-          <h3 id="rep-modal-title" class="text-2xl font-black italic text-white mt-1">운동</h3>
-          <p id="rep-modal-sub" class="text-[11px] font-black text-white/45 mt-2">세트</p>
-        </div>
-        <button class="pill" onclick="closeRepModal(true)">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-
-      <div class="mt-6">
-        <div class="glass rounded-2xl p-5 text-center">
-          <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/35">진행 REP</p>
-          <div id="rep-current" class="text-6xl font-black text-white mt-3 tracking-tighter">0</div>
-          <p id="rep-hint" class="text-[11px] font-black text-white/40 mt-3">추천 버튼을 누르면 바로 저장됩니다.</p>
-        </div>
-      </div>
-
-      <div class="mt-5 grid grid-cols-5 gap-2" id="rep-btns"></div>
-
-      <div class="mt-6 flex gap-3">
-        <button class="bigBtn" onclick="closeRepModal(false)" style="background:linear-gradient(135deg,var(--primary),var(--accent)); color:#000; border:none;">
-          <i class="fa-solid fa-check"></i> 저장
-        </button>
-        <button class="bigBtn" onclick="closeRepModal(true)">
-          <i class="fa-solid fa-forward"></i> 스킵(기본 REP)
-        </button>
-      </div>
-    </div>
-  </div>
-
   <script>
     /* =========================================================
-      DK MASTER OS v11.9
-      ✅ Weekly Compare Toast (세트 완료 시)
-      ✅ AI REP 추천 (지난주 동일세트 기반 우선)
-      ✅ Set 버튼 즉시 UI 반영
-      ✅ LiquidGlass Intro
-      ✅ GIF 깜빡임 최소화 (부분 업데이트)
+      DK MASTER OS v12.0
+      ✅ History Pro + Weekly Compare + Rep Input + Liquid Intro
+      ✅ Set complete UI instantly updates
+      ✅ Rep input modal w/ quick +/- buttons + skip
+      ✅ Better alert sound (no blink)
+      ✅ Progress text: "xx% 완료!"
+      ✅ StopWatch pause/resume
+      ✅ Keep screen awake (Wake Lock API best-effort)
     ========================================================= */
 
-    /* ---------- GIF 매칭 ---------- */
+    /* ---------- Wake Lock (Keep Screen On) ---------- */
+    let wakeLock = null;
+    async function requestWakeLock(){
+      try{
+        if('wakeLock' in navigator){
+          wakeLock = await navigator.wakeLock.request('screen');
+          wakeLock.addEventListener('release', ()=> {});
+          toast('화면 꺼짐 방지 ON');
+        }
+      }catch(e){}
+    }
+    async function releaseWakeLock(){
+      try{ if(wakeLock){ await wakeLock.release(); wakeLock=null; } }catch(e){}
+    }
+    document.addEventListener('visibilitychange', ()=>{
+      if(document.visibilityState === 'visible'){
+        requestWakeLock();
+      }else{
+        releaseWakeLock();
+      }
+    });
+
+    /* ---------- GIF 매칭 헬퍼 ---------- */
     function getGifByExerciseName(name){
       const n = (name || '').toLowerCase();
       if(n.includes('스쿼트') || n.includes('squat')) return 'AIR_SQT.gif';
@@ -1007,8 +1103,8 @@
       if(n.includes('런지') || n.includes('lunge')) return 'LUNGE.gif';
       if(n.includes('파이크 푸쉬업') || n.includes('pike')) return 'PIKE_PUSH_UP.gif';
       if(n.includes('플랭크') || n.includes('plank')) return 'PLANK.gif';
-      if(n.includes('풀업') || n.includes('pull up') || n.includes('pullup')) return 'PULL_UP.gif';
-      if(n.includes('푸쉬업') || n.includes('push up') || n.includes('pushup')) return 'PUSH_UP.gif';
+      if(n.includes('풀업') || n.includes('pull up') || n.includes('pullup') || n.includes('와이드 풀업') || n.includes('내로우 풀업')) return 'PULL_UP.gif';
+      if(n.includes('푸쉬업') || n.includes('push up') || n.includes('pushup') || n.includes('디클라인')) return 'PUSH_UP.gif';
       return '';
     }
 
@@ -1048,13 +1144,14 @@
     };
 
     /* ---------- STORAGE KEYS ---------- */
-    const KEY_LOGS = 'dk_os_v119_logs';
-    const KEY_SETS = 'dk_os_v119_sets';
-    const KEY_REPS = 'dk_os_v119_reps';
-    const KEY_PROGRESS_BY_DATE = 'dk_os_v119_progress_by_date';
-    const KEY_SPLASH = 'dk_os_v119_splash_shown';
-    const KEY_SUMMARY_SHOWN = 'dk_os_v119_summary_shown';
-    const KEY_NOTIF = 'dk_os_v119_rest_notif';
+    const KEY_LOGS = 'dk_os_v12_logs';
+    const KEY_SETS = 'dk_os_v12_sets';
+    const KEY_REPS = 'dk_os_v12_reps';
+    const KEY_PROGRESS_BY_DATE = 'dk_os_v12_progress_by_date';
+    const KEY_SPLASH = 'dk_os_v12_splash_shown';
+    const KEY_SUMMARY_SHOWN = 'dk_os_v12_summary_shown';
+    const KEY_NOTIF = 'dk_os_v12_rest_notif';
+    const KEY_SW = 'dk_os_v12_stopwatch_sessions'; // per date session minutes
 
     /* ---------- LOAD ---------- */
     function safeParse(raw, fallback){ try { return raw ? JSON.parse(raw) : fallback; } catch(e){ return fallback; } }
@@ -1062,6 +1159,7 @@
     let customSets = safeParse(localStorage.getItem(KEY_SETS), {});
     let customReps = safeParse(localStorage.getItem(KEY_REPS), {});
     let progressByDate = safeParse(localStorage.getItem(KEY_PROGRESS_BY_DATE), {});
+    let stopwatchSessions = safeParse(localStorage.getItem(KEY_SW), {}); // {date: seconds}
 
     /* ---------- STATE ---------- */
     let timerInt = null;
@@ -1073,16 +1171,19 @@
     let restTotal = 0;
     let currentSlideIndex = 0;
     let restNotifEnabled = (localStorage.getItem(KEY_NOTIF) ?? '1') === '1';
+
     let restStartedAt = null;
     let restCurrentLogKey = null;
 
-    /* Stopwatch */
-    let swInterval = null;
-    let swStart = Date.now();
+    /* stopwatch */
     let swRunning = true;
-    let swElapsed = 0;
+    let swStartTs = Date.now();
+    let swAccum = stopwatchSessions[todayStr()] || 0; // seconds
 
-    /* Audio */
+    /* REP modal state */
+    let repModalState = null; // { logKey, baseRep, dayIdx, exIdx, setNo }
+
+    /* Audio context */
     let audioCtx = null;
     function unlockAudio(){
       try{
@@ -1099,16 +1200,14 @@
     function todayStr(){ return new Date().toISOString().split('T')[0]; }
     function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
     function exId(dayIdx, exIdx){ return `${dayIdx}-${exIdx}`; }
-    function addDays(dateStr, delta){
-      const d = new Date(dateStr);
-      d.setDate(d.getDate() + delta);
-      return d.toISOString().split('T')[0];
-    }
-    function lastWeekSameDay(dateStr){
-      return addDays(dateStr, -7);
+    function secondsToMMSS(sec){
+      sec = Math.max(0, Math.floor(sec));
+      const m = String(Math.floor(sec/60)).padStart(2,'0');
+      const s = String(sec%60).padStart(2,'0');
+      return `${m}:${s}`;
     }
 
-    /* ---------- INTRO ---------- */
+    /* ---------- SPLASH ---------- */
     function initIntro(){
       const shown = sessionStorage.getItem(KEY_SPLASH) === '1';
       const splash = document.getElementById('splash-screen');
@@ -1116,10 +1215,10 @@
 
       setTimeout(() => {
         splash.style.opacity = '0';
-        splash.style.transform = 'scale(1.05)';
-        setTimeout(()=> splash.style.display='none', 900);
+        splash.style.transform = 'scale(1.08)';
+        setTimeout(()=> splash.style.display='none', 1000);
         sessionStorage.setItem(KEY_SPLASH, '1');
-      }, 2300);
+      }, 1600);
     }
 
     /* ---------- TOAST ---------- */
@@ -1174,7 +1273,7 @@
       });
     }
 
-    /* ---------- PROGRESS ---------- */
+    /* ---------- DATE-BASED PROGRESS ---------- */
     function getProgressArr(date, exerciseId, setTotal){
       if(!progressByDate[date]) progressByDate[date] = {};
       let arr = progressByDate[date][exerciseId];
@@ -1307,13 +1406,15 @@
 
       setSheetTab(tabs[0], tabWrap.querySelector('.sheetTab'));
 
-      document.getElementById('detail-sheet').classList.add('show');
+      const sheetWrap = document.getElementById('detail-sheet');
+      sheetWrap.classList.add('show');
       haptic(14);
       showDockTemporarily();
     }
 
     function closeDetailSheet(){
-      document.getElementById('detail-sheet').classList.remove('show');
+      const sheetWrap = document.getElementById('detail-sheet');
+      sheetWrap.classList.remove('show');
       haptic(10);
     }
 
@@ -1328,7 +1429,7 @@
           <div class="sheetLabel">동작 가이드</div>
           <img src="${w.gif}" class="sheetGif" loading="lazy" alt="exercise guide"
                onerror="this.style.display='none';" />
-          <div class="sheetHint">* GIF는 동작 흐름 참고용입니다. 폼 우선 ✅</div>
+          <div class="sheetHint">* GIF는 동작 흐름만 참고하세요. 폼이 우선입니다.</div>
         </div>
       ` : '';
 
@@ -1338,7 +1439,7 @@
         <div class="sheetBox">
           <div class="sheetLabel">${tab.label}</div>
           <div class="sheetText">${tab.text}</div>
-          <div class="sheetHint">* 처음엔 <b>천천히</b>, 정확하게.</div>
+          <div class="sheetHint">* 처음엔 <b>천천히</b>, 정확하게. 다음 단계는 “범위”와 “호흡” 유지.</div>
         </div>
       `;
     }
@@ -1347,162 +1448,131 @@
       const base = (w.cue || w.tip || '').trim();
       return `
         ${base ? `• ${base}<br><br>` : ''}
-        <b>폼이 무너지지 않는 범위</b>가 핵심입니다.<br>
-        • 어깨 올라가면 → 어깨 내리기<br>
-        • 허리 꺾이면 → 코어 고정<br>
-        • 반동 생기면 → 속도 20% ↓
+        <b>초보자 기준 핵심은 “폼이 무너지지 않는 범위”</b>입니다.<br>
+        1) 타겟을 느끼고<br>
+        2) 흔들리면 속도 ↓<br>
+        3) 반동 없이 정확히<br><br>
+        ✅ <b>체크 포인트</b><br>
+        • 어깨가 올라가면 → 어깨 내리고 가슴 열기<br>
+        • 허리가 꺾이면 → 코어 고정<br>
+        • 반동 생기면 → 속도 20% 줄이기
       `.trim();
     }
     function expandBreath(w){
       return `
-        <b>힘 쓰는 순간에 내쉬기</b><br><br>
-        • 기본: <b>${w.breath}</b><br>
-        • 내려갈 때 흡기 / 올라올 때 호기
+        <b>호흡은 “힘을 쓰는 순간에 내쉬기”</b>가 원칙입니다.<br><br>
+        • 기본: <b>${w.breath}</b><br><br>
+        ✅ <b>요령</b><br>
+        1) 내려갈 때 → 코로 흡기<br>
+        2) 올라올 때 → 입으로 호기<br><br>
+        ✅ 호흡이 무너지면 자세도 무너집니다.
       `.trim();
     }
     function expandMind(w){
       return `
         <b>${w.mind}</b><br><br>
-        • 타겟 부위 “수축/이완” 느끼기<br>
-        • 흔들리면 속도 ↓
+        ✅ <b>흔한 실수</b><br>
+        • 팔로만 함 → 타겟 못 잡음<br>
+        • 너무 빠름 → 반동<br><br>
+        ✅ <b>바로 적용</b><br>
+        1) 타겟 수축/늘어남 느낌<br>
+        2) 중간에 0.5초 정지<br>
+        3) 타겟이 바뀌면 속도 ↓
       `.trim();
     }
     function expandElite(w){
       return `
         <b>${w.tip}</b><br>
         <span style="opacity:.75;">${w.guide || ''}</span><br><br>
-        • 마지막 2회는 느리게(컨트롤)<br>
-        • 쉬우면 “정지 1초” 추가
+        ✅ <b>체크리스트</b><br>
+        1) 흔들림 없음<br>
+        2) 전 구간 긴장 유지<br>
+        3) 마지막 2회는 컨트롤<br><br>
+        ✅ 강화 루틴<br>
+        • 마지막 3회 템포 느리게(2초 내려감)
       `.trim();
     }
 
     /* =========================================================
-      ✅ REP MODAL + Weekly Compare
+      ✅ REP Modal Logic
     ========================================================= */
-    let repModalState = {
-      logKey: null,
-      repValue: 0,
-      plannedRep: 0,
-      exerciseName: '',
-      setNo: 0,
-      date: '',
-      dayIdx: 0
-    };
+    function openRepModal({logKey, name, setNo, baseRep}){
+      repModalState = {logKey, baseRep};
 
-    function openRepModal({ logKey, exerciseName, plannedRep, setNo, date, dayIdx }){
-      repModalState = { logKey, plannedRep, exerciseName, setNo, repValue: plannedRep, date, dayIdx };
-
-      document.getElementById('rep-modal-title').textContent = exerciseName;
-      document.getElementById('rep-modal-sub').textContent = `${setNo} 세트 · 기본 ${plannedRep} REP`;
-      document.getElementById('rep-current').textContent = plannedRep;
-
-      // ✅ 지난주 동일 요일 데이터가 있으면 그걸 중심으로 추천
-      const lastWeekRep = getLastWeekRep(exerciseName, setNo, date, dayIdx);
-      renderRepButtons(plannedRep, lastWeekRep);
+      document.getElementById('rep-title').textContent = name;
+      document.getElementById('rep-sub').textContent = `${setNo} SET`;
+      document.getElementById('rep-base').textContent = baseRep;
 
       const modal = document.getElementById('rep-modal');
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
+      modal.classList.add('show');
       haptic(12);
+      showDockTemporarily();
     }
 
-    function getLastWeekRep(exerciseName, setNo, date, dayIdx){
-      const lw = lastWeekSameDay(date);
-      // ✅ 지난주 같은 요일 dayIdx를 기준으로 찾기
-      const found = logs.find(l => l.date === lw && l.name === exerciseName && l.set === setNo);
-      return found ? (found.repActual ?? found.plannedRep ?? null) : null;
-    }
-
-    function renderRepButtons(base, lastWeekRep){
-      const btnWrap = document.getElementById('rep-btns');
-      btnWrap.innerHTML = '';
-
-      // ✅ 추천 중심값: 지난주 rep 있으면 그게 우선, 없으면 base
-      const center = (typeof lastWeekRep === 'number') ? lastWeekRep : base;
-
-      // ✅ 후보 구성: center 기준 -2,-1,0,+1,+2
-      const candidates = [center-2, center-1, center, center+1, center+2]
-        .map(n => clamp(n,1,999));
-
-      candidates.forEach(n=>{
-        const b = document.createElement('button');
-        b.className = "glass rounded-2xl h-[52px] font-black text-white/90 text-lg border border-white/10 active:scale-[0.98]";
-        b.textContent = n;
-
-        b.onclick = () => {
-          repModalState.repValue = n;
-          document.getElementById('rep-current').textContent = n;
-          saveRepToLog(repModalState.logKey, n);
-
-          // ✅ 저장 시 지난주 비교 토스트 (1번)
-          showWeeklyCompareToast(repModalState.exerciseName, repModalState.setNo, repModalState.date, n);
-
-          closeRepModal(false);
-        };
-        btnWrap.appendChild(b);
-      });
-
-      // ✅ 힌트 표시
-      const hint = document.getElementById('rep-hint');
-      if(typeof lastWeekRep === 'number'){
-        hint.textContent = `지난주 동일 세트 ${lastWeekRep} REP 기준으로 추천`;
-      }else{
-        hint.textContent = `지난주 데이터 없음 · 기본 REP 중심 추천`;
-      }
-    }
-
-    function saveRepToLog(logKey, rep){
-      const idx = logs.findIndex(l => l.logKey === logKey);
-      if(idx !== -1){
-        logs[idx].repActual = rep;
-        localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
-      }
-    }
-
-    function closeRepModal(skipToDefault){
+    function closeRepModal(save=false){
       const modal = document.getElementById('rep-modal');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-
-      if(skipToDefault && repModalState.logKey){
-        saveRepToLog(repModalState.logKey, repModalState.plannedRep);
-        // ✅ 스킵도 비교 토스트 (기본 REP로 기록)
-        showWeeklyCompareToast(repModalState.exerciseName, repModalState.setNo, repModalState.date, repModalState.plannedRep);
-      }
-
-      repModalState = {
-        logKey: null,
-        repValue: 0,
-        plannedRep: 0,
-        exerciseName: '',
-        setNo: 0,
-        date: '',
-        dayIdx: 0
-      };
-
-      haptic(10);
+      modal.classList.remove('show');
+      repModalState = null;
+      showDockTemporarily();
     }
 
-    /* ✅ Weekly Compare Toast */
-    function showWeeklyCompareToast(exerciseName, setNo, date, todayRep){
-      const lw = lastWeekSameDay(date);
-      const lastLog = logs.find(l => l.date === lw && l.name === exerciseName && l.set === setNo);
+    function repQuick(delta){
+      if(!repModalState) return;
+      const value = clamp(repModalState.baseRep + delta, 0, 999);
+      saveRepToLog(repModalState.logKey, value);
+      closeRepModal(true);
+    }
 
-      if(!lastLog){
-        toast("지난주 데이터 없음 · 오늘부터 쌓입니다 ✅");
-        return;
+    function repSkip(){
+      if(!repModalState) return;
+      saveRepToLog(repModalState.logKey, repModalState.baseRep);
+      closeRepModal(true);
+    }
+
+    function saveRepToLog(logKey, repValue){
+      const idx = logs.findIndex(l => l.logKey === logKey);
+      if(idx === -1) return;
+      logs[idx].repActual = repValue;
+      localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+      toast(`REP ${repValue} 기록됨`);
+
+      // ✅ Weekly compare toast
+      weeklyCompareToast(logs[idx]);
+
+      haptic(16);
+    }
+
+    /* =========================================================
+      ✅ Weekly compare (last week same weekday + same exercise)
+    ========================================================= */
+    function getLastWeekDateStr(dateStr){
+      const d = new Date(dateStr);
+      d.setDate(d.getDate() - 7);
+      return d.toISOString().split('T')[0];
+    }
+
+    function findLastWeekSameExerciseLog(curLog){
+      const lastDate = getLastWeekDateStr(curLog.date);
+      const last = logs.filter(l =>
+        l.date === lastDate &&
+        l.exerciseId === curLog.exerciseId &&
+        l.set === curLog.set
+      )[0];
+      return last || null;
+    }
+
+    function weeklyCompareToast(curLog){
+      const prev = findLastWeekSameExerciseLog(curLog);
+      if(!prev || prev.repActual == null || curLog.repActual == null) return;
+
+      const diff = curLog.repActual - prev.repActual;
+      if(diff > 0){
+        toast(`🔥 지난주 대비 +${diff} REP`);
+      }else if(diff < 0){
+        toast(`⚡ 지난주 대비 ${diff} REP`);
+      }else{
+        toast(`✅ 지난주와 동일 REP`);
       }
-
-      const lastRep = (lastLog.repActual ?? lastLog.plannedRep ?? null);
-      if(typeof lastRep !== 'number'){
-        toast("지난주 REP 기록 없음 · 오늘부터 쌓입니다 ✅");
-        return;
-      }
-
-      const diff = todayRep - lastRep;
-      if(diff > 0) toast(`지난주 대비 +${diff} REP 🔥`);
-      else if(diff < 0) toast(`지난주 대비 ${diff} REP ⚡ (폼 유지 집중)`);
-      else toast("지난주와 동일 ✅");
     }
 
     /* =========================================================
@@ -1516,8 +1586,8 @@
 
       data.list.forEach((w, idx) => {
         const id = exId(currentDayIdx, idx);
-        const gif = getGifByExerciseName(w.name);
-        w.gif = gif || '';
+
+        w.gif = getGifByExerciseName(w.name) || '';
 
         const setTotal = customSets[id] || w.set;
         const repTotal = customReps[id] || w.rep;
@@ -1528,7 +1598,7 @@
         slide.className = 'slide';
         slide.setAttribute('data-slide', idx);
 
-        const detailAction = gif ? `
+        const detailAction = w.gif ? `
           <span class="pill cyan">
             <i class="fa-solid fa-hand-pointer"></i> GIF 터치로 상세 보기
           </span>
@@ -1547,7 +1617,7 @@
                   <div class="mt-3 flex items-center gap-2 flex-wrap">
                     <span class="pill cyan">${w.target}</span>
                     <span class="pill">휴식 ${w.rest}s</span>
-                    <span class="pill" id="pill-progress-${id}">진행 ${doneCount}/${setTotal}</span>
+                    <span class="pill">진행 ${doneCount}/${setTotal}</span>
                   </div>
                 </div>
                 <button onclick="resetExercise('${id}')" class="pill" title="이 운동(오늘) 초기화">
@@ -1581,10 +1651,10 @@
                       <p class="text-[13px] font-bold text-white/75">${w.tip} · <span class="text-white/45">${w.guide}</span></p>
                     </div>
 
-                    ${gif ? `
+                    ${w.gif ? `
                       <div class="mt-2 col-span-2">
                         <div class="cardGifSquareWrap" onclick='openDetailSheet(${JSON.stringify(w).replace(/'/g,"&#39;")})'>
-                          <img src="${gif}" class="cardGifSquare" loading="lazy" alt="exercise guide"
+                          <img src="${w.gif}" class="cardGifSquare" loading="lazy" alt="exercise guide"
                                onerror="this.parentElement.style.display='none';" />
                         </div>
                         <div class="mt-2 text-[10px] font-black tracking-[0.18em] uppercase text-white/35">
@@ -1604,7 +1674,7 @@
                   <div class="stepper">
                     <div>
                       <div class="stepperLabel">SET</div>
-                      <div class="stepperValue" id="step-set-${id}">${setTotal}</div>
+                      <div class="stepperValue" id="setv-${id}">${setTotal}</div>
                     </div>
                     <div class="flex items-center gap-2">
                       <button class="stepperBtn" onclick="adjust('set','${id}',-1)"><i class="fa-solid fa-minus"></i></button>
@@ -1615,7 +1685,7 @@
                   <div class="stepper">
                     <div>
                       <div class="stepperLabel">REP</div>
-                      <div class="stepperValue" id="step-rep-${id}">${repTotal}</div>
+                      <div class="stepperValue" id="repv-${id}">${repTotal}</div>
                     </div>
                     <div class="flex items-center gap-2">
                       <button class="stepperBtn" onclick="adjust('rep','${id}',-1)"><i class="fa-solid fa-minus"></i></button>
@@ -1628,7 +1698,7 @@
                     세트/횟수 기본값
                   </button>
 
-                  <div class="grid grid-cols-2 gap-3" id="set-grid-${id}">
+                  <div class="grid grid-cols-2 gap-3" id="setgrid-${id}">
                     ${Array.from({length:setTotal}).map((_, s)=>{
                       const done = !!doneArr[s];
                       const nextIndex = doneArr.indexOf(false);
@@ -1658,6 +1728,7 @@
             </div>
           </div>
         `;
+
         carousel.appendChild(slide);
       });
 
@@ -1723,58 +1794,49 @@
       showDockTemporarily();
     }
 
+    /* ✅ IMPORTANT FIX:
+       세트 버튼 클릭이 즉시 파란색 반영되도록
+       렌더 전체 재생성 없이 DOM만 업데이트
+    */
     function bindSetButtons(){
       const buttons = document.querySelectorAll('.setBtn[data-ex]');
       buttons.forEach(btn => {
-        const date = btn.getAttribute('data-date');
-        const ex = btn.getAttribute('data-ex');
-        const setIndex = Number(btn.getAttribute('data-set'));
-        btn.onclick = () => toggleSetComplete(date, ex, setIndex);
+        btn.onclick = null;
+        btn.addEventListener('click', () => {
+          const date = btn.getAttribute('data-date');
+          const ex = btn.getAttribute('data-ex');
+          const setIndex = Number(btn.getAttribute('data-set'));
+          toggleSetComplete(date, ex, setIndex, btn);
+        });
       });
     }
 
-    /* ✅ 부분 업데이트 (GIF 깜빡임 방지) */
-    function updateCurrentSlideUI(exerciseId){
-      const idx = currentSlideIndex;
-      const w = workoutData[currentDayIdx]?.list?.[idx];
+    function updateSetGridLocking(date, exerciseId){
+      const [dayIdx, exIdx] = exerciseId.split('-').map(Number);
+      const w = workoutData[dayIdx]?.list?.[exIdx];
       if(!w) return;
 
-      const targetId = exId(currentDayIdx, idx);
-      if(targetId !== exerciseId) return;
+      const setTotal = customSets[exerciseId] || w.set;
+      const doneArr = getProgressArr(date, exerciseId, setTotal);
+      const nextIndex = doneArr.indexOf(false);
 
-      const date = todayStr();
-      const setTotal = customSets[targetId] || w.set;
-
-      const doneArr = getProgressArr(date, targetId, setTotal);
-      const doneCount = doneArr.filter(Boolean).length;
-
-      const pill = document.getElementById(`pill-progress-${targetId}`);
-      if(pill) pill.textContent = `진행 ${doneCount}/${setTotal}`;
-
-      const grid = document.getElementById(`set-grid-${targetId}`);
+      const grid = document.getElementById(`setgrid-${exerciseId}`);
       if(!grid) return;
 
-      const curBtns = Array.from(grid.querySelectorAll('.setBtn'));
-      curBtns.forEach((btn, s)=>{
+      const btns = Array.from(grid.querySelectorAll('.setBtn'));
+      btns.forEach((b, s)=>{
         const done = !!doneArr[s];
-        const nextIndex = doneArr.indexOf(false);
         const isLocked = (!done && nextIndex !== -1 && s !== nextIndex);
 
-        btn.classList.toggle('done', done);
-        btn.classList.toggle('locked', isLocked);
+        b.classList.toggle('done', done);
+        b.classList.toggle('locked', isLocked);
+        b.disabled = isLocked;
 
-        if(isLocked){
-          btn.setAttribute('disabled','disabled');
-        }else{
-          btn.removeAttribute('disabled');
-        }
-
-        btn.innerHTML = `${done ? `<i class='fa-solid fa-check'></i>` : ''}${s+1} 세트`;
+        b.innerHTML = `${done ? `<i class='fa-solid fa-check'></i>` : ''}${s+1} 세트`;
       });
     }
 
-    /* ---------- 핵심: Set Toggle + Rep Modal + Weekly Compare ---------- */
-    function toggleSetComplete(date, exerciseId, setIndex){
+    function toggleSetComplete(date, exerciseId, setIndex, domBtn){
       unlockAudio();
       showDockTemporarily();
 
@@ -1784,8 +1846,8 @@
 
       const setTotal = customSets[exerciseId] || w.set;
       const doneArr = getProgressArr(date, exerciseId, setTotal);
-      const nextIndex = doneArr.indexOf(false);
 
+      const nextIndex = doneArr.indexOf(false);
       if(!doneArr[setIndex] && nextIndex !== -1 && setIndex !== nextIndex){
         haptic(10);
         toast('다음 세트를 먼저 완료하세요');
@@ -1813,7 +1875,8 @@
             set: setNo,
             plannedSetTotal: setTotal,
             plannedRep: repTotal,
-            repActual: repTotal,   // 기본
+            repActual: null,
+            rpe: null,
             restPlanned: w.rest,
             restUsed: w.rest,
             type: workoutData[currentDayIdx].type
@@ -1821,38 +1884,23 @@
           localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
         }
 
-        // ✅ 즉시 UI 반영 (새로고침 필요 없음)
-        updateCurrentSlideUI(exerciseId);
+        // ✅ Rep modal open immediately
+        openRepModal({logKey, name: w.name, setNo, baseRep: repTotal});
 
-        // ✅ REP 모달 띄우기
-        openRepModal({
-          logKey,
-          exerciseName: w.name,
-          plannedRep: repTotal,
-          setNo,
-          date,
-          dayIdx: currentDayIdx
-        });
-
-        // ✅ 휴식 타이머 시작
         if(w.rest > 0) startTimer(w.rest, logKey);
 
-        // ✅ 마지막 세트면 다음 운동 자동
-        if(setNo === setTotal){
-          setTimeout(()=> carouselNext(), 250);
-        }
         haptic(16);
       }else{
         logs = logs.filter(l => l.logKey !== logKey);
         localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
-        updateCurrentSlideUI(exerciseId);
         haptic(12);
       }
 
+      // ✅ UI update instantly
+      updateSetGridLocking(date, exerciseId);
       updateProgressUI();
     }
 
-    /* ---------- ADJUST ---------- */
     function adjust(type, key, val){
       showDockTemporarily();
 
@@ -1866,16 +1914,16 @@
         customSets[key] = next;
         localStorage.setItem(KEY_SETS, JSON.stringify(customSets));
         getProgressArr(todayStr(), key, next);
+
+        // ✅ update only needed UI
+        renderCarousel();
       }else{
         const cur = customReps[key] || w.rep;
         customReps[key] = clamp(cur + val, 1, 100);
         localStorage.setItem(KEY_REPS, JSON.stringify(customReps));
+        renderCarousel();
       }
 
-      // ✅ 전체 렌더 대신 현재 슬라이드만 부분 업데이트 하고 싶지만,
-      // 세트 수가 바뀌면 grid 재생성이 필요해서 renderCarousel로 유지.
-      // 대신 GIF 깜빡임은 img 로딩 자체가 캐싱되므로 거의 없음.
-      renderCarousel();
       updateProgressUI();
       toast('설정 저장됨');
     }
@@ -1910,7 +1958,6 @@
       const [d, idx] = exerciseId.split('-').map(Number);
       const w = workoutData[d]?.list?.[idx];
       const setTotal = customSets[exerciseId] || w.set;
-
       if(progressByDate[date] && progressByDate[date][exerciseId]){
         progressByDate[date][exerciseId] = new Array(setTotal).fill(false);
         localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
@@ -1933,13 +1980,21 @@
       if(progressByDate[date]){ delete progressByDate[date]; localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate)); }
       localStorage.removeItem(KEY_SUMMARY_SHOWN);
 
+      // stopwatch reset
+      stopwatchSessions[date] = 0;
+      localStorage.setItem(KEY_SW, JSON.stringify(stopwatchSessions));
+      swAccum = 0;
+      swStartTs = Date.now();
+
       renderCarousel();
       updateProgressUI();
       toast('오늘 초기화 완료');
       haptic(25);
     }
 
-    /* ---------- TIMER ---------- */
+    /* =========================================================
+      ✅ TIMER
+    ========================================================= */
     function showHUD(on){
       const hud = document.getElementById('timer-hud');
       if(!hud) return;
@@ -2036,9 +2091,10 @@
       }
     }
 
-    /* ✅ 알림음 개선 (아이폰/안드 기본 느낌: 더 명확한 2-3톤 chime) */
+    /* ✅ Better alert sound - more "notification-like" */
     function restDoneNotify(){
       try{ if(navigator.vibrate) navigator.vibrate([120,80,200,80,220]); }catch(e){}
+
       try{
         if(!audioCtx){
           audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -2047,28 +2103,35 @@
 
         const now = audioCtx.currentTime;
 
-        // ✅ 더 알림 같은 chime (triangle + sine mix)
-        const tones = [
-          { t:0.00, freq: 880,  dur:0.16 },
-          { t:0.22, freq: 988,  dur:0.18 },
-          { t:0.46, freq: 1175, dur:0.22 }
+        // ✅ Soft + strong "ping" style
+        const seq = [
+          { t: 0.00, dur: 0.18, freq: 1318 }, // E6
+          { t: 0.22, dur: 0.14, freq: 1047 }, // C6
+          { t: 0.40, dur: 0.22, freq: 1568 }, // G6
         ];
 
-        tones.forEach(p=>{
+        seq.forEach(p => {
           const o = audioCtx.createOscillator();
           const g = audioCtx.createGain();
-          o.type = 'triangle';
-          o.frequency.setValueAtTime(p.freq, now + p.t);
+          const f = audioCtx.createBiquadFilter();
+          f.type = 'lowpass';
+          f.frequency.value = 6000;
 
+          o.connect(f);
+          f.connect(g);
+          g.connect(audioCtx.destination);
+
+          o.type = 'sine';
+
+          o.frequency.setValueAtTime(p.freq, now + p.t);
           g.gain.setValueAtTime(0.0001, now + p.t);
-          g.gain.exponentialRampToValueAtTime(0.25, now + p.t + 0.02);
+          g.gain.exponentialRampToValueAtTime(0.22, now + p.t + 0.02);
           g.gain.exponentialRampToValueAtTime(0.0001, now + p.t + p.dur);
 
-          o.connect(g);
-          g.connect(audioCtx.destination);
           o.start(now + p.t);
           o.stop(now + p.t + p.dur);
         });
+
       }catch(e){}
     }
 
@@ -2083,6 +2146,245 @@
       }
       toast(restNotifEnabled ? '알림 ON' : '알림 OFF');
       haptic(14);
+    }
+
+    /* =========================================================
+      ✅ STOPWATCH: pause/resume + save to localStorage by date
+    ========================================================= */
+    function tickStopwatch(){
+      if(swRunning){
+        const now = Date.now();
+        const delta = Math.floor((now - swStartTs)/1000);
+        const total = swAccum + delta;
+        document.getElementById('stopwatch').innerText = secondsToMMSS(total);
+      }else{
+        document.getElementById('stopwatch').innerText = secondsToMMSS(swAccum);
+      }
+    }
+
+    function persistStopwatch(){
+      stopwatchSessions[todayStr()] = swAccum;
+      localStorage.setItem(KEY_SW, JSON.stringify(stopwatchSessions));
+    }
+
+    function toggleStopwatch(){
+      showDockTemporarily();
+      const btn = document.getElementById('sw-toggle');
+      if(swRunning){
+        // pause
+        const now = Date.now();
+        const delta = Math.floor((now - swStartTs)/1000);
+        swAccum += delta;
+        swRunning = false;
+        persistStopwatch();
+        btn.innerHTML = `<i class="fa-solid fa-play"></i> 재개`;
+        toast('운동 시간 일시정지');
+      }else{
+        // resume
+        swStartTs = Date.now();
+        swRunning = true;
+        btn.innerHTML = `<i class="fa-solid fa-pause"></i> 일시정지`;
+        toast('운동 시간 재개');
+      }
+      haptic(14);
+    }
+
+    setInterval(()=> {
+      tickStopwatch();
+    }, 500);
+
+    /* =========================================================
+      ✅ HISTORY PRO (Daily Summary + Collapsible exercises + Weekly compare)
+    ========================================================= */
+    function calcAutoWorkoutTime(dateStr){
+      // estimate by sum(restUsed) + 40s per set (rough)
+      const dayLogs = logs.filter(l => l.date === dateStr);
+      if(dayLogs.length === 0) return 0;
+      let restSum = 0;
+      dayLogs.forEach(l => restSum += (l.restUsed ?? l.restPlanned ?? 0));
+      const setWork = dayLogs.length * 40; // rough active time per set
+      return restSum + setWork;
+    }
+
+    function getWorkoutTimeForDate(dateStr){
+      const sw = stopwatchSessions[dateStr] || 0;
+      if(sw > 0) return { sec: sw, source: 'STOPWATCH' };
+      const auto = calcAutoWorkoutTime(dateStr);
+      return { sec: auto, source: 'AUTO' };
+    }
+
+    function getDailyTotals(dateStr){
+      const dayLogs = logs.filter(l => l.date === dateStr);
+      const sets = dayLogs.length;
+      const exercises = new Set(dayLogs.map(l => l.exerciseId)).size;
+      const totalRep = dayLogs.reduce((a,l)=> a + (l.repActual ?? l.plannedRep ?? 0), 0);
+      const restSum = dayLogs.reduce((a,l)=> a + (l.restUsed ?? l.restPlanned ?? 0), 0);
+      const avgRest = sets ? Math.round(restSum/sets) : 0;
+      return { sets, exercises, totalRep, restSum, avgRest, dayLogs };
+    }
+
+    function dailyWeeklyCompareSummary(dateStr){
+      const last = getLastWeekDateStr(dateStr);
+      const cur = getDailyTotals(dateStr);
+      const prev = getDailyTotals(last);
+
+      if(cur.sets === 0 || prev.sets === 0){
+        return { ok:false, text:'지난주 기록 없음' };
+      }
+
+      const dRep = cur.totalRep - prev.totalRep;
+      const dSets = cur.sets - prev.sets;
+      const curTime = getWorkoutTimeForDate(dateStr).sec;
+      const prevTime = getWorkoutTimeForDate(last).sec;
+      const dTime = curTime - prevTime;
+
+      const parts = [];
+      parts.push(dRep === 0 ? `REP 동일` : (dRep>0 ? `+${dRep} REP 🔥` : `${dRep} REP ⚡`));
+      parts.push(dSets === 0 ? `세트 동일` : (dSets>0 ? `+${dSets} 세트 ✅` : `${dSets} 세트`));
+      parts.push(dTime === 0 ? `시간 동일` : (dTime>0 ? `+${Math.round(dTime/60)}m` : `${Math.round(dTime/60)}m`));
+
+      return { ok:true, text: parts.join(' / ') };
+    }
+
+    function groupLogsByExercise(dayLogs){
+      return dayLogs.reduce((acc, l)=>{
+        if(!acc[l.exerciseId]) acc[l.exerciseId] = [];
+        acc[l.exerciseId].push(l);
+        return acc;
+      }, {});
+    }
+
+    function exerciseWeeklyCompare(exerciseId, dateStr){
+      const last = getLastWeekDateStr(dateStr);
+      const cur = logs.filter(l => l.date === dateStr && l.exerciseId === exerciseId);
+      const prev = logs.filter(l => l.date === last && l.exerciseId === exerciseId);
+      if(cur.length === 0 || prev.length === 0) return null;
+
+      const curRep = cur.reduce((a,l)=> a + (l.repActual ?? l.plannedRep ?? 0), 0);
+      const prevRep = prev.reduce((a,l)=> a + (l.repActual ?? l.plannedRep ?? 0), 0);
+      const diff = curRep - prevRep;
+
+      if(diff > 0) return `🔥 지난주 대비 +${diff} REP`;
+      if(diff < 0) return `⚡ 지난주 대비 ${diff} REP`;
+      return `✅ 지난주와 동일`;
+    }
+
+    function renderHistoryDetail(){
+      const area = document.getElementById('history-detail');
+
+      const { sets, exercises, totalRep, restSum, avgRest, dayLogs } = getDailyTotals(selectedDate);
+      const wt = getWorkoutTimeForDate(selectedDate);
+      const compare = dailyWeeklyCompareSummary(selectedDate);
+
+      area.innerHTML = `
+        <p class="text-[10px] font-black text-gray-400 tracking-widest uppercase px-2">${selectedDate} 리포트</p>
+      `;
+
+      if(dayLogs.length === 0){
+        area.innerHTML += `<div class="glass rounded-[28px] p-12 text-center text-gray-500 italic text-xs">기록이 없습니다</div>`;
+        return;
+      }
+
+      // ✅ Daily Summary Card
+      area.innerHTML += `
+        <div class="glass rounded-[28px] p-6 border border-white/10">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="text-[10px] font-black tracking-[0.2em] uppercase text-white/45">Daily Summary</p>
+              <h3 class="text-2xl font-black italic text-white mt-1">${wt.source === 'STOPWATCH' ? '총 운동시간' : '추정 운동시간'}</h3>
+            </div>
+            <span class="pill cyan">${secondsToMMSS(wt.sec)}</span>
+          </div>
+
+          <div class="mt-5 grid grid-cols-2 gap-3">
+            <div class="glass rounded-2xl p-4">
+              <p class="text-[9px] font-black tracking-[0.18em] uppercase text-white/40">총 세트</p>
+              <p class="text-3xl font-black text-white mt-2">${sets}</p>
+            </div>
+            <div class="glass rounded-2xl p-4">
+              <p class="text-[9px] font-black tracking-[0.18em] uppercase text-white/40">총 운동</p>
+              <p class="text-3xl font-black text-white mt-2">${exercises}</p>
+            </div>
+            <div class="glass rounded-2xl p-4">
+              <p class="text-[9px] font-black tracking-[0.18em] uppercase text-white/40">총 REP</p>
+              <p class="text-3xl font-black text-white mt-2">${totalRep}</p>
+            </div>
+            <div class="glass rounded-2xl p-4">
+              <p class="text-[9px] font-black tracking-[0.18em] uppercase text-white/40">평균 휴식</p>
+              <p class="text-3xl font-black text-white mt-2">${avgRest}s</p>
+            </div>
+            <div class="glass rounded-2xl p-4 col-span-2">
+              <p class="text-[9px] font-black tracking-[0.18em] uppercase text-white/40">지난주 동일 요일 대비</p>
+              <p class="text-base font-black text-white/80 mt-2">${compare.ok ? compare.text : compare.text}</p>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // ✅ Exercise cards (collapsible)
+      const groups = groupLogsByExercise(dayLogs);
+
+      Object.entries(groups).forEach(([exerciseId, data]) => {
+        data.sort((a,b)=> a.set - b.set);
+
+        const name = data[0].name;
+        const plannedRep = data[0].plannedRep ?? "-";
+        const totalSets = data.length;
+        const repSum = data.reduce((a,l)=> a + (l.repActual ?? l.plannedRep ?? 0), 0);
+        const compareText = exerciseWeeklyCompare(exerciseId, selectedDate);
+
+        const tableRows = data.map(row => {
+          const rep = (row.repActual ?? row.plannedRep ?? "-");
+          const rest = (row.restUsed ?? row.restPlanned ?? "-");
+          return `
+            <tr class="log-row">
+              <td><span class="pill">${row.set}</span></td>
+              <td><span class="pill cyan">${rep}</span></td>
+              <td><span class="pill">${rest}s</span></td>
+            </tr>
+          `;
+        }).join('');
+
+        area.innerHTML += `
+          <div class="glass rounded-[28px] p-6 border-l-4 border-cyan-400">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <h4 class="font-black text-white italic text-lg">${name}</h4>
+                <div class="flex items-center gap-2 mt-3 flex-wrap">
+                  <span class="pill cyan">${totalSets} 세트</span>
+                  <span class="pill">목표 REP: ${plannedRep}</span>
+                  <span class="pill">총 REP: ${repSum}</span>
+                </div>
+                ${compareText ? `<div class="mt-3 text-[12px] font-black text-white/70">${compareText}</div>` : `<div class="mt-3 text-[12px] font-black text-white/40">지난주 기록 없음</div>`}
+              </div>
+
+              <button class="pill" onclick="toggleExerciseTable('${exerciseId}')">
+                <i class="fa-solid fa-chevron-down"></i> 펼치기
+              </button>
+            </div>
+
+            <div class="mt-5 hidden" id="table-${exerciseId}">
+              <table class="log-table">
+                <thead>
+                  <tr>
+                    <th style="width:60px;">세트</th>
+                    <th>REP</th>
+                    <th style="width:90px;">REST</th>
+                  </tr>
+                </thead>
+                <tbody>${tableRows}</tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function toggleExerciseTable(exerciseId){
+      const t = document.getElementById(`table-${exerciseId}`);
+      if(!t) return;
+      t.classList.toggle('hidden');
+      showDockTemporarily();
     }
 
     /* ---------- CALENDAR ---------- */
@@ -2110,70 +2412,6 @@
       renderHistoryDetail();
     }
 
-    function renderHistoryDetail(){
-      const area = document.getElementById('history-detail');
-      const dayLogs = logs
-        .filter(l => l.date === selectedDate)
-        .sort((a,b)=> (a.exerciseId > b.exerciseId ? 1 : -1) || (a.set - b.set));
-
-      area.innerHTML = `<p class="text-[10px] font-black text-gray-400 tracking-widest uppercase px-2">${selectedDate} 리포트</p>`;
-
-      if(dayLogs.length === 0){
-        area.innerHTML += `<div class="glass rounded-[28px] p-12 text-center text-gray-500 italic text-xs">기록이 없습니다</div>`;
-        return;
-      }
-
-      const groups = dayLogs.reduce((acc, o) => {
-        if(!acc[o.exerciseId]) acc[o.exerciseId] = [];
-        acc[o.exerciseId].push(o);
-        return acc;
-      }, {});
-
-      Object.entries(groups).forEach(([exerciseId, data]) => {
-        const name = data[0].name;
-        const plannedRep = data[0].plannedRep ?? "-";
-        const totalSets = data.length;
-
-        area.innerHTML += `
-          <div class="glass rounded-[28px] p-6 border-l-4 border-cyan-400">
-            <div>
-              <h4 class="font-black text-white italic">${name}</h4>
-              <div class="flex items-center gap-2 mt-3 flex-wrap">
-                <span class="pill cyan">${totalSets} 세트</span>
-                <span class="pill">목표 REP: ${plannedRep}</span>
-              </div>
-            </div>
-
-            <div class="mt-6">
-              <table class="log-table">
-                <thead>
-                  <tr>
-                    <th style="width:60px;">세트</th>
-                    <th>REP</th>
-                    <th style="width:90px;">REST</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${data.map(row => {
-                    const rep = (row.repActual ?? row.plannedRep ?? "-");
-                    const repDisplay = `<span class="pill">${rep}</span>`;
-                    const restDisplay = `<span class="pill">${(row.restUsed ?? row.restPlanned ?? "-")}s</span>`;
-                    return `
-                      <tr class="log-row">
-                        <td><span class="pill">${row.set}</span></td>
-                        <td>${repDisplay}</td>
-                        <td>${restDisplay}</td>
-                      </tr>
-                    `;
-                  }).join('')}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        `;
-      });
-    }
-
     function changeMonth(dir){
       showDockTemporarily();
       currentMonth += dir;
@@ -2189,6 +2427,9 @@
       logs = logs.filter(l => l.date !== date);
       localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
       if(progressByDate[date]){ delete progressByDate[date]; localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate)); }
+      stopwatchSessions[date] = 0;
+      localStorage.setItem(KEY_SW, JSON.stringify(stopwatchSessions));
+
       toast('선택 날짜 초기화');
       renderCalendar();
       haptic(25);
@@ -2234,7 +2475,11 @@
     /* ---------- BACKUP / RESET ALL ---------- */
     function backupJSON(){
       showDockTemporarily();
-      const payload = { version: 'v11.9', exportedAt: nowISO(), logs, customSets, customReps, progressByDate };
+      const payload = {
+        version: 'v12.0',
+        exportedAt: nowISO(),
+        logs, customSets, customReps, progressByDate, stopwatchSessions
+      };
       const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
@@ -2252,7 +2497,8 @@
       localStorage.removeItem(KEY_REPS);
       localStorage.removeItem(KEY_PROGRESS_BY_DATE);
       localStorage.removeItem(KEY_SUMMARY_SHOWN);
-      logs = []; customSets = {}; customReps = {}; progressByDate = {};
+      localStorage.removeItem(KEY_SW);
+      logs = []; customSets = {}; customReps = {}; progressByDate = {}; stopwatchSessions = {};
       renderCarousel();
       updateProgressUI();
       renderCalendar();
@@ -2276,7 +2522,7 @@
       document.addEventListener('dblclick', (e)=> e.preventDefault(), {passive:false});
     })();
 
-    /* Dock Auto Hide */
+    /* ✅ Dock Auto Hide Controller */
     let dockTimer = null;
     function showDockTemporarily(){
       const dock = document.querySelector('.navDockWrap');
@@ -2289,43 +2535,12 @@
       dockTimer = setTimeout(()=>{
         dock.classList.remove('dock-show');
         dock.classList.add('dock-hide');
-      }, 1600);
+      }, 1800);
     }
 
     ['scroll','touchstart','touchmove','click'].forEach(ev=>{
       window.addEventListener(ev, showDockTemporarily, {passive:true});
     });
-
-    /* ---------- STOPWATCH ---------- */
-    function startStopwatch(){
-      if(swInterval) clearInterval(swInterval);
-      swInterval = setInterval(()=>{
-        if(!swRunning) return;
-        const total = swElapsed + (Date.now() - swStart);
-        const sec = Math.floor(total/1000);
-        const m = String(Math.floor(sec/60)).padStart(2,'0');
-        const s = String(sec%60).padStart(2,'0');
-        document.getElementById('stopwatch').textContent = `${m}:${s}`;
-      }, 250);
-    }
-
-    function toggleStopwatch(){
-      const btn = document.getElementById('sw-toggle');
-      swRunning = !swRunning;
-
-      if(swRunning){
-        swStart = Date.now();
-        btn.innerHTML = `<i class="fa-solid fa-pause"></i> PAUSE`;
-        btn.classList.add('cyan');
-        toast("타이머 재개");
-      }else{
-        swElapsed += (Date.now() - swStart);
-        btn.innerHTML = `<i class="fa-solid fa-play"></i> RESUME`;
-        btn.classList.remove('cyan');
-        toast("타이머 일시정지");
-      }
-      haptic(10);
-    }
 
     /* ---------- INIT ---------- */
     window.onload = () => {
@@ -2340,11 +2555,18 @@
         btn.classList.toggle('cyan', restNotifEnabled);
       }
 
-      // ✅ 스톱워치 시작
-      swStart = Date.now();
-      swElapsed = 0;
-      swRunning = true;
-      startStopwatch();
+      // wake lock best effort
+      requestWakeLock();
+
+      // persist stopwatch every 10 sec if running
+      setInterval(()=>{
+        if(swRunning){
+          const now = Date.now();
+          const delta = Math.floor((now - swStartTs)/1000);
+          stopwatchSessions[todayStr()] = swAccum + delta;
+          localStorage.setItem(KEY_SW, JSON.stringify(stopwatchSessions));
+        }
+      }, 10000);
 
       setTimeout(()=> {
         const dock = document.querySelector('.navDockWrap');
