@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-  <title>DK Fit OS v12.1 (WakeLock + Rep AI Buttons + History Pro)</title>
+  <title>DK Fit OS v12.2 (Rep Live Fix + History Pro)</title>
 
   <!-- ✅ PWA / iOS Standalone -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -603,7 +603,6 @@
       line-height: 1.4;
     }
 
-    /* ✅ 상세 GIF: 너무 크지 않게 적정 사이즈 + 화면에서 탭/내용 같이 보이도록 */
     .sheetGif{
       width: 100%;
       max-height: 220px;
@@ -616,7 +615,6 @@
       background: rgba(255,255,255,0.03);
     }
 
-    /* 카드 GIF */
     .cardGifSquareWrap{
       width: 100%;
       aspect-ratio: 1 / 1;
@@ -638,7 +636,6 @@
       background: rgba(0,0,0,0.15);
     }
 
-    /* ✅ REP 입력 모달 */
     #rep-modal{
       position:fixed; inset:0;
       z-index: 260;
@@ -680,7 +677,6 @@
       box-shadow: 0 18px 34px rgba(34,211,238,0.22);
     }
 
-    /* Mobile Layout Optimization */
     @media (max-width: 520px){
       .layoutWrap{ padding-left: 0; padding-right: 0; }
       main .layoutWrap.px-4{ padding-left: 14px !important; padding-right: 14px !important; }
@@ -795,7 +791,6 @@
         </div>
       </div>
 
-      <!-- ✅ AI 추천 + 숫자 그리드 -->
       <div class="mt-4 glass rounded-2xl p-4">
         <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45">AI 추천</p>
         <div id="rep-ai-reco" class="mt-3 grid grid-cols-3 gap-2"></div>
@@ -846,8 +841,6 @@
       <div>
         <div class="flex items-center gap-2">
           <h2 id="stopwatch" class="text-3xl font-black font-mono tracking-tighter text-white">00:00</h2>
-
-          <!-- ✅ 일시정지 버튼 -->
           <button onclick="toggleStopwatchPause()" class="pill cyan" style="padding:6px 10px;" title="총 운동시간 일시정지">
             <i id="pause-icon" class="fa-solid fa-pause"></i>
           </button>
@@ -1081,18 +1074,11 @@
 
   <script>
     /* =========================================================
-      DK Fit OS v12.1
-      ✅ Wake Lock (screen on)
-      ✅ Stopwatch Pause
-      ✅ Set tap -> instant done UI + REP modal appears
-      ✅ REP modal: previous week based number buttons (no mental math)
-      ✅ Rest sound: notification-like melody (no flash)
-      ✅ Progress percent + "현재 XX% 완료!"
-      ✅ History: daily summary with duration / avg rest / detail
-      ✅ GIF blink fix: avoid full re-render when stepper changes
+      DK Fit OS v12.2
+      ✅ FIX: REP +/- 즉시 카드에 반영
+      ✅ 기존 v12.1 UI/기능 100% 유지
     ========================================================= */
 
-    /* ---------- GIF 매칭 ---------- */
     function getGifByExerciseName(name){
       const n = (name || '').toLowerCase();
       if(n.includes('스쿼트') || n.includes('squat')) return 'AIR_SQT.gif';
@@ -1108,7 +1094,6 @@
       return '';
     }
 
-    /* ---------- DATA ---------- */
     const workoutData = {
       1: { day: "월요일", type: "push", title: "가슴 & 삼두", list: [
         { name: "체스트 딥스", set: 4, rep: 10, rest: 90, breath: "내려갈 때 흡기 / 올라올 때 호기", target: "가슴 하부", mind: "바닥을 가슴으로 밀어내기", tip: "상체 15도 숙이기", guide: "발을 대고 무게 조절 가능", cue: "시선 바닥 1~2m + 팔 95%만 펴 긴장 유지" },
@@ -1143,7 +1128,6 @@
       ]}
     };
 
-    /* ---------- STORAGE KEYS ---------- */
     const KEY_LOGS = 'dk_os_v121_logs';
     const KEY_SETS = 'dk_os_v121_sets';
     const KEY_REPS = 'dk_os_v121_reps';
@@ -1152,14 +1136,12 @@
     const KEY_SUMMARY_SHOWN = 'dk_os_v121_summary_shown';
     const KEY_NOTIF = 'dk_os_v121_rest_notif';
 
-    /* ---------- LOAD ---------- */
     function safeParse(raw, fallback){ try { return raw ? JSON.parse(raw) : fallback; } catch(e){ return fallback; } }
     let logs = safeParse(localStorage.getItem(KEY_LOGS), []);
     let customSets = safeParse(localStorage.getItem(KEY_SETS), {});
     let customReps = safeParse(localStorage.getItem(KEY_REPS), {});
     let progressByDate = safeParse(localStorage.getItem(KEY_PROGRESS_BY_DATE), {});
 
-    /* ---------- STATE ---------- */
     let timerInt = null;
     let currentDayIdx = new Date().getDay();
     let currentYear = new Date().getFullYear();
@@ -1170,11 +1152,9 @@
     let currentSlideIndex = 0;
     let restNotifEnabled = (localStorage.getItem(KEY_NOTIF) ?? '1') === '1';
 
-    /* 휴식 기록 */
     let restStartedAt = null;
     let restCurrentLogKey = null;
 
-    /* Audio unlock */
     let audioCtx = null;
     function unlockAudio(){
       try{
@@ -1187,13 +1167,11 @@
       }catch(e){}
     }
 
-    /* Stopwatch (pause support) */
     let workoutStartAt = Date.now();
     let stopwatchPaused = false;
     let pauseStartedAt = null;
     let pausedTotalMs = 0;
 
-    /* Wake Lock */
     let wakeLock = null;
     async function requestWakeLock(){
       try{
@@ -1210,17 +1188,14 @@
       if(document.visibilityState === 'visible') requestWakeLock();
     });
 
-    /* REP modal state */
     let repModalState = null;
 
-    /* ---------- UTILS ---------- */
     function haptic(ms=18){ if(navigator.vibrate) navigator.vibrate(ms); }
     function nowISO(){ return new Date().toISOString(); }
     function todayStr(){ return new Date().toISOString().split('T')[0]; }
     function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
     function exId(dayIdx, exIdx){ return `${dayIdx}-${exIdx}`; }
 
-    /* ---------- SPLASH ---------- */
     function initIntro(){
       const shown = sessionStorage.getItem(KEY_SPLASH) === '1';
       const splash = document.getElementById('splash-screen');
@@ -1234,7 +1209,6 @@
       }, 2200);
     }
 
-    /* ---------- TOAST ---------- */
     let toastTimer=null;
     function toast(msg){
       const el = document.getElementById('toast');
@@ -1244,7 +1218,6 @@
       toastTimer = setTimeout(()=> el.classList.remove('show'), 1800);
     }
 
-    /* ---------- SUMMARY MODAL ---------- */
     function openSummary(stats){
       document.getElementById('sum-sets').textContent = stats.sets;
       document.getElementById('sum-ex').textContent = stats.exercises;
@@ -1255,7 +1228,6 @@
       document.getElementById('summary-modal').classList.remove('show');
     }
 
-    /* ---------- TABS ---------- */
     function showTab(name, btn){
       document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
       document.getElementById(`tab-${name}`).classList.add('active');
@@ -1272,7 +1244,6 @@
       showDockTemporarily();
     }
 
-    /* ---------- DAY NAV ---------- */
     function updateDayNav(){
       const nav = document.getElementById('day-nav');
       nav.innerHTML = '';
@@ -1286,7 +1257,6 @@
       });
     }
 
-    /* ---------- DATE-BASED PROGRESS ---------- */
     function getProgressArr(date, exerciseId, setTotal){
       if(!progressByDate[date]) progressByDate[date] = {};
       let arr = progressByDate[date][exerciseId];
@@ -1365,7 +1335,6 @@
       };
     }
 
-    /* ---------- STOPWATCH ---------- */
     function toggleStopwatchPause(){
       stopwatchPaused = !stopwatchPaused;
 
@@ -1393,7 +1362,6 @@
       return Math.max(0, Math.floor(elapsedMs / 1000));
     }
 
-    /* ---------- CHANGE DAY ---------- */
     function changeDay(d){
       currentDayIdx = d;
       currentSlideIndex = 0;
@@ -1416,9 +1384,6 @@
       showDockTemporarily();
     }
 
-    /* =========================================================
-      ✅ Bottom Sheet (운동 상세)
-    ========================================================= */
     let mobileActive = { w:null };
 
     function openDetailSheet(w){
@@ -1496,7 +1461,6 @@
         • 반동이 생기면 → 속도 20% 줄이기
       `.trim();
     }
-
     function expandBreath(w){
       return `
         <b>호흡은 “힘을 쓰는 순간에 내쉬기”</b>가 원칙입니다.<br><br>
@@ -1506,7 +1470,6 @@
         2) 올라올 때 → 입으로 길게 내쉬기
       `.trim();
     }
-
     function expandMind(w){
       return `
         <b>${w.mind}</b><br><br>
@@ -1518,7 +1481,6 @@
         2) 0.5초 정지로 정확도 확보
       `.trim();
     }
-
     function expandElite(w){
       return `
         <b>${w.tip}</b><br>
@@ -1532,10 +1494,8 @@
 
     /* =========================================================
       ✅ CAROUSEL
-      - GIF 깜빡임 방지: 필요할 때만 renderCarousel(full=true)
-      - 세트 완료 시엔 버튼 상태만 즉시 업데이트(부분 업데이트)
+      ✅ FIX 핵심: 부분 업데이트 시 REP Total도 업데이트!
     ========================================================= */
-
     function renderCarousel(full=true){
       const date = todayStr();
       const data = workoutData[currentDayIdx];
@@ -1685,28 +1645,36 @@
         updateSlideHUD();
         requestAnimationFrame(()=> scrollToSlide(currentSlideIndex,false));
       }else{
-        // 부분 업데이트: 현재 슬라이드 세트 그리드만 갱신
-        const slide = carousel.querySelector(`.slide[data-slide="${currentSlideIndex}"]`);
+        // ✅ 부분 업데이트: 현재 슬라이드 UI만 갱신
+        const slide = carousel.querySelector(\`.slide[data-slide="\${currentSlideIndex}"]\`);
         if(!slide) return;
 
         const data = workoutData[currentDayIdx];
         const w = data.list[currentSlideIndex];
         const exid = slide.getAttribute('data-exid');
+
         const setTotal = customSets[exid] || w.set;
+        const repTotal = customReps[exid] || w.rep;  // ✅ 여기서 최신 rep 다시 읽음
+
         const doneArr = getProgressArr(date, exid, setTotal);
         const doneCount = doneArr.filter(Boolean).length;
 
         const progressTag = slide.querySelector('[data-role="progress"]');
-        if(progressTag) progressTag.textContent = `진행 ${doneCount}/${setTotal}`;
+        if(progressTag) progressTag.textContent = \`진행 \${doneCount}/\${setTotal}\`;
 
         const setGrid = slide.querySelector('[data-role="setGrid"]');
         if(setGrid){
           setGrid.innerHTML = renderSetButtonsHTML(exid, w, date);
         }
+
         const setValue = slide.querySelector('[data-role="setTotal"]');
         if(setValue) setValue.textContent = setTotal;
 
-        bindSetButtons(); // 새 버튼 바인딩
+        // ✅✅✅ FIX: REP 숫자도 즉시 반영
+        const repValue = slide.querySelector('[data-role="repTotal"]');
+        if(repValue) repValue.textContent = repTotal;
+
+        bindSetButtons();
       }
     }
 
@@ -1719,12 +1687,12 @@
         const nextIndex = doneArr.indexOf(false);
         const isLocked = (!done && nextIndex !== -1 && s !== nextIndex);
 
-        return `<button class="setBtn ${done?'done':''} ${isLocked?'locked':''}"
-          ${isLocked ? 'disabled' : ''}
-          data-date="${date}" data-ex="${id}" data-set="${s}">
-          ${done ? `<i class='fa-solid fa-check'></i>` : ''}
-          ${s+1} 세트
-        </button>`;
+        return \`<button class="setBtn \${done?'done':''} \${isLocked?'locked':''}"
+          \${isLocked ? 'disabled' : ''}
+          data-date="\${date}" data-ex="\${id}" data-set="\${s}">
+          \${done ? \`<i class='fa-solid fa-check'></i>\` : ''}
+          \${s+1} 세트
+        </button>\`;
       }).join('');
     }
 
@@ -1747,7 +1715,7 @@
       const data = workoutData[currentDayIdx];
       const total = data.list.length;
       const idx = clamp(currentSlideIndex, 0, total-1);
-      document.getElementById('slide-indicator').innerText = `${idx+1} / ${total}`;
+      document.getElementById('slide-indicator').innerText = \`\${idx+1} / \${total}\`;
       document.getElementById('slide-name').innerText = data.list[idx]?.name || '운동';
 
       const carousel = document.getElementById('session-carousel');
@@ -1794,14 +1762,10 @@
         const date = btn.getAttribute('data-date');
         const ex = btn.getAttribute('data-ex');
         const setIndex = Number(btn.getAttribute('data-set'));
-
         btn.onclick = () => toggleSetComplete(date, ex, setIndex);
       });
     }
 
-    /* =========================================================
-      ✅ 핵심: 세트 완료 → 즉시 done 반영 + REP 입력 모달
-    ========================================================= */
     function toggleSetComplete(date, exerciseId, setIndex){
       unlockAudio();
       showDockTemporarily();
@@ -1849,11 +1813,9 @@
           localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
         }
 
-        // ✅ UI 즉시 반영 (새로고침 필요 없음)
         renderCarousel(false);
         updateProgressUI();
 
-        // ✅ REP 입력 모달 열기
         openRepModal({
           logKey,
           name: w.name,
@@ -1862,10 +1824,8 @@
         });
 
       }else{
-        // undone
         logs = logs.filter(l => l.logKey !== logKey);
         localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
-
         renderCarousel(false);
         updateProgressUI();
         haptic(12);
@@ -1873,9 +1833,6 @@
       }
     }
 
-    /* =========================================================
-      ✅ REP MODAL (AI 추천 + 숫자 버튼)
-    ========================================================= */
     function openRepModal({logKey, name, setNo, baseRep}){
       repModalState = {logKey, baseRep};
 
@@ -1897,7 +1854,6 @@
     function closeRepModal(saved=false){
       document.getElementById('rep-modal').classList.remove('show');
       if(!saved){
-        // 저장 안 했으면 해당 log의 repActual null 유지 + (선택적) 취소 안내
         toast("REP 입력 취소됨");
       }
       repModalState = null;
@@ -1916,7 +1872,6 @@
     }
 
     function renderRepRecommendations(baseRep, prevRep){
-      // ✅ AI 추천 3개
       const aiWrap = document.getElementById("rep-ai-reco");
       aiWrap.innerHTML = "";
 
@@ -1941,7 +1896,6 @@
         aiWrap.appendChild(btn);
       });
 
-      // ✅ 숫자 추천 (prevRep 기준 ±5)
       const grid = document.getElementById("rep-number-grid");
       grid.innerHTML = "";
 
@@ -1971,11 +1925,9 @@
       logs[idx].repActual = value;
       localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
 
-      // ✅ 휴식 타이머 시작 (rep 입력 후)
       const restSec = logs[idx].restPlanned || 0;
       if(restSec > 0) startTimer(restSec, logKey);
 
-      // ✅ 지난주 비교 토스트
       const prevLog = findLastWeekSameExerciseLog(logs[idx]);
       if(prevLog){
         const prev = prevLog.repActual ?? prevLog.plannedRep ?? null;
@@ -1995,7 +1947,6 @@
       renderCalendar();
     }
 
-    /* ✅ 지난주 동일 요일 / 동일 운동 / 동일 세트 찾기 */
     function findLastWeekSameExerciseLog(cur){
       const targetDate = cur.date;
       const prevDate = shiftDate(targetDate, -7);
@@ -2009,7 +1960,6 @@
       return d.toISOString().split('T')[0];
     }
 
-    /* ---------- adjust set/rep (딜레이 완화) ---------- */
     function adjust(type, key, val){
       showDockTemporarily();
 
@@ -2029,8 +1979,7 @@
         localStorage.setItem(KEY_REPS, JSON.stringify(customReps));
       }
 
-      // ✅ GIF 깜빡임 방지: 전체 렌더 말고 현재 슬라이드만 부분 업데이트
-      renderCarousel(false);
+      renderCarousel(false);   // ✅ 이제 REP도 카드에 즉시 반영됨
       updateProgressUI();
       toast('설정 저장됨');
       haptic(10);
@@ -2094,7 +2043,6 @@
       haptic(25);
     }
 
-    /* ---------- TIMER ---------- */
     function showHUD(on){
       const hud = document.getElementById('timer-hud');
       if(!hud) return;
@@ -2191,7 +2139,6 @@
       }
     }
 
-    /* ✅ 알림음: “알림 사운드 느낌” (비프 X, 짧은 멜로디) */
     function restDoneNotify(){
       try{ if(navigator.vibrate) navigator.vibrate([120,80,200,80,220]); }catch(e){}
 
@@ -2204,13 +2151,11 @@
         }
 
         const now = audioCtx.currentTime;
-
-        // iOS/Android 알림 느낌: "딩-딩-딩"
         const pattern = [
-          { t: 0.00, dur: 0.16, freq: 1318 }, // E6
-          { t: 0.20, dur: 0.16, freq: 1567 }, // G6
-          { t: 0.40, dur: 0.18, freq: 2093 }, // C7
-          { t: 0.66, dur: 0.18, freq: 1567 }, // G6
+          { t: 0.00, dur: 0.16, freq: 1318 },
+          { t: 0.20, dur: 0.16, freq: 1567 },
+          { t: 0.40, dur: 0.18, freq: 2093 },
+          { t: 0.66, dur: 0.18, freq: 1567 },
         ];
 
         pattern.forEach(p => {
@@ -2245,7 +2190,6 @@
       haptic(14);
     }
 
-    /* ---------- CALENDAR ---------- */
     function renderCalendar(){
       document.getElementById('calendar-month').innerText = `${currentYear}.${String(currentMonth + 1).padStart(2,'0')}`;
       const first = new Date(currentYear, currentMonth, 1).getDay();
@@ -2270,7 +2214,6 @@
       renderHistoryDetail();
     }
 
-    /* ✅ 기록 탭 강화: 날짜 요약 + 운동별 세트/rep/휴식 + 총 시간/평균휴식 */
     function renderHistoryDetail(){
       const area = document.getElementById('history-detail');
       const dayLogs = logs
@@ -2284,7 +2227,6 @@
         return;
       }
 
-      // ✅ day summary
       const totalSets = dayLogs.length;
       const avgRest = Math.round(dayLogs.reduce((a,c)=> a + (c.restUsed ?? c.restPlanned ?? 0), 0) / totalSets);
       const approxWorkoutMin = estimateWorkoutDurationMinutes(selectedDate);
@@ -2366,7 +2308,6 @@
     }
 
     function estimateWorkoutDurationMinutes(date){
-      // 간단 추정: 세트당 평균 45초 + 평균 휴식
       const day = logs.filter(l => l.date === date);
       if(!day.length) return 0;
       const avgRest = day.reduce((a,c)=> a + (c.restUsed ?? c.restPlanned ?? 0), 0) / day.length;
@@ -2395,7 +2336,6 @@
       haptic(25);
     }
 
-    /* ---------- STATS ---------- */
     function renderStats(){
       const counts = { push:0, pull:0, leg:0, rest:0 };
       logs.forEach(l => counts[l.type] !== undefined && counts[l.type]++);
@@ -2432,10 +2372,9 @@
       });
     }
 
-    /* ---------- BACKUP / RESET ALL ---------- */
     function backupJSON(){
       showDockTemporarily();
-      const payload = { version: 'v12.1', exportedAt: nowISO(), logs, customSets, customReps, progressByDate };
+      const payload = { version: 'v12.2', exportedAt: nowISO(), logs, customSets, customReps, progressByDate };
       const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
@@ -2461,7 +2400,6 @@
       haptic(30);
     }
 
-    /* ---------- ZOOM PREVENT ---------- */
     (function preventZoom(){
       document.addEventListener('gesturestart', (e)=> e.preventDefault(), {passive:false});
       document.addEventListener('gesturechange', (e)=> e.preventDefault(), {passive:false});
@@ -2477,7 +2415,6 @@
       document.addEventListener('dblclick', (e)=> e.preventDefault(), {passive:false});
     })();
 
-    /* Dock Auto Hide */
     let dockTimer = null;
     function showDockTemporarily(){
       const dock = document.querySelector('.navDockWrap');
@@ -2497,7 +2434,6 @@
       window.addEventListener(ev, showDockTemporarily, {passive:true});
     });
 
-    /* ---------- INIT ---------- */
     window.onload = async () => {
       initIntro();
       await requestWakeLock();
