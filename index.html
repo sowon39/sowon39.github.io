@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-  <title>DK MASTER OS v11.3 (Stable+ ScrollFix + Mobile+Dock)</title>
+  <title>DK MASTER OS v11.4 (WakeLock + Pause + Chime + ProgressText + GIF Resize)</title>
 
   <!-- ✅ PWA / iOS Standalone (주소창 숨김) -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -32,14 +32,12 @@
 
     html,body{ height:100%; }
 
-    /* ✅ 확대/줌 방지 (best effort) */
     html{
       touch-action: manipulation;
       -webkit-text-size-adjust: 100%;
       overscroll-behavior: none;
     }
 
-    /* ✅ 스크롤 복구 */
     body{
       font-family:'Pretendard',sans-serif;
       background-color:var(--bg);
@@ -69,7 +67,6 @@
       border:1px solid rgba(255,255,255,0.10);
     }
 
-    /* ✅ 전체 폭 레이아웃 컨테이너 */
     .layoutWrap{
       width:100%;
       max-width: 1100px;
@@ -87,7 +84,6 @@
       transition:all 1s cubic-bezier(0.65,0,0.35,1);
     }
 
-    /* Aurora Layer */
     #splash-screen.splashA::before{
       content:"";
       position:absolute; inset:-45%;
@@ -101,7 +97,6 @@
       opacity:1;
     }
 
-    /* Noise Layer */
     #splash-screen.splashA::after{
       content:"";
       position:absolute; inset:0;
@@ -252,7 +247,6 @@
     .tab-content.active{ display:block; }
     @keyframes fadeInContent{ from{opacity:0; transform:translateY(6px) scale(0.985);} to{opacity:1; transform:translateY(0) scale(1);} }
 
-    /* Pills */
     .pill{
       display:inline-flex; align-items:center; gap:6px;
       padding:6px 10px; border-radius:999px;
@@ -265,13 +259,11 @@
     }
     .pill.cyan{ border-color:rgba(34,211,238,0.25); background:rgba(34,211,238,0.10); color:rgba(34,211,238,0.95); }
 
-    /* ✅ Main */
     main{
       padding-top: calc(var(--headerH) + 18px + env(safe-area-inset-top));
       padding-bottom: calc(var(--dockH) + env(safe-area-inset-bottom) + 28px);
     }
 
-    /* ✅ Carousel */
     .carousel{
       display:flex;
       gap:18px;
@@ -308,7 +300,6 @@
       overflow:hidden;
     }
 
-    /* Right Panel */
     .rightPanel{ border-radius:26px; padding:18px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); }
 
     .stepper{
@@ -356,14 +347,12 @@
     .setBtn:active{ transform:scale(0.985); }
     .setBtn.done{ background:linear-gradient(135deg,var(--primary),var(--accent)); color:#000; box-shadow:0 18px 34px rgba(34,211,238,0.24); border:none; }
 
-    /* ✅ 세트 순서 잠금 */
     .setBtn.locked{
       opacity: .35;
       filter: saturate(.6);
       pointer-events: none;
     }
 
-    /* ✅ Floating Dock */
     .navDockWrap{ position:fixed; left:0; right:0; bottom:0; padding: 18px; z-index:60; }
     .nav-dock{
       background:rgba(10,10,12,0.78);
@@ -382,7 +371,6 @@
     .nav-active-dot{ position:absolute; bottom:1px; width:4px; height:4px; background:var(--primary); border-radius:50%; box-shadow:0 0 12px var(--primary); opacity:0; transition:all .25s; }
     .nav-item.active .nav-active-dot{ opacity:1; transform:scale(1.6); }
 
-    /* ✅ Dock Auto Hide */
     .navDockWrap{
       transition: transform .45s cubic-bezier(0.22, 1, 0.36, 1), opacity .35s ease;
       will-change: transform, opacity;
@@ -398,7 +386,6 @@
       pointer-events: auto;
     }
 
-    /* Day chips */
     .day-chip{
       width:44px; height:44px;
       border-radius:18px;
@@ -423,11 +410,9 @@
       box-shadow:0 10px 24px rgba(34,211,238,0.25);
     }
 
-    /* Timer Modal */
     #timer-modal{ transition:all .65s ease; }
     #timer-sec{ letter-spacing:-0.08em; }
 
-    /* ✅ Timer HUD */
     #timer-hud{
       position:fixed;
       top: calc(var(--headerH) + 10px + env(safe-area-inset-top));
@@ -481,15 +466,12 @@
     }
     .hudBtn:active{ transform:scale(.98); }
 
-    /* Summary modal */
     #summary-modal{ position:fixed; inset:0; z-index:220; display:none; align-items:center; justify-content:center; }
     #summary-modal.show{ display:flex; }
 
-    /* Toast */
     #toast{ position:fixed; left:50%; bottom:130px; transform:translateX(-50%); z-index:250; opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; }
     #toast.show{ opacity:1; transform:translateX(-50%) translateY(-6px); }
 
-    /* History layout */
     .historyLayout{
       display:grid;
       grid-template-columns: 1fr;
@@ -501,13 +483,11 @@
       }
     }
 
-    /* Calendar */
     .calendar-day{ aspect-ratio:1; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:13px; position:relative; transition:all .18s; font-weight:800; color:rgba(255,255,255,0.75); background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); user-select:none;}
     .has-log::after{ content:''; width:6px; height:6px; background:rgba(34,211,238,0.90); border-radius:50%; position:absolute; bottom:8px; box-shadow:0 0 12px rgba(34,211,238,0.35); }
     .calendar-day.selected{ background:rgba(34,211,238,0.14); border:1px solid rgba(34,211,238,0.35); box-shadow:0 0 0 2px rgba(34,211,238,0.18), 0 0 30px rgba(34,211,238,0.12); color:#eaffff; font-weight:900; transform:translateY(-2px); }
     .calendar-day.today{ border:1px solid rgba(255,255,255,0.12); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08); color:rgba(255,255,255,0.95); font-weight:900; }
 
-    /* History table */
     .log-table{ width:100%; border-collapse:separate; border-spacing:0 10px; }
     .log-table th{ font-size:10px; text-transform:uppercase; letter-spacing:.18em; color:rgba(255,255,255,0.35); font-weight:900; text-align:left; padding:0 10px 6px; }
     .log-row{ background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:16px; overflow:hidden; }
@@ -651,6 +631,8 @@
       color: rgba(255,255,255,0.45);
       line-height: 1.4;
     }
+
+    /* ✅ GIF 크기 조절 (v11.4 핵심) */
     .sheetGif{
       width: 100%;
       border-radius: 18px;
@@ -658,11 +640,11 @@
       border: 1px solid rgba(255,255,255,0.10);
       box-shadow: 0 22px 55px rgba(0,0,0,0.65);
       display:block;
-      object-fit: cover;
-      background: rgba(255,255,255,0.03);
+      object-fit: contain;
+      background: rgba(0,0,0,0.20);
+      max-height: 240px; /* ✅ 너무 크게 나오지 않게 제한 */
     }
 
-    /* ✅ 카드에서 정사각 GIF 노출 (태블릿/PC에서도 안 잘림) */
     .cardGifSquareWrap{
       width: 100%;
       aspect-ratio: 1 / 1;
@@ -679,7 +661,7 @@
     .cardGifSquare{
       width: 100%;
       height: 100%;
-      object-fit: contain; /* ✅ 핵심: 절대 안 잘림 */
+      object-fit: contain;
       display: block;
       background: rgba(0,0,0,0.15);
     }
@@ -713,9 +695,16 @@
       #progress-percent{
         font-size: 16px !important;
         font-weight: 950 !important;
-        margin-bottom: 6px !important;
+        margin-bottom: 4px !important;
         letter-spacing: -0.02em;
       }
+
+      #progress-text{
+        font-size: 9px !important;
+        margin-bottom: 6px !important;
+        letter-spacing: 0.12em !important;
+      }
+
       header .w-28{
         width: 140px !important;
         height: 8px !important;
@@ -779,7 +768,7 @@
 
       <div class="splash-foot">
         <div class="splash-auth">AUTHORIZED ACCESS · <b>GRANTED</b></div>
-        <div class="splash-ver">v11.3 · Stable</div>
+        <div class="splash-ver">v11.4 · Stable</div>
       </div>
     </div>
   </div>
@@ -814,9 +803,18 @@
           <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
           <p class="text-[9px] font-black text-gray-300 tracking-widest uppercase">엘리트 모드 · DK</p>
         </div>
+
+        <!-- ✅ v11.4: 일시정지 버튼 -->
+        <div class="flex items-center gap-2 mt-2">
+          <button id="stopwatch-toggle" onclick="toggleStopwatch()" class="pill cyan">
+            <i class="fa-solid fa-pause"></i> PAUSE
+          </button>
+        </div>
       </div>
+
       <div class="flex flex-col items-end">
-        <span id="progress-percent" class="text-[10px] font-black mb-1.5 text-cyan-300">0%</span>
+        <span id="progress-percent" class="text-[10px] font-black mb-1 text-cyan-300">0%</span>
+        <span id="progress-text" class="text-[9px] font-black text-white/50 tracking-widest mb-1.5">0% 완료!</span>
         <div class="w-28 h-1.5 bg-white/5 rounded-full overflow-hidden">
           <div id="progress-bar" class="h-full bg-cyan-400 shadow-[0_0_12px_#22d3ee] transition-all duration-700" style="width:0%"></div>
         </div>
@@ -1036,19 +1034,43 @@
 
   <script>
     /* =========================================================
-      DK MASTER OS v11.3
-      ✅ GIF: 대문자 파일명, index.html과 같은 경로로 매칭
-      ✅ 카드: 엘리트 가이드 밑 정사각 GIF 노출 + 클릭하면 상세 열림
-      ✅ GIF 없으면 기존 상세 버튼 노출
+      DK MASTER OS v11.4
+      ✅ WakeLock(화면 꺼짐 방지)
+      ✅ Stopwatch Pause
+      ✅ Chime Rest Notify
+      ✅ ProgressText
+      ✅ Detail GIF Resize
     ========================================================= */
+
+    /* ---------- WAKE LOCK (화면 꺼짐 방지) ---------- */
+    let wakeLock = null;
+
+    async function requestWakeLock(){
+      try{
+        if('wakeLock' in navigator){
+          wakeLock = await navigator.wakeLock.request('screen');
+          console.log('✅ WakeLock active');
+          wakeLock.addEventListener('release', () => {
+            console.log('WakeLock released');
+          });
+        }
+      }catch(e){
+        console.log('WakeLock error', e);
+      }
+    }
+
+    function releaseWakeLock(){
+      try{ wakeLock && wakeLock.release(); }catch(e){}
+      wakeLock = null;
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if(document.visibilityState === 'visible') requestWakeLock();
+    });
 
     /* ---------- GIF 매칭 헬퍼 ---------- */
     function getGifByExerciseName(name){
       const n = (name || '').toLowerCase();
-
-      // ✅ 너가 제공한 파일 목록 기반 매핑
-      // AIR_SQT.gif, CHIN_UP.gif, DB_LAT_RAISE.gif, DIPS.gif, INVT_ROW.gif,
-      // LUNGE.gif, PIKE_PUSH_UP.gif, PLANK.gif, PULL_UP.gif, PUSH_UP.gif
       if(n.includes('스쿼트') || n.includes('squat')) return 'AIR_SQT.gif';
       if(n.includes('친업') || n.includes('chin')) return 'CHIN_UP.gif';
       if(n.includes('사이드 레이즈') || n.includes('side raise') || n.includes('레터럴') || n.includes('lateral')) return 'DB_LAT_RAISE.gif';
@@ -1059,8 +1081,7 @@
       if(n.includes('플랭크') || n.includes('plank')) return 'PLANK.gif';
       if(n.includes('풀업') || n.includes('pull up') || n.includes('pullup')) return 'PULL_UP.gif';
       if(n.includes('푸쉬업') || n.includes('push up') || n.includes('pushup')) return 'PUSH_UP.gif';
-
-      return ''; // 매칭 없으면 빈값
+      return '';
     }
 
     /* ---------- DATA ---------- */
@@ -1099,13 +1120,13 @@
     };
 
     /* ---------- STORAGE KEYS ---------- */
-    const KEY_LOGS = 'dk_os_v113_logs';
-    const KEY_SETS = 'dk_os_v113_sets';
-    const KEY_REPS = 'dk_os_v113_reps';
-    const KEY_PROGRESS_BY_DATE = 'dk_os_v113_progress_by_date';
-    const KEY_SPLASH = 'dk_os_v113_splash_shown';
-    const KEY_SUMMARY_SHOWN = 'dk_os_v113_summary_shown';
-    const KEY_NOTIF = 'dk_os_v113_rest_notif';
+    const KEY_LOGS = 'dk_os_v114_logs';
+    const KEY_SETS = 'dk_os_v114_sets';
+    const KEY_REPS = 'dk_os_v114_reps';
+    const KEY_PROGRESS_BY_DATE = 'dk_os_v114_progress_by_date';
+    const KEY_SPLASH = 'dk_os_v114_splash_shown';
+    const KEY_SUMMARY_SHOWN = 'dk_os_v114_summary_shown';
+    const KEY_NOTIF = 'dk_os_v114_rest_notif';
 
     /* ---------- LOAD ---------- */
     function safeParse(raw, fallback){ try { return raw ? JSON.parse(raw) : fallback; } catch(e){ return fallback; } }
@@ -1141,6 +1162,31 @@
           audioCtx.resume();
         }
       }catch(e){}
+    }
+
+    /* ✅ Stopwatch Pause (v11.4) */
+    let stopwatchRunning = true;
+    let stopwatchBaseStart = null;
+    let stopwatchAccumulated = 0;
+
+    function toggleStopwatch(){
+      stopwatchRunning = !stopwatchRunning;
+      const btn = document.getElementById('stopwatch-toggle');
+
+      if(stopwatchRunning){
+        stopwatchBaseStart = Date.now();
+        btn.innerHTML = `<i class="fa-solid fa-pause"></i> PAUSE`;
+        btn.classList.add('cyan');
+        toast("타이머 재개");
+      }else{
+        const elapsed = Math.floor((Date.now() - stopwatchBaseStart)/1000);
+        stopwatchAccumulated += elapsed;
+        btn.innerHTML = `<i class="fa-solid fa-play"></i> RESUME`;
+        btn.classList.remove('cyan');
+        toast("타이머 일시정지");
+      }
+      haptic(10);
+      showDockTemporarily();
     }
 
     /* ---------- UTILS ---------- */
@@ -1199,7 +1245,6 @@
       if(name === 'history') renderCalendar();
 
       window.scrollTo({top:0, behavior:'smooth'});
-
       showDockTemporarily();
     }
 
@@ -1249,10 +1294,15 @@
       return { total, done, pct: Math.round((done/total)*100) || 0 };
     }
 
+    /* ✅ v11.4: 진행률 문구 추가 */
     function updateProgressUI(){
       const p = computeProgressForDay(todayStr(), currentDayIdx);
       document.getElementById('progress-bar').style.width = p.pct + '%';
       document.getElementById('progress-percent').innerText = p.pct + '%';
+
+      const text = document.getElementById('progress-text');
+      if(text) text.innerText = `${p.pct}% 완료!`;
+
       if(p.pct === 100) maybeShowSummary();
     }
 
@@ -1314,7 +1364,6 @@
       renderCarousel();
       updateProgressUI();
       updateDayNav();
-
       showDockTemporarily();
     }
 
@@ -1457,10 +1506,8 @@
 
       data.list.forEach((w, idx) => {
         const id = exId(currentDayIdx, idx);
-
-        // ✅ GIF 자동 매칭 (대문자 파일명, index.html과 같은 경로)
         const gif = getGifByExerciseName(w.name);
-        w.gif = gif || ''; // 상세에서도 사용
+        w.gif = gif || '';
 
         const setTotal = customSets[id] || w.set;
         const repTotal = customReps[id] || w.rep;
@@ -1471,7 +1518,6 @@
         slide.className = 'slide';
         slide.setAttribute('data-slide', idx);
 
-        // ✅ gif 있으면 버튼 대신 "GIF 터치로 상세" 안내
         const detailAction = gif ? `
           <span class="pill cyan">
             <i class="fa-solid fa-hand-pointer"></i> GIF 터치로 상세 보기
@@ -1525,7 +1571,6 @@
                       <p class="text-[13px] font-bold text-white/75">${w.tip} · <span class="text-white/45">${w.guide}</span></p>
                     </div>
 
-                    <!-- ✅ GIF는 엘리트 가이드 밑 정사각형 공간에 노출 -->
                     ${gif ? `
                       <div class="mt-2 col-span-2">
                         <div class="cardGifSquareWrap" onclick='openDetailSheet(${JSON.stringify(w).replace(/'/g,"&#39;")})'>
@@ -1698,7 +1743,6 @@
       }
 
       const repTotal = customReps[exerciseId] || w.rep;
-
       doneArr[setIndex] = !doneArr[setIndex];
       progressByDate[date][exerciseId] = doneArr;
       localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
@@ -1927,18 +1971,9 @@
       }
     }
 
+    /* ✅ v11.4: 알림음을 Chime 스타일로 변경 + 화면깜빡임 제거 */
     function restDoneNotify(){
       try{ if(navigator.vibrate) navigator.vibrate([120,80,200,80,220]); }catch(e){}
-      try{
-        document.body.animate(
-          [
-            { filter:"brightness(1)" },
-            { filter:"brightness(1.35)" },
-            { filter:"brightness(1)" }
-          ],
-          { duration: 240, iterations: 3 }
-        );
-      }catch(e){}
 
       try{
         if(!audioCtx){
@@ -1949,23 +1984,25 @@
         }
 
         const now = audioCtx.currentTime;
-        const pattern = [
-          { t: 0.00, dur: 0.22, freq: 988 },
-          { t: 0.30, dur: 0.22, freq: 880 },
-          { t: 0.60, dur: 0.25, freq: 988 },
-          { t: 0.95, dur: 0.25, freq: 1047 }
+
+        const tones = [
+          { t: 0.00, dur: 0.18, freq: 1318 }, // E6
+          { t: 0.22, dur: 0.18, freq: 1047 }, // C6
+          { t: 0.44, dur: 0.22, freq: 1318 }, // E6
+          { t: 0.72, dur: 0.28, freq: 1568 }, // G6
         ];
 
-        pattern.forEach(p => {
+        tones.forEach(p => {
           const o = audioCtx.createOscillator();
           const g = audioCtx.createGain();
           o.connect(g);
           g.connect(audioCtx.destination);
-          o.type = 'square';
+
+          o.type = 'triangle';
           o.frequency.setValueAtTime(p.freq, now + p.t);
 
           g.gain.setValueAtTime(0.0001, now + p.t);
-          g.gain.exponentialRampToValueAtTime(0.18, now + p.t + 0.02);
+          g.gain.exponentialRampToValueAtTime(0.35, now + p.t + 0.01);
           g.gain.exponentialRampToValueAtTime(0.0001, now + p.t + p.dur);
 
           o.start(now + p.t);
@@ -2136,7 +2173,7 @@
     /* ---------- BACKUP / RESET ALL ---------- */
     function backupJSON(){
       showDockTemporarily();
-      const payload = { version: 'v11.3', exportedAt: nowISO(), logs, customSets, customReps, progressByDate };
+      const payload = { version: 'v11.4', exportedAt: nowISO(), logs, customSets, customReps, progressByDate };
       const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
@@ -2211,13 +2248,28 @@
         btn.classList.toggle('cyan', restNotifEnabled);
       }
 
-      const start = Date.now();
+      /* ✅ v11.4: Stopwatch (Pause 지원) */
+      stopwatchBaseStart = Date.now();
       setInterval(()=> {
-        totalSec = Math.floor((Date.now() - start)/1000);
+        if(stopwatchRunning){
+          const elapsed = Math.floor((Date.now() - stopwatchBaseStart)/1000);
+          totalSec = stopwatchAccumulated + elapsed;
+        }else{
+          totalSec = stopwatchAccumulated;
+        }
+
         const m = Math.floor(totalSec/60).toString().padStart(2,'0');
         const s = (totalSec%60).toString().padStart(2,'0');
         document.getElementById('stopwatch').innerText = `${m}:${s}`;
       }, 1000);
+
+      /* ✅ v11.4: WakeLock 요청 */
+      requestWakeLock();
+
+      /* ✅ iOS WakeLock 안정성: 터치 시 재요청 */
+      ['touchstart','click'].forEach(ev=>{
+        window.addEventListener(ev, () => requestWakeLock(), {passive:true});
+      });
 
       setTimeout(()=> {
         const dock = document.querySelector('.navDockWrap');
