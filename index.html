@@ -1231,7 +1231,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     function buildPayload(){
       return {
         version:"dk_fit_cloud_v1",
-        updatedAt:new Date().toISOString(),
+        updatedAt:(getLocalUpdatedAt() || new Date().toISOString()),
         logs, customSets, customReps, progressByDate
       };
     }
@@ -1243,40 +1243,79 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       customReps = p.customReps && typeof p.customReps==='object'? p.customReps: {};
       progressByDate = p.progressByDate && typeof p.progressByDate==='object'? p.progressByDate: {};
       localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+      touchLocalUpdate();
       localStorage.setItem(KEY_SETS, JSON.stringify(customSets));
+      touchLocalUpdate();
       localStorage.setItem(KEY_REPS, JSON.stringify(customReps));
+      touchLocalUpdate();
       localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
+      localStorage.setItem(KEY_LOCAL_UPDATED_AT, p.updatedAt || new Date().toISOString());
+      touchLocalUpdate();
     }
 
+    
     async function pullFromCloud(){
-      if(!currentUser||!fbDb) return;
+      if(!currentUser||!fbDb) return null;
       const ref = fbDb.collection('users').doc(currentUser.uid);
       const snap = await ref.get();
-      if(snap.exists && snap.data()){
-        applyPayload(snap.data());
-      }else{
-        await ref.set(buildPayload(), {merge:true});
-      }
-      cloudReady=true;
-      try{
-        renderCarousel(true);
-        updateProgressUI();
-        renderCalendar();
-        renderStats();
-      }catch(e){}
+      if(snap.exists && snap.data()) return snap.data();
+      return null;
     }
 
     async function pushToCloud(){
-      if(!currentUser||!fbDb||!cloudReady) return;
+      if(!currentUser||!fbDb) return;
       const ref = fbDb.collection('users').doc(currentUser.uid);
       await ref.set(buildPayload(), {merge:true});
     }
 
-    async function manualRefresh(){
+    function isoToMs(iso){
+      if(!iso) return 0;
+      const t = Date.parse(iso);
+      return Number.isFinite(t) ? t : 0;
+    }
+
+    async function syncCloudPreferLatest({showToast=false}={}){
+      if(!currentUser) return;
       try{
-        await pushToCloud();   // 먼저 업로드(내 기록 반영)
-        await pullFromCloud(); // 그 다음 최신 다운로드
-      }catch(e){ console.warn(e); }
+        const cloud = await syncCloudPreferLatest();
+        const localIso = getLocalUpdatedAt() || null;
+        const cloudIso = cloud?.updatedAt || null;
+        const localMs = isoToMs(localIso);
+        const cloudMs = isoToMs(cloudIso);
+
+        // 1) 클라우드가 없으면: 로컬을 업로드(첫 로그인)
+        if(!cloud){
+          await pushToCloud();
+          cloudReady=true;
+          setAuthUI('in');
+          return;
+        }
+
+        // 2) 비교해서 더 최신 데이터를 선택
+        if(cloudMs > localMs){
+          applyPayload(cloud);
+          cloudReady=true;
+        }else if(localMs > cloudMs){
+          await pushToCloud();
+          cloudReady=true;
+        }else{
+          // 동일하면 아무것도 하지 않음
+          cloudReady=true;
+        }
+
+        // UI 업데이트
+        try{
+          renderCarousel(true);
+          updateProgressUI();
+          renderCalendar();
+          renderStats();
+        }catch(e){}
+      }catch(e){ console.warn("syncCloudPreferLatest", e); }
+    }
+
+    async function manualRefresh(){
+      // Fit앱 UX: 새로고침 시 "최신 기준"으로 맞추기
+      await syncCloudPreferLatest();
     }
 
     function bindAuthState(){
@@ -1284,7 +1323,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         currentUser=u||null;
         if(!currentUser){ cloudReady=false; setAuthUI('out'); return; }
         setAuthUI('in');
-        await pullFromCloud();
+        await syncCloudPreferLatest();
       });
     }
 
@@ -1352,6 +1391,16 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     const KEY_SPLASH = 'dk_os_v121_splash_shown';
     const KEY_SUMMARY_SHOWN = 'dk_os_v121_summary_shown';
     const KEY_NOTIF = 'dk_os_v121_rest_notif';
+
+
+    const KEY_LOCAL_UPDATED_AT = 'dk_os_v121_local_updatedAt';
+    function touchLocalUpdate(){
+      try{ localStorage.setItem(KEY_LOCAL_UPDATED_AT, new Date().toISOString()); }catch(e){}
+    }
+    function getLocalUpdatedAt(){
+      try{ return localStorage.getItem(KEY_LOCAL_UPDATED_AT) || null; }catch(e){ return null; }
+    }
+
 
     /* ---------- LOAD ---------- */
     function safeParse(raw, fallback){ try { return raw ? JSON.parse(raw) : fallback; } catch(e){ return fallback; } }
@@ -1495,6 +1544,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         arr = new Array(setTotal).fill(false);
         progressByDate[date][exerciseId] = arr;
         localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
+      touchLocalUpdate();
         return arr;
       }
       if(arr.length !== setTotal){
@@ -1502,6 +1552,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         for(let i=0;i<Math.min(arr.length,setTotal);i++) next[i]=!!arr[i];
         progressByDate[date][exerciseId] = next;
         localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
+      touchLocalUpdate();
         return next;
       }
       return arr;
@@ -2020,6 +2071,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       doneArr[setIndex] = !doneArr[setIndex];
       progressByDate[date][exerciseId] = doneArr;
       localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
+      touchLocalUpdate();
 
       const setNo = setIndex + 1;
       const logKey = `${date}|${exerciseId}|${setNo}`;
@@ -2043,6 +2095,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
             type: workoutData[currentDayIdx].type
           });
           localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+      touchLocalUpdate();
         }
 
         // ✅ UI 즉시 반영 (새로고침 필요 없음)
@@ -2061,6 +2114,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         // undone
         logs = logs.filter(l => l.logKey !== logKey);
         localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+      touchLocalUpdate();
 
         renderCarousel(false);
         updateProgressUI();
@@ -2190,6 +2244,7 @@ function saveRepToLog(logKey, value){
 
       logs[idx].repActual = value;
       localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+      touchLocalUpdate();
 
       // ✅ 휴식 타이머 시작 (rep 입력 후)
       const restSec = logs[idx].restPlanned || 0;
@@ -2243,11 +2298,13 @@ function saveRepToLog(logKey, value){
         const next = clamp(cur + val, 1, 12);
         customSets[key] = next;
         localStorage.setItem(KEY_SETS, JSON.stringify(customSets));
+      touchLocalUpdate();
         getProgressArr(todayStr(), key, next);
       }else{
         const cur = customReps[key] || w.rep;
         customReps[key] = clamp(cur + val, 1, 100);
         localStorage.setItem(KEY_REPS, JSON.stringify(customReps));
+      touchLocalUpdate();
       }
 
       // ✅ 즉시 DOM 숫자 갱신 (새로고침 없이 반영)
@@ -2280,7 +2337,9 @@ function saveRepToLog(logKey, value){
       if(customSets[exerciseId] !== undefined) delete customSets[exerciseId];
       if(customReps[exerciseId] !== undefined) delete customReps[exerciseId];
       localStorage.setItem(KEY_SETS, JSON.stringify(customSets));
+      touchLocalUpdate();
       localStorage.setItem(KEY_REPS, JSON.stringify(customReps));
+      touchLocalUpdate();
 
 
       // ✅ 즉시 DOM 갱신 (새로고침 불필요)
@@ -2306,6 +2365,7 @@ function saveRepToLog(logKey, value){
 
       logs = logs.filter(l => !(l.date === date && l.exerciseId === exerciseId));
       localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+      touchLocalUpdate();
 
       const [d, idx] = exerciseId.split('-').map(Number);
       const w = workoutData[d]?.list?.[idx];
@@ -2313,6 +2373,7 @@ function saveRepToLog(logKey, value){
       if(progressByDate[date] && progressByDate[date][exerciseId]){
         progressByDate[date][exerciseId] = new Array(setTotal).fill(false);
         localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
+      touchLocalUpdate();
       }
 
       renderCarousel(false);
@@ -2328,8 +2389,10 @@ function saveRepToLog(logKey, value){
 
       logs = logs.filter(l => l.date !== date);
       localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+      touchLocalUpdate();
 
-      if(progressByDate[date]){ delete progressByDate[date]; localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate)); }
+      if(progressByDate[date]){ delete progressByDate[date]; localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
+      touchLocalUpdate(); }
       localStorage.removeItem(KEY_SUMMARY_SHOWN);
 
       renderCarousel(true);
@@ -2423,6 +2486,7 @@ function saveRepToLog(logKey, value){
         if(idx !== -1){
           logs[idx].restUsed = used;
           localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+      touchLocalUpdate();
         }
       }
       restStartedAt = null;
@@ -2633,7 +2697,9 @@ function saveRepToLog(logKey, value){
       const date = selectedDate;
       logs = logs.filter(l => l.date !== date);
       localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
-      if(progressByDate[date]){ delete progressByDate[date]; localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate)); }
+      touchLocalUpdate();
+      if(progressByDate[date]){ delete progressByDate[date]; localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
+      touchLocalUpdate(); }
       toast(t('messages.toast.selectedDateReset','선택 날짜 초기화'));
       renderCalendar();
       haptic(25);
