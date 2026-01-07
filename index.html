@@ -1292,7 +1292,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     async function syncCloudPreferLatest({showToast=false}={}){
       if(!currentUser) return;
       try{
-        const cloud = await syncCloudPreferLatest();
+        const cloud = await pullFromCloud();
         const localIso = getLocalUpdatedAt() || null;
         const cloudIso = cloud?.updatedAt || null;
         const localMs = isoToMs(localIso);
@@ -1344,6 +1344,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
 
     // ✅ 포커스/탭 전환/탭 이동 시 자동 동기화 (일반 Fit앱 UX)
     function setupAutoSync(){
+      window.addEventListener('beforeunload', ()=>{ try{ if(currentUser && cloudReady) pushToCloud(); }catch(e){} });
       window.addEventListener('focus', ()=>{ if(currentUser) manualRefresh(); });
       document.addEventListener('visibilitychange', ()=>{ if(!document.hidden && currentUser) manualRefresh(); });
     }
@@ -1415,6 +1416,10 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       try{
         if(!currentUser || !fbDb || !cloudReady) return;
         if(isApplyingCloud) return;
+
+        // 즉시 1회 업로드(추가 기록 후 다른 기기에서 새로고침 시 바로 보이게)
+        (async ()=>{ try{ await pushToCloud(); }catch(e){} })();
+
         if(silentPushTimer) clearTimeout(silentPushTimer);
         silentPushTimer = setTimeout(async ()=>{
           try{ await pushToCloud(); }catch(e){}
