@@ -14,7 +14,96 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
 
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com">
+
+/* =======================
+   Firebase Sync (Basic A-1)
+   ======================= */
+
+async function loginGoogle(){
+  const { auth, GoogleAuthProvider, signInWithPopup } = window.firebase;
+  const provider = new GoogleAuthProvider();
+  await signInWithPopup(auth, provider);
+}
+
+async function logout(){
+  const { auth, signOut } = window.firebase;
+  await signOut(auth);
+  if (typeof toast === "function") toast("로그아웃됨");
+}
+
+async function loadCloud(){
+  const { auth, db, doc, getDoc } = window.firebase;
+  const user = auth.currentUser;
+  if(!user) return false;
+
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+  if(!snap.exists()) return false;
+
+  const cloud = snap.data();
+
+  logs = cloud.logs || [];
+  customSets = cloud.customSets || {};
+  customReps = cloud.customReps || {};
+  progressByDate = cloud.progressByDate || {};
+
+  localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+  
+    saveCloudDebounced();localStorage.setItem(KEY_SETS, JSON.stringify(customSets));
+  
+    saveCloudDebounced();localStorage.setItem(KEY_REPS, JSON.stringify(customReps));
+  
+    saveCloudDebounced();localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
+
+  
+    saveCloudDebounced();return true;
+}
+
+let cloudSaveTimer = null;
+function saveCloudDebounced(){
+  if(cloudSaveTimer) clearTimeout(cloudSaveTimer);
+  cloudSaveTimer = setTimeout(saveCloud, 800);
+}
+
+async function saveCloud(){
+  const { auth, db, doc, setDoc } = window.firebase;
+  const user = auth.currentUser;
+  if(!user) return;
+
+  await setDoc(doc(db, "users", user.uid), {
+    logs,
+    customSets,
+    customReps,
+    progressByDate,
+    updatedAt: Date.now()
+  }, { merge: true });
+}
+
+function initAuth(){
+  const { auth, onAuthStateChanged } = window.firebase;
+
+  onAuthStateChanged(auth, async (user) => {
+    const el = document.getElementById("auth-state");
+    if(user){
+      if(el) el.textContent = "로그인 상태: ON";
+      if (typeof toast === "function") toast("로그인됨. 클라우드 데이터 불러오는 중...");
+      const ok = await loadCloud();
+      if(ok){
+        if (typeof toast === "function") toast("클라우드 데이터 반영 완료 ✅");
+        if (typeof renderCarousel === "function") renderCarousel(true);
+        if (typeof updateProgressUI === "function") updateProgressUI();
+        if (typeof renderCalendar === "function") renderCalendar();
+      } else {
+        if (typeof toast === "function") toast("클라우드 데이터 없음(첫 로그인)");
+      }
+    } else {
+      if(el) el.textContent = "로그인 상태: OFF";
+    }
+  });
+}
+
+</script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
@@ -774,7 +863,7 @@ button,a{
     }
   
 /* ===== Swipe-friendly touch-action tuning ===== */
-.carousel, .slides, .slideTrack, .slideContainer{ touch-action: pan-x; }
+.carousel, .slides, .slideTrack, .slideContainer{ touch-action: pan-y; }
 button, a, [role="button"], .btn, .chip, .tab, .iconbtn{ touch-action: manipulation; }
 .main, .content, .scrollArea, .list{ -webkit-overflow-scrolling: touch; }
 .is-pressed{
@@ -1345,14 +1434,16 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         arr = new Array(setTotal).fill(false);
         progressByDate[date][exerciseId] = arr;
         localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
-        return arr;
+        
+    saveCloudDebounced();return arr;
       }
       if(arr.length !== setTotal){
         const next = new Array(setTotal).fill(false);
         for(let i=0;i<Math.min(arr.length,setTotal);i++) next[i]=!!arr[i];
         progressByDate[date][exerciseId] = next;
         localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
-        return next;
+        
+    saveCloudDebounced();return next;
       }
       return arr;
     }
@@ -1871,7 +1962,8 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       progressByDate[date][exerciseId] = doneArr;
       localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
 
-      const setNo = setIndex + 1;
+      
+    saveCloudDebounced();const setNo = setIndex + 1;
       const logKey = `${date}|${exerciseId}|${setNo}`;
 
       if(doneArr[setIndex]){
@@ -1893,7 +1985,8 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
             type: workoutData[currentDayIdx].type
           });
           localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
-        }
+        
+    saveCloudDebounced();}
 
         // ✅ UI 즉시 반영 (새로고침 필요 없음)
         renderCarousel(false);
@@ -1912,7 +2005,8 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         logs = logs.filter(l => l.logKey !== logKey);
         localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
 
-        renderCarousel(false);
+        
+    saveCloudDebounced();renderCarousel(false);
         updateProgressUI();
         haptic(12);
         toast("세트 취소됨");
@@ -2041,7 +2135,8 @@ function saveRepToLog(logKey, value){
       logs[idx].repActual = value;
       localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
 
-      // ✅ 휴식 타이머 시작 (rep 입력 후)
+      
+    saveCloudDebounced();// ✅ 휴식 타이머 시작 (rep 입력 후)
       const restSec = logs[idx].restPlanned || 0;
       if(restSec > 0) startTimer(restSec, logKey);
 
@@ -2093,12 +2188,14 @@ function saveRepToLog(logKey, value){
         const next = clamp(cur + val, 1, 12);
         customSets[key] = next;
         localStorage.setItem(KEY_SETS, JSON.stringify(customSets));
-        getProgressArr(todayStr(), key, next);
+        
+    saveCloudDebounced();getProgressArr(todayStr(), key, next);
       }else{
         const cur = customReps[key] || w.rep;
         customReps[key] = clamp(cur + val, 1, 100);
         localStorage.setItem(KEY_REPS, JSON.stringify(customReps));
-      }
+      
+    saveCloudDebounced();}
 
       // ✅ 즉시 DOM 숫자 갱신 (새로고침 없이 반영)
       // ✅ 즉시 DOM 숫자 갱신 (새로고침 없이 반영)
@@ -2130,10 +2227,12 @@ function saveRepToLog(logKey, value){
       if(customSets[exerciseId] !== undefined) delete customSets[exerciseId];
       if(customReps[exerciseId] !== undefined) delete customReps[exerciseId];
       localStorage.setItem(KEY_SETS, JSON.stringify(customSets));
-      localStorage.setItem(KEY_REPS, JSON.stringify(customReps));
+      
+    saveCloudDebounced();localStorage.setItem(KEY_REPS, JSON.stringify(customReps));
 
 
-      // ✅ 즉시 DOM 갱신 (새로고침 불필요)
+      
+    saveCloudDebounced();// ✅ 즉시 DOM 갱신 (새로고침 불필요)
       const slide = document.querySelector(`.slide[data-slide="${currentSlideIndex}"]`);
       if(slide){
         const setEl = slide.querySelector('[data-role="setTotal"]');
@@ -2157,13 +2256,15 @@ function saveRepToLog(logKey, value){
       logs = logs.filter(l => !(l.date === date && l.exerciseId === exerciseId));
       localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
 
-      const [d, idx] = exerciseId.split('-').map(Number);
+      
+    saveCloudDebounced();const [d, idx] = exerciseId.split('-').map(Number);
       const w = workoutData[d]?.list?.[idx];
       const setTotal = customSets[exerciseId] || w.set;
       if(progressByDate[date] && progressByDate[date][exerciseId]){
         progressByDate[date][exerciseId] = new Array(setTotal).fill(false);
         localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
-      }
+      
+    saveCloudDebounced();}
 
       renderCarousel(false);
       updateProgressUI();
@@ -2179,7 +2280,9 @@ function saveRepToLog(logKey, value){
       logs = logs.filter(l => l.date !== date);
       localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
 
-      if(progressByDate[date]){ delete progressByDate[date]; localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate)); }
+      
+    saveCloudDebounced();if(progressByDate[date]){ delete progressByDate[date]; localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate)); 
+    saveCloudDebounced();}
       localStorage.removeItem(KEY_SUMMARY_SHOWN);
 
       renderCarousel(true);
@@ -2273,7 +2376,8 @@ function saveRepToLog(logKey, value){
         if(idx !== -1){
           logs[idx].restUsed = used;
           localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
-        }
+        
+    saveCloudDebounced();}
       }
       restStartedAt = null;
       restCurrentLogKey = null;
@@ -2483,7 +2587,9 @@ function saveRepToLog(logKey, value){
       const date = selectedDate;
       logs = logs.filter(l => l.date !== date);
       localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
-      if(progressByDate[date]){ delete progressByDate[date]; localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate)); }
+      
+    saveCloudDebounced();if(progressByDate[date]){ delete progressByDate[date]; localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate)); 
+    saveCloudDebounced();}
       toast(t('messages.toast.selectedDateReset','선택 날짜 초기화'));
       renderCalendar();
       haptic(25);
@@ -2697,75 +2803,100 @@ function saveRepToLog(logKey, value){
   })();
 </script>
 <script>
-/* ===== Robust swipe-to-slide (bind after carousel renders) ===== */
+/* ===== Robust swipe-to-slide (scrollLeft drag) ===== */
 (function(){
-  function bindScroller(scroller){
-    if(!scroller || scroller.__swipeBound) return;
-    scroller.__swipeBound = true;
+  // Find the horizontal scroller used for slides
+  const scroller = document.querySelector('.slides') || document.querySelector('.slideTrack') || document.querySelector('.carousel');
+  if(!scroller) return;
 
-    const isHScrollable = ()=> scroller.scrollWidth > scroller.clientWidth + 5;
+  // Only apply if it's actually horizontally scrollable
+  const isHScrollable = ()=> scroller.scrollWidth > scroller.clientWidth + 5;
+  if(!isHScrollable()) return;
 
-    let isDown=false, startX=0, startScrollLeft=0, pointerId=null, moved=0;
+  let isDown = false;
+  let startX = 0;
+  let startScrollLeft = 0;
+  let pointerId = null;
+  let moved = 0;
 
-    const onDown=(e)=>{
-      const t=e.target;
-      if(t && t.closest && t.closest('button,[role="button"],.btn,.iconbtn,.chip,.tab,a,input,textarea,select')) return;
-      if(!isHScrollable()) return;
-      isDown=true; moved=0; pointerId=e.pointerId;
-      startX=e.clientX; startScrollLeft=scroller.scrollLeft;
-      try{ scroller.setPointerCapture(pointerId); }catch(_){}
-    };
-    const onMove=(e)=>{
-      if(!isDown || e.pointerId!==pointerId) return;
-      const dx=e.clientX-startX;
-      moved=Math.max(moved, Math.abs(dx));
-      if(moved>6) e.preventDefault();
-      scroller.scrollLeft = startScrollLeft - dx;
-    };
-    const onUp=(e)=>{
-      if(!isDown || e.pointerId!==pointerId) return;
-      isDown=false;
-      try{ scroller.releasePointerCapture(pointerId); }catch(_){}
-      pointerId=null;
+  const onDown = (e)=>{
+    // ignore if starting on interactive control
+    const t = e.target;
+    if(t && t.closest && t.closest('button,[role="button"],.btn,.iconbtn,.chip,.tab,a,input,textarea,select')) return;
 
-      // snap to nearest child (if any)
-      const children = Array.from(scroller.children || []);
-      if(!children.length) return;
-      const cur = scroller.scrollLeft;
-      let nearest = children[0], best = Math.abs(children[0].offsetLeft - cur);
-      for(const ch of children){
-        const d = Math.abs(ch.offsetLeft - cur);
-        if(d < best){ best=d; nearest=ch; }
-      }
-      if(best > 2){
-        scroller.scrollTo({left: nearest.offsetLeft, behavior:'smooth'});
-      }
-    };
+    isDown = true;
+    moved = 0;
+    pointerId = e.pointerId;
+    startX = e.clientX;
+    startScrollLeft = scroller.scrollLeft;
+    try{ scroller.setPointerCapture(pointerId); }catch(_){}
+  };
 
-    scroller.addEventListener('pointerdown', onDown, {passive:true});
-    scroller.addEventListener('pointermove', onMove, {passive:false});
-    scroller.addEventListener('pointerup', onUp, {passive:true});
-    scroller.addEventListener('pointercancel', onUp, {passive:true});
-  }
+  const onMove = (e)=>{
+    if(!isDown || e.pointerId !== pointerId) return;
+    const dx = e.clientX - startX;
+    moved = Math.max(moved, Math.abs(dx));
+    // If user is clearly swiping horizontally, prevent vertical scroll jitter
+    if(moved > 6) e.preventDefault();
+    scroller.scrollLeft = startScrollLeft - dx;
+  };
 
-  function findAndBind(){
-    // Your carousel element exists from start, but its children are rendered later by JS
-    const car = document.querySelector('.carousel');
-    if(!car) return;
-    // sometimes the scroller is carousel itself; sometimes a child
-    bindScroller(car);
-    const childScroller = car.querySelector('.slides,.track,.slideTrack,.scroller,[data-role="carousel"],[data-carousel]');
-    if(childScroller) bindScroller(childScroller);
-  }
+  const onUp = (e)=>{
+    if(!isDown || e.pointerId !== pointerId) return;
+    isDown = false;
+    try{ scroller.releasePointerCapture(pointerId); }catch(_){}
+    pointerId = null;
 
-  // Initial attempt (in case already rendered)
-  findAndBind();
+    // Snap to nearest slide (if scroll-snap is set, browser will snap anyway)
+    // But we can help by gently scrolling to nearest child offset.
+    const children = Array.from(scroller.children || []);
+    if(!children.length) return;
 
-  // Observe for renderCarousel() DOM changes and bind when nodes appear
-  const mo = new MutationObserver(()=>{ findAndBind(); });
-  mo.observe(document.body, {childList:true, subtree:true});
+    // Find nearest child left
+    const cur = scroller.scrollLeft;
+    let nearest = children[0];
+    let best = Math.abs(children[0].offsetLeft - cur);
+    for(const ch of children){
+      const d = Math.abs(ch.offsetLeft - cur);
+      if(d < best){ best = d; nearest = ch; }
+    }
+    if(best > 2){
+      scroller.scrollTo({left: nearest.offsetLeft, behavior: 'smooth'});
+    }
+  };
+
+  scroller.addEventListener('pointerdown', onDown, {passive:true});
+  scroller.addEventListener('pointermove', onMove, {passive:false});
+  scroller.addEventListener('pointerup', onUp, {passive:true});
+  scroller.addEventListener('pointercancel', onUp, {passive:true});
 })();
 </script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-firestore.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAIrxl_GDVJYzLZxuSzUt9cLBUCfkUoCaw",
+    authDomain: "dk-pit.firebaseapp.com",
+    projectId: "dk-pit",
+    storageBucket: "dk-pit.firebasestorage.app",
+    messagingSenderId: "835447327032",
+    appId: "1:835447327032:web:6101fd173f5214926359cd"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+
+  window.firebase = {
+    db, auth,
+    doc, getDoc, setDoc,
+    GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut
+  };
+</script>
+
 </body>
 </html>
 
