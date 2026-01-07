@@ -783,42 +783,6 @@ button, a, [role="button"], .btn, .chip, .tab, .iconbtn{ touch-action: manipulat
   transition: transform 0.08s ease, filter 0.08s ease;
 }
 
-
-/* ===== Firebase Auth / Account UI ===== */
-#auth-modal, #account-modal{
-  position:fixed; inset:0; z-index: 300;
-  display:none; align-items:center; justify-content:center;
-}
-#auth-modal.show, #account-modal.show{ display:flex; }
-.modalCard{
-  width:min(520px, calc(100vw - 44px));
-  border-radius: 30px;
-  padding: 18px;
-  background: rgba(10,10,12,0.92);
-  border: 1px solid rgba(255,255,255,0.10);
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
-  box-shadow: 0 40px 140px rgba(0,0,0,0.72);
-}
-.modalBtn{
-  height: 56px;
-  border-radius: 18px;
-  font-weight: 950;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.06);
-  color: rgba(255,255,255,0.92);
-  display:flex; align-items:center; justify-content:center; gap:10px;
-  transition: transform .08s ease;
-  user-select:none; -webkit-tap-highlight-color:transparent;
-}
-.modalBtn:active{ transform: scale(.985); }
-.modalBtn.primary{
-  background: linear-gradient(135deg, var(--primary), var(--accent));
-  border: none;
-  color:#000;
-  box-shadow: 0 18px 34px rgba(34,211,238,0.22);
-}
-
 </style>
 <style>
 /* ===== Mobile / Tablet app-like touch tuning ===== */
@@ -857,6 +821,12 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
 /* Disable double-tap zoom on iOS for controls */
 *{ -webkit-tap-highlight-color: transparent; }
 </style>
+
+  <!-- ✅ Firebase (Auth + Firestore) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
 </head>
 
 <body>
@@ -919,78 +889,6 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     </div>
   </div>
 
-  
-  <!-- ✅ Firebase Auth Modal (Google only) -->
-  <div id="auth-modal">
-    <div class="absolute inset-0 bg-black/80 backdrop-blur-xl" onclick="closeAuthModal()"></div>
-    <div class="relative modalCard">
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <p class="text-[10px] font-black tracking-[0.2em] uppercase text-white/45">계정</p>
-          <h3 class="text-2xl font-black italic text-white mt-1">로그인</h3>
-          <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/35 mt-2">
-            로그인하면 기기 간 기록이 자동 동기화됩니다
-          </p>
-        </div>
-        <button class="pill" onclick="closeAuthModal()"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-
-      <div class="mt-5 grid gap-3">
-        <button class="modalBtn primary" onclick="googleLogin()">
-          <i class="fa-brands fa-google"></i> Google로 로그인
-        </button>
-
-        <div class="glass rounded-2xl p-4">
-          <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45">동기화 안내</p>
-          <p class="text-[12px] font-black text-white/70 mt-2 leading-relaxed">
-            • 로그인하면 기기 간 기록이 자동 동기화됩니다.<br>
-            • 저장은 네트워크 상태에 따라 지연될 수 있으며, 앱이 다시 열릴 때 자동으로 맞춰집니다.<br>원할 때만 “로컬 초기화”를 실행하세요.
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ✅ Account Modal (logged-in) -->
-  <div id="account-modal">
-    <div class="absolute inset-0 bg-black/80 backdrop-blur-xl" onclick="closeAccountModal()"></div>
-    <div class="relative modalCard">
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <p class="text-[10px] font-black tracking-[0.2em] uppercase text-white/45">Cloud</p>
-          <h3 class="text-2xl font-black italic text-white mt-1">계정</h3>
-          <p id="acct-email" class="text-[12px] font-black text-white/70 mt-2"></p>
-          <p id="acct-sub" class="text-[10px] font-black tracking-[0.18em] uppercase text-white/35 mt-1"></p>
-        </div>
-        <button class="pill" onclick="closeAccountModal()"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-
-      <div class="mt-5 grid gap-3">
-        <div class="glass rounded-2xl p-4">
-          <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45">동기화 상태</p>
-          <p id="acct-sync" class="text-[12px] font-black text-white/70 mt-2 leading-relaxed">연결됨</p>
-          <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/35 mt-2">
-            * 스마트폰은 백그라운드/절전 상태에서 저장이 지연될 수 있어 페이지 전환 시 즉시 저장합니다.
-          </p>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <button class="modalBtn" onclick="manualCloudPull()"><i class="fa-solid fa-cloud-arrow-down"></i> 불러오기</button>
-          <button class="modalBtn" onclick="manualCloudPush()"><i class="fa-solid fa-cloud-arrow-up"></i> 저장</button>
-        </div>
-
-        <button class="modalBtn" style="border-color: rgba(255,255,255,0.18);" onclick="logoutFirebase()">
-          <i class="fa-solid fa-right-from-bracket"></i> 로그아웃
-        </button>
-
-        <button class="modalBtn" style="border-color: rgba(255,255,255,0.18);" onclick="wipeLocalDataOnly()">
-          <i class="fa-solid fa-eraser"></i> 로컬 데이터 초기화
-        </button>
-      </div>
-    </div>
-  </div>
-
-
   <!-- ✅ Bottom Sheet (운동 상세) -->
   <div id="detail-sheet">
     <div class="sheet-backdrop" onclick="closeDetailSheet()"></div>
@@ -1028,16 +926,24 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         <div class="flex items-center gap-2 mt-1">
           <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
           <p class="text-[9px] font-black text-gray-300 tracking-widest uppercase">ELITE MODE · DK</p>
-        
-        <div class="flex items-center gap-2 mt-2">
-          <button id="cloud-pill" class="pill" onclick="cloudButtonPressed()" title="로그인/동기화 동기화">
-            <i class="fa-solid fa-cloud"></i> Cloud: OFF
-          </button>
         </div>
-</div>
       </div>
 
       <div class="flex flex-col items-end">
+        <!-- ✅ Auth UI -->
+        <div id="auth-bar" class="mt-2 flex items-center gap-2">
+          <button id="btn-login" class="pill cyan" onclick="loginWithGoogle()" style="display:none;">
+            <i class="fa-brands fa-google"></i> 로그인
+          </button>
+          <div id="user-chip" class="pill" style="display:none; max-width: 200px;">
+            <i class="fa-solid fa-user"></i>
+            <span id="user-name" class="truncate">User</span>
+          </div>
+          <button id="btn-logout" class="pill" onclick="logout()" style="display:none;">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </button>
+        </div>
+
         <span id="progress-percent" class="text-[10px] font-black mb-0.5 text-cyan-300">0%</span>
         <span id="progress-text" class="text-[9px] font-black text-white/40 tracking-widest uppercase">현재 0% 완료!</span>
         <div class="w-28 h-1.5 bg-white/5 rounded-full overflow-hidden mt-2">
@@ -1138,24 +1044,6 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
           <button onclick="backupJSON()" class="bigBtn"><i class="fa-solid fa-download"></i> 백업(JSON)</button>
           <button onclick="resetAll()" class="bigBtn" style="border-color: rgba(255,255,255,0.18);"><i class="fa-solid fa-triangle-exclamation"></i> 전체 초기화</button>
         </div>
-
-        <div class="glass rounded-[28px] p-6 mt-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45">로그인/동기화 동기화</p>
-              <p class="text-sm font-black text-white/70 mt-2">Google 로그인 후 자동 저장/동기화</p>
-            </div>
-            <button class="pill cyan" onclick="cloudButtonPressed()"><i class="fa-solid fa-cloud"></i> 계정</button>
-          </div>
-          <div class="mt-4 grid grid-cols-2 gap-3">
-            <button class="bigBtn" onclick="manualCloudPull()"><i class="fa-solid fa-cloud-arrow-down"></i> 불러오기</button>
-            <button class="bigBtn" onclick="manualCloudPush()"><i class="fa-solid fa-cloud-arrow-up"></i> 저장</button>
-          </div>
-          <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/35 mt-3">
-            * Firestore: /users/{uid} · 충돌 시 마지막 저장이 최종 반영됩니다.
-          </p>
-        </div>
-
       </section>
 
       <!-- History -->
@@ -1275,27 +1163,17 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
   <!-- Toast -->
   <div id="toast" class="pill cyan"></div>
 
-  
-  <!-- =========================================================
-    ✅ Firebase (Modular v9)
-    - Google 로그인만 사용
-    - 로그아웃 시 로컬도 초기화
-    - 모바일 저장 지연 완화: 디바운스 단축 + pagehide/visibilitychange 즉시 플러시 + IndexedDB persistence
-  ========================================================= -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-    import {
-      getAuth, onAuthStateChanged,
-      GoogleAuthProvider, signInWithPopup,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+  <script>
+    
+    /* =========================================================
+      ✅ Firebase Sync Layer (Auth + Firestore)
+      - Google Login
+      - users/{uid} 문서에 로컬 기록을 저장/복원
+      - 기존 로직(localStorage 기반) 유지 + 로그인 시 자동 동기화
+      - UX: 상단에 로그인 버튼(비로그인), 로그인 후 프로필 칩 + 로그아웃
+    ========================================================= */
 
-    import {
-      getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp,
-      enableIndexedDbPersistence
-    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-
-    // ✅ Firebase config (제공된 값)
+    // ✅ Firebase Config (user provided)
     const firebaseConfig = {
       apiKey: "AIzaSyAIrxl_GDVJYzLZxuSzUt9cLBUCfkUoCaw",
       authDomain: "dk-pit.firebaseapp.com",
@@ -1305,429 +1183,220 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       appId: "1:835447327032:web:6101fd173f5214926359cd"
     };
 
-    const fbApp = initializeApp(firebaseConfig);
-    const auth = getAuth(fbApp);
-    const db = getFirestore(fbApp);
+    let fbApp = null;
+    let fbAuth = null;
+    let fbDb = null;
+    let currentUser = null;
+    let cloudReady = false;
+    let lastCloudWriteAt = 0;
+    let pendingCloudTimer = null;
 
-    // 모바일에서 네트워크/백그라운드로 저장 지연될 때를 대비해 오프라인 퍼시스턴스 활성화(가능한 경우)
-    enableIndexedDbPersistence(db).catch(()=>{});
-
-    const googleProvider = new GoogleAuthProvider();
-
-    // ===== UI helpers =====
-    function toast(msg){
-      const el = document.getElementById('toast');
-      if(!el) return;
-      el.textContent = msg;
-      el.classList.add('show');
-      clearTimeout(window.__toastTimer);
-      window.__toastTimer = setTimeout(()=> el.classList.remove('show'), 1800);
-    }
-    function setCloudPill(state){
-      const pill = document.getElementById("cloud-pill");
-      if(!pill) return;
-      if(state?.on){
-        pill.classList.add("cyan");
-        pill.innerHTML = `<i class="fa-solid fa-cloud"></i> Cloud: ON`;
-        pill.title = state.label || "로그인/동기화 동기화 ON";
-      }else{
-        pill.classList.remove("cyan");
-        pill.innerHTML = `<i class="fa-solid fa-cloud"></i> Cloud: OFF`;
-        pill.title = "로그인/동기화 로그인";
+    function initFirebase(){
+      try{
+        if(!window.firebase || !window.firebase.initializeApp) return;
+        fbApp = firebase.initializeApp(firebaseConfig);
+        fbAuth = firebase.auth();
+        fbDb = firebase.firestore();
+      }catch(e){
+        console.warn("Firebase init failed:", e);
       }
     }
 
-    // ===== Modal open/close =====
-    window.openAuthModal = () => document.getElementById("auth-modal")?.classList.add("show");
-    window.closeAuthModal = () => document.getElementById("auth-modal")?.classList.remove("show");
-    window.openAccountModal = () => document.getElementById("account-modal")?.classList.add("show");
-    window.closeAccountModal = () => document.getElementById("account-modal")?.classList.remove("show");
-
-    // Cloud pill behavior
-    window.cloudButtonPressed = () => {
-      if(!currentUser) window.openAuthModal();
-      else window.openAccountModal();
-    };
-
-    // ===== Client id to avoid self-echo/conflicts =====
-    const CLIENT_KEY = "dkfit_client_id";
-    let clientId = localStorage.getItem(CLIENT_KEY);
-    if(!clientId){
-      clientId = (crypto?.randomUUID?.() || Math.random().toString(16).slice(2) + Date.now().toString(16));
-      localStorage.setItem(CLIENT_KEY, clientId);
+    function getUserDocRef(uid){
+      return fbDb.collection('users').doc(uid);
     }
 
-    // ===== Cloud Sync Layer =====
-    let currentUser = null;
-    let unsub = null;
+    function setAuthUI(state){
+      const loginBtn = document.getElementById('btn-login');
+      const logoutBtn = document.getElementById('btn-logout');
+      const userChip = document.getElementById('user-chip');
+      const userName = document.getElementById('user-name');
 
-    let cloudEnabled = false;
-    let isApplyingRemote = false;
-    let lastAppliedServerMs = 0;
+      if(!loginBtn || !logoutBtn || !userChip) return;
 
-    let saveTimer = null;
-    const CLOUD_DEBOUNCE_MS = 300;
+      if(state === 'signed-out'){
+        loginBtn.style.display = '';
+        logoutBtn.style.display = 'none';
+        userChip.style.display = 'none';
+      }else if(state === 'signed-in'){
+        loginBtn.style.display = 'none';
+        logoutBtn.style.display = '';
+        userChip.style.display = '';
+        if(userName){
+          const name = currentUser?.displayName || currentUser?.email || "DK User";
+          userName.textContent = name;
+          userName.title = name;
+        }
+      }else if(state === 'loading'){
+        loginBtn.style.display = 'none';
+        logoutBtn.style.display = 'none';
+        userChip.style.display = 'none';
+      }
+    }
 
-// ✅ Modern Sync: gentle, resilient, and explicit
-const SYNC_BACKOFF = { base: 800, max: 15000 };
-let retryTimer = null;
-let retryDelay = SYNC_BACKOFF.base;
-let dirtySince = 0;
+    async function loginWithGoogle(){
+      try{
+        unlockAudio();
+        haptic(10);
+        toast("Google 로그인 중...");
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
+        await fbAuth.signInWithPopup(provider);
+      }catch(e){
+        console.warn(e);
+        toast("로그인 실패");
+      }
+    }
 
-function setSyncStatus(text){
-  const s = document.getElementById("acct-sync");
-  if(s) s.textContent = text;
-}
-function netOkay(){ return navigator.onLine !== false; }
+    async function logout(){
+      try{
+        haptic(10);
+        await fbAuth.signOut();
+        toast("로그아웃 완료");
+      }catch(e){
+        console.warn(e);
+        toast("로그아웃 실패");
+      }
+    }
 
-function scheduleRetry(fn){
-  clearTimeout(retryTimer);
-  retryTimer = setTimeout(async ()=>{
-    try{ await fn(); retryDelay = SYNC_BACKOFF.base; }
-    catch(_){ retryDelay = Math.min(SYNC_BACKOFF.max, Math.round(retryDelay * 1.6)); scheduleRetry(fn); }
-  }, retryDelay);
-}
-
-window.addEventListener("online", ()=>{
-  if(cloudEnabled && currentUser?.uid && dirtySince){
-    setSyncStatus("재연결…");
-    scheduleRetry(()=>flushCloudSave("online_recover"));
-  }
-});
-
-
-    function userDocRef(uid){ return doc(db, "users", uid); }
-
-    function getLocalSnapshot(){
+    // ✅ 로컬 상태 -> 클라우드 페이로드
+    function buildCloudPayload(){
       return {
-        version: "dk_fit_v12.1_cloud",
-        updatedAtClient: Date.now(),
-        clientId,
-        logs: window.logs || [],
-        customSets: window.customSets || {},
-        customReps: window.customReps || {},
-        progressByDate: window.progressByDate || {},
-        settings: { restNotifEnabled: window.restNotifEnabled ?? true }
+        version: "dk_fit_cloud_v1",
+        updatedAt: new Date().toISOString(),
+        logs,
+        customSets,
+        customReps,
+        progressByDate
       };
     }
 
-    function applyCloudSnapshot(payload){
-      if(!payload) return;
-      isApplyingRemote = true;
+    // ✅ 클라우드 -> 로컬 상태 적용 (기존 로직/키 유지)
+    function applyCloudPayload(payload){
+      if(!payload) return false;
 
-      window.logs = payload.logs || [];
-      window.customSets = payload.customSets || {};
-      window.customReps = payload.customReps || {};
-      window.progressByDate = payload.progressByDate || {};
+      // 방어적 파싱
+      const pLogs = Array.isArray(payload.logs) ? payload.logs : [];
+      const pCustomSets = payload.customSets && typeof payload.customSets === 'object' ? payload.customSets : {};
+      const pCustomReps = payload.customReps && typeof payload.customReps === 'object' ? payload.customReps : {};
+      const pProgressByDate = payload.progressByDate && typeof payload.progressByDate === 'object' ? payload.progressByDate : {};
 
-      if(payload.settings && typeof payload.settings.restNotifEnabled === "boolean"){
-        window.restNotifEnabled = payload.settings.restNotifEnabled;
-        localStorage.setItem(window.KEY_NOTIF, window.restNotifEnabled ? "1" : "0");
-      }
+      // 로컬 반영
+      logs = pLogs;
+      customSets = pCustomSets;
+      customReps = pCustomReps;
+      progressByDate = pProgressByDate;
 
-      localStorage.setItem(window.KEY_LOGS, JSON.stringify(window.logs));
-      localStorage.setItem(window.KEY_SETS, JSON.stringify(window.customSets));
-      localStorage.setItem(window.KEY_REPS, JSON.stringify(window.customReps));
-      localStorage.setItem(window.KEY_PROGRESS_BY_DATE, JSON.stringify(window.progressByDate));
+      // 로컬스토리지에도 저장(기존 로직 유지)
+      localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+      localStorage.setItem(KEY_SETS, JSON.stringify(customSets));
+      localStorage.setItem(KEY_REPS, JSON.stringify(customReps));
+      localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
+
+      return true;
+    }
+
+    // ✅ 최초 로그인 시: 클라우드 데이터가 있으면 내려받아 적용, 없으면 로컬을 업로드(첫 동기화)
+    async function initialSync(){
+      if(!currentUser || !fbDb) return;
+      setAuthUI('loading');
 
       try{
-        window.renderCarousel(true);
-        window.updateProgressUI();
-        window.renderCalendar();
-        const btn = document.getElementById("notif-toggle");
-        if(btn){
-          btn.textContent = window.restNotifEnabled ? "ON" : "OFF";
-          btn.classList.toggle("cyan", window.restNotifEnabled);
-        }
-      }catch(e){}
+        const ref = getUserDocRef(currentUser.uid);
+        const snap = await ref.get();
 
-      isApplyingRemote = false;
-    }
-
-    async function pushToCloud(uid, reason="auto"){
-      const ref = userDocRef(uid);
-      const payload = getLocalSnapshot();
-      await setDoc(ref, {
-        uid,
-        clientId,
-        reason,
-        updatedAtServer: serverTimestamp(),
-        payload
-      }, { merge: true });
-    }
-
-    async function pullFromCloud(uid){
-      const ref = userDocRef(uid);
-      const snap = await getDoc(ref);
-      if(!snap.exists()){
-        await pushToCloud(uid, "first_create");
-        return { created:true };
-      }
-      const data = snap.data();
-      const payload = data?.payload || null;
-      const ts = data?.updatedAtServer;
-      if(ts && typeof ts.toMillis === "function"){
-        lastAppliedServerMs = ts.toMillis();
-      }
-      if(payload){
-        applyCloudSnapshot(payload);
-        return { pulled:true };
-      }
-      return { empty:true };
-    }
-
-    function scheduleCloudSave(reason="local_change"){
-  if(!cloudEnabled || !currentUser?.uid) return;
-  if(isApplyingRemote) return;
-
-  dirtySince = dirtySince || Date.now();
-
-  // ✅ 최신 UX: 오프라인이면 조용히 큐잉만 (자동 재시도)
-  if(!netOkay()){
-    setSyncStatus("오프라인 · 대기 중");
-    scheduleRetry(()=>flushCloudSave("offline_retry"));
-    return;
-  }
-
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(async ()=>{
-    try{
-      setSyncStatus("저장 중…");
-      await pushToCloud(currentUser.uid, reason);
-      dirtySince = 0;
-      setSyncStatus("저장됨 ✅");
-    }catch(e){
-      console.error(e);
-      setSyncStatus("저장 대기…");
-      scheduleRetry(()=>flushCloudSave("retry"));
-      toast("네트워크 불안정 · 자동 재시도");
-    }
-  }, CLOUD_DEBOUNCE_MS);
-}catch(e){
-          console.error(e);
-          toast("로그인/동기화 저장 실패");
-          const s = document.getElementById("acct-sync");
-          if(s) s.textContent = "저장 실패";
-        }
-      }, CLOUD_DEBOUNCE_MS);
-
-      const s = document.getElementById("acct-sync");
-      if(s) s.textContent = "저장 중…";
-    }
-
-    async function flushCloudSave(reason="flush"){
-  if(!cloudEnabled || !currentUser?.uid) return;
-  if(isApplyingRemote) return;
-
-  dirtySince = dirtySince || Date.now();
-
-  if(!netOkay()){
-    setSyncStatus("오프라인 · 대기 중");
-    scheduleRetry(()=>flushCloudSave("offline_retry"));
-    return;
-  }
-
-  clearTimeout(saveTimer);
-  try{
-    setSyncStatus("저장 중…");
-    await pushToCloud(currentUser.uid, reason);
-    dirtySince = 0;
-    setSyncStatus("저장됨 ✅");
-  }catch(e){
-    setSyncStatus("저장 대기…");
-    scheduleRetry(()=>flushCloudSave("retry"));
-  }
-}catch(e){}
-    }
-
-    function startRealtime(uid){
-      if(unsub) unsub();
-      const ref = userDocRef(uid);
-
-      unsub = onSnapshot(ref, { includeMetadataChanges:true }, (snap)=>{
-        // 로컬 write echo(특히 모바일) 무시
-        if(snap.metadata.hasPendingWrites) return;
-        if(!snap.exists()) return;
-
-        const data = snap.data();
-        const serverTs = data?.updatedAtServer;
-        const serverMs = (serverTs && typeof serverTs.toMillis === "function") ? serverTs.toMillis() : 0;
-
-        // 이미 적용한 서버 버전이면 무시
-        if(serverMs && serverMs <= lastAppliedServerMs) return;
-
-        const payload = data?.payload;
-        if(!payload) return;
-
-        // 같은 clientId가 올린 변경이면 굳이 토스트/적용 최소화
-        const fromSameClient = payload?.clientId && payload.clientId === clientId;
-
-        lastAppliedServerMs = serverMs || Date.now();
-        if(!fromSameClient){
-          applyCloudSnapshot(payload);
-          setSyncStatus("동기화됨 ✅");
+        if(snap.exists && snap.data()){
+          const data = snap.data();
+          const hasCloud = data && (data.logs || data.customSets || data.customReps || data.progressByDate);
+          if(hasCloud){
+            applyCloudPayload(data);
+            toast("기록 동기화 완료 ✅");
+          }else{
+            await ref.set(buildCloudPayload(), { merge:true });
+            toast("클라우드에 기록 저장 ✅");
+          }
         }else{
-          // 내 저장이 서버에서 확정된 상태
-          const s = document.getElementById("acct-sync");
-          if(s) s.textContent = "저장됨 ✅";
+          await ref.set(buildCloudPayload(), { merge:true });
+          toast("클라우드에 기록 저장 ✅");
         }
+
+        cloudReady = true;
+        setAuthUI('signed-in');
+
+        // UI 리렌더(기존 로직 호출)
+        try{
+          renderCarousel(true);
+          updateProgressUI();
+          renderCalendar();
+          renderStats();
+        }catch(e){}
+      }catch(e){
+        console.warn("Initial sync failed:", e);
+        setAuthUI('signed-in');
+        toast("동기화 실패(오프라인?)");
+      }
+    }
+
+    // ✅ Debounced Cloud Save: 잦은 writes 방지
+    function scheduleCloudSave(){
+      if(!currentUser || !fbDb || !cloudReady) return;
+
+      const now = Date.now();
+      // 너무 자주면 800ms debounce + 최소 간격 2.5s
+      const minGap = 2500;
+      const delay = (now - lastCloudWriteAt < minGap) ? (minGap - (now - lastCloudWriteAt)) : 800;
+
+      if(pendingCloudTimer) clearTimeout(pendingCloudTimer);
+      pendingCloudTimer = setTimeout(async ()=>{
+        try{
+          const ref = getUserDocRef(currentUser.uid);
+          await ref.set(buildCloudPayload(), { merge:true });
+          lastCloudWriteAt = Date.now();
+        }catch(e){
+          console.warn("Cloud save failed:", e);
+        }
+      }, delay);
+    }
+
+    // ✅ localStorage.setItem 가 호출되면 자동으로 scheduleCloudSave 되도록 후킹
+    function hookLocalStorage(){
+      const _setItem = localStorage.setItem.bind(localStorage);
+      localStorage.setItem = function(k, v){
+        _setItem(k, v);
+        if(k===KEY_LOGS || k===KEY_SETS || k===KEY_REPS || k===KEY_PROGRESS_BY_DATE){
+          scheduleCloudSave();
+        }
+      };
+      // removeItem도 반영
+      const _removeItem = localStorage.removeItem.bind(localStorage);
+      localStorage.removeItem = function(k){
+        _removeItem(k);
+        if(k===KEY_LOGS || k===KEY_SETS || k===KEY_REPS || k===KEY_PROGRESS_BY_DATE){
+          scheduleCloudSave();
+        }
+      };
+    }
+
+    function bindAuthState(){
+      if(!fbAuth) return;
+      setAuthUI('loading');
+
+      fbAuth.onAuthStateChanged(async (u)=>{
+        currentUser = u || null;
+
+        if(!currentUser){
+          cloudReady = false;
+          setAuthUI('signed-out');
+          return;
+        }
+
+        setAuthUI('signed-in');
+        toast("로그인됨 ✅");
+        await initialSync();
       });
     }
 
-    // ===== Hook localStorage.setItem to auto-save on important keys =====
-    const _setItem = localStorage.setItem.bind(localStorage);
-    localStorage.setItem = function(k, v){
-      _setItem(k, v);
-      const watch = [window.KEY_LOGS, window.KEY_SETS, window.KEY_REPS, window.KEY_PROGRESS_BY_DATE, window.KEY_NOTIF];
-      if(watch.includes(k)){
-        scheduleCloudSave("local_change");
-      }
-    };
-
-    // 모바일 저장 지연 완화: 페이지 숨김/종료 때 즉시 저장
-    window.addEventListener("visibilitychange", ()=>{
-      if(document.visibilityState === "hidden") flushCloudSave("visibility_hidden");
-    });
-    window.addEventListener("pagehide", ()=> flushCloudSave("pagehide"));
-
-    // ===== Auth actions (Google only) =====
-    window.googleLogin = async () => {
-  try{
-    // GitHub Pages에서도 팝업이 차단되거나(브라우저 정책/모바일) 허용 도메인 미등록 시 실패할 수 있어요.
-    // 1) 우선 팝업 시도 → 2) 실패하면 Redirect로 자동 전환
-    setSyncStatus("로그인 중…");
-    try{
-      await signInWithPopup(auth, provider);
-    }catch(e){
-      console.warn("Popup login failed, fallback to redirect:", e);
-      // 팝업 차단 / 403 / unauthorized_domain 등 → redirect 방식으로 전환
-      await signInWithRedirect(auth, provider);
-      return; // redirect로 이동하므로 여기서 종료
-    }
-    window.closeAuthModal();
-    toast("로그인 완료 ✅");
-  }catch(e){
-    console.error(e);
-    const msg = (e && e.code) ? e.code : "로그인 실패";
-    alert("로그인이 시작되지 않았습니다.
-
-가장 흔한 원인:
-1) Firebase Authentication → Settings → Authorized domains에
-   'sowon39.github.io'가 추가되지 않음
-2) 팝업 차단 (모바일/사파리 등) → 자동으로 Redirect로 전환됨
-
-에러코드: "+msg);
-    setSyncStatus("로그인 필요");
-  }
-};
-
-catch(e){
-        console.error(e);
-        toast("Google 로그인 실패");
-      }
-    };
-
-    function renderAccountUI(user){
-      const emailEl = document.getElementById("acct-email");
-      const subEl = document.getElementById("acct-sub");
-      if(emailEl) emailEl.textContent = user?.email || "Google 계정";
-      if(subEl) subEl.textContent = `UID: ${(user?.uid||"").slice(0,8)}… · 자동 동기화 ON`;
-      const s = document.getElementById("acct-sync");
-      setSyncStatus("연결됨");
-    }
-
-    function clearLocalAll(){
-      // ✅ 로그아웃 시 로컬도 초기화
-      const keys = [window.KEY_LOGS, window.KEY_SETS, window.KEY_REPS, window.KEY_PROGRESS_BY_DATE, window.KEY_SUMMARY_SHOWN];
-      keys.forEach(k=> localStorage.removeItem(k));
-
-      // 메모리 상태도 초기화
-      window.logs = [];
-      window.customSets = {};
-      window.customReps = {};
-      window.progressByDate = {};
-
-      // 기본값 반영
-      try{
-        window.renderCarousel(true);
-        window.updateProgressUI();
-        window.renderCalendar();
-      }catch(e){}
-    }
-
-    window.logoutFirebase = async () => {
-  try{
-    // ✅ 최신 UX: 로그아웃은 "계정 연결 해제"만 수행 (로컬 기록 유지)
-    await signOut(auth);
-    window.closeAccountModal();
-    toast("로그아웃 완료 (로컬 기록 유지)");
-  }catch(e){
-    console.error(e);
-    toast("로그아웃 실패");
-  }
-};
-
-// ✅ 로컬만 초기화(사용자가 명시적으로 선택할 때만)
-window.wipeLocalDataOnly = async () => {
-  try{
-    if(!confirm("로컬에 저장된 기록/설정을 모두 삭제할까요?
-(로그인/동기화 데이터는 삭제되지 않습니다)")) return;
-    clearLocalAll();
-    window.closeAccountModal();
-    toast("로컬 데이터 초기화 완료");
-  }catch(e){
-    console.error(e);
-    toast("로컬 초기화 실패");
-  }
-};
-
-    window.manualCloudPull = async () => {
-      if(!currentUser?.uid) return toast("로그인이 필요합니다");
-      const r = await pullFromCloud(currentUser.uid);
-      if(r?.created) toast("로그인/동기화 새로 생성됨 ✅");
-      else if(r?.pulled) toast("로그인/동기화 불러옴 ✅");
-      else toast("로그인/동기화 데이터 없음");
-    };
-
-    window.manualCloudPush = async () => {
-      if(!currentUser?.uid) return toast("로그인이 필요합니다");
-      await flushCloudSave("manual_push");
-      toast("지금 로그인/동기화 저장 ✅");
-    };
-
-    // ===== Auth state =====
-    onAuthStateChanged(auth, async (user)=>{
-      currentUser = user || null;
-
-      if(!user){
-        cloudEnabled = false;
-        setCloudPill({on:false});
-        if(unsub) unsub();
-        unsub = null;
-        return;
-      }
-
-      cloudEnabled = true;
-      setCloudPill({on:true, label: user.email || "Google 계정"});
-      renderAccountUI(user);
-
-      // 로그인 직후: pull → realtime → push(서버에 최신 스냅샷 보장)
-      try{
-        const r = await pullFromCloud(user.uid);
-        if(r?.created) toast("로그인/동기화 시작 ✅");
-        else toast("로그인/동기화 연결 ✅");
-      }catch(e){}
-
-      startRealtime(user.uid);
-
-      try{
-        await flushCloudSave("post_login_sync");
-      }catch(e){}
-    });
-  </script>
-
-<script>
-    /* =========================================================
+/* =========================================================
       DK Fit OS v12.1
       ✅ Wake Lock (screen on)
       ✅ Stopwatch Pause
@@ -3173,6 +2842,10 @@ function saveRepToLog(logKey, value){
 
     /* ---------- INIT ---------- */
     window.onload = async () => {
+      initFirebase();
+      hookLocalStorage();
+      bindAuthState();
+
       await loadAppData();
       initIntro();
       await requestWakeLock();
