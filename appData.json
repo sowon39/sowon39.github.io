@@ -325,6 +325,16 @@
         "kw_ko": "풀업 (밴드)",
         "kw_en": "band pull",
         "gif": "PULL_UP.gif"
+      },
+      {
+        "kw_ko": "사이드 레이즈",
+        "kw_en": "lateral raise",
+        "gif": "DB_LAT_RAISE.gif"
+      },
+      {
+        "kw_ko": "인버티드 로우",
+        "kw_en": "inverted row",
+        "gif": "INVT_ROW.gif"
       }
     ]
   },
