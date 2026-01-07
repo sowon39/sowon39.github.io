@@ -1257,7 +1257,13 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     async function pullFromCloud(){
       if(!currentUser||!fbDb) return null;
       const ref = fbDb.collection('users').doc(currentUser.uid);
-      const snap = await ref.get();
+      let snap = null;
+      try{
+        snap = await ref.get({ source: 'server' });
+      }catch(e){
+        // offline or server unavailable -> cache
+        snap = await ref.get();
+      }
       if(snap.exists && snap.data()){
         const d = snap.data();
         // Firestore Timestamp -> ISO
@@ -1514,6 +1520,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
 
     /* ---------- TABS ---------- */
     function showTab(name, btn){
+      try{ if(currentUser) manualRefresh(); }catch(e){}
       document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
       document.getElementById(`tab-${name}`).classList.add('active');
       document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
