@@ -1199,6 +1199,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         fbApp = firebase.initializeApp(firebaseConfig);
         fbAuth = firebase.auth();
         fbDb = firebase.firestore();
+        try{ fbDb.enablePersistence({ synchronizeTabs:true }); }catch(e){}
       }catch(e){
         console.warn("Firebase init failed:", e);
       }
@@ -1339,6 +1340,123 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       };
     }
 
+
+    /* =========================================================
+      🚀 Advanced Sync (Subcollection for logs)
+      - users/{uid}/logs/{logKey}
+      - 실시간 CRUD 반영 (추가/수정/삭제)
+      - 기존 localStorage 구조(logs 배열) 유지
+    ========================================================= */
+    let unsubscribeLogs = null;
+    let isApplyingRemoteLogs = false;
+    let lastSyncedLogsMap = new Map(); // logKey -> ts
+
+    function logsColRef(){
+      return fbDb.collection('users').doc(currentUser.uid).collection('logs');
+    }
+
+    function buildLogDoc(log){
+      return {
+        ...log,
+        logKey: log.logKey ?? log.id,
+        ts: log.ts || new Date().toISOString(),
+        updatedAt: log.updatedAt || log.ts || new Date().toISOString(),
+        lastWriterId: getDeviceId()
+      };
+    }
+
+    // ✅ 클라우드 → 로컬 logs 반영 (실시간)
+    function startLogsRealtime(){
+      if(!currentUser || !fbDb) return;
+      if(unsubscribeLogs){ try{ unsubscribeLogs(); }catch(e){} unsubscribeLogs=null; }
+
+      unsubscribeLogs = logsColRef().orderBy('ts','desc').onSnapshot((snap)=>{
+        const remoteLogs = [];
+        snap.forEach(doc=>{
+          const d = doc.data();
+          if(d && d.deleted) return;
+          remoteLogs.push(d);
+        });
+
+        const localPayload = buildCloudPayload();
+        const mergedLogs = mergeLogs(localPayload.logs||[], remoteLogs);
+
+        isApplyingRemoteLogs = true;
+        logs = mergedLogs;
+        localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+        lastSyncedLogsMap = new Map();
+        logs.forEach(l=>{
+          const k = l.logKey ?? l.id;
+          lastSyncedLogsMap.set(k, l.ts || l.updatedAt || "");
+        });
+        isApplyingRemoteLogs = false;
+
+        try{
+          renderCarousel(true);
+          updateProgressUI();
+          renderCalendar();
+          renderStats();
+        }catch(e){}
+
+        const now=Date.now();
+        if(now>toastCooldownUntil){
+          toast("실시간 동기화 ✅");
+          toastCooldownUntil = now + 3000;
+        }
+      }, (err)=>{
+        console.warn("Logs realtime error:", err);
+      });
+    }
+
+    // ✅ 로컬 logs → 클라우드 반영 (추가/수정/삭제 diff)
+    async function syncLogsToCloud(){
+      if(!currentUser || !fbDb || !cloudReady) return;
+      if(isApplyingRemoteLogs) return;
+
+      try{
+        const col = logsColRef();
+        const localArr = Array.isArray(logs) ? logs : [];
+        const localMap = new Map();
+        localArr.forEach(l=>{
+          const k = l.logKey ?? l.id;
+          if(!k) return;
+          localMap.set(k, l);
+        });
+
+        const batch = fbDb.batch();
+        let ops = 0;
+
+        // upsert new/changed
+        localMap.forEach((log, k)=>{
+          const prevTs = lastSyncedLogsMap.get(k);
+          const curTs = log.ts || log.updatedAt;
+          if(!prevTs || isLater(curTs, prevTs)){
+            batch.set(col.doc(k), buildLogDoc(log), { merge:true });
+            ops++;
+          }
+        });
+
+        // delete missing
+        lastSyncedLogsMap.forEach((prevTs, k)=>{
+          if(!localMap.has(k)){
+            batch.delete(col.doc(k));
+            ops++;
+          }
+        });
+
+        if(ops>0){
+          await batch.commit();
+          lastSyncedLogsMap = new Map();
+          localArr.forEach(l=>{
+            const k = l.logKey ?? l.id;
+            lastSyncedLogsMap.set(k, l.ts || l.updatedAt || "");
+          });
+        }
+      }catch(e){
+        console.warn("syncLogsToCloud failed:", e);
+      }
+    }
+
     // ✅ 로컬 상태 -> 클라우드 페이로드
     function buildCloudPayload(){
       return {
@@ -1391,9 +1509,10 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
           const hasCloud = data && (data.logs || data.customSets || data.customReps || data.progressByDate);
           if(hasCloud){
             const localPayload = buildCloudPayload();
-            const merged = mergePayload(localPayload, data);
+            const merged = mergePayload({ ...localPayload, logs: localPayload.logs||[] }, { ...data, logs: [] });
             applyCloudPayload(merged);
-            await ref.set(merged, { merge:true });
+            const { logs: _logs, ...rest } = merged;
+            await ref.set(rest, { merge:true });
             toast("기록 동기화 완료 ✅");
           }else{
             await ref.set(buildCloudPayload(), { merge:true });
@@ -1406,6 +1525,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
 
         cloudReady = true;
         setAuthUI('signed-in');
+        startLogsRealtime();
 
         // UI 리렌더(기존 로직 호출)
         try{
@@ -1481,7 +1601,10 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       pendingCloudTimer = setTimeout(async ()=>{
         try{
           const ref = getUserDocRef(currentUser.uid);
-          await ref.set(buildCloudPayload(), { merge:true });
+          const payload = buildCloudPayload();
+          const { logs: _logs, ...rest } = payload;
+          await ref.set(rest, { merge:true });
+          await syncLogsToCloud();
           lastCloudWriteAt = Date.now();
         }catch(e){
           console.warn("Cloud save failed:", e);
@@ -1497,6 +1620,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         if(k===KEY_LOGS || k===KEY_SETS || k===KEY_REPS || k===KEY_PROGRESS_BY_DATE){
           touchLocalUpdatedAt();
           scheduleCloudSave();
+          if(k===KEY_LOGS) syncLogsToCloud();
         }
       };
       // removeItem도 반영
@@ -1506,6 +1630,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         if(k===KEY_LOGS || k===KEY_SETS || k===KEY_REPS || k===KEY_PROGRESS_BY_DATE){
           touchLocalUpdatedAt();
           scheduleCloudSave();
+          if(k===KEY_LOGS) syncLogsToCloud();
         }
       };
     }
