@@ -1231,7 +1231,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     function buildPayload(){
       return {
         version:"dk_fit_cloud_v1",
-        updatedAt:(getLocalUpdatedAt() || new Date().toISOString()),
+        localUpdatedAt:(getLocalUpdatedAt() || new Date().toISOString()),
         logs, customSets, customReps, progressByDate
       };
     }
@@ -1249,7 +1249,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       localStorage.setItem(KEY_REPS, JSON.stringify(customReps));
       touchLocalUpdate();
       localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
-      localStorage.setItem(KEY_LOCAL_UPDATED_AT, p.updatedAt || new Date().toISOString());
+      localStorage.setItem(KEY_LOCAL_UPDATED_AT, p.localUpdatedAt || p.updatedAt || new Date().toISOString());
       touchLocalUpdate();
     }
 
@@ -1258,14 +1258,21 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       if(!currentUser||!fbDb) return null;
       const ref = fbDb.collection('users').doc(currentUser.uid);
       const snap = await ref.get();
-      if(snap.exists && snap.data()) return snap.data();
+      if(snap.exists && snap.data()){
+        const d = snap.data();
+        // Firestore Timestamp -> ISO
+        if(d.updatedAt && typeof d.updatedAt.toDate === 'function'){
+          d.updatedAt = d.updatedAt.toDate().toISOString();
+        }
+        return d;
+      }
       return null;
     }
 
     async function pushToCloud(){
       if(!currentUser||!fbDb) return;
       const ref = fbDb.collection('users').doc(currentUser.uid);
-      await ref.set(buildPayload(), {merge:true});
+      await ref.set({ ...buildPayload(), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, {merge:true});
     }
 
     function isoToMs(iso){
