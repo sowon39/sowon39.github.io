@@ -1259,6 +1259,68 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       }
     }
 
+
+    // ✅ 로컬 변경 시각 기록 (로그인 전에도 동기화 준비)
+    function touchLocalUpdatedAt(){
+      try{ localStorage.setItem(KEY_LOCAL_UPDATED_AT, new Date().toISOString()); }catch(e){}
+    }
+    function getLocalUpdatedAt(){
+      try{ return localStorage.getItem(KEY_LOCAL_UPDATED_AT) || null; }catch(e){ return null; }
+    }
+    // ✅ ISO 날짜 비교 (null 안전)
+    function isLater(aISO, bISO){
+      if(!aISO) return false;
+      if(!bISO) return true;
+      return new Date(aISO).getTime() > new Date(bISO).getTime();
+    }
+    // ✅ logs 충돌 병합: logKey 기준으로 최신(ts) 선택
+    function mergeLogs(localArr, cloudArr){
+      const map = new Map();
+      (cloudArr||[]).forEach(item=>{
+        if(!item) return;
+        const k = item.logKey ?? item.id;
+        map.set(k, item);
+      });
+      (localArr||[]).forEach(item=>{
+        if(!item) return;
+        const k = item.logKey ?? item.id;
+        const prev = map.get(k);
+        if(!prev){ map.set(k, item); return; }
+        const prevTs = prev.ts || prev.updatedAt;
+        const curTs = item.ts || item.updatedAt;
+        if(isLater(curTs, prevTs)) map.set(k, item);
+      });
+      return Array.from(map.values()).sort((a,b)=> new Date(b.ts||0)-new Date(a.ts||0));
+    }
+    // ✅ object 충돌 병합: key별 최신(updatedAt/ts) 우선, 없으면 로컬 우선
+    function mergeKeyedObject(localObj, cloudObj){
+      const out = { ...(cloudObj||{}) };
+      const keys = new Set([...Object.keys(cloudObj||{}), ...Object.keys(localObj||{})]);
+      keys.forEach(k=>{
+        const l = localObj?.[k];
+        const c = cloudObj?.[k];
+        if(l==null && c!=null){ out[k]=c; return; }
+        if(c==null && l!=null){ out[k]=l; return; }
+        const lTs = (l && (l.updatedAt || l.ts)) || null;
+        const cTs = (c && (c.updatedAt || c.ts)) || null;
+        if(isLater(lTs, cTs)) out[k]=l; else out[k]=c;
+      });
+      return out;
+    }
+    // ✅ 전체 페이로드 병합(충돌 방지)
+    function mergePayload(localPayload, cloudPayload){
+      return {
+        version: "dk_fit_cloud_v1",
+        updatedAt: new Date().toISOString(),
+        localUpdatedAt: getLocalUpdatedAt(),
+        localUpdatedAt: getLocalUpdatedAt(),
+        logs: mergeLogs(localPayload?.logs||[], cloudPayload?.logs||[]),
+        customSets: mergeKeyedObject(localPayload?.customSets||{}, cloudPayload?.customSets||{}),
+        customReps: mergeKeyedObject(localPayload?.customReps||{}, cloudPayload?.customReps||{}),
+        progressByDate: mergeKeyedObject(localPayload?.progressByDate||{}, cloudPayload?.progressByDate||{})
+      };
+    }
+
     // ✅ 로컬 상태 -> 클라우드 페이로드
     function buildCloudPayload(){
       return {
@@ -1293,6 +1355,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       localStorage.setItem(KEY_REPS, JSON.stringify(customReps));
       localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
 
+      localStorage.setItem(KEY_LOCAL_UPDATED_AT, payload.localUpdatedAt || payload.updatedAt || new Date().toISOString());
       return true;
     }
 
@@ -1309,7 +1372,10 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
           const data = snap.data();
           const hasCloud = data && (data.logs || data.customSets || data.customReps || data.progressByDate);
           if(hasCloud){
-            applyCloudPayload(data);
+            const localPayload = buildCloudPayload();
+            const merged = mergePayload(localPayload, data);
+            applyCloudPayload(merged);
+            await ref.set(merged, { merge:true });
             toast("기록 동기화 완료 ✅");
           }else{
             await ref.set(buildCloudPayload(), { merge:true });
@@ -1364,6 +1430,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       localStorage.setItem = function(k, v){
         _setItem(k, v);
         if(k===KEY_LOGS || k===KEY_SETS || k===KEY_REPS || k===KEY_PROGRESS_BY_DATE){
+          touchLocalUpdatedAt();
           scheduleCloudSave();
         }
       };
@@ -1372,6 +1439,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       localStorage.removeItem = function(k){
         _removeItem(k);
         if(k===KEY_LOGS || k===KEY_SETS || k===KEY_REPS || k===KEY_PROGRESS_BY_DATE){
+          touchLocalUpdatedAt();
           scheduleCloudSave();
         }
       };
@@ -1451,6 +1519,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     const KEY_SETS = 'dk_os_v121_sets';
     const KEY_REPS = 'dk_os_v121_reps';
     const KEY_PROGRESS_BY_DATE = 'dk_os_v121_progress_by_date';
+    const KEY_LOCAL_UPDATED_AT = 'dk_os_v121_local_updated_at';
     const KEY_SPLASH = 'dk_os_v121_splash_shown';
     const KEY_SUMMARY_SHOWN = 'dk_os_v121_summary_shown';
     const KEY_NOTIF = 'dk_os_v121_rest_notif';
