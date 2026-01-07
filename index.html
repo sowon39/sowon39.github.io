@@ -1689,7 +1689,7 @@ button:active, .btn:active, .setBtn:active, .repBtn:active, .chip:active, .pill:
                     <div class="stepper">
                       <div>
                         <div class="stepperLabel">SET</div>
-                        <div class="stepperValue" data-role="setTotal">${setTotal}</div>
+                        <div class="stepperValue" data-role="setTotal" data-exid="${id}">${setTotal}</div>
                       </div>
                       <div class="flex items-center gap-2">
                         <button class="stepperBtn" onclick="adjust('set','${id}',-1)"><i class="fa-solid fa-minus"></i></button>
@@ -1700,7 +1700,7 @@ button:active, .btn:active, .setBtn:active, .repBtn:active, .chip:active, .pill:
                     <div class="stepper">
                       <div>
                         <div class="stepperLabel">REP</div>
-                        <div class="stepperValue" data-role="repTotal">${repTotal}</div>
+                        <div class="stepperValue" data-role="repTotal" data-exid="${id}">${repTotal}</div>
                       </div>
                       <div class="flex items-center gap-2">
                         <button class="stepperBtn" onclick="adjust('rep','${id}',-1)"><i class="fa-solid fa-minus"></i></button>
@@ -2110,7 +2110,7 @@ function saveRepToLog(logKey, value){
       }
 
       // ✅ GIF 깜빡임 방지: 전체 렌더 말고 현재 슬라이드만 부분 업데이트
-      renderCarousel(false);
+      if(type==='rep') updateRepDisplay(id); if(type==='set') updateSetDisplay(id);
       updateProgressUI();
       toast(t('messages.toast.settingSaved','설정 저장됨'));
       haptic(10);
