@@ -772,7 +772,61 @@ button,a{
       .nav-item{ padding: 10px 0 !important; }
       .nav-item i{ font-size: 1.15rem !important; }
     }
-  </style>
+  
+/* ===== Slide swipe (pan-x) + app-like scrolling ===== */
+.carousel, .slides, .slideTrack, .slideContainer{
+  touch-action: pan-x;
+}
+/* allow vertical scrolling on main content */
+.main, .content, .scrollArea, .list{
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+/* stronger pressed feedback (app-like) */
+.is-pressed{
+  transform: scale(0.97);
+  filter: brightness(0.95);
+  transition: transform 0.08s ease, filter 0.08s ease;
+}
+
+</style>
+<style>
+/* ===== Mobile / Tablet app-like touch tuning ===== */
+html, body{
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+}
+/* Prevent text selection & callouts where it feels "app-y" */
+body, button, .btn, .chip, .tab, .dock, .card, .slide, .control, .iconbtn, input[type="button"], input[type="submit"]{
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+/* Make taps respond immediately and stop browser gestures hijacking */
+button, a, [role="button"], .btn, .chip, .tab, .iconbtn{
+  touch-action: manipulation;
+}
+/* If you have horizontal swipe areas (carousel), only allow horizontal pan there */
+.carousel, .slides, .slideTrack{
+  touch-action: pan-y;
+}
+.slide, .carousel{
+  -webkit-user-drag: none;
+}
+/* Remove 300ms delays and accidental drag cursors */
+button, [role="button"], .btn, .iconbtn{
+  cursor: pointer;
+}
+/* Press feedback (subtle) */
+button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .chip:active{
+  transform: scale(0.98);
+  filter: brightness(0.97);
+}
+/* Disable double-tap zoom on iOS for controls */
+*{ -webkit-tap-highlight-color: transparent; }
+</style>
 </head>
 
 <body>
@@ -2579,6 +2633,122 @@ function saveRepToLog(logKey, value){
       if(e.key === 'Escape') closeTimer(false);
     });
   </script>
+<script>
+/* ===== Touch responsiveness helpers ===== */
+(function(){
+  // Prevent double-tap to zoom on iOS (only on controls, not on inputs)
+  let lastTouchEnd = 0;
+  document.addEventListener('touchend', function(e){
+    const now = Date.now();
+    if(now - lastTouchEnd <= 300){
+      const t = e.target;
+      // Only block if it's a button-like element
+      if(t && (t.closest('button,[role=\"button\"],.btn,.iconbtn,.chip,.tab,a'))){
+        e.preventDefault();
+      }
+    }
+    lastTouchEnd = now;
+  }, {passive:false});
+
+  // Stop "drag cursor" text selection from long-press on controls
+  document.addEventListener('selectstart', function(e){
+    const t = e.target;
+    if(t && t.closest && t.closest('button,[role=\"button\"],.btn,.iconbtn,.chip,.tab,a')){
+      e.preventDefault();
+    }
+  });
+
+  // Convert touch to click reliably on some Android WebViews
+  // Ensure pointer events don't get canceled by small movement
+  document.addEventListener('touchstart', function(e){
+    const t = e.target;
+    if(t && t.closest && t.closest('button,[role=\"button\"],.btn,.iconbtn,.chip,.tab,a')){
+      // Add a pressed class for richer feedback if desired
+      const el = t.closest('button,[role=\"button\"],.btn,.iconbtn,.chip,.tab,a');
+      el.classList.add('is-pressed');
+    }
+  }, {passive:true});
+
+  document.addEventListener('touchcancel', function(e){
+    const t = e.target;
+    if(t && t.closest){
+      const el = t.closest('button,[role=\"button\"],.btn,.iconbtn,.chip,.tab,a');
+      if(el) el.classList.remove('is-pressed');
+    }
+  }, {passive:true});
+
+  document.addEventListener('touchend', function(e){
+    const t = e.target;
+    if(t && t.closest){
+      const el = t.closest('button,[role=\"button\"],.btn,.iconbtn,.chip,.tab,a');
+      if(el) el.classList.remove('is-pressed');
+    }
+  }, {passive:true});
+
+  // iOS momentum + prevent scroll rubber band in nested elements (optional)
+  // document.body.addEventListener('touchmove', function(e){}, {passive:true});
+})();
+</script>
+<script>
+/* ===== Pointer-based tap unification (reduce missed taps / ghost clicks) ===== */
+(function(){
+  // Delegate pointerdown to trigger the same handler as click, but instantly.
+  // Works well on mobile/tablet and reduces "double tap needed" cases.
+  const TAP_SELECTOR = 'button,[role="button"],.btn,.iconbtn,.chip,.tab,a';
+
+  function isInteractive(el){
+    return el && el.closest && el.closest(TAP_SELECTOR);
+  }
+
+  // Prevent synthetic ghost clicks after pointer interaction
+  let lastPointerTime = 0;
+  document.addEventListener('click', function(e){
+    if(Date.now() - lastPointerTime < 450){
+      const t = e.target;
+      if(isInteractive(t)){
+        e.stopPropagation();
+        e.preventDefault();
+      }
+    }
+  }, true);
+
+  document.addEventListener('pointerdown', function(e){
+    const t = e.target;
+    const el = isInteractive(t) ? t.closest(TAP_SELECTOR) : null;
+    if(!el) return;
+
+    // Don't interfere with text inputs
+    if(el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') return;
+
+    // Capture so we win against drag/select
+    lastPointerTime = Date.now();
+    // Important: prevent default to avoid focus/selection/double-tap zoom
+    e.preventDefault();
+
+    // Visual feedback
+    el.classList.add('is-pressed');
+
+    // If element has onclick handler or is a button-like, dispatch click immediately
+    // BUT avoid double firing if the app already handles pointer events.
+    // We dispatch a click and rely on ghost-click blocker above.
+    try{
+      el.click();
+    }catch(_){}
+  }, {capture:true});
+
+  document.addEventListener('pointerup', function(e){
+    const t = e.target;
+    const el = isInteractive(t) ? t.closest(TAP_SELECTOR) : null;
+    if(el) el.classList.remove('is-pressed');
+  }, {capture:true});
+
+  document.addEventListener('pointercancel', function(e){
+    const t = e.target;
+    const el = isInteractive(t) ? t.closest(TAP_SELECTOR) : null;
+    if(el) el.classList.remove('is-pressed');
+  }, {capture:true});
+})();
+</script>
 </body>
 </html>
 
