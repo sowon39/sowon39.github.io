@@ -1188,6 +1188,8 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     let fbDb = null;
     let currentUser = null;
     let cloudReady = false;
+    let unsubscribeUserDoc = null;
+    let lastRemoteAppliedAt = null;
     let lastCloudWriteAt = 0;
     let pendingCloudTimer = null;
 
@@ -1403,6 +1405,46 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       }
     }
 
+
+    // ✅ 실시간 반영: 다른 기기에서 변경되면 즉시 로컬/UI 업데이트
+    function startRealtimeListener(){
+      if(!currentUser || !fbDb) return;
+      // 기존 리스너 제거
+      if(unsubscribeUserDoc){ try{ unsubscribeUserDoc(); }catch(e){} unsubscribeUserDoc=null; }
+
+      const ref = getUserDocRef(currentUser.uid);
+      unsubscribeUserDoc = ref.onSnapshot((snap)=>{
+        if(!snap.exists) return;
+        const data = snap.data() || {};
+        const remoteAt = data.updatedAt || data.localUpdatedAt || null;
+
+        // (1) 내가 방금 쓴 변경이라면 무시(루프 방지)
+        // lastCloudWriteAt 는 Date.now() 기준이라 ISO 비교가 어려워서,
+        // 마지막으로 원격 적용한 updatedAt 과 같으면 패스
+        if(lastRemoteAppliedAt && remoteAt && remoteAt === lastRemoteAppliedAt) return;
+
+        // (2) 로컬이 더 최신이면 원격 덮어쓰기 금지 (다음 save에서 내가 올림)
+        const localAt = getLocalUpdatedAt();
+        if(isLater(localAt, remoteAt)) return;
+
+        // (3) 원격이 더 최신/동일이면 병합 후 적용
+        const localPayload = buildCloudPayload();
+        const merged = mergePayload(localPayload, data);
+        applyCloudPayload(merged);
+        lastRemoteAppliedAt = merged.updatedAt || remoteAt || new Date().toISOString();
+
+        try{
+          renderCarousel(true);
+          updateProgressUI();
+          renderCalendar();
+          renderStats();
+        }catch(e){}
+        toast("다른 기기 기록 반영 ✅");
+      }, (err)=>{
+        console.warn("Realtime listener error:", err);
+      });
+    }
+
     // ✅ Debounced Cloud Save: 잦은 writes 방지
     function scheduleCloudSave(){
       if(!currentUser || !fbDb || !cloudReady) return;
@@ -1453,6 +1495,8 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         currentUser = u || null;
 
         if(!currentUser){
+          if(unsubscribeUserDoc){ try{ unsubscribeUserDoc(); }catch(e){} unsubscribeUserDoc=null; }
+
           cloudReady = false;
           setAuthUI('signed-out');
           return;
@@ -1461,6 +1505,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         setAuthUI('signed-in');
         toast("로그인됨 ✅");
         await initialSync();
+        startRealtimeListener();
       });
     }
 
