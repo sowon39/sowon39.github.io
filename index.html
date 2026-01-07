@@ -2653,3 +2653,28 @@ function saveRepToLog(logKey, value){
 </body>
 </html>
 
+    /* ✅ SET 실시간 반영: 세트 수 변경 시 세트 버튼 그리드만 부분 업데이트 */
+    function updateSetDisplay(exId){
+      try{
+        const date = (typeof selectedDate === 'string' && selectedDate) ? selectedDate : getToday();
+        const [dayIdx, exIdx] = exId.split('-').map(Number);
+        const w = workoutData[dayIdx]?.list?.[exIdx];
+        if(!w) return;
+        const setTotal = customSets[exId] || w.set;
+
+        // 화면에 해당 운동의 setGrid가 있으면 부분 업데이트
+        const grid = document.querySelector(`[data-role="setGrid"][data-exid="${exId}"]`);
+        if(grid){
+          grid.innerHTML = renderSetButtonsHTML(exId, w, date);
+          // 새로 생성된 버튼들에 ripple 효과가 먹도록 클래스만 유지 (delegation이라 OK)
+          return;
+        }
+
+        // fallback: 현재 카드면 최소 리렌더
+        const curId = `${currentDayIdx}-${currentSlideIndex}`;
+        if(curId === exId){
+          renderCarousel(false);
+        }
+      }catch(e){}
+    }
+
