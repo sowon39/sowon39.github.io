@@ -290,6 +290,41 @@
         "kw_ko": "플랭크",
         "kw_en": "plank",
         "gif": "PLANK.gif"
+      },
+      {
+        "kw_ko": "푸쉬업",
+        "kw_en": "push",
+        "gif": "PUSH_UP.gif"
+      },
+      {
+        "kw_ko": "풀업",
+        "kw_en": "pull",
+        "gif": "PULL_UP.gif"
+      },
+      {
+        "kw_ko": "스탠다드 푸쉬업",
+        "kw_en": "standard push",
+        "gif": "PUSH_UP.gif"
+      },
+      {
+        "kw_ko": "디클라인 푸쉬업",
+        "kw_en": "decline push",
+        "gif": "DECLINE_PUSH_UP.gif"
+      },
+      {
+        "kw_ko": "와이드 풀업",
+        "kw_en": "wide pull",
+        "gif": "PULL_UP.gif"
+      },
+      {
+        "kw_ko": "내로우 풀업",
+        "kw_en": "narrow pull",
+        "gif": "PULL_UP.gif"
+      },
+      {
+        "kw_ko": "풀업 (밴드)",
+        "kw_en": "band pull",
+        "gif": "PULL_UP.gif"
       }
     ]
   },
