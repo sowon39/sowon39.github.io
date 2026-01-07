@@ -772,64 +772,7 @@ button,a{
       .nav-item{ padding: 10px 0 !important; }
       .nav-item i{ font-size: 1.15rem !important; }
     }
-  
-/* --- REP bump animation --- */
-.rep-bump{
-  transform: scale(1.12);
-  transition: transform 120ms ease;
-}
-
-/* ================================
-   Touch UX Max (Tablet App Feel)
-================================ */
-html, body{
-  overscroll-behavior: none;
-  touch-action: manipulation;
-}
-#carousel, .carousel, .slides, .slide{
-  touch-action: pan-y;
-}
-button, .btn, .setBtn, .repBtn, .chip, .pill{
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-button:active, .btn:active, .setBtn:active, .repBtn:active, .chip:active, .pill:active{
-  transform: scale(0.98);
-  filter: brightness(0.98);
-}
-.setBtn{
-  transition: transform 120ms ease, filter 120ms ease;
-}
-.setBtn.done{
-  animation: set-pop 160ms ease;
-}
-@keyframes set-pop{
-  0%{transform: scale(1);}
-  55%{transform: scale(1.06);}
-  100%{transform: scale(1);}
-}
-.ripple{
-  position: relative;
-  overflow: hidden;
-}
-.ripple::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  background: currentColor;
-  opacity:0;
-  transform: scale(0.6);
-  border-radius: inherit;
-}
-.ripple.rippling::after{
-  animation: ripple 420ms ease;
-}
-@keyframes ripple{
-  0%{opacity:.12; transform:scale(.65);}
-  100%{opacity:0; transform:scale(1.25);}
-}
-
-</style>
+  </style>
 </head>
 
 <body>
@@ -1689,7 +1632,7 @@ button:active, .btn:active, .setBtn:active, .repBtn:active, .chip:active, .pill:
                     <div class="stepper">
                       <div>
                         <div class="stepperLabel">SET</div>
-                        <div class="stepperValue" data-role="setTotal" data-exid="${id}">${setTotal}</div>
+                        <div class="stepperValue" data-role="setTotal">${setTotal}</div>
                       </div>
                       <div class="flex items-center gap-2">
                         <button class="stepperBtn" onclick="adjust('set','${id}',-1)"><i class="fa-solid fa-minus"></i></button>
@@ -1700,7 +1643,7 @@ button:active, .btn:active, .setBtn:active, .repBtn:active, .chip:active, .pill:
                     <div class="stepper">
                       <div>
                         <div class="stepperLabel">REP</div>
-                        <div class="stepperValue" data-role="repTotal" data-exid="${id}">${repTotal}</div>
+                        <div class="stepperValue" data-role="repTotal">${repTotal}</div>
                       </div>
                       <div class="flex items-center gap-2">
                         <button class="stepperBtn" onclick="adjust('rep','${id}',-1)"><i class="fa-solid fa-minus"></i></button>
@@ -2110,7 +2053,7 @@ function saveRepToLog(logKey, value){
       }
 
       // ✅ GIF 깜빡임 방지: 전체 렌더 말고 현재 슬라이드만 부분 업데이트
-      if(type==='rep') updateRepDisplay(id); if(type==='set') updateSetDisplay(id);
+      renderCarousel(false);
       updateProgressUI();
       toast(t('messages.toast.settingSaved','설정 저장됨'));
       haptic(10);
@@ -2544,43 +2487,6 @@ function saveRepToLog(logKey, value){
     /* ---------- DRAG / CONTEXT MENU PREVENT ---------- */
     document.addEventListener("dragstart", e => e.preventDefault(), { passive:false });
     document.addEventListener("contextmenu", e => e.preventDefault());
-    
-    /* ================================
-       Touch UX Max JS (Tablet App Feel)
-    ================================ */
-    const HAPTIC = {
-      light(){ try{ navigator.vibrate?.(8); }catch(e){} },
-      medium(){ try{ navigator.vibrate?.(18); }catch(e){} }
-    };
-
-    // ripple on tap (delegated)
-    document.addEventListener('pointerdown', (e)=>{
-      const el = e.target.closest('button,.btn,.setBtn,.repBtn,.chip,.pill');
-      if(!el) return;
-      el.classList.add('ripple','rippling');
-      setTimeout(()=>el.classList.remove('rippling'), 460);
-    }, {passive:true});
-
-    // haptics for key actions
-    document.addEventListener('click', (e)=>{
-      const setBtn = e.target.closest('.setBtn');
-      if(setBtn){ HAPTIC.light(); return; }
-      const repBtn = e.target.closest('.repBtn');
-      if(repBtn){ HAPTIC.light(); return; }
-      const navBtn = e.target.closest('#btn-prev,#btn-next,.navBtn');
-      if(navBtn){ HAPTIC.light(); return; }
-    });
-
-    // prevent iOS double-tap zoom (extra safety)
-    let lastTouchEnd = 0;
-    document.addEventListener('touchend', function (event) {
-      const now = (new Date()).getTime();
-      if (now - lastTouchEnd <= 300) {
-        event.preventDefault();
-      }
-      lastTouchEnd = now;
-    }, { passive: false });
-
     /* ---------- ZOOM PREVENT ---------- */
     (function preventZoom(){
       document.addEventListener('gesturestart', (e)=> e.preventDefault(), {passive:false});
@@ -2652,29 +2558,4 @@ function saveRepToLog(logKey, value){
   </script>
 </body>
 </html>
-
-    /* ✅ SET 실시간 반영: 세트 수 변경 시 세트 버튼 그리드만 부분 업데이트 */
-    function updateSetDisplay(exId){
-      try{
-        const date = (typeof selectedDate === 'string' && selectedDate) ? selectedDate : getToday();
-        const [dayIdx, exIdx] = exId.split('-').map(Number);
-        const w = workoutData[dayIdx]?.list?.[exIdx];
-        if(!w) return;
-        const setTotal = customSets[exId] || w.set;
-
-        // 화면에 해당 운동의 setGrid가 있으면 부분 업데이트
-        const grid = document.querySelector(`[data-role="setGrid"][data-exid="${exId}"]`);
-        if(grid){
-          grid.innerHTML = renderSetButtonsHTML(exId, w, date);
-          // 새로 생성된 버튼들에 ripple 효과가 먹도록 클래스만 유지 (delegation이라 OK)
-          return;
-        }
-
-        // fallback: 현재 카드면 최소 리렌더
-        const curId = `${currentDayIdx}-${currentSlideIndex}`;
-        if(curId === exId){
-          renderCarousel(false);
-        }
-      }catch(e){}
-    }
 
