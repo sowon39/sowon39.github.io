@@ -1378,11 +1378,10 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
           remoteLogs.push(d);
         });
 
-        const localPayload = buildCloudPayload();
-        const mergedLogs = mergeLogs(localPayload.logs||[], remoteLogs);
+        remoteLogs.sort((a,b)=> new Date(b.ts||0)-new Date(a.ts||0));
 
         isApplyingRemoteLogs = true;
-        logs = mergedLogs;
+        logs = remoteLogs;
         localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
         lastSyncedLogsMap = new Map();
         logs.forEach(l=>{
@@ -1431,7 +1430,8 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
           const prevTs = lastSyncedLogsMap.get(k);
           const curTs = log.ts || log.updatedAt;
           if(!prevTs || isLater(curTs, prevTs)){
-            batch.set(col.doc(k), buildLogDoc(log), { merge:true });
+            const toWrite = { ...buildLogDoc(log), updatedAt: new Date().toISOString(), ts: (log.ts || new Date().toISOString()) };
+            batch.set(col.doc(k), toWrite, { merge:true });
             ops++;
           }
         });
