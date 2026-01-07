@@ -1263,6 +1263,20 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
 
 
     // ✅ 로컬 변경 시각 기록 (로그인 전에도 동기화 준비)
+
+    function getDeviceId(){
+      try{
+        let id = localStorage.getItem(KEY_DEVICE_ID);
+        if(!id){
+          id = (crypto?.randomUUID ? crypto.randomUUID() : (Date.now()+"_"+Math.random().toString(16).slice(2)));
+          localStorage.setItem(KEY_DEVICE_ID, id);
+        }
+        return id;
+      }catch(e){
+        return "unknown_device";
+      }
+    }
+
     function touchLocalUpdatedAt(){
       try{ localStorage.setItem(KEY_LOCAL_UPDATED_AT, new Date().toISOString()); }catch(e){}
     }
@@ -1315,6 +1329,8 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         version: "dk_fit_cloud_v1",
         updatedAt: new Date().toISOString(),
         localUpdatedAt: getLocalUpdatedAt(),
+        lastWriterId: getDeviceId(),
+        lastWriterId: getDeviceId(),
         localUpdatedAt: getLocalUpdatedAt(),
         logs: mergeLogs(localPayload?.logs||[], cloudPayload?.logs||[]),
         customSets: mergeKeyedObject(localPayload?.customSets||{}, cloudPayload?.customSets||{}),
@@ -1407,6 +1423,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
 
 
     // ✅ 실시간 반영: 다른 기기에서 변경되면 즉시 로컬/UI 업데이트
+    let toastCooldownUntil = 0;
     function startRealtimeListener(){
       if(!currentUser || !fbDb) return;
       // 기존 리스너 제거
@@ -1416,6 +1433,8 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       unsubscribeUserDoc = ref.onSnapshot((snap)=>{
         if(!snap.exists) return;
         const data = snap.data() || {};
+        // ✅ 내가 쓴 변경이면 무시 (토스트/루프 방지)
+        if(data.lastWriterId && data.lastWriterId === getDeviceId()) return;
         const remoteAt = data.updatedAt || data.localUpdatedAt || null;
 
         // (1) 내가 방금 쓴 변경이라면 무시(루프 방지)
@@ -1439,7 +1458,11 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
           renderCalendar();
           renderStats();
         }catch(e){}
-        toast("다른 기기 기록 반영 ✅");
+        const now = Date.now();
+        if(now > toastCooldownUntil){
+          toast("다른 기기 기록 반영 ✅");
+          toastCooldownUntil = now + 4000; // 4초 쿨다운
+        }
       }, (err)=>{
         console.warn("Realtime listener error:", err);
       });
@@ -1565,6 +1588,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     const KEY_REPS = 'dk_os_v121_reps';
     const KEY_PROGRESS_BY_DATE = 'dk_os_v121_progress_by_date';
     const KEY_LOCAL_UPDATED_AT = 'dk_os_v121_local_updated_at';
+    const KEY_DEVICE_ID = 'dk_os_v121_device_id';
     const KEY_SPLASH = 'dk_os_v121_splash_shown';
     const KEY_SUMMARY_SHOWN = 'dk_os_v121_summary_shown';
     const KEY_NOTIF = 'dk_os_v121_rest_notif';
