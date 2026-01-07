@@ -952,13 +952,6 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         <div class="w-28 h-1.5 bg-white/5 rounded-full overflow-hidden mt-2">
           <div id="progress-bar" class="h-full bg-cyan-400 shadow-[0_0_12px_#22d3ee] transition-all duration-700" style="width:0%"></div>
         </div>
-
-        <!-- ✅ Sync Debug Panel (iPad에서도 상태 확인) -->
-        <div id="sync-debug" class="mt-2 glass rounded-2xl px-3 py-2 text-[9px] font-black tracking-widest uppercase text-white/55" style="display:none; max-width: 320px;">
-          <div id="dbg-line1">SYNC: -</div>
-          <div id="dbg-line2" class="mt-1">UID: -</div>
-        </div>
-
       </div>
     </div>
   </header>
@@ -1228,20 +1221,8 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       try{
         const provider = new firebase.auth.GoogleAuthProvider();
         provider.setCustomParameters({ prompt:'select_account' });
-
-        const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
-
-        try{
-          if(isiOS){
-            await fbAuth.signInWithRedirect(provider);
-          }else{
-            await fbAuth.signInWithPopup(provider);
-          }
-        }catch(err){
-          console.warn("popup failed -> redirect", err);
-          await fbAuth.signInWithRedirect(provider);
-        }
-      }catch(e){ console.warn(e); toast("로그인 실패"); }
+        await fbAuth.signInWithPopup(provider);
+      }catch(e){ console.warn(e); }
     }
     async function logout(){
       try{ await fbAuth.signOut(); }catch(e){ console.warn(e); }
@@ -1276,7 +1257,6 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
 
     
     async function pullFromCloud(){
-      dbgSet('PULL: start', 'UID: '+(currentUser?.uid||'-'));
       if(!currentUser||!fbDb) return null;
       const ref = fbDb.collection('users').doc(currentUser.uid);
       let snap = null;
@@ -1292,20 +1272,15 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         if(d.updatedAt && typeof d.updatedAt.toDate === 'function'){
           d.updatedAt = d.updatedAt.toDate().toISOString();
         }
-        dbgSet('PULL: ok', 'updatedAt: '+(d.updatedAt||'-'));
-        dbgAutoHide();
         return d;
       }
-      dbgSet('PULL: empty', 'no doc'); dbgAutoHide();
       return null;
     }
 
     async function pushToCloud(){
-      dbgSet('PUSH: start', 'UID: '+(currentUser?.uid||'-'));
       if(!currentUser||!fbDb) return;
       const ref = fbDb.collection('users').doc(currentUser.uid);
       await ref.set({ ...buildPayload(), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, {merge:true});
-      dbgSet('PUSH: ok', 'localUpdatedAt: '+(getLocalUpdatedAt()||'-')); dbgAutoHide();
     }
 
     function isoToMs(iso){
@@ -1350,7 +1325,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
           renderCalendar();
           renderStats();
         }catch(e){}
-      }catch(e){ console.warn("syncCloudPreferLatest", e); dbgSet('SYNC: error', String(e)); dbgAutoHide(); }
+      }catch(e){ console.warn("syncCloudPreferLatest", e); }
     }
 
     async function manualRefresh(){
@@ -1359,7 +1334,6 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     }
 
     function bindAuthState(){
-      try{ fbAuth.getRedirectResult().catch(()=>{}); }catch(e){}
       fbAuth.onAuthStateChanged(async (u)=>{
         currentUser=u||null;
         if(!currentUser){ cloudReady=false; setAuthUI('out'); return; }
@@ -1545,24 +1519,6 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     }
 
     /* ---------- TOAST ---------- */
-    let dbgTimer=null;
-    function dbgShow(on=true){
-      const box=document.getElementById('sync-debug');
-      if(!box) return;
-      box.style.display = on ? '' : 'none';
-    }
-    function dbgSet(l1,l2){
-      const a=document.getElementById('dbg-line1');
-      const b=document.getElementById('dbg-line2');
-      if(a) a.textContent=l1;
-      if(b) b.textContent=l2;
-      dbgShow(true);
-    }
-    function dbgAutoHide(){
-      if(dbgTimer) clearTimeout(dbgTimer);
-      dbgTimer=setTimeout(()=>dbgShow(false), 4500);
-    }
-
     let toastTimer=null;
     function toast(msg){
       const el = document.getElementById('toast');
