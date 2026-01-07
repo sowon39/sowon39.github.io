@@ -1592,25 +1592,36 @@ window.addEventListener("online", ()=>{
 
     // ===== Auth actions (Google only) =====
     window.googleLogin = async () => {
-      try{
-// ⚠️ file:// 로 열면 Firebase 팝업 로그인이 차단될 수 있습니다.
-if(location.protocol === "file:"){
-  alert("현재 파일(로컬)에서 실행 중입니다.
+  try{
+    // GitHub Pages에서도 팝업이 차단되거나(브라우저 정책/모바일) 허용 도메인 미등록 시 실패할 수 있어요.
+    // 1) 우선 팝업 시도 → 2) 실패하면 Redirect로 자동 전환
+    setSyncStatus("로그인 중…");
+    try{
+      await signInWithPopup(auth, provider);
+    }catch(e){
+      console.warn("Popup login failed, fallback to redirect:", e);
+      // 팝업 차단 / 403 / unauthorized_domain 등 → redirect 방식으로 전환
+      await signInWithRedirect(auth, provider);
+      return; // redirect로 이동하므로 여기서 종료
+    }
+    window.closeAuthModal();
+    toast("로그인 완료 ✅");
+  }catch(e){
+    console.error(e);
+    const msg = (e && e.code) ? e.code : "로그인 실패";
+    alert("로그인이 시작되지 않았습니다.
 
-Google 로그인 팝업은 보안상 file:// 환경에서 차단될 수 있어요.
+가장 흔한 원인:
+1) Firebase Authentication → Settings → Authorized domains에
+   'sowon39.github.io'가 추가되지 않음
+2) 팝업 차단 (모바일/사파리 등) → 자동으로 Redirect로 전환됨
 
-✅ 해결 방법:
-1) VSCode Live Server
-2) http://localhost 로 실행
-3) 웹호스팅에 업로드
+에러코드: "+msg);
+    setSyncStatus("로그인 필요");
+  }
+};
 
-그 후 다시 로그인 버튼을 눌러주세요.");
-  return;
-}
-
-        await signInWithPopup(auth, googleProvider);
-        window.closeAuthModal();
-      }catch(e){
+catch(e){
         console.error(e);
         toast("Google 로그인 실패");
       }
