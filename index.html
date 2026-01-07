@@ -1681,15 +1681,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     }
 
     // ✅ localStorage.setItem 가 호출되면 자동으로 scheduleCloudSave 되도록 후킹
-    function hookLocalStorage(){
-      const _setItem = localStorage.setItem.bind(localStorage);
-      localStorage.setItem = function(k, v){
-        _setItem(k, v);
-        if(k===KEY_LOGS || k===KEY_SETS || k===KEY_REPS || k===KEY_PROGRESS_BY_DATE){
-          touchLocalUpdatedAt();
-          scheduleCloudSave();
-          if(k===KEY_LOGS && typeof suppressCloudWritesUntilInit!=='undefined' && !suppressCloudWritesUntilInit) syncLogsToCloud();
-        }
+    function hookLocalStorage(){ /* 일반형: localStorage 후킹 비활성화(로컬 저장 안정성 우선) */ }
       };
       // removeItem도 반영
       const _removeItem = localStorage.removeItem.bind(localStorage);
