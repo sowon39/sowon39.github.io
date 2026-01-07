@@ -774,7 +774,7 @@ button,a{
     }
   
 /* ===== Swipe-friendly touch-action tuning ===== */
-.carousel, .slides, .slideTrack, .slideContainer{ touch-action: pan-y; }
+.carousel, .slides, .slideTrack, .slideContainer{ touch-action: pan-x; }
 button, a, [role="button"], .btn, .chip, .tab, .iconbtn{ touch-action: manipulation; }
 .main, .content, .scrollArea, .list{ -webkit-overflow-scrolling: touch; }
 .is-pressed{
@@ -2697,72 +2697,73 @@ function saveRepToLog(logKey, value){
   })();
 </script>
 <script>
-/* ===== Robust swipe-to-slide (scrollLeft drag) ===== */
+/* ===== Robust swipe-to-slide (bind after carousel renders) ===== */
 (function(){
-  // Find the horizontal scroller used for slides
-  const scroller = document.querySelector('.slides') || document.querySelector('.slideTrack') || document.querySelector('.carousel');
-  if(!scroller) return;
+  function bindScroller(scroller){
+    if(!scroller || scroller.__swipeBound) return;
+    scroller.__swipeBound = true;
 
-  // Only apply if it's actually horizontally scrollable
-  const isHScrollable = ()=> scroller.scrollWidth > scroller.clientWidth + 5;
-  if(!isHScrollable()) return;
+    const isHScrollable = ()=> scroller.scrollWidth > scroller.clientWidth + 5;
 
-  let isDown = false;
-  let startX = 0;
-  let startScrollLeft = 0;
-  let pointerId = null;
-  let moved = 0;
+    let isDown=false, startX=0, startScrollLeft=0, pointerId=null, moved=0;
 
-  const onDown = (e)=>{
-    // ignore if starting on interactive control
-    const t = e.target;
-    if(t && t.closest && t.closest('button,[role="button"],.btn,.iconbtn,.chip,.tab,a,input,textarea,select')) return;
+    const onDown=(e)=>{
+      const t=e.target;
+      if(t && t.closest && t.closest('button,[role="button"],.btn,.iconbtn,.chip,.tab,a,input,textarea,select')) return;
+      if(!isHScrollable()) return;
+      isDown=true; moved=0; pointerId=e.pointerId;
+      startX=e.clientX; startScrollLeft=scroller.scrollLeft;
+      try{ scroller.setPointerCapture(pointerId); }catch(_){}
+    };
+    const onMove=(e)=>{
+      if(!isDown || e.pointerId!==pointerId) return;
+      const dx=e.clientX-startX;
+      moved=Math.max(moved, Math.abs(dx));
+      if(moved>6) e.preventDefault();
+      scroller.scrollLeft = startScrollLeft - dx;
+    };
+    const onUp=(e)=>{
+      if(!isDown || e.pointerId!==pointerId) return;
+      isDown=false;
+      try{ scroller.releasePointerCapture(pointerId); }catch(_){}
+      pointerId=null;
 
-    isDown = true;
-    moved = 0;
-    pointerId = e.pointerId;
-    startX = e.clientX;
-    startScrollLeft = scroller.scrollLeft;
-    try{ scroller.setPointerCapture(pointerId); }catch(_){}
-  };
+      // snap to nearest child (if any)
+      const children = Array.from(scroller.children || []);
+      if(!children.length) return;
+      const cur = scroller.scrollLeft;
+      let nearest = children[0], best = Math.abs(children[0].offsetLeft - cur);
+      for(const ch of children){
+        const d = Math.abs(ch.offsetLeft - cur);
+        if(d < best){ best=d; nearest=ch; }
+      }
+      if(best > 2){
+        scroller.scrollTo({left: nearest.offsetLeft, behavior:'smooth'});
+      }
+    };
 
-  const onMove = (e)=>{
-    if(!isDown || e.pointerId !== pointerId) return;
-    const dx = e.clientX - startX;
-    moved = Math.max(moved, Math.abs(dx));
-    // If user is clearly swiping horizontally, prevent vertical scroll jitter
-    if(moved > 6) e.preventDefault();
-    scroller.scrollLeft = startScrollLeft - dx;
-  };
+    scroller.addEventListener('pointerdown', onDown, {passive:true});
+    scroller.addEventListener('pointermove', onMove, {passive:false});
+    scroller.addEventListener('pointerup', onUp, {passive:true});
+    scroller.addEventListener('pointercancel', onUp, {passive:true});
+  }
 
-  const onUp = (e)=>{
-    if(!isDown || e.pointerId !== pointerId) return;
-    isDown = false;
-    try{ scroller.releasePointerCapture(pointerId); }catch(_){}
-    pointerId = null;
+  function findAndBind(){
+    // Your carousel element exists from start, but its children are rendered later by JS
+    const car = document.querySelector('.carousel');
+    if(!car) return;
+    // sometimes the scroller is carousel itself; sometimes a child
+    bindScroller(car);
+    const childScroller = car.querySelector('.slides,.track,.slideTrack,.scroller,[data-role="carousel"],[data-carousel]');
+    if(childScroller) bindScroller(childScroller);
+  }
 
-    // Snap to nearest slide (if scroll-snap is set, browser will snap anyway)
-    // But we can help by gently scrolling to nearest child offset.
-    const children = Array.from(scroller.children || []);
-    if(!children.length) return;
+  // Initial attempt (in case already rendered)
+  findAndBind();
 
-    // Find nearest child left
-    const cur = scroller.scrollLeft;
-    let nearest = children[0];
-    let best = Math.abs(children[0].offsetLeft - cur);
-    for(const ch of children){
-      const d = Math.abs(ch.offsetLeft - cur);
-      if(d < best){ best = d; nearest = ch; }
-    }
-    if(best > 2){
-      scroller.scrollTo({left: nearest.offsetLeft, behavior: 'smooth'});
-    }
-  };
-
-  scroller.addEventListener('pointerdown', onDown, {passive:true});
-  scroller.addEventListener('pointermove', onMove, {passive:false});
-  scroller.addEventListener('pointerup', onUp, {passive:true});
-  scroller.addEventListener('pointercancel', onUp, {passive:true});
+  // Observe for renderCarousel() DOM changes and bind when nodes appear
+  const mo = new MutationObserver(()=>{ findAndBind(); });
+  mo.observe(document.body, {childList:true, subtree:true});
 })();
 </script>
 </body>
