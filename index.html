@@ -1513,7 +1513,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       // ✅ 초기 스냅샷 전에는 업로드/삭제 금지(빈 로컬이 서버를 덮지 않게)
       if(suppressCloudWritesUntilInit || !logsSnapshotReady) return;
       if(!currentUser || !fbDb || !cloudReady) return;
-      if(suppressCloudWritesUntilInit) return;
+      if(typeof suppressCloudWritesUntilInit!=='undefined' && suppressCloudWritesUntilInit) return;
       if(isApplyingRemoteLogs) return;
 
       try{
@@ -1658,7 +1658,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     // ✅ Debounced Cloud Save: 잦은 writes 방지
     function scheduleCloudSave(){
       if(!currentUser || !fbDb || !cloudReady) return;
-      if(suppressCloudWritesUntilInit) return;
+      if(typeof suppressCloudWritesUntilInit!=='undefined' && suppressCloudWritesUntilInit) return;
 
       const now = Date.now();
       // 너무 자주면 800ms debounce + 최소 간격 2.5s
@@ -1688,7 +1688,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         if(k===KEY_LOGS || k===KEY_SETS || k===KEY_REPS || k===KEY_PROGRESS_BY_DATE){
           touchLocalUpdatedAt();
           scheduleCloudSave();
-          if(k===KEY_LOGS && !suppressCloudWritesUntilInit) syncLogsToCloud();
+          if(k===KEY_LOGS && typeof suppressCloudWritesUntilInit!=='undefined' && !suppressCloudWritesUntilInit) syncLogsToCloud();
         }
       };
       // removeItem도 반영
@@ -1698,7 +1698,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         if(k===KEY_LOGS || k===KEY_SETS || k===KEY_REPS || k===KEY_PROGRESS_BY_DATE){
           touchLocalUpdatedAt();
           scheduleCloudSave();
-          if(k===KEY_LOGS && !suppressCloudWritesUntilInit) syncLogsToCloud();
+          if(k===KEY_LOGS && typeof suppressCloudWritesUntilInit!=='undefined' && !suppressCloudWritesUntilInit) syncLogsToCloud();
         }
       };
     }
