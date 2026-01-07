@@ -939,6 +939,9 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
             <i class="fa-solid fa-user"></i>
             <span id="user-name" class="truncate">User</span>
           </div>
+          <button id="btn-refresh" class="pill" onclick="manualRefresh()" style="display:none;">
+            <i class="fa-solid fa-rotate-right"></i>
+          </button>
           <button id="btn-logout" class="pill" onclick="logout()" style="display:none;">
             <i class="fa-solid fa-right-from-bracket"></i>
           </button>
@@ -1220,10 +1223,12 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       if(state === 'signed-out'){
         loginBtn.style.display = '';
         logoutBtn.style.display = 'none';
+        const refreshBtn=document.getElementById('btn-refresh'); if(refreshBtn) refreshBtn.style.display='none';
         userChip.style.display = 'none';
       }else if(state === 'signed-in'){
         loginBtn.style.display = 'none';
         logoutBtn.style.display = '';
+        const refreshBtn=document.getElementById('btn-refresh'); if(refreshBtn) refreshBtn.style.display='';
         userChip.style.display = '';
         if(userName){
           const name = currentUser?.displayName || currentUser?.email || "DK User";
@@ -1233,6 +1238,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       }else if(state === 'loading'){
         loginBtn.style.display = 'none';
         logoutBtn.style.display = 'none';
+        const refreshBtn=document.getElementById('btn-refresh'); if(refreshBtn) refreshBtn.style.display='none';
         userChip.style.display = 'none';
       }
     }
@@ -1370,20 +1376,86 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
 
     // ✅ 클라우드 → 로컬 logs 반영 (실시간)
     function startLogsRealtime(){
+      // ✅ 일반적인 Fit앱 스타일: 실시간 구독 X, 필요할 때만 서버에서 최신 불러오기
       if(!currentUser || !fbDb) return;
-      if(unsubscribeLogs){ try{ unsubscribeLogs(); }catch(e){} unsubscribeLogs=null; }
+      fetchLogsOnce();
+    }
 
-      unsubscribeLogs = logsColRef().orderBy('ts','desc').onSnapshot((snap)=>{
-        const isFirst = !logsSnapshotReady;
+    async function manualRefresh(){
+      try{
+        if(typeof haptic==='function') haptic(8);
+        await fetchLogsOnce(true);
+      }catch(e){}
+    }
+
+
+    // ✅ Pull-to-Refresh (모바일: 아래로 당기면 새로고침)
+    function setupPullToRefresh(){
+      let startY = 0;
+      let pulling = false;
+      const threshold = 80;
+
+      const indicator = document.createElement('div');
+      indicator.id = "ptr-indicator";
+      indicator.style.cssText = `
+        position:fixed; top:-60px; left:0; right:0; height:60px;
+        display:flex; align-items:center; justify-content:center;
+        z-index:9999; backdrop-filter: blur(10px);
+        background: rgba(20,20,24,0.75);
+        border-bottom:1px solid rgba(255,255,255,0.08);
+        transition: transform .18s ease;
+        transform: translateY(0px);
+      `;
+      indicator.innerHTML = `<div class="pill"><i class="fa-solid fa-arrow-down"></i>&nbsp;당겨서 새로고침</div>`;
+      document.body.appendChild(indicator);
+
+      const setPull = (dy)=>{
+        const y = Math.min(110, Math.max(0, dy));
+        indicator.style.transform = `translateY(${y}px)`;
+        if(y > threshold){
+          indicator.innerHTML = `<div class="pill cyan"><i class="fa-solid fa-rotate-right"></i>&nbsp;놓으면 새로고침</div>`;
+        }else{
+          indicator.innerHTML = `<div class="pill"><i class="fa-solid fa-arrow-down"></i>&nbsp;당겨서 새로고침</div>`;
+        }
+      };
+
+      window.addEventListener('touchstart', (e)=>{
+        if(window.scrollY > 0) return;
+        startY = e.touches[0].clientY;
+        pulling = true;
+      }, {passive:true});
+
+      window.addEventListener('touchmove', (e)=>{
+        if(!pulling) return;
+        const dy = e.touches[0].clientY - startY;
+        if(dy <= 0) return;
+        setPull(dy);
+      }, {passive:true});
+
+      window.addEventListener('touchend', async ()=>{
+        if(!pulling) return;
+        const current = parseFloat(indicator.style.transform.replace('translateY(','').replace('px)','')) || 0;
+        pulling = false;
+        if(current > threshold){
+          indicator.innerHTML = `<div class="pill cyan"><i class="fa-solid fa-rotate-right fa-spin"></i>&nbsp;새로고침 중…</div>`;
+          try{ await fetchLogsOnce(); }catch(e){}
+        }
+        indicator.style.transform = `translateY(0px)`;
+        setTimeout(()=>{ indicator.style.transform = `translateY(0px)`; }, 250);
+      }, {passive:true});
+    }
+
+    async function fetchLogsOnce(forceToast=false){
+      if(!currentUser || !fbDb) return;
+      try{
+        const snap = await logsColRef().orderBy('ts','desc').get();
         const remoteLogs = [];
         snap.forEach(doc=>{
           const d = doc.data();
           if(d && d.deleted) return;
           remoteLogs.push(d);
         });
-
-        remoteLogs.sort((a,b)=> new Date(b.ts||0)-new Date(a.ts||0));
-
+        // 서버를 소스 오브 트루스로 사용
         isApplyingRemoteLogs = true;
         logs = remoteLogs;
         localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
@@ -1393,12 +1465,10 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
           lastSyncedLogsMap.set(k, l.ts || l.updatedAt || "");
         });
         isApplyingRemoteLogs = false;
+
         logsSnapshotReady = true;
-        if(isFirst){
-          // ✅ 이제부터 업로드/삭제 동기화 허용
-          suppressCloudWritesUntilInit = false;
-          allowDeleteSync = true;
-        }
+        suppressCloudWritesUntilInit = false;
+        allowDeleteSync = true;
 
         try{
           renderCarousel(true);
@@ -1406,18 +1476,13 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
           renderCalendar();
           renderStats();
         }catch(e){}
-
-        const now=Date.now();
-        if(now>toastCooldownUntil){
-          toast("실시간 동기화 ✅");
-          toastCooldownUntil = now + 3000;
-        }
-      }, (err)=>{
-        console.warn("Logs realtime error:", err);
-      });
+      }catch(e){
+        console.warn("fetchLogsOnce failed:", e);
+      }
     }
 
     // ✅ 로컬 logs → 클라우드 반영 (추가/수정/삭제 diff)
+ (추가/수정/삭제 diff)
     async function syncLogsToCloud(){
       // ✅ 초기 스냅샷 전에는 업로드/삭제 금지(빈 로컬이 서버를 덮지 않게)
       if(suppressCloudWritesUntilInit || !logsSnapshotReady) return;
@@ -1528,19 +1593,22 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
             applyCloudPayload(merged);
             const { logs: _logs, ...rest } = merged;
             await ref.set(rest, { merge:true });
-            toast("기록 동기화 완료 ✅");
+            // (sync toast removed)
           }else{
             await ref.set(buildCloudPayload(), { merge:true });
-            toast("클라우드에 기록 저장 ✅");
+            // (sync toast removed)
           }
         }else{
           await ref.set(buildCloudPayload(), { merge:true });
-          toast("클라우드에 기록 저장 ✅");
+          // (sync toast removed)
         }
 
         cloudReady = true;
         setAuthUI('signed-in');
         startLogsRealtime();
+        // ✅ 앱 복귀/탭 포커스 시 최신 데이터 다시 불러오기(일반 Fit앱 UX)
+        window.addEventListener('focus', ()=>{ if(currentUser) fetchLogsOnce(); });
+        document.addEventListener('visibilitychange', ()=>{ if(!document.hidden && currentUser) fetchLogsOnce(); });
 
         // UI 리렌더(기존 로직 호출)
         try{
@@ -1559,10 +1627,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
 
     // ✅ 실시간 반영: 다른 기기에서 변경되면 즉시 로컬/UI 업데이트
     let toastCooldownUntil = 0;
-    function startRealtimeListener(){
-      if(!currentUser || !fbDb) return;
-      // 기존 리스너 제거
-      if(unsubscribeUserDoc){ try{ unsubscribeUserDoc(); }catch(e){} unsubscribeUserDoc=null; }
+    function startRealtimeListener(){ /* 일반형: 실시간 문서 구독 사용 안함 */ }
 
       const ref = getUserDocRef(currentUser.uid);
       unsubscribeUserDoc = ref.onSnapshot((snap)=>{
@@ -1595,7 +1660,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         }catch(e){}
         const now = Date.now();
         if(now > toastCooldownUntil){
-          toast("다른 기기 기록 반영 ✅");
+          // (sync toast removed)
           toastCooldownUntil = now + 4000; // 4초 쿨다운
         }
       }, (err)=>{
@@ -1667,7 +1732,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         }
 
         setAuthUI('signed-in');
-        toast("로그인됨 ✅");
+        // (login toast removed)
         await initialSync();
         startRealtimeListener();
       });
@@ -1839,6 +1904,8 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
 
     /* ---------- TABS ---------- */
     function showTab(name, btn){
+      // ✅ Fit앱 UX: 탭 이동 시 최신 데이터 1회 fetch
+      try{ if(typeof fetchLogsOnce==='function' && currentUser) fetchLogsOnce(); }catch(e){}
       document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
       document.getElementById(`tab-${name}`).classList.add('active');
       document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
@@ -3124,6 +3191,7 @@ function saveRepToLog(logKey, value){
       initFirebase();
       hookLocalStorage();
       bindAuthState();
+      setupPullToRefresh();
 
       await loadAppData();
       initIntro();
