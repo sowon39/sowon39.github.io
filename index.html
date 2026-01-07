@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-  <title>DK Fit OS v12.1 (WakeLock + Rep AI Buttons + History Pro)</title>
+  <title>DK Fit OS v12.1 (Firebase Sync)</title>
 
   <!-- ✅ PWA / iOS Standalone -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -14,96 +14,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
 
-  <script src="https://cdn.tailwindcss.com">
-
-/* =======================
-   Firebase Sync (Basic A-1)
-   ======================= */
-
-async function loginGoogle(){
-  const { auth, GoogleAuthProvider, signInWithPopup } = window.firebase;
-  const provider = new GoogleAuthProvider();
-  await signInWithPopup(auth, provider);
-}
-
-async function logout(){
-  const { auth, signOut } = window.firebase;
-  await signOut(auth);
-  if (typeof toast === "function") toast("로그아웃됨");
-}
-
-async function loadCloud(){
-  const { auth, db, doc, getDoc } = window.firebase;
-  const user = auth.currentUser;
-  if(!user) return false;
-
-  const ref = doc(db, "users", user.uid);
-  const snap = await getDoc(ref);
-  if(!snap.exists()) return false;
-
-  const cloud = snap.data();
-
-  logs = cloud.logs || [];
-  customSets = cloud.customSets || {};
-  customReps = cloud.customReps || {};
-  progressByDate = cloud.progressByDate || {};
-
-  localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
-  
-    saveCloudDebounced();localStorage.setItem(KEY_SETS, JSON.stringify(customSets));
-  
-    saveCloudDebounced();localStorage.setItem(KEY_REPS, JSON.stringify(customReps));
-  
-    saveCloudDebounced();localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
-
-  
-    saveCloudDebounced();return true;
-}
-
-let cloudSaveTimer = null;
-function saveCloudDebounced(){
-  if(cloudSaveTimer) clearTimeout(cloudSaveTimer);
-  cloudSaveTimer = setTimeout(saveCloud, 800);
-}
-
-async function saveCloud(){
-  const { auth, db, doc, setDoc } = window.firebase;
-  const user = auth.currentUser;
-  if(!user) return;
-
-  await setDoc(doc(db, "users", user.uid), {
-    logs,
-    customSets,
-    customReps,
-    progressByDate,
-    updatedAt: Date.now()
-  }, { merge: true });
-}
-
-function initAuth(){
-  const { auth, onAuthStateChanged } = window.firebase;
-
-  onAuthStateChanged(auth, async (user) => {
-    const el = document.getElementById("auth-state");
-    if(user){
-      if(el) el.textContent = "로그인 상태: ON";
-      if (typeof toast === "function") toast("로그인됨. 클라우드 데이터 불러오는 중...");
-      const ok = await loadCloud();
-      if(ok){
-        if (typeof toast === "function") toast("클라우드 데이터 반영 완료 ✅");
-        if (typeof renderCarousel === "function") renderCarousel(true);
-        if (typeof updateProgressUI === "function") updateProgressUI();
-        if (typeof renderCalendar === "function") renderCalendar();
-      } else {
-        if (typeof toast === "function") toast("클라우드 데이터 없음(첫 로그인)");
-      }
-    } else {
-      if(el) el.textContent = "로그인 상태: OFF";
-    }
-  });
-}
-
-</script>
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
@@ -121,21 +32,17 @@ function initAuth(){
 
     html,body{ height:100%; }
 
-/* --- Tablet WebApp UX Polish (app-like touch) --- */
-*{
-  -webkit-user-select:none;
-  user-select:none;
-  -webkit-touch-callout:none;
-  -webkit-tap-highlight-color:transparent;
-}
-img, video{
-  -webkit-user-drag:none;
-  user-drag:none;
-}
-button,a{
-  touch-action: manipulation;
-}
-
+    *{
+      -webkit-user-select:none;
+      user-select:none;
+      -webkit-touch-callout:none;
+      -webkit-tap-highlight-color:transparent;
+    }
+    img, video{
+      -webkit-user-drag:none;
+      user-drag:none;
+    }
+    button,a{ touch-action: manipulation; }
 
     html{
       touch-action: manipulation;
@@ -179,7 +86,7 @@ button,a{
     }
 
     /* =========================================================
-       ✅ NEW Splash (Apple Liquid Glass Style)
+       ✅ Splash
     ========================================================= */
     #splash-screen{
       position:fixed; inset:0; z-index:10000;
@@ -311,7 +218,6 @@ button,a{
     .tab-content.active{ display:block; }
     @keyframes fadeInContent{ from{opacity:0; transform:translateY(6px) scale(0.985);} to{opacity:1; transform:translateY(0) scale(1);} }
 
-    /* Pills */
     .pill{
       display:inline-flex; align-items:center; gap:6px;
       padding:6px 10px; border-radius:999px;
@@ -329,7 +235,6 @@ button,a{
       padding-bottom: calc(var(--dockH) + env(safe-area-inset-bottom) + 28px);
     }
 
-    /* Carousel */
     .carousel{
       display:flex;
       gap:18px;
@@ -341,7 +246,6 @@ button,a{
       touch-action: pan-x pan-y;
     }
     .carousel::before,.carousel::after{ content:''; flex:0 0 22px; }
-
     .carousel > .slide{
       scroll-snap-align:center;
       flex: 0 0 calc(100% - 120px);
@@ -350,7 +254,6 @@ button,a{
     }
     .slide.peek{ opacity:.60; transform:scale(.965); filter:blur(.6px); }
     .slide.focus{ opacity:1; transform:scale(1); filter:none; }
-
     @media (min-width: 860px){
       .carousel > .slide{ flex:0 0 calc(100% - 160px); }
       .slide.peek{ opacity:.62; transform:scale(.97); filter:blur(.45px); }
@@ -367,7 +270,6 @@ button,a{
     }
 
     .rightPanel{ border-radius:26px; padding:18px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); }
-
     .stepper{
       display:flex; gap:10px; align-items:center; justify-content:space-between;
       padding:14px 14px; border-radius:22px;
@@ -414,14 +316,8 @@ button,a{
     }
     .setBtn:active{ transform:scale(0.985); }
     .setBtn.done{ background:linear-gradient(135deg,var(--primary),var(--accent)); color:#000; box-shadow:0 18px 34px rgba(34,211,238,0.24); border:none; }
+    .setBtn.locked{ opacity: .35; filter: saturate(.6); pointer-events: none; }
 
-    .setBtn.locked{
-      opacity: .35;
-      filter: saturate(.6);
-      pointer-events: none;
-    }
-
-    /* Floating Dock */
     .navDockWrap{ position:fixed; left:0; right:0; bottom:0; padding: 18px; z-index:60; }
     .nav-dock{
       background:rgba(10,10,12,0.78);
@@ -440,7 +336,6 @@ button,a{
     .nav-active-dot{ position:absolute; bottom:1px; width:4px; height:4px; background:var(--primary); border-radius:50%; box-shadow:0 0 12px var(--primary); opacity:0; transition:all .25s; }
     .nav-item.active .nav-active-dot{ opacity:1; transform:scale(1.6); }
 
-    /* Dock Auto Hide */
     .navDockWrap{
       transition: transform .45s cubic-bezier(0.22, 1, 0.36, 1), opacity .35s ease;
       will-change: transform, opacity;
@@ -456,7 +351,6 @@ button,a{
       pointer-events: auto;
     }
 
-    /* Day chips */
     .day-chip{
       width:44px; height:44px;
       border-radius:18px;
@@ -481,11 +375,9 @@ button,a{
       box-shadow:0 10px 24px rgba(34,211,238,0.25);
     }
 
-    /* Timer Modal */
     #timer-modal{ transition:all .65s ease; }
     #timer-sec{ letter-spacing:-0.08em; }
 
-    /* Timer HUD */
     #timer-hud{
       position:fixed;
       top: calc(var(--headerH) + 10px + env(safe-area-inset-top));
@@ -559,13 +451,11 @@ button,a{
       }
     }
 
-    /* Calendar */
     .calendar-day{ aspect-ratio:1; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:13px; position:relative; transition:all .18s; font-weight:800; color:rgba(255,255,255,0.75); background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); user-select:none;}
     .has-log::after{ content:''; width:6px; height:6px; background:rgba(34,211,238,0.90); border-radius:50%; position:absolute; bottom:8px; box-shadow:0 0 12px rgba(34,211,238,0.35); }
     .calendar-day.selected{ background:rgba(34,211,238,0.14); border:1px solid rgba(34,211,238,0.35); box-shadow:0 0 0 2px rgba(34,211,238,0.18), 0 0 30px rgba(34,211,238,0.12); color:#eaffff; font-weight:900; transform:translateY(-2px); }
     .calendar-day.today{ border:1px solid rgba(255,255,255,0.12); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08); color:rgba(255,255,255,0.95); font-weight:900; }
 
-    /* History table */
     .log-table{ width:100%; border-collapse:separate; border-spacing:0 10px; }
     .log-table th{ font-size:10px; text-transform:uppercase; letter-spacing:.18em; color:rgba(255,255,255,0.35); font-weight:900; text-align:left; padding:0 10px 6px; }
     .log-row{ background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:16px; overflow:hidden; }
@@ -707,8 +597,6 @@ button,a{
       color: rgba(255,255,255,0.45);
       line-height: 1.4;
     }
-
-    /* ✅ 상세 GIF: 너무 크지 않게 적정 사이즈 + 화면에서 탭/내용 같이 보이도록 */
     .sheetGif{
       width: 100%;
       max-height: 220px;
@@ -721,7 +609,6 @@ button,a{
       background: rgba(255,255,255,0.03);
     }
 
-    /* 카드 GIF */
     .cardGifSquareWrap{
       width: 100%;
       aspect-ratio: 1 / 1;
@@ -743,7 +630,6 @@ button,a{
       background: rgba(0,0,0,0.15);
     }
 
-    /* ✅ REP 입력 모달 */
     #rep-modal{
       position:fixed; inset:0;
       z-index: 260;
@@ -785,131 +671,38 @@ button,a{
       box-shadow: 0 18px 34px rgba(34,211,238,0.22);
     }
 
-    /* Mobile Layout Optimization */
-    @media (max-width: 520px){
-      .layoutWrap{ padding-left: 0; padding-right: 0; }
-      main .layoutWrap.px-4{ padding-left: 14px !important; padding-right: 14px !important; }
-
-      header{
-        padding: 14px 14px 10px !important;
-        height: 88px;
-        padding-top: calc(10px + env(safe-area-inset-top)) !important;
-      }
-      :root{ --headerH: 88px; --dockH: 92px; }
-
-      #view-day{
-        font-size: 1.38rem !important;
-        letter-spacing: -0.02em !important;
-      }
-      #view-title{
-        font-size: 0.95rem !important;
-        margin-top: 2px !important;
-        opacity: 0.9;
-      }
-      #view-subcue{
-        margin-top: 6px !important;
-        font-size: 9px !important;
-      }
-
-      #progress-percent{
-        font-size: 16px !important;
-        font-weight: 950 !important;
-        margin-bottom: 4px !important;
-        letter-spacing: -0.02em;
-      }
-      #progress-text{
-        font-size: 10px !important;
-      }
-      header .w-28{
-        width: 140px !important;
-        height: 8px !important;
-      }
-
-      .slideCard{ border-radius: 24px; }
-      .slideCard .p-6{ padding: 14px !important; }
-      .slideCard h3{ font-size: 1.55rem !important; }
-
-      .slideCard .md\:grid-cols-2{ grid-template-columns: 1fr !important; }
-
-      .rightPanel{
-        padding: 14px !important;
-        border-radius: 22px !important;
-      }
-
-      .stepperBtn{
-        width: 44px !important;
-        height: 44px !important;
-        border-radius: 16px !important;
-      }
-      .stepperValue{ font-size: 20px !important; }
-
-      .rightPanel .grid.grid-cols-2{
-        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-      }
-      .setBtn{
-        height: 54px !important;
-        font-size: 15px !important;
-        border-radius: 18px !important;
-      }
-
-      .carousel > .slide{
-        flex: 0 0 calc(100% - 70px) !important;
-      }
-
-      .navDockWrap{ padding: 14px !important; }
-      .nav-dock{ border-radius: 30px !important; padding: 9px !important; }
-      .nav-item{ padding: 10px 0 !important; }
-      .nav-item i{ font-size: 1.15rem !important; }
+    /* ===== Firebase Auth Modal ===== */
+    #auth-modal{
+      position:fixed; inset:0;
+      z-index: 300;
+      display:none;
+      align-items:center;
+      justify-content:center;
     }
-  
-/* ===== Swipe-friendly touch-action tuning ===== */
-.carousel, .slides, .slideTrack, .slideContainer{ touch-action: pan-y; }
-button, a, [role="button"], .btn, .chip, .tab, .iconbtn{ touch-action: manipulation; }
-.main, .content, .scrollArea, .list{ -webkit-overflow-scrolling: touch; }
-.is-pressed{
-  transform: scale(0.97);
-  filter: brightness(0.95);
-  transition: transform 0.08s ease, filter 0.08s ease;
-}
-
-</style>
-<style>
-/* ===== Mobile / Tablet app-like touch tuning ===== */
-html, body{
-  overscroll-behavior: none;
-  -webkit-text-size-adjust: 100%;
-  text-rendering: optimizeLegibility;
-}
-/* Prevent text selection & callouts where it feels "app-y" */
-body, button, .btn, .chip, .tab, .dock, .card, .slide, .control, .iconbtn, input[type="button"], input[type="submit"]{
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-touch-callout: none;
-  -webkit-tap-highlight-color: rgba(0,0,0,0);
-}
-/* Make taps respond immediately and stop browser gestures hijacking */
-button, a, [role="button"], .btn, .chip, .tab, .iconbtn{
-  touch-action: manipulation;
-}
-/* If you have horizontal swipe areas (carousel), only allow horizontal pan there */
-.carousel, .slides, .slideTrack{
-  touch-action: pan-y;
-}
-.slide, .carousel{
-  -webkit-user-drag: none;
-}
-/* Remove 300ms delays and accidental drag cursors */
-button, [role="button"], .btn, .iconbtn{
-  cursor: pointer;
-}
-/* Press feedback (subtle) */
-button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .chip:active{
-  transform: scale(0.98);
-  filter: brightness(0.97);
-}
-/* Disable double-tap zoom on iOS for controls */
-*{ -webkit-tap-highlight-color: transparent; }
-</style>
+    #auth-modal.show{ display:flex; }
+    .authCard{
+      width:min(520px, calc(100vw - 44px));
+      border-radius: 30px;
+      padding: 18px;
+      background: rgba(10,10,12,0.92);
+      border: 1px solid rgba(255,255,255,0.10);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      box-shadow: 0 40px 140px rgba(0,0,0,0.72);
+    }
+    .input{
+      width:100%;
+      height:50px;
+      border-radius: 18px;
+      padding: 0 14px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.10);
+      color: rgba(255,255,255,0.92);
+      outline: none;
+      font-weight: 800;
+    }
+    .input::placeholder{ color: rgba(255,255,255,0.35); }
+  </style>
 </head>
 
 <body>
@@ -921,6 +714,46 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       <div class="splash-logo">DK Fit</div>
       <div class="splash-loader">
         <div class="splash-line"><span></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ Firebase Auth Modal -->
+  <div id="auth-modal">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-xl" onclick="closeAuthModal()"></div>
+    <div class="relative authCard">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <p class="text-[10px] font-black tracking-[0.2em] uppercase text-white/45">Firebase 로그인</p>
+          <h3 class="text-2xl font-black italic text-white mt-1">기록 동기화</h3>
+          <p class="text-[10px] font-black tracking-[0.2em] uppercase text-white/35 mt-2">
+            이메일/비밀번호 · Google · 익명 지원
+          </p>
+        </div>
+        <button class="pill" onclick="closeAuthModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="mt-5 grid gap-3">
+        <input id="auth-email" class="input" type="email" placeholder="이메일" autocomplete="email" />
+        <input id="auth-pass"  class="input" type="password" placeholder="비밀번호" autocomplete="current-password" />
+
+        <div class="grid grid-cols-2 gap-3 mt-1">
+          <button class="bigBtn" onclick="emailLogin()"><i class="fa-solid fa-right-to-bracket"></i> 로그인</button>
+          <button class="bigBtn" onclick="emailSignup()"><i class="fa-solid fa-user-plus"></i> 회원가입</button>
+        </div>
+
+        <button class="bigBtn" style="background:linear-gradient(135deg,var(--primary),var(--accent)); color:#000; border:none;"
+                onclick="googleLogin()">
+          <i class="fa-brands fa-google"></i> Google 로그인
+        </button>
+
+        <button class="bigBtn" onclick="anonLogin()">
+          <i class="fa-solid fa-user-secret"></i> 익명 로그인
+        </button>
+
+        <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/35 mt-2">
+          * 로그인 시 /users/{uid} 문서에 저장되어 디바이스간 공유됩니다.
+        </p>
       </div>
     </div>
   </div>
@@ -948,7 +781,6 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         </div>
       </div>
 
-      <!-- ✅ AI 추천 + 숫자 그리드 -->
       <div class="mt-4 glass rounded-2xl p-4">
         <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45">AI 추천</p>
         <div id="rep-ai-reco" class="mt-3 grid grid-cols-3 gap-2"></div>
@@ -1000,7 +832,6 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         <div class="flex items-center gap-2">
           <h2 id="stopwatch" class="text-3xl font-black font-mono tracking-tighter text-white">00:00</h2>
 
-          <!-- ✅ 일시정지 버튼 -->
           <button onclick="toggleStopwatchPause()" class="pill cyan" style="padding:6px 10px;" title="총 운동시간 일시정지">
             <i id="pause-icon" class="fa-solid fa-pause"></i>
           </button>
@@ -1009,6 +840,16 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         <div class="flex items-center gap-2 mt-1">
           <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
           <p class="text-[9px] font-black text-gray-300 tracking-widest uppercase">ELITE MODE · DK</p>
+        </div>
+
+        <!-- ✅ Firebase user status -->
+        <div class="flex items-center gap-2 mt-2">
+          <span id="cloud-pill" class="pill" onclick="openAuthModal()" title="클라우드 로그인">
+            <i class="fa-solid fa-cloud"></i> Cloud: OFF
+          </span>
+          <button id="logout-btn" class="pill" onclick="logoutFirebase()" style="display:none;">
+            <i class="fa-solid fa-right-from-bracket"></i> 로그아웃
+          </button>
         </div>
       </div>
 
@@ -1112,6 +953,20 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         <div class="grid gap-3">
           <button onclick="backupJSON()" class="bigBtn"><i class="fa-solid fa-download"></i> 백업(JSON)</button>
           <button onclick="resetAll()" class="bigBtn" style="border-color: rgba(255,255,255,0.18);"><i class="fa-solid fa-triangle-exclamation"></i> 전체 초기화</button>
+        </div>
+
+        <div class="glass rounded-[28px] p-6 mt-6">
+          <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45">클라우드 동기화</p>
+          <p class="text-sm font-black text-white/70 mt-2">
+            로그인 시 자동 동기화가 켜집니다. 다른 디바이스에서도 같은 계정으로 로그인하면 기록이 공유됩니다.
+          </p>
+          <div class="mt-4 grid gap-3">
+            <button class="bigBtn" onclick="manualCloudPull()"><i class="fa-solid fa-cloud-arrow-down"></i> 클라우드에서 불러오기</button>
+            <button class="bigBtn" onclick="manualCloudPush()"><i class="fa-solid fa-cloud-arrow-up"></i> 지금 클라우드 저장</button>
+          </div>
+          <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/35 mt-3">
+            * Firestore 경로: /users/{uid}
+          </p>
         </div>
       </section>
 
@@ -1232,24 +1087,340 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
   <!-- Toast -->
   <div id="toast" class="pill cyan"></div>
 
+  <!-- =========================================================
+    ✅ Firebase (Modular v9) — index 통파일 내부에서 import
+    ※ CORS 이슈 없게 하려면 반드시 "웹서버(예: Firebase Hosting)"로 실행 권장
+  ========================================================= -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import {
+      getAuth, onAuthStateChanged,
+      signInWithEmailAndPassword, createUserWithEmailAndPassword,
+      GoogleAuthProvider, signInWithPopup,
+      signInAnonymously, signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+    import {
+      getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+    // ✅ 너가 준 Firebase 정보
+    const firebaseConfig = {
+      apiKey: "AIzaSyAIrxl_GDVJYzLZxuSzUt9cLBUCfkUoCaw",
+      authDomain: "dk-pit.firebaseapp.com",
+      projectId: "dk-pit",
+      storageBucket: "dk-pit.firebasestorage.app",
+      messagingSenderId: "835447327032",
+      appId: "1:835447327032:web:6101fd173f5214926359cd"
+    };
+
+    // ✅ Firebase init
+    const fbApp = initializeApp(firebaseConfig);
+    const auth = getAuth(fbApp);
+    const db = getFirestore(fbApp);
+    const googleProvider = new GoogleAuthProvider();
+
+    // =========================================================
+    //  ✅ Cloud Sync Layer (Firestore /users/{uid})
+    // =========================================================
+    let currentUser = null;
+    let userDocUnsub = null;
+
+    // 저장 디바운스
+    let cloudSaveTimer = null;
+    let cloudEnabled = false;
+    let isApplyingRemote = false;
+    const CLOUD_DEBOUNCE_MS = 900;
+
+    function toast(msg){
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      if(window.__toastTimer) clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(()=> el.classList.remove('show'), 1800);
+    }
+
+    function setCloudUI(on, label=""){
+      const pill = document.getElementById("cloud-pill");
+      const logoutBtn = document.getElementById("logout-btn");
+
+      if(on){
+        pill.classList.add("cyan");
+        pill.innerHTML = `<i class="fa-solid fa-cloud"></i> Cloud: ON`;
+        pill.title = label || "클라우드 동기화 ON";
+        logoutBtn.style.display = "inline-flex";
+      }else{
+        pill.classList.remove("cyan");
+        pill.innerHTML = `<i class="fa-solid fa-cloud"></i> Cloud: OFF`;
+        pill.title = "클라우드 로그인";
+        logoutBtn.style.display = "none";
+      }
+    }
+
+    function userDocRef(uid){
+      return doc(db, "users", uid);
+    }
+
+    function getLocalSnapshot(){
+      // 앱이 쓰는 로컬 상태 그대로 묶어서 저장
+      return {
+        version: "dk_fit_v12.1_cloud",
+        updatedAt: Date.now(),
+        logs: window.logs || [],
+        customSets: window.customSets || {},
+        customReps: window.customReps || {},
+        progressByDate: window.progressByDate || {},
+        settings: {
+          restNotifEnabled: window.restNotifEnabled ?? true
+        }
+      };
+    }
+
+    function applyCloudSnapshot(payload){
+      if(!payload) return;
+
+      isApplyingRemote = true;
+
+      // Firestore -> localStorage + 메모리 변수 반영
+      window.logs = payload.logs || [];
+      window.customSets = payload.customSets || {};
+      window.customReps = payload.customReps || {};
+      window.progressByDate = payload.progressByDate || {};
+
+      // settings
+      if(payload.settings && typeof payload.settings.restNotifEnabled === "boolean"){
+        window.restNotifEnabled = payload.settings.restNotifEnabled;
+        localStorage.setItem(window.KEY_NOTIF, window.restNotifEnabled ? "1" : "0");
+      }
+
+      // localStorage에 반영 (기존 앱 로직과 동일하게 유지)
+      localStorage.setItem(window.KEY_LOGS, JSON.stringify(window.logs));
+      localStorage.setItem(window.KEY_SETS, JSON.stringify(window.customSets));
+      localStorage.setItem(window.KEY_REPS, JSON.stringify(window.customReps));
+      localStorage.setItem(window.KEY_PROGRESS_BY_DATE, JSON.stringify(window.progressByDate));
+
+      // UI 리렌더
+      try{
+        window.renderCarousel(true);
+        window.updateProgressUI();
+        window.renderCalendar();
+        if(document.getElementById("notif-toggle")){
+          const btn = document.getElementById("notif-toggle");
+          btn.textContent = window.restNotifEnabled ? "ON" : "OFF";
+          btn.classList.toggle("cyan", window.restNotifEnabled);
+        }
+      }catch(e){}
+
+      isApplyingRemote = false;
+    }
+
+    async function pullFromCloud(uid){
+      const ref = userDocRef(uid);
+      const snap = await getDoc(ref);
+      if(!snap.exists()){
+        // 처음 로그인: 로컬을 기준으로 클라우드 생성
+        await pushToCloud(uid, "first_create");
+        toast("클라우드 새로 생성됨 ✅");
+        return;
+      }
+      const data = snap.data();
+      const payload = data?.payload || null;
+      if(payload){
+        applyCloudSnapshot(payload);
+        toast("클라우드 데이터 불러옴 ✅");
+      }else{
+        toast("클라우드 데이터가 비어있음");
+      }
+    }
+
+    async function pushToCloud(uid, reason="auto"){
+      if(!uid) return;
+      const ref = userDocRef(uid);
+      const payload = getLocalSnapshot();
+
+      await setDoc(ref, {
+        uid,
+        reason,
+        updatedAt: Date.now(),
+        updatedAtServer: serverTimestamp(),
+        payload
+      }, { merge: true });
+    }
+
+    function scheduleCloudSave(reason="auto"){
+      if(!cloudEnabled || !currentUser?.uid) return;
+      if(isApplyingRemote) return;
+
+      if(cloudSaveTimer) clearTimeout(cloudSaveTimer);
+      cloudSaveTimer = setTimeout(async ()=>{
+        try{
+          await pushToCloud(currentUser.uid, reason);
+          // 너무 자주 토스트 나오지 않게 silent
+        }catch(e){
+          console.error(e);
+          toast("클라우드 저장 실패");
+        }
+      }, CLOUD_DEBOUNCE_MS);
+    }
+
+    function startRealtimeSync(uid){
+      if(userDocUnsub) userDocUnsub();
+      const ref = userDocRef(uid);
+
+      userDocUnsub = onSnapshot(ref, (snap)=>{
+        if(!snap.exists()) return;
+        const data = snap.data();
+        const payload = data?.payload;
+        if(!payload) return;
+
+        // 로컬이 막 저장한 직후 같은 내용이 되돌아오는 것을 방지
+        // updatedAt 비교로 "내가 더 최신이면 무시"
+        const localUpdatedAt = (window.__localCloudUpdatedAt || 0);
+        const remoteUpdatedAt = payload.updatedAt || 0;
+
+        if(isApplyingRemote) return;
+        if(remoteUpdatedAt <= localUpdatedAt) return;
+
+        window.__localCloudUpdatedAt = remoteUpdatedAt;
+        applyCloudSnapshot(payload);
+        toast("다른 디바이스 변경사항 동기화 ✅");
+      });
+    }
+
+    // 로컬 저장 감지: localStorage setItem 후에 scheduleCloudSave 호출
+    // 기존 코드를 많이 건드리지 않기 위해 setItem을 hook
+    const _setItem = localStorage.setItem.bind(localStorage);
+    localStorage.setItem = function(k, v){
+      _setItem(k, v);
+      // 앱 핵심 키들이 갱신되면 클라우드 저장 예약
+      const watch = [window.KEY_LOGS, window.KEY_SETS, window.KEY_REPS, window.KEY_PROGRESS_BY_DATE, window.KEY_NOTIF];
+      if(watch.includes(k)){
+        window.__localCloudUpdatedAt = Date.now();
+        scheduleCloudSave("local_change");
+      }
+    };
+
+    // =========================================================
+    //  ✅ Auth UI Functions (window에 노출)
+    // =========================================================
+    window.openAuthModal = () => {
+      document.getElementById("auth-modal").classList.add("show");
+    };
+    window.closeAuthModal = () => {
+      document.getElementById("auth-modal").classList.remove("show");
+    };
+
+    window.emailLogin = async () => {
+      try{
+        const email = document.getElementById("auth-email").value.trim();
+        const pass = document.getElementById("auth-pass").value.trim();
+        if(!email || !pass) return toast("이메일/비밀번호 입력");
+        await signInWithEmailAndPassword(auth, email, pass);
+        window.closeAuthModal();
+      }catch(e){
+        console.error(e);
+        toast("이메일 로그인 실패");
+      }
+    };
+
+    window.emailSignup = async () => {
+      try{
+        const email = document.getElementById("auth-email").value.trim();
+        const pass = document.getElementById("auth-pass").value.trim();
+        if(!email || !pass) return toast("이메일/비밀번호 입력");
+        await createUserWithEmailAndPassword(auth, email, pass);
+        window.closeAuthModal();
+      }catch(e){
+        console.error(e);
+        toast("회원가입 실패");
+      }
+    };
+
+    window.googleLogin = async () => {
+      try{
+        await signInWithPopup(auth, googleProvider);
+        window.closeAuthModal();
+      }catch(e){
+        console.error(e);
+        toast("Google 로그인 실패");
+      }
+    };
+
+    window.anonLogin = async () => {
+      try{
+        await signInAnonymously(auth);
+        window.closeAuthModal();
+      }catch(e){
+        console.error(e);
+        toast("익명 로그인 실패");
+      }
+    };
+
+    window.logoutFirebase = async () => {
+      try{
+        await signOut(auth);
+        toast("로그아웃 완료");
+      }catch(e){
+        console.error(e);
+        toast("로그아웃 실패");
+      }
+    };
+
+    window.manualCloudPull = async () => {
+      if(!currentUser?.uid) return toast("로그인이 필요합니다");
+      await pullFromCloud(currentUser.uid);
+    };
+    window.manualCloudPush = async () => {
+      if(!currentUser?.uid) return toast("로그인이 필요합니다");
+      await pushToCloud(currentUser.uid, "manual_push");
+      toast("지금 클라우드 저장 ✅");
+    };
+
+    // =========================================================
+    //  ✅ Auth State
+    // =========================================================
+    onAuthStateChanged(auth, async (user)=>{
+      currentUser = user || null;
+
+      if(!user){
+        cloudEnabled = false;
+        setCloudUI(false);
+        if(userDocUnsub) userDocUnsub();
+        userDocUnsub = null;
+        return;
+      }
+
+      cloudEnabled = true;
+
+      const isAnon = user.isAnonymous;
+      const label = isAnon ? "익명 계정" : (user.email || "Google 계정");
+      setCloudUI(true, label);
+
+      toast(`로그인됨: ${label}`);
+
+      // ✅ 1) 클라우드에서 데이터 pull
+      await pullFromCloud(user.uid);
+
+      // ✅ 2) 실시간 동기화 시작
+      startRealtimeSync(user.uid);
+
+      // ✅ 3) 로그인 직후 한번 push (서버에 최종 snapshot 보장)
+      try{
+        await pushToCloud(user.uid, "post_login_sync");
+      }catch(e){}
+    });
+  </script>
+
+  <!-- =========================================================
+      ✅ 기존 DK Fit 앱 스크립트 (원본 v12.1 그대로)
+      ※ 단, Firebase Layer가 로그/설정 localStorage 변화를 감지해 자동 저장합니다
+  ========================================================= -->
   <script>
     /* =========================================================
       DK Fit OS v12.1
-      ✅ Wake Lock (screen on)
-      ✅ Stopwatch Pause
-      ✅ Set tap -> instant done UI + REP modal appears
-      ✅ REP modal: previous week based number buttons (no mental math)
-      ✅ Rest sound: notification-like melody (no flash)
-      ✅ Progress percent + "현재 XX% 완료!"
-      ✅ History: daily summary with duration / avg rest / detail
-      ✅ GIF blink fix: avoid full re-render when stepper changes
     ========================================================= */
 
-    /* ---------- GIF 매칭 ---------- */
-    
     /* ---------- DATA ---------- */
-
-    /* ---------- APP DATA (JSON) ---------- */
     let appData = null;
     let workoutData = null;
     let gifMap = null;
@@ -1282,22 +1453,21 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       return '';
     }
 
-
     /* ---------- STORAGE KEYS ---------- */
-    const KEY_LOGS = 'dk_os_v121_logs';
-    const KEY_SETS = 'dk_os_v121_sets';
-    const KEY_REPS = 'dk_os_v121_reps';
-    const KEY_PROGRESS_BY_DATE = 'dk_os_v121_progress_by_date';
-    const KEY_SPLASH = 'dk_os_v121_splash_shown';
-    const KEY_SUMMARY_SHOWN = 'dk_os_v121_summary_shown';
-    const KEY_NOTIF = 'dk_os_v121_rest_notif';
+    window.KEY_LOGS = 'dk_os_v121_logs';
+    window.KEY_SETS = 'dk_os_v121_sets';
+    window.KEY_REPS = 'dk_os_v121_reps';
+    window.KEY_PROGRESS_BY_DATE = 'dk_os_v121_progress_by_date';
+    window.KEY_SPLASH = 'dk_os_v121_splash_shown';
+    window.KEY_SUMMARY_SHOWN = 'dk_os_v121_summary_shown';
+    window.KEY_NOTIF = 'dk_os_v121_rest_notif';
 
     /* ---------- LOAD ---------- */
     function safeParse(raw, fallback){ try { return raw ? JSON.parse(raw) : fallback; } catch(e){ return fallback; } }
-    let logs = safeParse(localStorage.getItem(KEY_LOGS), []);
-    let customSets = safeParse(localStorage.getItem(KEY_SETS), {});
-    let customReps = safeParse(localStorage.getItem(KEY_REPS), {});
-    let progressByDate = safeParse(localStorage.getItem(KEY_PROGRESS_BY_DATE), {});
+    window.logs = safeParse(localStorage.getItem(KEY_LOGS), []);
+    window.customSets = safeParse(localStorage.getItem(KEY_SETS), {});
+    window.customReps = safeParse(localStorage.getItem(KEY_REPS), {});
+    window.progressByDate = safeParse(localStorage.getItem(KEY_PROGRESS_BY_DATE), {});
 
     /* ---------- STATE ---------- */
     let timerInt = null;
@@ -1308,13 +1478,11 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     let restRemaining = 0;
     let restTotal = 0;
     let currentSlideIndex = 0;
-    let restNotifEnabled = (localStorage.getItem(KEY_NOTIF) ?? '1') === '1';
+    window.restNotifEnabled = (localStorage.getItem(KEY_NOTIF) ?? '1') === '1';
 
-    /* 휴식 기록 */
     let restStartedAt = null;
     let restCurrentLogKey = null;
 
-    /* Audio unlock */
     let audioCtx = null;
     function unlockAudio(){
       try{
@@ -1327,13 +1495,11 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       }catch(e){}
     }
 
-    /* Stopwatch (pause support) */
     let workoutStartAt = Date.now();
     let stopwatchPaused = false;
     let pauseStartedAt = null;
     let pausedTotalMs = 0;
 
-    /* Wake Lock */
     let wakeLock = null;
     async function requestWakeLock(){
       try{
@@ -1350,7 +1516,6 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       if(document.visibilityState === 'visible') requestWakeLock();
     });
 
-    /* REP modal state */
     let repModalState = null;
 
     /* ---------- UTILS ---------- */
@@ -1428,22 +1593,20 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
 
     /* ---------- DATE-BASED PROGRESS ---------- */
     function getProgressArr(date, exerciseId, setTotal){
-      if(!progressByDate[date]) progressByDate[date] = {};
-      let arr = progressByDate[date][exerciseId];
+      if(!window.progressByDate[date]) window.progressByDate[date] = {};
+      let arr = window.progressByDate[date][exerciseId];
       if(!Array.isArray(arr)){
         arr = new Array(setTotal).fill(false);
-        progressByDate[date][exerciseId] = arr;
-        localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
-        
-    saveCloudDebounced();return arr;
+        window.progressByDate[date][exerciseId] = arr;
+        localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(window.progressByDate));
+        return arr;
       }
       if(arr.length !== setTotal){
         const next = new Array(setTotal).fill(false);
         for(let i=0;i<Math.min(arr.length,setTotal);i++) next[i]=!!arr[i];
-        progressByDate[date][exerciseId] = next;
-        localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
-        
-    saveCloudDebounced();return next;
+        window.progressByDate[date][exerciseId] = next;
+        localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(window.progressByDate));
+        return next;
       }
       return arr;
     }
@@ -1452,7 +1615,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       let total = 0, done = 0;
       workoutData[dayIdx].list.forEach((w, idx) => {
         const id = exId(dayIdx, idx);
-        const setTotal = customSets[id] || w.set;
+        const setTotal = window.customSets[id] || w.set;
         total += setTotal;
         const arr = getProgressArr(date, id, setTotal);
         done += arr.filter(Boolean).length;
@@ -1460,7 +1623,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       return { total, done, pct: Math.round((done/total)*100) || 0 };
     }
 
-    function updateProgressUI(){
+    window.updateProgressUI = function(){
       const p = computeProgressForDay(todayStr(), currentDayIdx);
       document.getElementById('progress-bar').style.width = p.pct + '%';
       document.getElementById('progress-percent').innerText = p.pct + '%';
@@ -1487,7 +1650,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       let exDone = 0;
       data.list.forEach((w, idx)=>{
         const id = exId(currentDayIdx, idx);
-        const setTotal = customSets[id] || w.set;
+        const setTotal = window.customSets[id] || w.set;
         const arr = getProgressArr(date, id, setTotal);
         const done = arr.filter(Boolean).length;
         setsDone += done;
@@ -1548,7 +1711,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       document.getElementById('view-subcue').innerText = cueMap[data.type] || '훈련 모드';
 
       renderCarousel(true);
-      updateProgressUI();
+      window.updateProgressUI();
       updateDayNav();
       showDockTemporarily();
     }
@@ -1633,7 +1796,6 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         • 반동이 생기면 → 속도 20% 줄이기
       `.trim();
     }
-
     function expandBreath(w){
       return `
         <b>호흡은 “힘을 쓰는 순간에 내쉬기”</b>가 원칙입니다.<br><br>
@@ -1643,7 +1805,6 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         2) 올라올 때 → 입으로 길게 내쉬기
       `.trim();
     }
-
     function expandMind(w){
       return `
         <b>${w.mind}</b><br><br>
@@ -1655,7 +1816,6 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         2) 0.5초 정지로 정확도 확보
       `.trim();
     }
-
     function expandElite(w){
       return `
         <b>${w.tip}</b><br>
@@ -1669,11 +1829,8 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
 
     /* =========================================================
       ✅ CAROUSEL
-      - GIF 깜빡임 방지: 필요할 때만 renderCarousel(full=true)
-      - 세트 완료 시엔 버튼 상태만 즉시 업데이트(부분 업데이트)
     ========================================================= */
-
-    function renderCarousel(full=true){
+    window.renderCarousel = function(full=true){
       const date = todayStr();
       const data = workoutData[currentDayIdx];
       const carousel = document.getElementById('session-carousel');
@@ -1685,8 +1842,8 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
           const gif = getGifByExerciseName(w.name);
           w.gif = gif || '';
 
-          const setTotal = customSets[id] || w.set;
-          const repTotal = customReps[id] || w.rep;
+          const setTotal = window.customSets[id] || w.set;
+          const repTotal = window.customReps[id] || w.rep;
           const doneArr = getProgressArr(date, id, setTotal);
           const doneCount = doneArr.filter(Boolean).length;
 
@@ -1822,14 +1979,13 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         updateSlideHUD();
         requestAnimationFrame(()=> scrollToSlide(currentSlideIndex,false));
       }else{
-        // 부분 업데이트: 현재 슬라이드 세트 그리드만 갱신
         const slide = carousel.querySelector(`.slide[data-slide="${currentSlideIndex}"]`);
         if(!slide) return;
 
         const data = workoutData[currentDayIdx];
         const w = data.list[currentSlideIndex];
         const exid = slide.getAttribute('data-exid');
-        const setTotal = customSets[exid] || w.set;
+        const setTotal = window.customSets[exid] || w.set;
         const doneArr = getProgressArr(date, exid, setTotal);
         const doneCount = doneArr.filter(Boolean).length;
 
@@ -1843,12 +1999,12 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         const setValue = slide.querySelector('[data-role="setTotal"]');
         if(setValue) setValue.textContent = setTotal;
 
-        bindSetButtons(); // 새 버튼 바인딩
+        bindSetButtons();
       }
     }
 
     function renderSetButtonsHTML(id, w, date){
-      const setTotal = customSets[id] || w.set;
+      const setTotal = window.customSets[id] || w.set;
       const doneArr = getProgressArr(date, id, setTotal);
 
       return Array.from({length:setTotal}).map((_, s)=>{
@@ -1931,14 +2087,10 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         const date = btn.getAttribute('data-date');
         const ex = btn.getAttribute('data-ex');
         const setIndex = Number(btn.getAttribute('data-set'));
-
         btn.onclick = () => toggleSetComplete(date, ex, setIndex);
       });
     }
 
-    /* =========================================================
-      ✅ 핵심: 세트 완료 → 즉시 done 반영 + REP 입력 모달
-    ========================================================= */
     function toggleSetComplete(date, exerciseId, setIndex){
       unlockAudio();
       showDockTemporarily();
@@ -1947,7 +2099,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       const w = workoutData[dayIdx]?.list?.[exIdx];
       if(!w) return;
 
-      const setTotal = customSets[exerciseId] || w.set;
+      const setTotal = window.customSets[exerciseId] || w.set;
       const doneArr = getProgressArr(date, exerciseId, setTotal);
       const nextIndex = doneArr.indexOf(false);
 
@@ -1957,18 +2109,17 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         return;
       }
 
-      const repTotal = customReps[exerciseId] || w.rep;
+      const repTotal = window.customReps[exerciseId] || w.rep;
       doneArr[setIndex] = !doneArr[setIndex];
-      progressByDate[date][exerciseId] = doneArr;
-      localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
+      window.progressByDate[date][exerciseId] = doneArr;
+      localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(window.progressByDate));
 
-      
-    saveCloudDebounced();const setNo = setIndex + 1;
+      const setNo = setIndex + 1;
       const logKey = `${date}|${exerciseId}|${setNo}`;
 
       if(doneArr[setIndex]){
-        if(!logs.some(l => l.logKey === logKey)){
-          logs.push({
+        if(!window.logs.some(l => l.logKey === logKey)){
+          window.logs.push({
             id: Date.now(),
             logKey,
             date,
@@ -1984,15 +2135,12 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
             restUsed: w.rest,
             type: workoutData[currentDayIdx].type
           });
-          localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
-        
-    saveCloudDebounced();}
+          localStorage.setItem(KEY_LOGS, JSON.stringify(window.logs));
+        }
 
-        // ✅ UI 즉시 반영 (새로고침 필요 없음)
-        renderCarousel(false);
-        updateProgressUI();
+        window.renderCarousel(false);
+        window.updateProgressUI();
 
-        // ✅ REP 입력 모달 열기
         openRepModal({
           logKey,
           name: w.name,
@@ -2001,21 +2149,16 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         });
 
       }else{
-        // undone
-        logs = logs.filter(l => l.logKey !== logKey);
-        localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+        window.logs = window.logs.filter(l => l.logKey !== logKey);
+        localStorage.setItem(KEY_LOGS, JSON.stringify(window.logs));
 
-        
-    saveCloudDebounced();renderCarousel(false);
-        updateProgressUI();
+        window.renderCarousel(false);
+        window.updateProgressUI();
         haptic(12);
         toast("세트 취소됨");
       }
     }
 
-    /* =========================================================
-      ✅ REP MODAL (AI 추천 + 숫자 버튼)
-    ========================================================= */
     function openRepModal({logKey, name, setNo, baseRep}){
       repModalState = {logKey, baseRep};
 
@@ -2023,7 +2166,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       document.getElementById('rep-sub').textContent = `${setNo} SET`;
       document.getElementById('rep-base').textContent = baseRep;
 
-      const curLog = logs.find(l => l.logKey === logKey);
+      const curLog = window.logs.find(l => l.logKey === logKey);
       const prevLog = curLog ? findLastWeekSameExerciseLog(curLog) : null;
       const prevRep = prevLog?.repActual ?? prevLog?.plannedRep ?? baseRep;
 
@@ -2037,7 +2180,6 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     function closeRepModal(saved=false){
       document.getElementById('rep-modal').classList.remove('show');
       if(!saved){
-        // 저장 안 했으면 해당 log의 repActual null 유지 + (선택적) 취소 안내
         toast("REP 입력 취소됨");
       }
       repModalState = null;
@@ -2056,7 +2198,6 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     }
 
     function renderRepRecommendations(baseRep, prevRep){
-      // ✅ AI 추천 3개
       const aiWrap = document.getElementById("rep-ai-reco");
       aiWrap.innerHTML = "";
 
@@ -2081,7 +2222,6 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         aiWrap.appendChild(btn);
       });
 
-      // ✅ 숫자 추천 (prevRep 기준 ±5)
       const grid = document.getElementById("rep-number-grid");
       grid.innerHTML = "";
 
@@ -2104,44 +2244,37 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       }
     }
 
-    
-    /* ✅ AUTO ADVANCE: 운동 세트 전부 완료 시 다음 운동으로 자동 이동 */
     function maybeAutoAdvance(exerciseId, date){
       try{
         const [dayIdx, exIdx] = exerciseId.split('-').map(Number);
         const w = workoutData[dayIdx]?.list?.[exIdx];
         if(!w) return;
-        const setTotal = customSets[exerciseId] || w.set;
+        const setTotal = window.customSets[exerciseId] || w.set;
         const arr = getProgressArr(date, exerciseId, setTotal);
         const allDone = arr.length && arr.every(Boolean);
         if(!allDone) return;
 
-        // 마지막 운동이면 이동하지 않음 (요약은 updateProgressUI에서 처리)
         const data = workoutData[currentDayIdx];
         const isLast = (currentSlideIndex >= data.list.length - 1);
         if(isLast) return;
 
-        // 타이머가 떠있으면 사용자 집중을 위해 즉시 이동하되, 애니메이션만 부드럽게
         setTimeout(()=>{
           carouselNext();
         }, 220);
       }catch(e){}
     }
 
-function saveRepToLog(logKey, value){
-      const idx = logs.findIndex(l => l.logKey === logKey);
+    function saveRepToLog(logKey, value){
+      const idx = window.logs.findIndex(l => l.logKey === logKey);
       if(idx === -1) return;
 
-      logs[idx].repActual = value;
-      localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+      window.logs[idx].repActual = value;
+      localStorage.setItem(KEY_LOGS, JSON.stringify(window.logs));
 
-      
-    saveCloudDebounced();// ✅ 휴식 타이머 시작 (rep 입력 후)
-      const restSec = logs[idx].restPlanned || 0;
+      const restSec = window.logs[idx].restPlanned || 0;
       if(restSec > 0) startTimer(restSec, logKey);
 
-      // ✅ 지난주 비교 토스트
-      const prevLog = findLastWeekSameExerciseLog(logs[idx]);
+      const prevLog = findLastWeekSameExerciseLog(window.logs[idx]);
       if(prevLog){
         const prev = prevLog.repActual ?? prevLog.plannedRep ?? null;
         if(prev !== null){
@@ -2155,18 +2288,17 @@ function saveRepToLog(logKey, value){
       }
 
       haptic(18);
-      renderCarousel(false);
-      updateProgressUI();
+      window.renderCarousel(false);
+      window.updateProgressUI();
       renderCalendar();
-      maybeAutoAdvance(logs[idx].exerciseId, logs[idx].date);
+      maybeAutoAdvance(window.logs[idx].exerciseId, window.logs[idx].date);
     }
 
-    /* ✅ 지난주 동일 요일 / 동일 운동 / 동일 세트 찾기 */
     function findLastWeekSameExerciseLog(cur){
       const targetDate = cur.date;
       const prevDate = shiftDate(targetDate, -7);
       const prevKeyPrefix = `${prevDate}|${cur.exerciseId}|${cur.set}`;
-      return logs.find(l => l.logKey.startsWith(prevKeyPrefix)) || null;
+      return window.logs.find(l => l.logKey.startsWith(prevKeyPrefix)) || null;
     }
 
     function shiftDate(dateStr, deltaDays){
@@ -2175,7 +2307,6 @@ function saveRepToLog(logKey, value){
       return d.toISOString().split('T')[0];
     }
 
-    /* ---------- adjust set/rep (딜레이 완화) ---------- */
     function adjust(type, key, val){
       showDockTemporarily();
 
@@ -2184,35 +2315,30 @@ function saveRepToLog(logKey, value){
       if(!w) return;
 
       if(type === 'set'){
-        const cur = customSets[key] || w.set;
+        const cur = window.customSets[key] || w.set;
         const next = clamp(cur + val, 1, 12);
-        customSets[key] = next;
-        localStorage.setItem(KEY_SETS, JSON.stringify(customSets));
-        
-    saveCloudDebounced();getProgressArr(todayStr(), key, next);
+        window.customSets[key] = next;
+        localStorage.setItem(KEY_SETS, JSON.stringify(window.customSets));
+        getProgressArr(todayStr(), key, next);
       }else{
-        const cur = customReps[key] || w.rep;
-        customReps[key] = clamp(cur + val, 1, 100);
-        localStorage.setItem(KEY_REPS, JSON.stringify(customReps));
-      
-    saveCloudDebounced();}
+        const cur = window.customReps[key] || w.rep;
+        window.customReps[key] = clamp(cur + val, 1, 100);
+        localStorage.setItem(KEY_REPS, JSON.stringify(window.customReps));
+      }
 
-      // ✅ 즉시 DOM 숫자 갱신 (새로고침 없이 반영)
-      // ✅ 즉시 DOM 숫자 갱신 (새로고침 없이 반영)
       const slide = document.querySelector(`.slide[data-slide="${currentSlideIndex}"]`);
       if(slide){
         if(type === 'set'){
           const v = slide.querySelector('[data-role="setTotal"]');
-          if(v) v.textContent = customSets[key] || w.set;
+          if(v) v.textContent = window.customSets[key] || w.set;
         }else{
           const v = slide.querySelector('[data-role="repTotal"]');
-          if(v) v.textContent = customReps[key] || w.rep;
+          if(v) v.textContent = window.customReps[key] || w.rep;
         }
       }
 
-      // ✅ GIF 깜빡임 방지: 전체 렌더 말고 현재 슬라이드만 부분 업데이트
-      renderCarousel(false);
-      updateProgressUI();
+      window.renderCarousel(false);
+      window.updateProgressUI();
       toast(t('messages.toast.settingSaved','설정 저장됨'));
       haptic(10);
     }
@@ -2224,15 +2350,11 @@ function saveRepToLog(logKey, value){
       const w = workoutData[d]?.list?.[idx];
       if(!w) return;
 
-      if(customSets[exerciseId] !== undefined) delete customSets[exerciseId];
-      if(customReps[exerciseId] !== undefined) delete customReps[exerciseId];
-      localStorage.setItem(KEY_SETS, JSON.stringify(customSets));
-      
-    saveCloudDebounced();localStorage.setItem(KEY_REPS, JSON.stringify(customReps));
+      if(window.customSets[exerciseId] !== undefined) delete window.customSets[exerciseId];
+      if(window.customReps[exerciseId] !== undefined) delete window.customReps[exerciseId];
+      localStorage.setItem(KEY_SETS, JSON.stringify(window.customSets));
+      localStorage.setItem(KEY_REPS, JSON.stringify(window.customReps));
 
-
-      
-    saveCloudDebounced();// ✅ 즉시 DOM 갱신 (새로고침 불필요)
       const slide = document.querySelector(`.slide[data-slide="${currentSlideIndex}"]`);
       if(slide){
         const setEl = slide.querySelector('[data-role="setTotal"]');
@@ -2242,8 +2364,8 @@ function saveRepToLog(logKey, value){
       }
 
       getProgressArr(todayStr(), exerciseId, w.set);
-      renderCarousel(false);
-      updateProgressUI();
+      window.renderCarousel(false);
+      window.updateProgressUI();
       toast(t('messages.toast.restoredDefault','기본값으로 복원'));
       haptic(18);
     }
@@ -2253,21 +2375,19 @@ function saveRepToLog(logKey, value){
       if(!confirm(t('messages.confirm.resetExercise','이 운동의 오늘 기록을 초기화할까요?'))) return;
       const date = todayStr();
 
-      logs = logs.filter(l => !(l.date === date && l.exerciseId === exerciseId));
-      localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+      window.logs = window.logs.filter(l => !(l.date === date && l.exerciseId === exerciseId));
+      localStorage.setItem(KEY_LOGS, JSON.stringify(window.logs));
 
-      
-    saveCloudDebounced();const [d, idx] = exerciseId.split('-').map(Number);
+      const [d, idx] = exerciseId.split('-').map(Number);
       const w = workoutData[d]?.list?.[idx];
-      const setTotal = customSets[exerciseId] || w.set;
-      if(progressByDate[date] && progressByDate[date][exerciseId]){
-        progressByDate[date][exerciseId] = new Array(setTotal).fill(false);
-        localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
-      
-    saveCloudDebounced();}
+      const setTotal = window.customSets[exerciseId] || w.set;
+      if(window.progressByDate[date] && window.progressByDate[date][exerciseId]){
+        window.progressByDate[date][exerciseId] = new Array(setTotal).fill(false);
+        localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(window.progressByDate));
+      }
 
-      renderCarousel(false);
-      updateProgressUI();
+      window.renderCarousel(false);
+      window.updateProgressUI();
       toast(t('messages.toast.exerciseResetDone','운동 초기화 완료'));
       haptic(22);
     }
@@ -2277,21 +2397,18 @@ function saveRepToLog(logKey, value){
       if(!confirm('오늘 진행/기록을 모두 초기화할까요?')) return;
       const date = todayStr();
 
-      logs = logs.filter(l => l.date !== date);
-      localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+      window.logs = window.logs.filter(l => l.date !== date);
+      localStorage.setItem(KEY_LOGS, JSON.stringify(window.logs));
 
-      
-    saveCloudDebounced();if(progressByDate[date]){ delete progressByDate[date]; localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate)); 
-    saveCloudDebounced();}
+      if(window.progressByDate[date]){ delete window.progressByDate[date]; localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(window.progressByDate)); }
       localStorage.removeItem(KEY_SUMMARY_SHOWN);
 
-      renderCarousel(true);
-      updateProgressUI();
+      window.renderCarousel(true);
+      window.updateProgressUI();
       toast(t('messages.toast.todayResetDone','오늘 초기화 완료'));
       haptic(25);
     }
 
-    /* ---------- TIMER ---------- */
     function showHUD(on){
       const hud = document.getElementById('timer-hud');
       if(!hud) return;
@@ -2372,24 +2489,22 @@ function saveRepToLog(logKey, value){
 
       if(restStartedAt && restCurrentLogKey){
         const used = clamp(Math.round((Date.now() - restStartedAt) / 1000), 0, restTotal);
-        const idx = logs.findIndex(l => l.logKey === restCurrentLogKey);
+        const idx = window.logs.findIndex(l => l.logKey === restCurrentLogKey);
         if(idx !== -1){
-          logs[idx].restUsed = used;
-          localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
-        
-    saveCloudDebounced();}
+          window.logs[idx].restUsed = used;
+          localStorage.setItem(KEY_LOGS, JSON.stringify(window.logs));
+        }
       }
       restStartedAt = null;
       restCurrentLogKey = null;
 
       if(finished){
         haptic(30);
-        if(restNotifEnabled) restDoneNotify();
+        if(window.restNotifEnabled) restDoneNotify();
         toast(t('messages.toast.restDone','휴식 끝! 다음 세트 ✅'));
       }
     }
 
-    /* ✅ 알림음: “알림 사운드 느낌” (비프 X, 짧은 멜로디) */
     function restDoneNotify(){
       try{ if(navigator.vibrate) navigator.vibrate([120,80,200,80,220]); }catch(e){}
 
@@ -2402,13 +2517,11 @@ function saveRepToLog(logKey, value){
         }
 
         const now = audioCtx.currentTime;
-
-        // iOS/Android 알림 느낌: "딩-딩-딩"
         const pattern = [
-          { t: 0.00, dur: 0.16, freq: 1318 }, // E6
-          { t: 0.20, dur: 0.16, freq: 1567 }, // G6
-          { t: 0.40, dur: 0.18, freq: 2093 }, // C7
-          { t: 0.66, dur: 0.18, freq: 1567 }, // G6
+          { t: 0.00, dur: 0.16, freq: 1318 },
+          { t: 0.20, dur: 0.16, freq: 1567 },
+          { t: 0.40, dur: 0.18, freq: 2093 },
+          { t: 0.66, dur: 0.18, freq: 1567 },
         ];
 
         pattern.forEach(p => {
@@ -2432,18 +2545,17 @@ function saveRepToLog(logKey, value){
 
     function toggleNotif(){
       showDockTemporarily();
-      restNotifEnabled = !restNotifEnabled;
-      localStorage.setItem(KEY_NOTIF, restNotifEnabled ? '1' : '0');
+      window.restNotifEnabled = !window.restNotifEnabled;
+      localStorage.setItem(KEY_NOTIF, window.restNotifEnabled ? '1' : '0');
       const btn = document.getElementById('notif-toggle');
       if(btn){
-        btn.textContent = restNotifEnabled ? 'ON' : 'OFF';
-        btn.classList.toggle('cyan', restNotifEnabled);
+        btn.textContent = window.restNotifEnabled ? 'ON' : 'OFF';
+        btn.classList.toggle('cyan', window.restNotifEnabled);
       }
-      toast(restNotifEnabled ? t('messages.toast.notifOn','알림 ON') : t('messages.toast.notifOff','알림 OFF'));
+      toast(window.restNotifEnabled ? t('messages.toast.notifOn','알림 ON') : t('messages.toast.notifOff','알림 OFF'));
       haptic(14);
     }
 
-    /* ---------- CALENDAR ---------- */
     function renderCalendar(){
       document.getElementById('calendar-month').innerText = `${currentYear}.${String(currentMonth + 1).padStart(2,'0')}`;
       const first = new Date(currentYear, currentMonth, 1).getDay();
@@ -2455,7 +2567,7 @@ function saveRepToLog(logKey, value){
 
       for(let d=1; d<=last; d++){
         const dStr = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-        const hasLog = logs.some(l => l.date === dStr);
+        const hasLog = window.logs.some(l => l.date === dStr);
 
         const el = document.createElement('div');
         el.className = `calendar-day cursor-pointer ${dStr===todayStr()?'today':''} ${hasLog?'has-log':''}`;
@@ -2468,10 +2580,9 @@ function saveRepToLog(logKey, value){
       renderHistoryDetail();
     }
 
-    /* ✅ 기록 탭 강화: 날짜 요약 + 운동별 세트/rep/휴식 + 총 시간/평균휴식 */
     function renderHistoryDetail(){
       const area = document.getElementById('history-detail');
-      const dayLogs = logs
+      const dayLogs = window.logs
         .filter(l => l.date === selectedDate)
         .sort((a,b)=> (a.exerciseId > b.exerciseId ? 1 : -1) || (a.set - b.set));
 
@@ -2482,7 +2593,6 @@ function saveRepToLog(logKey, value){
         return;
       }
 
-      // ✅ day summary
       const totalSets = dayLogs.length;
       const avgRest = Math.round(dayLogs.reduce((a,c)=> a + (c.restUsed ?? c.restPlanned ?? 0), 0) / totalSets);
       const approxWorkoutMin = estimateWorkoutDurationMinutes(selectedDate);
@@ -2517,7 +2627,7 @@ function saveRepToLog(logKey, value){
         const totalSets = data.length;
 
         const prevDate = shiftDate(selectedDate, -7);
-        const prevGroup = logs.filter(l => l.date === prevDate && l.exerciseId === exerciseId);
+        const prevGroup = window.logs.filter(l => l.date === prevDate && l.exerciseId === exerciseId);
         const prevAvgRep = prevGroup.length ? Math.round(prevGroup.reduce((a,c)=> a + (c.repActual ?? c.plannedRep ?? 0), 0) / prevGroup.length) : null;
         const curAvgRep = Math.round(data.reduce((a,c)=> a + (c.repActual ?? c.plannedRep ?? 0), 0) / data.length);
         const repDelta = prevAvgRep !== null ? (curAvgRep - prevAvgRep) : null;
@@ -2564,8 +2674,7 @@ function saveRepToLog(logKey, value){
     }
 
     function estimateWorkoutDurationMinutes(date){
-      // 간단 추정: 세트당 평균 45초 + 평균 휴식
-      const day = logs.filter(l => l.date === date);
+      const day = window.logs.filter(l => l.date === date);
       if(!day.length) return 0;
       const avgRest = day.reduce((a,c)=> a + (c.restUsed ?? c.restPlanned ?? 0), 0) / day.length;
       const perSet = 45 + avgRest;
@@ -2585,23 +2694,20 @@ function saveRepToLog(logKey, value){
       showDockTemporarily();
       if(!confirm('선택한 날짜의 기록을 초기화할까요?')) return;
       const date = selectedDate;
-      logs = logs.filter(l => l.date !== date);
-      localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
-      
-    saveCloudDebounced();if(progressByDate[date]){ delete progressByDate[date]; localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate)); 
-    saveCloudDebounced();}
+      window.logs = window.logs.filter(l => l.date !== date);
+      localStorage.setItem(KEY_LOGS, JSON.stringify(window.logs));
+      if(window.progressByDate[date]){ delete window.progressByDate[date]; localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(window.progressByDate)); }
       toast(t('messages.toast.selectedDateReset','선택 날짜 초기화'));
       renderCalendar();
       haptic(25);
     }
 
-    /* ---------- STATS ---------- */
     function renderStats(){
       const counts = { push:0, pull:0, leg:0, rest:0 };
-      logs.forEach(l => counts[l.type] !== undefined && counts[l.type]++);
+      window.logs.forEach(l => counts[l.type] !== undefined && counts[l.type]++);
 
-      document.getElementById('stat-total-sets').innerText = logs.length;
-      document.getElementById('stat-week-count').innerText = new Set(logs.map(l => l.date)).size;
+      document.getElementById('stat-total-sets').innerText = window.logs.length;
+      document.getElementById('stat-week-count').innerText = new Set(window.logs.map(l => l.date)).size;
 
       const ctx = document.getElementById('radarChart').getContext('2d');
       if(window.myRadar) window.myRadar.destroy();
@@ -2632,10 +2738,9 @@ function saveRepToLog(logKey, value){
       });
     }
 
-    /* ---------- BACKUP / RESET ALL ---------- */
     function backupJSON(){
       showDockTemporarily();
-      const payload = { version: 'v12.1', exportedAt: nowISO(), logs, customSets, customReps, progressByDate };
+      const payload = { version: 'v12.1', exportedAt: nowISO(), logs: window.logs, customSets: window.customSets, customReps: window.customReps, progressByDate: window.progressByDate };
       const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
@@ -2654,27 +2759,24 @@ function saveRepToLog(logKey, value){
       localStorage.removeItem(KEY_PROGRESS_BY_DATE);
       localStorage.removeItem(KEY_SUMMARY_SHOWN);
       logs = []; customSets = {}; customReps = {}; progressByDate = {};
-      renderCarousel(true);
-      updateProgressUI();
+      window.logs = []; window.customSets = {}; window.customReps = {}; window.progressByDate = {};
+      window.renderCarousel(true);
+      window.updateProgressUI();
       renderCalendar();
       toast(t('messages.toast.allResetDone','전체 초기화 완료'));
       haptic(30);
     }
 
-    /* ---------- DRAG / CONTEXT MENU PREVENT ---------- */
     document.addEventListener("dragstart", e => e.preventDefault(), { passive:false });
     document.addEventListener("contextmenu", e => e.preventDefault());
-    /* ---------- ZOOM PREVENT ---------- */
+
     (function preventZoom(){
       document.addEventListener('gesturestart', (e)=> e.preventDefault(), {passive:false});
       document.addEventListener('gesturechange', (e)=> e.preventDefault(), {passive:false});
       document.addEventListener('gestureend', (e)=> e.preventDefault(), {passive:false});
-
-      let lastTouchEnd = 0;
       document.addEventListener('dblclick', (e)=> e.preventDefault(), {passive:false});
     })();
 
-    /* Dock Auto Hide */
     let dockTimer = null;
     function showDockTemporarily(){
       const dock = document.querySelector('.navDockWrap');
@@ -2694,7 +2796,6 @@ function saveRepToLog(logKey, value){
       window.addEventListener(ev, showDockTemporarily, {passive:true});
     });
 
-    /* ---------- INIT ---------- */
     window.onload = async () => {
       await loadAppData();
       initIntro();
@@ -2706,8 +2807,8 @@ function saveRepToLog(logKey, value){
 
       const btn = document.getElementById('notif-toggle');
       if(btn){
-        btn.textContent = restNotifEnabled ? 'ON' : 'OFF';
-        btn.classList.toggle('cyan', restNotifEnabled);
+        btn.textContent = window.restNotifEnabled ? 'ON' : 'OFF';
+        btn.classList.toggle('cyan', window.restNotifEnabled);
       }
 
       setInterval(()=> {
@@ -2726,177 +2827,109 @@ function saveRepToLog(logKey, value){
     document.addEventListener('keydown', (e) => {
       if(e.key === 'Escape') closeTimer(false);
     });
+
+    // Auth modal default open trigger: cloud pill
+    // (openAuthModal는 firebase module에서 window에 노출됨)
   </script>
-<script>
-/* ===== Touch responsiveness helpers ===== */
-(function(){
-  // Prevent double-tap to zoom on iOS (only on controls, not on inputs)
-  let lastTouchEnd = 0;
-  // Stop "drag cursor" text selection from long-press on controls
-  document.addEventListener('selectstart', function(e){
-    const t = e.target;
-    if(t && t.closest && t.closest('button,[role=\"button\"],.btn,.iconbtn,.chip,.tab,a')){
-      e.preventDefault();
-    }
-  });
 
-  // Convert touch to click reliably on some Android WebViews
-  // Ensure pointer events don't get canceled by small movement
-  document.addEventListener('touchstart', function(e){
-    const t = e.target;
-    if(t && t.closest && t.closest('button,[role=\"button\"],.btn,.iconbtn,.chip,.tab,a')){
-      // Add a pressed class for richer feedback if desired
-      const el = t.closest('button,[role=\"button\"],.btn,.iconbtn,.chip,.tab,a');
-      el.classList.add('is-pressed');
-    }
-  }, {passive:true});
+  <script>
+    /* ===== Touch helpers (원본 유지) ===== */
+    (function(){
+      let lastTouchEnd = 0;
+      document.addEventListener('selectstart', function(e){
+        const t = e.target;
+        if(t && t.closest && t.closest('button,[role="button"],.btn,.iconbtn,.chip,.tab,a')){
+          e.preventDefault();
+        }
+      });
+      document.addEventListener('touchstart', function(e){
+        const t = e.target;
+        if(t && t.closest && t.closest('button,[role="button"],.btn,.iconbtn,.chip,.tab,a')){
+          const el = t.closest('button,[role="button"],.btn,.iconbtn,.chip,.tab,a');
+          el.classList.add('is-pressed');
+        }
+      }, {passive:true});
 
-  document.addEventListener('touchcancel', function(e){
-    const t = e.target;
-    if(t && t.closest){
-      const el = t.closest('button,[role=\"button\"],.btn,.iconbtn,.chip,.tab,a');
-      if(el) el.classList.remove('is-pressed');
-    }
-  }, {passive:true});
+      document.addEventListener('touchcancel', function(e){
+        const t = e.target;
+        if(t && t.closest){
+          const el = t.closest('button,[role="button"],.btn,.iconbtn,.chip,.tab,a');
+          if(el) el.classList.remove('is-pressed');
+        }
+      }, {passive:true});
 
-  document.addEventListener('touchend', function(e){
-    const t = e.target;
-    if(t && t.closest){
-      const el = t.closest('button,[role=\"button\"],.btn,.iconbtn,.chip,.tab,a');
-      if(el) el.classList.remove('is-pressed');
-    }
-  }, {passive:true});
+      document.addEventListener('touchend', function(e){
+        const t = e.target;
+        if(t && t.closest){
+          const el = t.closest('button,[role="button"],.btn,.iconbtn,.chip,.tab,a');
+          if(el) el.classList.remove('is-pressed');
+        }
+      }, {passive:true});
+    })();
+  </script>
 
-  // iOS momentum + prevent scroll rubber band in nested elements (optional)
-  // document.body.addEventListener('touchmove', function(e){}, {passive:true});
-})();
-</script>
-<script>
-/* ===== Safer fast-tap (no global preventDefault) ===== */
-(function(){
-  const FAST_SELECTOR = 'button,[role="button"],.btn,.iconbtn,.chip,.tab,a';
-  document.querySelectorAll(FAST_SELECTOR).forEach(el=>{
-    el.setAttribute('data-fasttap','1');
-  });
+  <script>
+    /* ===== Robust swipe-to-slide (원본 유지) ===== */
+    (function(){
+      function bindScroller(scroller){
+        if(!scroller || scroller.__swipeBound) return;
+        scroller.__swipeBound = true;
 
-  const addPressed = (el)=> el && el.classList.add('is-pressed');
-  const rmPressed  = (el)=> el && el.classList.remove('is-pressed');
+        const isHScrollable = ()=> scroller.scrollWidth > scroller.clientWidth + 5;
 
-  document.addEventListener('pointerdown', function(e){
-    const el = e.target.closest && e.target.closest('[data-fasttap="1"]');
-    if(!el) return;
-    addPressed(el);
-  }, {capture:true, passive:true});
+        let isDown=false, startX=0, startScrollLeft=0, pointerId=null, moved=0;
 
-  document.addEventListener('pointerup', function(e){
-    const el = e.target.closest && e.target.closest('[data-fasttap="1"]');
-    if(!el) return;
-    rmPressed(el);
-  }, {capture:true, passive:true});
+        const onDown=(e)=>{
+          const t=e.target;
+          if(t && t.closest && t.closest('button,[role="button"],.btn,.iconbtn,.chip,.tab,a,input,textarea,select')) return;
+          if(!isHScrollable()) return;
+          isDown=true; moved=0; pointerId=e.pointerId;
+          startX=e.clientX; startScrollLeft=scroller.scrollLeft;
+          try{ scroller.setPointerCapture(pointerId); }catch(_){}
+        };
+        const onMove=(e)=>{
+          if(!isDown || e.pointerId!==pointerId) return;
+          const dx=e.clientX-startX;
+          moved=Math.max(moved, Math.abs(dx));
+          if(moved>6) e.preventDefault();
+          scroller.scrollLeft = startScrollLeft - dx;
+        };
+        const onUp=(e)=>{
+          if(!isDown || e.pointerId!==pointerId) return;
+          isDown=false;
+          try{ scroller.releasePointerCapture(pointerId); }catch(_){}
+          pointerId=null;
 
-  document.addEventListener('pointercancel', function(e){
-    const el = e.target.closest && e.target.closest('[data-fasttap="1"]');
-    if(!el) return;
-    rmPressed(el);
-  }, {capture:true, passive:true});
+          const children = Array.from(scroller.children || []);
+          if(!children.length) return;
+          const cur = scroller.scrollLeft;
+          let nearest = children[0], best = Math.abs(children[0].offsetLeft - cur);
+          for(const ch of children){
+            const d = Math.abs(ch.offsetLeft - cur);
+            if(d < best){ best=d; nearest=ch; }
+          }
+          if(best > 2){
+            scroller.scrollTo({left: nearest.offsetLeft, behavior:'smooth'});
+          }
+        };
 
-  })();
-</script>
-<script>
-/* ===== Robust swipe-to-slide (scrollLeft drag) ===== */
-(function(){
-  // Find the horizontal scroller used for slides
-  const scroller = document.querySelector('.slides') || document.querySelector('.slideTrack') || document.querySelector('.carousel');
-  if(!scroller) return;
+        scroller.addEventListener('pointerdown', onDown, {passive:true});
+        scroller.addEventListener('pointermove', onMove, {passive:false});
+        scroller.addEventListener('pointerup', onUp, {passive:true});
+        scroller.addEventListener('pointercancel', onUp, {passive:true});
+      }
 
-  // Only apply if it's actually horizontally scrollable
-  const isHScrollable = ()=> scroller.scrollWidth > scroller.clientWidth + 5;
-  if(!isHScrollable()) return;
+      function findAndBind(){
+        const car = document.querySelector('.carousel');
+        if(!car) return;
+        bindScroller(car);
+      }
 
-  let isDown = false;
-  let startX = 0;
-  let startScrollLeft = 0;
-  let pointerId = null;
-  let moved = 0;
-
-  const onDown = (e)=>{
-    // ignore if starting on interactive control
-    const t = e.target;
-    if(t && t.closest && t.closest('button,[role="button"],.btn,.iconbtn,.chip,.tab,a,input,textarea,select')) return;
-
-    isDown = true;
-    moved = 0;
-    pointerId = e.pointerId;
-    startX = e.clientX;
-    startScrollLeft = scroller.scrollLeft;
-    try{ scroller.setPointerCapture(pointerId); }catch(_){}
-  };
-
-  const onMove = (e)=>{
-    if(!isDown || e.pointerId !== pointerId) return;
-    const dx = e.clientX - startX;
-    moved = Math.max(moved, Math.abs(dx));
-    // If user is clearly swiping horizontally, prevent vertical scroll jitter
-    if(moved > 6) e.preventDefault();
-    scroller.scrollLeft = startScrollLeft - dx;
-  };
-
-  const onUp = (e)=>{
-    if(!isDown || e.pointerId !== pointerId) return;
-    isDown = false;
-    try{ scroller.releasePointerCapture(pointerId); }catch(_){}
-    pointerId = null;
-
-    // Snap to nearest slide (if scroll-snap is set, browser will snap anyway)
-    // But we can help by gently scrolling to nearest child offset.
-    const children = Array.from(scroller.children || []);
-    if(!children.length) return;
-
-    // Find nearest child left
-    const cur = scroller.scrollLeft;
-    let nearest = children[0];
-    let best = Math.abs(children[0].offsetLeft - cur);
-    for(const ch of children){
-      const d = Math.abs(ch.offsetLeft - cur);
-      if(d < best){ best = d; nearest = ch; }
-    }
-    if(best > 2){
-      scroller.scrollTo({left: nearest.offsetLeft, behavior: 'smooth'});
-    }
-  };
-
-  scroller.addEventListener('pointerdown', onDown, {passive:true});
-  scroller.addEventListener('pointermove', onMove, {passive:false});
-  scroller.addEventListener('pointerup', onUp, {passive:true});
-  scroller.addEventListener('pointercancel', onUp, {passive:true});
-})();
-</script>
-
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js";
-  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-firestore.js";
-  import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-auth.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyAIrxl_GDVJYzLZxuSzUt9cLBUCfkUoCaw",
-    authDomain: "dk-pit.firebaseapp.com",
-    projectId: "dk-pit",
-    storageBucket: "dk-pit.firebasestorage.app",
-    messagingSenderId: "835447327032",
-    appId: "1:835447327032:web:6101fd173f5214926359cd"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const auth = getAuth(app);
-
-  window.firebase = {
-    db, auth,
-    doc, getDoc, setDoc,
-    GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut
-  };
-</script>
+      findAndBind();
+      const mo = new MutationObserver(()=>{ findAndBind(); });
+      mo.observe(document.body, {childList:true, subtree:true});
+    })();
+  </script>
 
 </body>
 </html>
-
