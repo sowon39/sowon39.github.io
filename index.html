@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-  <title>DK Fit OS v12.2 (Google Login · Cloud Sync)</title>
+  <title>DK Fit OS v12.1 (WakeLock + Rep AI Buttons + History Pro)</title>
 
   <!-- ✅ PWA / iOS Standalone -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -27,22 +27,26 @@
       --bg:#050507;
       --card:rgba(255,255,255,0.04);
       --dockH: 110px;
-      --headerH: 108px;
+      --headerH: 92px;
     }
 
     html,body{ height:100%; }
 
-    *{
-      -webkit-user-select:none;
-      user-select:none;
-      -webkit-touch-callout:none;
-      -webkit-tap-highlight-color:transparent;
-    }
-    img, video{
-      -webkit-user-drag:none;
-      user-drag:none;
-    }
-    button,a{ touch-action: manipulation; }
+/* --- Tablet WebApp UX Polish (app-like touch) --- */
+*{
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
+  -webkit-tap-highlight-color:transparent;
+}
+img, video{
+  -webkit-user-drag:none;
+  user-drag:none;
+}
+button,a{
+  touch-action: manipulation;
+}
+
 
     html{
       touch-action: manipulation;
@@ -86,7 +90,7 @@
     }
 
     /* =========================================================
-       ✅ Splash
+       ✅ NEW Splash (Apple Liquid Glass Style)
     ========================================================= */
     #splash-screen{
       position:fixed; inset:0; z-index:10000;
@@ -95,6 +99,7 @@
       overflow:hidden;
       transition:all 1s cubic-bezier(0.65,0,0.35,1);
     }
+
     #splash-screen::before{
       content:"";
       position:absolute; inset:-30%;
@@ -107,6 +112,7 @@
       filter:saturate(1.2);
       opacity:1;
     }
+
     #splash-screen::after{
       content:"";
       position:absolute; inset:0;
@@ -115,10 +121,12 @@
       opacity:.13;
       pointer-events:none;
     }
+
     @keyframes liquidFloat{
       0%{ transform: translateY(0) scale(1); }
       100%{ transform: translateY(-22px) scale(1.05); }
     }
+
     .splash-inner{
       width:min(540px, calc(100vw - 56px));
       padding: 56px 26px 46px;
@@ -137,6 +145,7 @@
       overflow: hidden;
       isolation:isolate;
     }
+
     .splash-inner .shine{
       position:absolute;
       inset:-30%;
@@ -151,9 +160,11 @@
       0%{ transform: translate(-10px, 10px); }
       100%{ transform: translate(18px, -18px); }
     }
+
     @keyframes splashIn{
       to{ transform: translateY(0) scale(1); opacity:1; }
     }
+
     .splash-logo{
       font-size: 4.5rem;
       font-weight: 950;
@@ -167,11 +178,13 @@
       display:inline-block;
       padding: 6px 14px;
     }
+
     .splash-loader{
       margin-top: 26px;
       position:relative;
       z-index:2;
     }
+
     .splash-line{
       height: 4px;
       border-radius: 999px;
@@ -179,6 +192,7 @@
       overflow:hidden;
       position:relative;
     }
+
     .splash-line span{
       position:absolute; inset:0;
       width:45%;
@@ -186,6 +200,7 @@
       animation: splashScan 1.15s ease-in-out infinite;
       filter: drop-shadow(0 0 14px rgba(34,211,238,0.35));
     }
+
     @keyframes splashScan{
       0%{ transform: translateX(-70%); }
       100%{ transform: translateX(170%); }
@@ -207,9 +222,10 @@
     .tab-content.active{ display:block; }
     @keyframes fadeInContent{ from{opacity:0; transform:translateY(6px) scale(0.985);} to{opacity:1; transform:translateY(0) scale(1);} }
 
+    /* Pills */
     .pill{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:7px 12px; border-radius:999px;
+      display:inline-flex; align-items:center; gap:6px;
+      padding:6px 10px; border-radius:999px;
       border:1px solid rgba(255,255,255,0.10);
       background:rgba(255,255,255,0.04);
       font-size:11px; font-weight:900;
@@ -218,14 +234,13 @@
       user-select:none;
     }
     .pill.cyan{ border-color:rgba(34,211,238,0.25); background:rgba(34,211,238,0.10); color:rgba(34,211,238,0.95); }
-    .pill.warn{ border-color:rgba(251,191,36,0.25); background:rgba(251,191,36,0.10); color:rgba(251,191,36,0.95); }
-    .pill.good{ border-color:rgba(34,197,94,0.25); background:rgba(34,197,94,0.10); color:rgba(34,197,94,0.95); }
 
     main{
       padding-top: calc(var(--headerH) + 18px + env(safe-area-inset-top));
       padding-bottom: calc(var(--dockH) + env(safe-area-inset-bottom) + 28px);
     }
 
+    /* Carousel */
     .carousel{
       display:flex;
       gap:18px;
@@ -237,6 +252,7 @@
       touch-action: pan-x pan-y;
     }
     .carousel::before,.carousel::after{ content:''; flex:0 0 22px; }
+
     .carousel > .slide{
       scroll-snap-align:center;
       flex: 0 0 calc(100% - 120px);
@@ -245,6 +261,7 @@
     }
     .slide.peek{ opacity:.60; transform:scale(.965); filter:blur(.6px); }
     .slide.focus{ opacity:1; transform:scale(1); filter:none; }
+
     @media (min-width: 860px){
       .carousel > .slide{ flex:0 0 calc(100% - 160px); }
       .slide.peek{ opacity:.62; transform:scale(.97); filter:blur(.45px); }
@@ -261,6 +278,7 @@
     }
 
     .rightPanel{ border-radius:26px; padding:18px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); }
+
     .stepper{
       display:flex; gap:10px; align-items:center; justify-content:space-between;
       padding:14px 14px; border-radius:22px;
@@ -307,8 +325,14 @@
     }
     .setBtn:active{ transform:scale(0.985); }
     .setBtn.done{ background:linear-gradient(135deg,var(--primary),var(--accent)); color:#000; box-shadow:0 18px 34px rgba(34,211,238,0.24); border:none; }
-    .setBtn.locked{ opacity: .35; filter: saturate(.6); pointer-events: none; }
 
+    .setBtn.locked{
+      opacity: .35;
+      filter: saturate(.6);
+      pointer-events: none;
+    }
+
+    /* Floating Dock */
     .navDockWrap{ position:fixed; left:0; right:0; bottom:0; padding: 18px; z-index:60; }
     .nav-dock{
       background:rgba(10,10,12,0.78);
@@ -327,6 +351,7 @@
     .nav-active-dot{ position:absolute; bottom:1px; width:4px; height:4px; background:var(--primary); border-radius:50%; box-shadow:0 0 12px var(--primary); opacity:0; transition:all .25s; }
     .nav-item.active .nav-active-dot{ opacity:1; transform:scale(1.6); }
 
+    /* Dock Auto Hide */
     .navDockWrap{
       transition: transform .45s cubic-bezier(0.22, 1, 0.36, 1), opacity .35s ease;
       will-change: transform, opacity;
@@ -342,9 +367,36 @@
       pointer-events: auto;
     }
 
+    /* Day chips */
+    .day-chip{
+      width:44px; height:44px;
+      border-radius:18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:900;
+      font-size:12px;
+      color:rgba(255,255,255,0.55);
+      border:1px solid rgba(255,255,255,0.10);
+      background:rgba(255,255,255,0.04);
+      flex:0 0 auto;
+      user-select:none;
+      overflow:hidden;
+      position:relative;
+      isolation:isolate;
+    }
+    .day-chip.active{
+      background:var(--primary);
+      color:#000;
+      border-color:rgba(34,211,238,0.25);
+      box-shadow:0 10px 24px rgba(34,211,238,0.25);
+    }
+
+    /* Timer Modal */
     #timer-modal{ transition:all .65s ease; }
     #timer-sec{ letter-spacing:-0.08em; }
 
+    /* Timer HUD */
     #timer-hud{
       position:fixed;
       top: calc(var(--headerH) + 10px + env(safe-area-inset-top));
@@ -363,7 +415,7 @@
       border:1px solid rgba(255,255,255,0.14);
       backdrop-filter: blur(22px);
       box-shadow:0 20px 40px rgba(0,0,0,0.55);
-      min-width: 190px;
+      min-width: 170px;
       user-select:none;
     }
     .hudTime{
@@ -398,20 +450,53 @@
     }
     .hudBtn:active{ transform:scale(.98); }
 
+    /* Summary modal */
+    #summary-modal{ position:fixed; inset:0; z-index:220; display:none; align-items:center; justify-content:center; }
+    #summary-modal.show{ display:flex; }
+
     /* Toast */
     #toast{ position:fixed; left:50%; bottom:130px; transform:translateX(-50%); z-index:250; opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; }
     #toast.show{ opacity:1; transform:translateX(-50%) translateY(-6px); }
 
-    /* ===== Account Sheet (로그인 UX) ===== */
-    #account-sheet{
-      position: fixed; inset: 0;
-      z-index: 400;
+    /* History layout */
+    .historyLayout{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    @media(min-width: 900px){
+      .historyLayout{
+        grid-template-columns: 360px 1fr;
+      }
+    }
+
+    /* Calendar */
+    .calendar-day{ aspect-ratio:1; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:13px; position:relative; transition:all .18s; font-weight:800; color:rgba(255,255,255,0.75); background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); user-select:none;}
+    .has-log::after{ content:''; width:6px; height:6px; background:rgba(34,211,238,0.90); border-radius:50%; position:absolute; bottom:8px; box-shadow:0 0 12px rgba(34,211,238,0.35); }
+    .calendar-day.selected{ background:rgba(34,211,238,0.14); border:1px solid rgba(34,211,238,0.35); box-shadow:0 0 0 2px rgba(34,211,238,0.18), 0 0 30px rgba(34,211,238,0.12); color:#eaffff; font-weight:900; transform:translateY(-2px); }
+    .calendar-day.today{ border:1px solid rgba(255,255,255,0.12); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08); color:rgba(255,255,255,0.95); font-weight:900; }
+
+    /* History table */
+    .log-table{ width:100%; border-collapse:separate; border-spacing:0 10px; }
+    .log-table th{ font-size:10px; text-transform:uppercase; letter-spacing:.18em; color:rgba(255,255,255,0.35); font-weight:900; text-align:left; padding:0 10px 6px; }
+    .log-row{ background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:16px; overflow:hidden; }
+    .log-row td{ padding:12px 10px; font-weight:800; font-size:12px; color:rgba(255,255,255,0.78); }
+
+    /* Bottom Sheet (운동 상세) */
+    #detail-sheet{
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
       display: none;
       pointer-events: none;
     }
-    #account-sheet.show{ display:block; pointer-events:auto; }
+    #detail-sheet.show{
+      display: block;
+      pointer-events: auto;
+    }
     .sheet-backdrop{
-      position:absolute; inset:0;
+      position:absolute;
+      inset:0;
       background: rgba(0,0,0,0.72);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
@@ -419,35 +504,47 @@
       pointer-events: auto;
     }
     .sheet{
-      position:absolute; left:0; right:0; bottom:0;
-      border-radius: 28px 28px 0 0;
+      position:absolute;
+      left:0;
+      right:0;
+      bottom:0;
+      border-radius: 26px 26px 0 0;
       background: rgba(10,10,12,0.92);
       border: 1px solid rgba(255,255,255,0.10);
       box-shadow: 0 -24px 80px rgba(0,0,0,0.75);
       transform: translateY(100%);
       transition: transform .45s cubic-bezier(0.22,1,0.36,1);
       z-index: 2;
-      padding: 16px 18px calc(env(safe-area-inset-bottom) + 16px);
-      max-height: 86vh;
-      overflow:hidden;
-      isolation:isolate;
+      pointer-events: auto;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 16px);
+      isolation: isolate;
+      max-height: 88vh;
+      overflow: hidden;
     }
-    #account-sheet.show .sheet{ transform: translateY(0%); }
+    #detail-sheet.show .sheet{
+      transform: translateY(0%);
+    }
     .sheetHeader{
-      display:flex; align-items:flex-start; justify-content:space-between;
-      gap: 12px;
-      padding-bottom: 14px;
+      padding: 16px 18px 12px;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
       border-bottom: 1px solid rgba(255,255,255,0.08);
     }
-    .avatar{
-      width:44px; height:44px; border-radius: 18px;
-      background: rgba(255,255,255,0.06);
-      border:1px solid rgba(255,255,255,0.12);
-      overflow:hidden;
-      flex:0 0 auto;
-      display:flex; align-items:center; justify-content:center;
+    .sheetTitle{
+      font-weight: 950;
+      font-size: 18px;
+      letter-spacing: -0.03em;
+      color: white;
     }
-    .avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .sheetSub{
+      margin-top: 4px;
+      font-size: 10px;
+      letter-spacing: .22em;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.40);
+    }
     .sheetClose{
       width:44px; height:44px;
       border-radius: 16px;
@@ -455,19 +552,47 @@
       background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.14);
       color: rgba(255,255,255,0.85);
+      z-index: 3;
+      pointer-events: auto;
       -webkit-tap-highlight-color:transparent;
     }
     .sheetClose:active{ transform: scale(.98); }
+
     .sheetBody{
-      padding-top: 14px;
-      overflow-y:auto;
+      padding: 16px 18px 18px;
+      overflow-y: auto;
       -webkit-overflow-scrolling: touch;
-      max-height: calc(86vh - 90px);
+      max-height: calc(88vh - 90px);
     }
-    .sheetCard{
+
+    .sheetTabs{
+      display:flex;
+      gap:10px;
+      padding: 0 0 14px;
+      overflow-x:auto;
+    }
+    .sheetTab{
+      flex: 0 0 auto;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 900;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      color: rgba(255,255,255,0.75);
+      -webkit-tap-highlight-color:transparent;
+    }
+    .sheetTab.active{
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color:#000;
+      border: none;
+      box-shadow: 0 14px 32px rgba(34,211,238,0.18);
+    }
+
+    .sheetBox{
       border-radius: 22px;
       background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.08);
       padding: 14px 14px;
       margin-bottom: 12px;
     }
@@ -478,25 +603,260 @@
       text-transform: uppercase;
       color: rgba(255,255,255,0.42);
     }
+    .sheetText{
+      margin-top: 10px;
+      font-size: 14px;
+      line-height: 1.55;
+      font-weight: 800;
+      color: rgba(255,255,255,0.88);
+      letter-spacing: -0.01em;
+    }
+    .sheetHint{
+      margin-top: 10px;
+      font-size: 11px;
+      font-weight: 800;
+      color: rgba(255,255,255,0.45);
+      line-height: 1.4;
+    }
 
-    .ctaGoogle{
-      width:100%;
-      height:60px;
-      border-radius: 20px;
+    /* ✅ 상세 GIF: 너무 크지 않게 적정 사이즈 + 화면에서 탭/내용 같이 보이도록 */
+    .sheetGif{
+      width: 100%;
+      max-height: 220px;
+      border-radius: 18px;
+      margin-top: 12px;
+      border: 1px solid rgba(255,255,255,0.10);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.55);
+      display:block;
+      object-fit: contain;
+      background: rgba(255,255,255,0.03);
+    }
+
+    /* 카드 GIF */
+    .cardGifSquareWrap{
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 22px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.03);
+      box-shadow: 0 22px 55px rgba(0,0,0,0.55);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform .12s ease;
+    }
+    .cardGifSquareWrap:active{ transform: scale(0.99); }
+    .cardGifSquare{
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      background: rgba(0,0,0,0.15);
+    }
+
+    /* ✅ REP 입력 모달 */
+    #rep-modal{
+      position:fixed; inset:0;
+      z-index: 260;
+      display:none;
+      align-items:center;
+      justify-content:center;
+    }
+    #rep-modal.show{ display:flex; }
+    .repCard{
+      width:min(520px, calc(100vw - 44px));
+      border-radius: 28px;
+      padding: 18px;
+      background: rgba(10,10,12,0.92);
+      border: 1px solid rgba(255,255,255,0.10);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      box-shadow: 0 40px 140px rgba(0,0,0,0.70);
+    }
+    .repBtn{
+      height: 54px;
+      border-radius: 18px;
       font-weight: 950;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.92);
       display:flex;
       align-items:center;
       justify-content:center;
-      gap:12px;
+      gap:10px;
+      transition: transform .08s ease;
+      user-select:none;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .repBtn:active{ transform: scale(.985); }
+    .repBtn.primary{
       background: linear-gradient(135deg, var(--primary), var(--accent));
       border: none;
       color:#000;
       box-shadow: 0 18px 34px rgba(34,211,238,0.22);
-      -webkit-tap-highlight-color:transparent;
-      transition: transform .12s ease;
     }
-    .ctaGoogle:active{ transform: scale(.985); }
-  </style>
+
+    /* Mobile Layout Optimization */
+    @media (max-width: 520px){
+      .layoutWrap{ padding-left: 0; padding-right: 0; }
+      main .layoutWrap.px-4{ padding-left: 14px !important; padding-right: 14px !important; }
+
+      header{
+        padding: 14px 14px 10px !important;
+        height: 88px;
+        padding-top: calc(10px + env(safe-area-inset-top)) !important;
+      }
+      :root{ --headerH: 88px; --dockH: 92px; }
+
+      #view-day{
+        font-size: 1.38rem !important;
+        letter-spacing: -0.02em !important;
+      }
+      #view-title{
+        font-size: 0.95rem !important;
+        margin-top: 2px !important;
+        opacity: 0.9;
+      }
+      #view-subcue{
+        margin-top: 6px !important;
+        font-size: 9px !important;
+      }
+
+      #progress-percent{
+        font-size: 16px !important;
+        font-weight: 950 !important;
+        margin-bottom: 4px !important;
+        letter-spacing: -0.02em;
+      }
+      #progress-text{
+        font-size: 10px !important;
+      }
+      header .w-28{
+        width: 140px !important;
+        height: 8px !important;
+      }
+
+      .slideCard{ border-radius: 24px; }
+      .slideCard .p-6{ padding: 14px !important; }
+      .slideCard h3{ font-size: 1.55rem !important; }
+
+      .slideCard .md\:grid-cols-2{ grid-template-columns: 1fr !important; }
+
+      .rightPanel{
+        padding: 14px !important;
+        border-radius: 22px !important;
+      }
+
+      .stepperBtn{
+        width: 44px !important;
+        height: 44px !important;
+        border-radius: 16px !important;
+      }
+      .stepperValue{ font-size: 20px !important; }
+
+      .rightPanel .grid.grid-cols-2{
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      }
+      .setBtn{
+        height: 54px !important;
+        font-size: 15px !important;
+        border-radius: 18px !important;
+      }
+
+      .carousel > .slide{
+        flex: 0 0 calc(100% - 70px) !important;
+      }
+
+      .navDockWrap{ padding: 14px !important; }
+      .nav-dock{ border-radius: 30px !important; padding: 9px !important; }
+      .nav-item{ padding: 10px 0 !important; }
+      .nav-item i{ font-size: 1.15rem !important; }
+    }
+  
+/* ===== Swipe-friendly touch-action tuning ===== */
+.carousel, .slides, .slideTrack, .slideContainer{ touch-action: pan-x; }
+button, a, [role="button"], .btn, .chip, .tab, .iconbtn{ touch-action: manipulation; }
+.main, .content, .scrollArea, .list{ -webkit-overflow-scrolling: touch; }
+.is-pressed{
+  transform: scale(0.97);
+  filter: brightness(0.95);
+  transition: transform 0.08s ease, filter 0.08s ease;
+}
+
+
+/* ===== Firebase Auth / Account UI ===== */
+#auth-modal, #account-modal{
+  position:fixed; inset:0; z-index: 300;
+  display:none; align-items:center; justify-content:center;
+}
+#auth-modal.show, #account-modal.show{ display:flex; }
+.modalCard{
+  width:min(520px, calc(100vw - 44px));
+  border-radius: 30px;
+  padding: 18px;
+  background: rgba(10,10,12,0.92);
+  border: 1px solid rgba(255,255,255,0.10);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  box-shadow: 0 40px 140px rgba(0,0,0,0.72);
+}
+.modalBtn{
+  height: 56px;
+  border-radius: 18px;
+  font-weight: 950;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.92);
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  transition: transform .08s ease;
+  user-select:none; -webkit-tap-highlight-color:transparent;
+}
+.modalBtn:active{ transform: scale(.985); }
+.modalBtn.primary{
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  border: none;
+  color:#000;
+  box-shadow: 0 18px 34px rgba(34,211,238,0.22);
+}
+
+</style>
+<style>
+/* ===== Mobile / Tablet app-like touch tuning ===== */
+html, body{
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+}
+/* Prevent text selection & callouts where it feels "app-y" */
+body, button, .btn, .chip, .tab, .dock, .card, .slide, .control, .iconbtn, input[type="button"], input[type="submit"]{
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+/* Make taps respond immediately and stop browser gestures hijacking */
+button, a, [role="button"], .btn, .chip, .tab, .iconbtn{
+  touch-action: manipulation;
+}
+/* If you have horizontal swipe areas (carousel), only allow horizontal pan there */
+.carousel, .slides, .slideTrack{
+  touch-action: pan-y;
+}
+.slide, .carousel{
+  -webkit-user-drag: none;
+}
+/* Remove 300ms delays and accidental drag cursors */
+button, [role="button"], .btn, .iconbtn{
+  cursor: pointer;
+}
+/* Press feedback (subtle) */
+button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .chip:active{
+  transform: scale(0.98);
+  filter: brightness(0.97);
+}
+/* Disable double-tap zoom on iOS for controls */
+*{ -webkit-tap-highlight-color: transparent; }
+</style>
 </head>
 
 <body>
@@ -512,84 +872,138 @@
     </div>
   </div>
 
-  <!-- ✅ Account Sheet (로그인/계정 UX) -->
-  <div id="account-sheet">
-    <div class="sheet-backdrop" onclick="closeAccountSheet()"></div>
-    <div class="sheet" role="dialog" aria-modal="true">
-      <div class="sheetHeader">
-        <div class="flex items-start gap-3">
-          <div class="avatar" id="acc-avatar">
-            <i class="fa-solid fa-user text-white/60"></i>
-          </div>
-          <div class="min-w-0">
-            <div class="sheetLabel">Cloud Sync</div>
-            <div id="acc-title" class="text-xl font-black text-white mt-1">로그인이 필요합니다</div>
-            <div id="acc-sub" class="text-[11px] font-black text-white/45 mt-2 tracking-widest uppercase">Google 로그인</div>
+  <!-- ✅ REP 입력 모달 -->
+  <div id="rep-modal">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-xl" onclick="closeRepModal(false)"></div>
+    <div class="relative repCard">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <p class="text-[10px] font-black tracking-[0.2em] uppercase text-white/45">REP 입력</p>
+          <h3 id="rep-title" class="text-2xl font-black italic text-white mt-1">운동</h3>
+          <p id="rep-sub" class="text-[10px] font-black tracking-[0.2em] uppercase text-white/35 mt-2">1 SET</p>
+        </div>
+        <button class="pill" onclick="closeRepModal(false)"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="mt-5 glass rounded-2xl p-5">
+        <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/40">기본 REP</p>
+        <div class="flex items-end justify-between mt-2">
+          <div id="rep-base" class="text-5xl font-black text-white tracking-tighter">20</div>
+          <div class="text-[10px] font-black tracking-[0.18em] uppercase text-white/35 text-right">
+            추천 입력<br>버튼 클릭만
           </div>
         </div>
-        <button class="sheetClose" onclick="closeAccountSheet()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <!-- ✅ AI 추천 + 숫자 그리드 -->
+      <div class="mt-4 glass rounded-2xl p-4">
+        <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45">AI 추천</p>
+        <div id="rep-ai-reco" class="mt-3 grid grid-cols-3 gap-2"></div>
+
+        <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/35 mt-5">추천 숫자</p>
+        <div id="rep-number-grid" class="mt-3 grid grid-cols-5 gap-2"></div>
+      </div>
+
+      <div class="mt-4 grid grid-cols-2 gap-3">
+        <button class="repBtn" onclick="closeRepModal(false)">
+          <i class="fa-solid fa-ban"></i> 취소
+        </button>
+        <button class="repBtn primary" onclick="repSkip()">
+          <i class="fa-solid fa-check"></i> 기본 REP 기록
+        </button>
+      </div>
+
+      <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/30 mt-4">
+        * 입력 완료 후 지난주 동일 요일/운동과 비교 결과를 토스트로 표시합니다
+      </p>
+    </div>
+  </div>
+
+  
+  <!-- ✅ Firebase Auth Modal (Google only) -->
+  <div id="auth-modal">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-xl" onclick="closeAuthModal()"></div>
+    <div class="relative modalCard">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <p class="text-[10px] font-black tracking-[0.2em] uppercase text-white/45">계정</p>
+          <h3 class="text-2xl font-black italic text-white mt-1">로그인</h3>
+          <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/35 mt-2">
+            Google로 로그인하면 기록이 디바이스간 동기화됩니다
+          </p>
+        </div>
+        <button class="pill" onclick="closeAuthModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="mt-5 grid gap-3">
+        <button class="modalBtn primary" onclick="googleLogin()">
+          <i class="fa-brands fa-google"></i> Google로 계속
+        </button>
+
+        <div class="glass rounded-2xl p-4">
+          <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45">동기화 안내</p>
+          <p class="text-[12px] font-black text-white/70 mt-2 leading-relaxed">
+            • Firestore 경로: <span class="text-cyan-300">/users/{uid}</span><br>
+            • 로그아웃 시 <span class="text-red-300">로컬 기록도 함께 초기화</span>됩니다.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ Account Modal (logged-in) -->
+  <div id="account-modal">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-xl" onclick="closeAccountModal()"></div>
+    <div class="relative modalCard">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <p class="text-[10px] font-black tracking-[0.2em] uppercase text-white/45">Cloud</p>
+          <h3 class="text-2xl font-black italic text-white mt-1">계정</h3>
+          <p id="acct-email" class="text-[12px] font-black text-white/70 mt-2"></p>
+          <p id="acct-sub" class="text-[10px] font-black tracking-[0.18em] uppercase text-white/35 mt-1"></p>
+        </div>
+        <button class="pill" onclick="closeAccountModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="mt-5 grid gap-3">
+        <div class="glass rounded-2xl p-4">
+          <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45">동기화 상태</p>
+          <p id="acct-sync" class="text-[12px] font-black text-white/70 mt-2 leading-relaxed">연결됨</p>
+          <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/35 mt-2">
+            * 스마트폰은 백그라운드/절전 상태에서 저장이 지연될 수 있어 페이지 전환 시 즉시 저장합니다.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <button class="modalBtn" onclick="manualCloudPull()"><i class="fa-solid fa-cloud-arrow-down"></i> 불러오기</button>
+          <button class="modalBtn" onclick="manualCloudPush()"><i class="fa-solid fa-cloud-arrow-up"></i> 저장</button>
+        </div>
+
+        <button class="modalBtn" style="border-color: rgba(255,255,255,0.18);" onclick="logoutFirebase()">
+          <i class="fa-solid fa-right-from-bracket"></i> 로그아웃 (로컬 초기화)
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ✅ Bottom Sheet (운동 상세) -->
+  <div id="detail-sheet">
+    <div class="sheet-backdrop" onclick="closeDetailSheet()"></div>
+    <div class="sheet" role="dialog" aria-modal="true">
+      <div class="sheetHeader">
+        <div>
+          <div class="sheetTitle" id="sheet-title">운동 상세</div>
+          <div class="sheetSub" id="sheet-sub">DETAIL</div>
+        </div>
+        <button class="sheetClose" onclick="closeDetailSheet()" aria-label="닫기">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
       </div>
 
       <div class="sheetBody">
-        <!-- Logged out view -->
-        <div id="acc-loggedout">
-          <div class="sheetCard">
-            <div class="sheetLabel">기록 동기화</div>
-            <p class="text-sm font-black text-white/75 mt-2 leading-relaxed">
-              Google 계정으로 로그인하면 <b>모든 기록이 자동으로 저장</b>되고,
-              다른 디바이스에서도 동일한 기록을 바로 볼 수 있어요.
-            </p>
-            <p class="text-[10px] font-black text-white/35 mt-3 tracking-[0.18em] uppercase">
-              * 경로: /users/{uid} (본인만 접근 가능)
-            </p>
-          </div>
-
-          <button class="ctaGoogle" onclick="googleLogin()">
-            <i class="fa-brands fa-google"></i>
-            Google로 계속
-          </button>
-
-          <div class="sheetCard mt-3">
-            <div class="sheetLabel">안내</div>
-            <p class="text-[12px] font-black text-white/60 leading-relaxed mt-2">
-              • 로그인 전에도 로컬 기록은 유지됩니다.<br>
-              • 로그인하면 <b>클라우드가 기준</b>이 되어 동기화됩니다.<br>
-              • 로그아웃 시 로컬 기록도 안전하게 초기화됩니다.
-            </p>
-          </div>
-        </div>
-
-        <!-- Logged in view -->
-        <div id="acc-loggedin" style="display:none;">
-          <div class="sheetCard">
-            <div class="sheetLabel">계정</div>
-            <p id="acc-email" class="text-base font-black text-white/90 mt-2">-</p>
-            <p id="acc-uid" class="text-[10px] font-black text-white/35 mt-3 tracking-[0.18em] uppercase">UID</p>
-          </div>
-
-          <div class="sheetCard">
-            <div class="sheetLabel">동기화 상태</div>
-            <div class="flex items-center justify-between mt-3">
-              <div class="text-sm font-black text-white/75">자동 저장</div>
-              <span id="sync-pill" class="pill good"><i class="fa-solid fa-check"></i> ON</span>
-            </div>
-            <div class="flex items-center justify-between mt-3">
-              <div class="text-sm font-black text-white/60">마지막 저장</div>
-              <div id="last-sync" class="text-[11px] font-black text-white/40 tracking-widest uppercase">-</div>
-            </div>
-            <div class="grid gap-3 mt-4">
-              <button class="bigBtn" onclick="manualCloudPull()"><i class="fa-solid fa-cloud-arrow-down"></i> 클라우드에서 불러오기</button>
-              <button class="bigBtn" onclick="manualCloudPush()"><i class="fa-solid fa-cloud-arrow-up"></i> 지금 클라우드 저장</button>
-            </div>
-            <p class="text-[10px] font-black text-white/35 mt-4 tracking-[0.18em] uppercase">
-              * 동시 접속 시 “마지막 저장한 디바이스” 값이 우선됩니다.
-            </p>
-          </div>
-
-          <button class="bigBtn" onclick="logoutFirebase()" style="border-color: rgba(239,68,68,0.25); background: rgba(239,68,68,0.10); color: rgba(239,68,68,0.95);">
-            <i class="fa-solid fa-right-from-bracket"></i> 로그아웃 (로컬도 초기화)
-          </button>
-        </div>
+        <div class="sheetTabs" id="sheet-tabs"></div>
+        <div id="sheet-body"></div>
       </div>
     </div>
   </div>
@@ -601,7 +1015,8 @@
         <div class="flex items-center gap-2">
           <h2 id="stopwatch" class="text-3xl font-black font-mono tracking-tighter text-white">00:00</h2>
 
-          <button onclick="toggleStopwatchPause()" class="pill cyan" style="padding:7px 12px;" title="총 운동시간 일시정지">
+          <!-- ✅ 일시정지 버튼 -->
+          <button onclick="toggleStopwatchPause()" class="pill cyan" style="padding:6px 10px;" title="총 운동시간 일시정지">
             <i id="pause-icon" class="fa-solid fa-pause"></i>
           </button>
         </div>
@@ -609,18 +1024,13 @@
         <div class="flex items-center gap-2 mt-1">
           <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
           <p class="text-[9px] font-black text-gray-300 tracking-widest uppercase">ELITE MODE · DK</p>
-        </div>
-
-        <!-- ✅ Cloud UX -->
+        
         <div class="flex items-center gap-2 mt-2">
-          <button id="cloud-btn" class="pill warn" onclick="openAccountSheet()">
-            <i class="fa-solid fa-cloud"></i>
-            <span id="cloud-label">Cloud OFF</span>
+          <button id="cloud-pill" class="pill" onclick="cloudButtonPressed()" title="클라우드 동기화">
+            <i class="fa-solid fa-cloud"></i> Cloud: OFF
           </button>
-          <span id="cloud-mini" class="pill" style="display:none;">
-            <i class="fa-solid fa-rotate"></i> Syncing…
-          </span>
         </div>
+</div>
       </div>
 
       <div class="flex flex-col items-end">
@@ -725,6 +1135,23 @@
           <button onclick="resetAll()" class="bigBtn" style="border-color: rgba(255,255,255,0.18);"><i class="fa-solid fa-triangle-exclamation"></i> 전체 초기화</button>
         </div>
 
+        <div class="glass rounded-[28px] p-6 mt-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45">클라우드 동기화</p>
+              <p class="text-sm font-black text-white/70 mt-2">Google 로그인 후 자동 저장/동기화</p>
+            </div>
+            <button class="pill cyan" onclick="cloudButtonPressed()"><i class="fa-solid fa-cloud"></i> 계정</button>
+          </div>
+          <div class="mt-4 grid grid-cols-2 gap-3">
+            <button class="bigBtn" onclick="manualCloudPull()"><i class="fa-solid fa-cloud-arrow-down"></i> 불러오기</button>
+            <button class="bigBtn" onclick="manualCloudPush()"><i class="fa-solid fa-cloud-arrow-up"></i> 저장</button>
+          </div>
+          <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/35 mt-3">
+            * Firestore: /users/{uid} · 충돌 시 마지막 저장이 최종 반영됩니다.
+          </p>
+        </div>
+
       </section>
 
       <!-- History -->
@@ -805,22 +1232,66 @@
     </div>
   </div>
 
+  <!-- SUMMARY MODAL -->
+  <div id="summary-modal">
+    <div class="absolute inset-0 bg-black/85 backdrop-blur-xl" onclick="closeSummary()"></div>
+    <div class="relative glass rounded-[28px] p-7 w-[min(520px,calc(100vw-44px))]">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <p class="text-[10px] font-black tracking-[0.2em] uppercase text-white/45">오늘 요약</p>
+          <h3 class="text-2xl font-black italic text-white mt-1">완료 🎉</h3>
+        </div>
+        <button class="pill" onclick="closeSummary()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="mt-5 grid grid-cols-2 gap-3">
+        <div class="glass rounded-2xl p-4">
+          <p class="text-[9px] font-black tracking-[0.18em] uppercase text-white/40">완료 세트</p>
+          <p id="sum-sets" class="text-3xl font-black text-white mt-2">0</p>
+        </div>
+        <div class="glass rounded-2xl p-4">
+          <p class="text-[9px] font-black tracking-[0.18em] uppercase text-white/40">완료 운동</p>
+          <p id="sum-ex" class="text-3xl font-black text-white mt-2">0</p>
+        </div>
+        <div class="glass rounded-2xl p-4 col-span-2">
+          <p class="text-[9px] font-black tracking-[0.18em] uppercase text-white/40">오늘 한마디</p>
+          <p id="sum-msg" class="text-base font-black text-white/80 mt-2">좋은 훈련이었습니다.</p>
+        </div>
+      </div>
+
+      <div class="mt-6 flex gap-3">
+        <button class="bigBtn" onclick="closeSummary()" style="background:linear-gradient(135deg,var(--primary),var(--accent)); color:#000; border:none;">
+          <i class="fa-solid fa-check"></i> 확인
+        </button>
+        <button class="bigBtn" onclick="showTab('history', document.querySelectorAll('.nav-item')[2]); closeSummary();">기록 보기</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast -->
   <div id="toast" class="pill cyan"></div>
 
+  
   <!-- =========================================================
-    ✅ Firebase (Modular v9) — Google Login ONLY
+    ✅ Firebase (Modular v9)
+    - Google 로그인만 사용
+    - 로그아웃 시 로컬도 초기화
+    - 모바일 저장 지연 완화: 디바운스 단축 + pagehide/visibilitychange 즉시 플러시 + IndexedDB persistence
   ========================================================= -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
     import {
       getAuth, onAuthStateChanged,
-      GoogleAuthProvider, signInWithPopup, signOut
+      GoogleAuthProvider, signInWithPopup,
+      signOut
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
     import {
-      getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp
+      getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp,
+      enableIndexedDbPersistence
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
+    // ✅ Firebase config (제공된 값)
     const firebaseConfig = {
       apiKey: "AIzaSyAIrxl_GDVJYzLZxuSzUt9cLBUCfkUoCaw",
       authDomain: "dk-pit.firebaseapp.com",
@@ -833,80 +1304,73 @@
     const fbApp = initializeApp(firebaseConfig);
     const auth = getAuth(fbApp);
     const db = getFirestore(fbApp);
+
+    // 모바일에서 네트워크/백그라운드로 저장 지연될 때를 대비해 오프라인 퍼시스턴스 활성화(가능한 경우)
+    enableIndexedDbPersistence(db).catch(()=>{});
+
     const googleProvider = new GoogleAuthProvider();
-    googleProvider.setCustomParameters({ prompt: "select_account" });
 
-    // =========================
-    // ✅ Cloud Sync Layer
-    // =========================
-    let currentUser = null;
-    let userDocUnsub = null;
-    let cloudEnabled = false;
-
-    let cloudSaveTimer = null;
-    let isApplyingRemote = false;
-
-    const CLOUD_DEBOUNCE_MS = 450; // ✅ 모바일에서 더 즉시성 있게
-    const MINI_SYNC_MS = 1200;
-
+    // ===== UI helpers =====
     function toast(msg){
       const el = document.getElementById('toast');
+      if(!el) return;
       el.textContent = msg;
       el.classList.add('show');
-      if(window.__toastTimer) clearTimeout(window.__toastTimer);
+      clearTimeout(window.__toastTimer);
       window.__toastTimer = setTimeout(()=> el.classList.remove('show'), 1800);
     }
-
-    // ✅ UI helpers
-    const cloudBtn = document.getElementById("cloud-btn");
-    const cloudLabel = document.getElementById("cloud-label");
-    const cloudMini = document.getElementById("cloud-mini");
-    const syncPill = document.getElementById("sync-pill");
-    const lastSync = document.getElementById("last-sync");
-
-    function setMiniSync(on){
-      cloudMini.style.display = on ? "inline-flex" : "none";
-      if(on){
-        cloudMini.classList.add("cyan");
-        setTimeout(()=> setMiniSync(false), MINI_SYNC_MS);
-      }
-    }
-
-    function formatTime(ts){
-      if(!ts) return "-";
-      const d = new Date(ts);
-      const hh = String(d.getHours()).padStart(2,"0");
-      const mm = String(d.getMinutes()).padStart(2,"0");
-      const ss = String(d.getSeconds()).padStart(2,"0");
-      return `${hh}:${mm}:${ss}`;
-    }
-
-    function setCloudBadge(state){
-      // state: off | on | syncing | error
-      cloudBtn.classList.remove("cyan","warn","good");
-      if(state === "off"){
-        cloudBtn.classList.add("warn");
-        cloudLabel.textContent = "Cloud OFF";
-      }else if(state === "on"){
-        cloudBtn.classList.add("good");
-        cloudLabel.textContent = "Cloud ON";
-      }else if(state === "syncing"){
-        cloudBtn.classList.add("cyan");
-        cloudLabel.textContent = "Syncing…";
+    function setCloudPill(state){
+      const pill = document.getElementById("cloud-pill");
+      if(!pill) return;
+      if(state?.on){
+        pill.classList.add("cyan");
+        pill.innerHTML = `<i class="fa-solid fa-cloud"></i> Cloud: ON`;
+        pill.title = state.label || "클라우드 동기화 ON";
       }else{
-        cloudBtn.classList.add("warn");
-        cloudLabel.textContent = "Cloud ERROR";
+        pill.classList.remove("cyan");
+        pill.innerHTML = `<i class="fa-solid fa-cloud"></i> Cloud: OFF`;
+        pill.title = "클라우드 로그인";
       }
     }
 
-    function userDocRef(uid){
-      return doc(db, "users", uid);
+    // ===== Modal open/close =====
+    window.openAuthModal = () => document.getElementById("auth-modal")?.classList.add("show");
+    window.closeAuthModal = () => document.getElementById("auth-modal")?.classList.remove("show");
+    window.openAccountModal = () => document.getElementById("account-modal")?.classList.add("show");
+    window.closeAccountModal = () => document.getElementById("account-modal")?.classList.remove("show");
+
+    // Cloud pill behavior
+    window.cloudButtonPressed = () => {
+      if(!currentUser) window.openAuthModal();
+      else window.openAccountModal();
+    };
+
+    // ===== Client id to avoid self-echo/conflicts =====
+    const CLIENT_KEY = "dkfit_client_id";
+    let clientId = localStorage.getItem(CLIENT_KEY);
+    if(!clientId){
+      clientId = (crypto?.randomUUID?.() || Math.random().toString(16).slice(2) + Date.now().toString(16));
+      localStorage.setItem(CLIENT_KEY, clientId);
     }
+
+    // ===== Cloud Sync Layer =====
+    let currentUser = null;
+    let unsub = null;
+
+    let cloudEnabled = false;
+    let isApplyingRemote = false;
+    let lastAppliedServerMs = 0;
+
+    let saveTimer = null;
+    const CLOUD_DEBOUNCE_MS = 300;
+
+    function userDocRef(uid){ return doc(db, "users", uid); }
 
     function getLocalSnapshot(){
       return {
-        version: "dk_fit_v12.2_cloud",
-        updatedAt: Date.now(),
+        version: "dk_fit_v12.1_cloud",
+        updatedAtClient: Date.now(),
+        clientId,
         logs: window.logs || [],
         customSets: window.customSets || {},
         customReps: window.customReps || {},
@@ -938,8 +1402,8 @@
         window.renderCarousel(true);
         window.updateProgressUI();
         window.renderCalendar();
-        if(document.getElementById("notif-toggle")){
-          const btn = document.getElementById("notif-toggle");
+        const btn = document.getElementById("notif-toggle");
+        if(btn){
           btn.textContent = window.restNotifEnabled ? "ON" : "OFF";
           btn.classList.toggle("cyan", window.restNotifEnabled);
         }
@@ -949,25 +1413,15 @@
     }
 
     async function pushToCloud(uid, reason="auto"){
-      if(!uid) return;
       const ref = userDocRef(uid);
       const payload = getLocalSnapshot();
-
-      // ✅ local timestamp keeps last-write-wins stable
-      window.__localCloudUpdatedAt = payload.updatedAt;
-      setMiniSync(true);
-      setCloudBadge("syncing");
-
       await setDoc(ref, {
         uid,
+        clientId,
         reason,
-        updatedAt: payload.updatedAt,
         updatedAtServer: serverTimestamp(),
         payload
       }, { merge: true });
-
-      if(lastSync) lastSync.textContent = formatTime(payload.updatedAt);
-      setCloudBadge("on");
     }
 
     async function pullFromCloud(uid){
@@ -975,170 +1429,152 @@
       const snap = await getDoc(ref);
       if(!snap.exists()){
         await pushToCloud(uid, "first_create");
-        toast("클라우드 생성 완료 ✅");
-        return;
+        return { created:true };
       }
       const data = snap.data();
       const payload = data?.payload || null;
+      const ts = data?.updatedAtServer;
+      if(ts && typeof ts.toMillis === "function"){
+        lastAppliedServerMs = ts.toMillis();
+      }
       if(payload){
         applyCloudSnapshot(payload);
-        if(lastSync) lastSync.textContent = formatTime(payload.updatedAt);
-        toast("클라우드 불러옴 ✅");
-      }else{
-        toast("클라우드 데이터 없음");
+        return { pulled:true };
       }
+      return { empty:true };
     }
 
     function scheduleCloudSave(reason="local_change"){
       if(!cloudEnabled || !currentUser?.uid) return;
       if(isApplyingRemote) return;
 
-      if(cloudSaveTimer) clearTimeout(cloudSaveTimer);
-      cloudSaveTimer = setTimeout(async ()=>{
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(async ()=>{
         try{
           await pushToCloud(currentUser.uid, reason);
+          // 상태 표시
+          const s = document.getElementById("acct-sync");
+          if(s) s.textContent = "저장됨 ✅";
         }catch(e){
           console.error(e);
           toast("클라우드 저장 실패");
-          setCloudBadge("error");
+          const s = document.getElementById("acct-sync");
+          if(s) s.textContent = "저장 실패";
         }
       }, CLOUD_DEBOUNCE_MS);
+
+      const s = document.getElementById("acct-sync");
+      if(s) s.textContent = "저장 중…";
     }
 
-    function startRealtimeSync(uid){
-      if(userDocUnsub) userDocUnsub();
+    async function flushCloudSave(reason="flush"){
+      if(!cloudEnabled || !currentUser?.uid) return;
+      if(isApplyingRemote) return;
+      clearTimeout(saveTimer);
+      try{
+        await pushToCloud(currentUser.uid, reason);
+      }catch(e){}
+    }
+
+    function startRealtime(uid){
+      if(unsub) unsub();
       const ref = userDocRef(uid);
 
-      userDocUnsub = onSnapshot(ref, (snap)=>{
+      unsub = onSnapshot(ref, { includeMetadataChanges:true }, (snap)=>{
+        // 로컬 write echo(특히 모바일) 무시
+        if(snap.metadata.hasPendingWrites) return;
         if(!snap.exists()) return;
+
         const data = snap.data();
+        const serverTs = data?.updatedAtServer;
+        const serverMs = (serverTs && typeof serverTs.toMillis === "function") ? serverTs.toMillis() : 0;
+
+        // 이미 적용한 서버 버전이면 무시
+        if(serverMs && serverMs <= lastAppliedServerMs) return;
+
         const payload = data?.payload;
         if(!payload) return;
 
-        const localUpdatedAt = (window.__localCloudUpdatedAt || 0);
-        const remoteUpdatedAt = payload.updatedAt || 0;
+        // 같은 clientId가 올린 변경이면 굳이 토스트/적용 최소화
+        const fromSameClient = payload?.clientId && payload.clientId === clientId;
 
-        // ✅ remote가 더 최신일 때만 적용
-        if(isApplyingRemote) return;
-        if(remoteUpdatedAt <= localUpdatedAt) return;
-
-        window.__localCloudUpdatedAt = remoteUpdatedAt;
-        applyCloudSnapshot(payload);
-        if(lastSync) lastSync.textContent = formatTime(remoteUpdatedAt);
-        toast("다른 기기 변경 동기화 ✅");
-      }, (err)=>{
-        console.error(err);
-        setCloudBadge("error");
+        lastAppliedServerMs = serverMs || Date.now();
+        if(!fromSameClient){
+          applyCloudSnapshot(payload);
+          toast("다른 디바이스 변경사항 동기화 ✅");
+          const s = document.getElementById("acct-sync");
+          if(s) s.textContent = "동기화됨 ✅";
+        }else{
+          // 내 저장이 서버에서 확정된 상태
+          const s = document.getElementById("acct-sync");
+          if(s) s.textContent = "저장됨 ✅";
+        }
       });
     }
 
-    // =========================
-    // ✅ localStorage hook (키가 정의된 뒤에만 동작)
-    // =========================
-    function installLocalStorageHook(){
-      if(localStorage.__dk_hooked) return;
-      localStorage.__dk_hooked = true;
-
-      const _setItem = localStorage.setItem.bind(localStorage);
-      localStorage.setItem = function(k, v){
-        _setItem(k, v);
-        const watch = [window.KEY_LOGS, window.KEY_SETS, window.KEY_REPS, window.KEY_PROGRESS_BY_DATE, window.KEY_NOTIF].filter(Boolean);
-        if(watch.includes(k)){
-          scheduleCloudSave("localstorage_change");
-        }
-      };
-    }
-
-    // =========================
-    // ✅ Account Sheet UX
-    // =========================
-    window.openAccountSheet = () => {
-      document.getElementById("account-sheet").classList.add("show");
-    };
-    window.closeAccountSheet = () => {
-      document.getElementById("account-sheet").classList.remove("show");
+    // ===== Hook localStorage.setItem to auto-save on important keys =====
+    const _setItem = localStorage.setItem.bind(localStorage);
+    localStorage.setItem = function(k, v){
+      _setItem(k, v);
+      const watch = [window.KEY_LOGS, window.KEY_SETS, window.KEY_REPS, window.KEY_PROGRESS_BY_DATE, window.KEY_NOTIF];
+      if(watch.includes(k)){
+        scheduleCloudSave("local_change");
+      }
     };
 
-    function setAccountSheetUI(user){
-      const loggedOut = document.getElementById("acc-loggedout");
-      const loggedIn  = document.getElementById("acc-loggedin");
-      const title = document.getElementById("acc-title");
-      const sub = document.getElementById("acc-sub");
-      const email = document.getElementById("acc-email");
-      const uid = document.getElementById("acc-uid");
-      const avatar = document.getElementById("acc-avatar");
+    // 모바일 저장 지연 완화: 페이지 숨김/종료 때 즉시 저장
+    window.addEventListener("visibilitychange", ()=>{
+      if(document.visibilityState === "hidden") flushCloudSave("visibility_hidden");
+    });
+    window.addEventListener("pagehide", ()=> flushCloudSave("pagehide"));
 
-      if(!user){
-        loggedOut.style.display = "block";
-        loggedIn.style.display = "none";
-        title.textContent = "로그인이 필요합니다";
-        sub.textContent = "Google 로그인";
-        avatar.innerHTML = `<i class="fa-solid fa-user text-white/60"></i>`;
-        return;
-      }
-
-      loggedOut.style.display = "none";
-      loggedIn.style.display = "block";
-      title.textContent = "계정이 연결되었습니다";
-      sub.textContent = "Cloud Sync ON";
-      email.textContent = user.email || "Google Account";
-      uid.textContent = `UID · ${user.uid}`;
-      if(user.photoURL){
-        avatar.innerHTML = `<img src="${user.photoURL}" alt="avatar">`;
-      }else{
-        avatar.innerHTML = `<i class="fa-solid fa-user text-white/60"></i>`;
-      }
-    }
-
-    // =========================
-    // ✅ Auth actions (Google only)
-    // =========================
+    // ===== Auth actions (Google only) =====
     window.googleLogin = async () => {
       try{
-        setCloudBadge("syncing");
         await signInWithPopup(auth, googleProvider);
-        window.closeAccountSheet();
+        window.closeAuthModal();
       }catch(e){
         console.error(e);
         toast("Google 로그인 실패");
-        setCloudBadge("error");
       }
     };
 
-    // ✅ logout = Firebase signOut + local reset
-    function clearAllLocalData(){
-      // 모든 키를 제거 (로컬도 초기화)
-      localStorage.removeItem(window.KEY_LOGS);
-      localStorage.removeItem(window.KEY_SETS);
-      localStorage.removeItem(window.KEY_REPS);
-      localStorage.removeItem(window.KEY_PROGRESS_BY_DATE);
-      localStorage.removeItem(window.KEY_SUMMARY_SHOWN);
-      localStorage.removeItem(window.KEY_NOTIF);
+    function renderAccountUI(user){
+      const emailEl = document.getElementById("acct-email");
+      const subEl = document.getElementById("acct-sub");
+      if(emailEl) emailEl.textContent = user?.email || "Google 계정";
+      if(subEl) subEl.textContent = `UID: ${(user?.uid||"").slice(0,8)}… · 자동 동기화 ON`;
+      const s = document.getElementById("acct-sync");
+      if(s) s.textContent = "연결됨";
+    }
 
+    function clearLocalAll(){
+      // ✅ 로그아웃 시 로컬도 초기화
+      const keys = [window.KEY_LOGS, window.KEY_SETS, window.KEY_REPS, window.KEY_PROGRESS_BY_DATE, window.KEY_SUMMARY_SHOWN];
+      keys.forEach(k=> localStorage.removeItem(k));
+
+      // 메모리 상태도 초기화
       window.logs = [];
       window.customSets = {};
       window.customReps = {};
       window.progressByDate = {};
-      window.restNotifEnabled = true;
 
+      // 기본값 반영
       try{
         window.renderCarousel(true);
         window.updateProgressUI();
         window.renderCalendar();
-        const btn = document.getElementById('notif-toggle');
-        if(btn){
-          btn.textContent = "ON";
-          btn.classList.add("cyan");
-        }
       }catch(e){}
     }
 
     window.logoutFirebase = async () => {
       try{
+        // (1) 로컬 초기화
+        clearLocalAll();
+        // (2) 클라우드 연결 종료
         await signOut(auth);
-        clearAllLocalData();
-        window.closeAccountSheet();
-        toast("로그아웃 완료 · 로컬 초기화 ✅");
+        window.closeAccountModal();
+        toast("로그아웃 & 로컬 초기화 완료");
       }catch(e){
         console.error(e);
         toast("로그아웃 실패");
@@ -1147,67 +1583,67 @@
 
     window.manualCloudPull = async () => {
       if(!currentUser?.uid) return toast("로그인이 필요합니다");
-      await pullFromCloud(currentUser.uid);
-    };
-    window.manualCloudPush = async () => {
-      if(!currentUser?.uid) return toast("로그인이 필요합니다");
-      await pushToCloud(currentUser.uid, "manual_push");
-      toast("클라우드 저장 ✅");
+      const r = await pullFromCloud(currentUser.uid);
+      if(r?.created) toast("클라우드 새로 생성됨 ✅");
+      else if(r?.pulled) toast("클라우드 불러옴 ✅");
+      else toast("클라우드 데이터 없음");
     };
 
-    // =========================
-    // ✅ Auth state
-    // =========================
+    window.manualCloudPush = async () => {
+      if(!currentUser?.uid) return toast("로그인이 필요합니다");
+      await flushCloudSave("manual_push");
+      toast("지금 클라우드 저장 ✅");
+    };
+
+    // ===== Auth state =====
     onAuthStateChanged(auth, async (user)=>{
       currentUser = user || null;
 
       if(!user){
         cloudEnabled = false;
-        setCloudBadge("off");
-        setAccountSheetUI(null);
-
-        if(userDocUnsub) userDocUnsub();
-        userDocUnsub = null;
+        setCloudPill({on:false});
+        if(unsub) unsub();
+        unsub = null;
         return;
       }
 
       cloudEnabled = true;
-      setCloudBadge("on");
-      setAccountSheetUI(user);
-      if(syncPill) syncPill.className = "pill good";
-      if(syncPill) syncPill.innerHTML = `<i class="fa-solid fa-check"></i> ON`;
+      setCloudPill({on:true, label: user.email || "Google 계정"});
+      renderAccountUI(user);
 
-      toast(`로그인됨 ✅`);
-
-      // ✅ hook 설치는 KEY_*가 정의된 후에 호출되어야 안정적 (앱 스크립트에서 호출)
-      // 여기선 fallback으로 한 번 더 설치 시도
-      installLocalStorageHook();
-
-      // ✅ 1) 클라우드 -> 로컬 pull
-      await pullFromCloud(user.uid);
-
-      // ✅ 2) 실시간 동기화
-      startRealtimeSync(user.uid);
-
-      // ✅ 3) 로그인 직후 1회 push
+      // 로그인 직후: pull → realtime → push(서버에 최신 스냅샷 보장)
       try{
-        await pushToCloud(user.uid, "post_login_sync");
+        const r = await pullFromCloud(user.uid);
+        if(r?.created) toast("클라우드 시작 ✅");
+        else toast("클라우드 연결 ✅");
+      }catch(e){}
+
+      startRealtime(user.uid);
+
+      try{
+        await flushCloudSave("post_login_sync");
       }catch(e){}
     });
-
-    // expose for app script
-    window.__dk_installLocalStorageHook = installLocalStorageHook;
   </script>
 
-  <!-- =========================================================
-      ✅ 기존 DK Fit 앱 스크립트 (동작은 유지)
-  ========================================================= -->
-  <script>
+<script>
     /* =========================================================
-      DK Fit OS v12.2 (App Core)
+      DK Fit OS v12.1
+      ✅ Wake Lock (screen on)
+      ✅ Stopwatch Pause
+      ✅ Set tap -> instant done UI + REP modal appears
+      ✅ REP modal: previous week based number buttons (no mental math)
+      ✅ Rest sound: notification-like melody (no flash)
+      ✅ Progress percent + "현재 XX% 완료!"
+      ✅ History: daily summary with duration / avg rest / detail
+      ✅ GIF blink fix: avoid full re-render when stepper changes
     ========================================================= */
 
+    /* ---------- GIF 매칭 ---------- */
+    
     /* ---------- DATA ---------- */
+
+    /* ---------- APP DATA (JSON) ---------- */
     let appData = null;
     let workoutData = null;
     let gifMap = null;
@@ -1240,24 +1676,22 @@
       return '';
     }
 
-    /* ---------- STORAGE KEYS ---------- */
-    window.KEY_LOGS = 'dk_os_v122_logs';
-    window.KEY_SETS = 'dk_os_v122_sets';
-    window.KEY_REPS = 'dk_os_v122_reps';
-    window.KEY_PROGRESS_BY_DATE = 'dk_os_v122_progress_by_date';
-    window.KEY_SPLASH = 'dk_os_v122_splash_shown';
-    window.KEY_SUMMARY_SHOWN = 'dk_os_v122_summary_shown';
-    window.KEY_NOTIF = 'dk_os_v122_rest_notif';
 
-    // ✅ localStorage hook 안전 설치 (Firebase script에서 제공)
-    try{ window.__dk_installLocalStorageHook && window.__dk_installLocalStorageHook(); }catch(e){}
+    /* ---------- STORAGE KEYS ---------- */
+    const KEY_LOGS = 'dk_os_v121_logs';
+    const KEY_SETS = 'dk_os_v121_sets';
+    const KEY_REPS = 'dk_os_v121_reps';
+    const KEY_PROGRESS_BY_DATE = 'dk_os_v121_progress_by_date';
+    const KEY_SPLASH = 'dk_os_v121_splash_shown';
+    const KEY_SUMMARY_SHOWN = 'dk_os_v121_summary_shown';
+    const KEY_NOTIF = 'dk_os_v121_rest_notif';
 
     /* ---------- LOAD ---------- */
     function safeParse(raw, fallback){ try { return raw ? JSON.parse(raw) : fallback; } catch(e){ return fallback; } }
-    window.logs = safeParse(localStorage.getItem(KEY_LOGS), []);
-    window.customSets = safeParse(localStorage.getItem(KEY_SETS), {});
-    window.customReps = safeParse(localStorage.getItem(KEY_REPS), {});
-    window.progressByDate = safeParse(localStorage.getItem(KEY_PROGRESS_BY_DATE), {});
+    let logs = safeParse(localStorage.getItem(KEY_LOGS), []);
+    let customSets = safeParse(localStorage.getItem(KEY_SETS), {});
+    let customReps = safeParse(localStorage.getItem(KEY_REPS), {});
+    let progressByDate = safeParse(localStorage.getItem(KEY_PROGRESS_BY_DATE), {});
 
     /* ---------- STATE ---------- */
     let timerInt = null;
@@ -1268,11 +1702,13 @@
     let restRemaining = 0;
     let restTotal = 0;
     let currentSlideIndex = 0;
-    window.restNotifEnabled = (localStorage.getItem(KEY_NOTIF) ?? '1') === '1';
+    let restNotifEnabled = (localStorage.getItem(KEY_NOTIF) ?? '1') === '1';
 
+    /* 휴식 기록 */
     let restStartedAt = null;
     let restCurrentLogKey = null;
 
+    /* Audio unlock */
     let audioCtx = null;
     function unlockAudio(){
       try{
@@ -1285,11 +1721,13 @@
       }catch(e){}
     }
 
+    /* Stopwatch (pause support) */
     let workoutStartAt = Date.now();
     let stopwatchPaused = false;
     let pauseStartedAt = null;
     let pausedTotalMs = 0;
 
+    /* Wake Lock */
     let wakeLock = null;
     async function requestWakeLock(){
       try{
@@ -1298,9 +1736,16 @@
         }
       }catch(e){}
     }
+    function releaseWakeLock(){
+      try{ wakeLock && wakeLock.release(); }catch(e){}
+      wakeLock = null;
+    }
     document.addEventListener("visibilitychange", () => {
       if(document.visibilityState === 'visible') requestWakeLock();
     });
+
+    /* REP modal state */
+    let repModalState = null;
 
     /* ---------- UTILS ---------- */
     function haptic(ms=18){ if(navigator.vibrate) navigator.vibrate(ms); }
@@ -1333,6 +1778,17 @@
       toastTimer = setTimeout(()=> el.classList.remove('show'), 1800);
     }
 
+    /* ---------- SUMMARY MODAL ---------- */
+    function openSummary(stats){
+      document.getElementById('sum-sets').textContent = stats.sets;
+      document.getElementById('sum-ex').textContent = stats.exercises;
+      document.getElementById('sum-msg').textContent = stats.msg;
+      document.getElementById('summary-modal').classList.add('show');
+    }
+    function closeSummary(){
+      document.getElementById('summary-modal').classList.remove('show');
+    }
+
     /* ---------- TABS ---------- */
     function showTab(name, btn){
       document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -1357,10 +1813,7 @@
       ['월','화','수','목','금','토','일'].forEach((d, i) => {
         const dm = (i === 6) ? 0 : i + 1;
         const b = document.createElement('button');
-        b.className = `pill ${dm === currentDayIdx ? 'cyan' : ''}`;
-        b.style.padding = "10px 14px";
-        b.style.borderRadius = "18px";
-        b.style.fontSize = "12px";
+        b.className = `day-chip ${dm === currentDayIdx ? 'active' : ''}`;
         b.innerText = d;
         b.onclick = () => changeDay(dm);
         nav.appendChild(b);
@@ -1369,19 +1822,19 @@
 
     /* ---------- DATE-BASED PROGRESS ---------- */
     function getProgressArr(date, exerciseId, setTotal){
-      if(!window.progressByDate[date]) window.progressByDate[date] = {};
-      let arr = window.progressByDate[date][exerciseId];
+      if(!progressByDate[date]) progressByDate[date] = {};
+      let arr = progressByDate[date][exerciseId];
       if(!Array.isArray(arr)){
         arr = new Array(setTotal).fill(false);
-        window.progressByDate[date][exerciseId] = arr;
-        localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(window.progressByDate));
+        progressByDate[date][exerciseId] = arr;
+        localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
         return arr;
       }
       if(arr.length !== setTotal){
         const next = new Array(setTotal).fill(false);
         for(let i=0;i<Math.min(arr.length,setTotal);i++) next[i]=!!arr[i];
-        window.progressByDate[date][exerciseId] = next;
-        localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(window.progressByDate));
+        progressByDate[date][exerciseId] = next;
+        localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
         return next;
       }
       return arr;
@@ -1391,7 +1844,7 @@
       let total = 0, done = 0;
       workoutData[dayIdx].list.forEach((w, idx) => {
         const id = exId(dayIdx, idx);
-        const setTotal = window.customSets[id] || w.set;
+        const setTotal = customSets[id] || w.set;
         total += setTotal;
         const arr = getProgressArr(date, id, setTotal);
         done += arr.filter(Boolean).length;
@@ -1399,16 +1852,57 @@
       return { total, done, pct: Math.round((done/total)*100) || 0 };
     }
 
-    window.updateProgressUI = function(){
+    function updateProgressUI(){
       const p = computeProgressForDay(todayStr(), currentDayIdx);
       document.getElementById('progress-bar').style.width = p.pct + '%';
       document.getElementById('progress-percent').innerText = p.pct + '%';
       document.getElementById('progress-text').innerText = `현재 ${p.pct}% 완료!`;
+
+      if(p.pct === 100) maybeShowSummary();
+    }
+
+    function maybeShowSummary(){
+      const date = todayStr();
+      const key = `${date}|${currentDayIdx}`;
+      if(localStorage.getItem(KEY_SUMMARY_SHOWN) === key) return;
+
+      const stats = getTodaySummaryStats();
+      localStorage.setItem(KEY_SUMMARY_SHOWN, key);
+      openSummary(stats);
+      haptic(30);
+    }
+
+    function getTodaySummaryStats(){
+      const date = todayStr();
+      const data = workoutData[currentDayIdx];
+      let setsDone = 0;
+      let exDone = 0;
+      data.list.forEach((w, idx)=>{
+        const id = exId(currentDayIdx, idx);
+        const setTotal = customSets[id] || w.set;
+        const arr = getProgressArr(date, id, setTotal);
+        const done = arr.filter(Boolean).length;
+        setsDone += done;
+        if(done === setTotal) exDone++;
+      });
+      const msgPool = [
+        "오늘도 완벽했다. 내일은 더 강해진다.",
+        "폼이 올라왔다. 다음 주는 기록 갱신.",
+        "집중력이 미쳤다. 컨디션 최고.",
+        "규칙은 배신하지 않는다. 계속 간다.",
+        "오늘은 성공. 다음은 진짜 레벨업."
+      ];
+      return {
+        sets: setsDone,
+        exercises: exDone,
+        msg: msgPool[Math.floor(Math.random()*msgPool.length)]
+      };
     }
 
     /* ---------- STOPWATCH ---------- */
     function toggleStopwatchPause(){
       stopwatchPaused = !stopwatchPaused;
+
       const icon = document.getElementById('pause-icon');
       if(stopwatchPaused){
         pauseStartedAt = Date.now();
@@ -1446,15 +1940,132 @@
       document.getElementById('view-subcue').innerText = cueMap[data.type] || '훈련 모드';
 
       renderCarousel(true);
-      window.updateProgressUI();
+      updateProgressUI();
       updateDayNav();
       showDockTemporarily();
     }
 
     /* =========================================================
-      ✅ CAROUSEL (간소화 + 원본 기능 유지)
+      ✅ Bottom Sheet (운동 상세)
     ========================================================= */
-    window.renderCarousel = function(full=true){
+    let mobileActive = { w:null };
+
+    function openDetailSheet(w){
+      mobileActive.w = w;
+
+      document.getElementById('sheet-title').textContent = w.name;
+      document.getElementById('sheet-sub').textContent = `${w.target || 'DETAIL'}`;
+
+      const tabs = [
+        { key:'cue',   label:'핵심 큐',    text: expandCue(w) },
+        { key:'breath',label:'호흡',      text: expandBreath(w) },
+        { key:'mind',  label:'의식',      text: expandMind(w) },
+        { key:'elite', label:'엘리트 가이드', text: expandElite(w) },
+      ];
+
+      const tabWrap = document.getElementById('sheet-tabs');
+      tabWrap.innerHTML = '';
+
+      tabs.forEach((t, i)=>{
+        const b = document.createElement('button');
+        b.className = `sheetTab ${i===0?'active':''}`;
+        b.textContent = t.label;
+        b.onclick = ()=> setSheetTab(t, b);
+        tabWrap.appendChild(b);
+      });
+
+      setSheetTab(tabs[0], tabWrap.querySelector('.sheetTab'));
+
+      document.getElementById('detail-sheet').classList.add('show');
+      haptic(14);
+      showDockTemporarily();
+    }
+
+    function closeDetailSheet(){
+      document.getElementById('detail-sheet').classList.remove('show');
+      haptic(10);
+    }
+
+    function setSheetTab(tab, btn){
+      document.querySelectorAll('.sheetTab').forEach(x=> x.classList.remove('active'));
+      btn.classList.add('active');
+
+      const w = mobileActive.w;
+      const gifBlock = (w.gif) ? `
+        <div class="sheetBox">
+          <div class="sheetLabel">동작 가이드</div>
+          <img src="${w.gif}" class="sheetGif" loading="lazy" alt="exercise guide"
+               onerror="this.style.display='none';" />
+          <div class="sheetHint">* GIF는 동작의 핵심 흐름만 참고하세요. 자세가 흔들리면 횟수보다 폼이 우선입니다.</div>
+        </div>
+      ` : '';
+
+      const body = document.getElementById('sheet-body');
+      body.innerHTML = `
+        ${gifBlock}
+        <div class="sheetBox">
+          <div class="sheetLabel">${tab.label}</div>
+          <div class="sheetText">${tab.text}</div>
+          <div class="sheetHint">* 처음엔 <b>천천히</b>, 정확하게. 다음 단계는 “범위”와 “호흡”을 유지하는 것입니다.</div>
+        </div>
+      `;
+    }
+
+    function expandCue(w){
+      const base = (w.cue || w.tip || '').trim();
+      return `
+        ${base ? `• ${base}<br><br>` : ''}
+        <b>초보자 기준 핵심은 “폼이 무너지지 않는 범위”</b>입니다.<br>
+        1) 타겟을 느끼고<br>
+        2) 흔들리면 속도를 줄이고<br>
+        3) 반동 없이 정확한 동작으로만 진행하세요.<br><br>
+        ✅ <b>체크 포인트</b><br>
+        • 어깨가 귀 쪽으로 올라가면 → 어깨 내리고 가슴 열기<br>
+        • 허리가 꺾이면 → 코어 고정<br>
+        • 반동이 생기면 → 속도 20% 줄이기
+      `.trim();
+    }
+
+    function expandBreath(w){
+      return `
+        <b>호흡은 “힘을 쓰는 순간에 내쉬기”</b>가 원칙입니다.<br><br>
+        • 기본: <b>${w.breath}</b><br><br>
+        ✅ <b>요령</b><br>
+        1) 내려갈 때 → 코로 들이마시기<br>
+        2) 올라올 때 → 입으로 길게 내쉬기
+      `.trim();
+    }
+
+    function expandMind(w){
+      return `
+        <b>${w.mind}</b><br><br>
+        ✅ <b>실수</b><br>
+        • 팔로만 하려는 것 → 자극이 흐트러짐<br>
+        • 너무 빠른 템포 → 반동<br><br>
+        ✅ <b>의식 포인트</b><br>
+        1) 타겟 수축/늘어남 느끼기<br>
+        2) 0.5초 정지로 정확도 확보
+      `.trim();
+    }
+
+    function expandElite(w){
+      return `
+        <b>${w.tip}</b><br>
+        <span style="opacity:.75;">${w.guide || ''}</span><br><br>
+        ✅ <b>엘리트 체크</b><br>
+        1) 시작 자세 흔들림 없음<br>
+        2) 전 구간 긴장 유지<br>
+        3) 마지막 2회는 컨트롤
+      `.trim();
+    }
+
+    /* =========================================================
+      ✅ CAROUSEL
+      - GIF 깜빡임 방지: 필요할 때만 renderCarousel(full=true)
+      - 세트 완료 시엔 버튼 상태만 즉시 업데이트(부분 업데이트)
+    ========================================================= */
+
+    function renderCarousel(full=true){
       const date = todayStr();
       const data = workoutData[currentDayIdx];
       const carousel = document.getElementById('session-carousel');
@@ -1466,8 +2077,8 @@
           const gif = getGifByExerciseName(w.name);
           w.gif = gif || '';
 
-          const setTotal = window.customSets[id] || w.set;
-          const repTotal = window.customReps[id] || w.rep;
+          const setTotal = customSets[id] || w.set;
+          const repTotal = customReps[id] || w.rep;
           const doneArr = getProgressArr(date, id, setTotal);
           const doneCount = doneArr.filter(Boolean).length;
 
@@ -1475,6 +2086,16 @@
           slide.className = 'slide';
           slide.setAttribute('data-slide', idx);
           slide.setAttribute('data-exid', id);
+
+          const detailAction = gif ? `
+            <span class="pill cyan">
+              <i class="fa-solid fa-hand-pointer"></i> GIF 터치로 상세 보기
+            </span>
+          ` : `
+            <button class="pill cyan" onclick='openDetailSheet(${safeStringify(w)})'>
+              <i class="fa-solid fa-circle-info"></i> 운동 상세 보기
+            </button>
+          `;
 
           slide.innerHTML = `
             <div class="glass slideCard p-6 md:p-7">
@@ -1493,12 +2114,9 @@
                   </button>
                 </div>
 
-                ${gif ? `
-                  <div class="mt-4 glass rounded-2xl overflow-hidden border border-white/10" onclick="window.openAccountSheet && 0">
-                    <img src="${gif}" style="width:100%; max-height:240px; object-fit:contain; background:rgba(255,255,255,0.03);" loading="lazy"
-                      onerror="this.parentElement.style.display='none';"/>
-                  </div>
-                `:``}
+                <div class="mt-4 flex items-center justify-between gap-2">
+                  ${detailAction}
+                </div>
 
                 <div class="mt-5 grid md:grid-cols-2 gap-4">
                   <div class="space-y-3">
@@ -1521,6 +2139,18 @@
                         <p class="text-[10px] font-black tracking-[0.18em] uppercase text-cyan-300 mb-2">엘리트 가이드</p>
                         <p class="text-[13px] font-bold text-white/75">${w.tip} · <span class="text-white/45">${w.guide}</span></p>
                       </div>
+
+                      ${gif ? `
+                        <div class="mt-2 col-span-2">
+                          <div class="cardGifSquareWrap" onclick='openDetailSheet(${safeStringify(w)})'>
+                            <img src="${gif}" class="cardGifSquare" loading="lazy" alt="exercise guide"
+                                 onerror="this.parentElement.style.display='none';" />
+                          </div>
+                          <div class="mt-2 text-[10px] font-black tracking-[0.18em] uppercase text-white/35">
+                            GIF 터치하면 운동 상세보기
+                          </div>
+                        </div>
+                      ` : ''}
                     </div>
                   </div>
 
@@ -1584,12 +2214,14 @@
         updateSlideHUD();
         requestAnimationFrame(()=> scrollToSlide(currentSlideIndex,false));
       }else{
+        // 부분 업데이트: 현재 슬라이드 세트 그리드만 갱신
         const slide = carousel.querySelector(`.slide[data-slide="${currentSlideIndex}"]`);
         if(!slide) return;
 
+        const data = workoutData[currentDayIdx];
         const w = data.list[currentSlideIndex];
         const exid = slide.getAttribute('data-exid');
-        const setTotal = window.customSets[exid] || w.set;
+        const setTotal = customSets[exid] || w.set;
         const doneArr = getProgressArr(date, exid, setTotal);
         const doneCount = doneArr.filter(Boolean).length;
 
@@ -1603,12 +2235,12 @@
         const setValue = slide.querySelector('[data-role="setTotal"]');
         if(setValue) setValue.textContent = setTotal;
 
-        bindSetButtons();
+        bindSetButtons(); // 새 버튼 바인딩
       }
     }
 
     function renderSetButtonsHTML(id, w, date){
-      const setTotal = window.customSets[id] || w.set;
+      const setTotal = customSets[id] || w.set;
       const doneArr = getProgressArr(date, id, setTotal);
 
       return Array.from({length:setTotal}).map((_, s)=>{
@@ -1681,17 +2313,24 @@
       showDockTemporarily();
     }
 
+    function safeStringify(obj){
+      return JSON.stringify(obj).replace(/'/g,"&#39;");
+    }
+
     function bindSetButtons(){
       const buttons = document.querySelectorAll('.setBtn[data-ex]');
       buttons.forEach(btn => {
         const date = btn.getAttribute('data-date');
         const ex = btn.getAttribute('data-ex');
         const setIndex = Number(btn.getAttribute('data-set'));
+
         btn.onclick = () => toggleSetComplete(date, ex, setIndex);
       });
     }
 
-    // ✅ 기록 toggle -> localStorage 변화 -> Firebase debounce 저장
+    /* =========================================================
+      ✅ 핵심: 세트 완료 → 즉시 done 반영 + REP 입력 모달
+    ========================================================= */
     function toggleSetComplete(date, exerciseId, setIndex){
       unlockAudio();
       showDockTemporarily();
@@ -1700,27 +2339,27 @@
       const w = workoutData[dayIdx]?.list?.[exIdx];
       if(!w) return;
 
-      const setTotal = window.customSets[exerciseId] || w.set;
+      const setTotal = customSets[exerciseId] || w.set;
       const doneArr = getProgressArr(date, exerciseId, setTotal);
       const nextIndex = doneArr.indexOf(false);
 
       if(!doneArr[setIndex] && nextIndex !== -1 && setIndex !== nextIndex){
         haptic(10);
-        toast("다음 세트를 먼저 완료하세요");
+        toast(t('messages.toast.nextSetFirst','다음 세트를 먼저 완료하세요'));
         return;
       }
 
-      const repTotal = window.customReps[exerciseId] || w.rep;
+      const repTotal = customReps[exerciseId] || w.rep;
       doneArr[setIndex] = !doneArr[setIndex];
-      window.progressByDate[date][exerciseId] = doneArr;
-      localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(window.progressByDate));
+      progressByDate[date][exerciseId] = doneArr;
+      localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
 
       const setNo = setIndex + 1;
       const logKey = `${date}|${exerciseId}|${setNo}`;
 
       if(doneArr[setIndex]){
-        if(!window.logs.some(l => l.logKey === logKey)){
-          window.logs.push({
+        if(!logs.some(l => l.logKey === logKey)){
+          logs.push({
             id: Date.now(),
             logKey,
             date,
@@ -1730,35 +2369,201 @@
             set: setNo,
             plannedSetTotal: setTotal,
             plannedRep: repTotal,
-            repActual: repTotal, // ✅ modal 제거 대신 기본값 바로 기록
+            repActual: null,
             rpe: null,
             restPlanned: w.rest,
             restUsed: w.rest,
             type: workoutData[currentDayIdx].type
           });
-          localStorage.setItem(KEY_LOGS, JSON.stringify(window.logs));
+          localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
         }
 
-        // ✅ 타이머 즉시
-        const restSec = w.rest || 0;
-        if(restSec > 0) startTimer(restSec, logKey);
+        // ✅ UI 즉시 반영 (새로고침 필요 없음)
+        renderCarousel(false);
+        updateProgressUI();
 
-        window.renderCarousel(false);
-        window.updateProgressUI();
-        renderCalendar();
+        // ✅ REP 입력 모달 열기
+        openRepModal({
+          logKey,
+          name: w.name,
+          setNo,
+          baseRep: repTotal
+        });
 
-        haptic(16);
       }else{
-        window.logs = window.logs.filter(l => l.logKey !== logKey);
-        localStorage.setItem(KEY_LOGS, JSON.stringify(window.logs));
+        // undone
+        logs = logs.filter(l => l.logKey !== logKey);
+        localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
 
-        window.renderCarousel(false);
-        window.updateProgressUI();
-        renderCalendar();
+        renderCarousel(false);
+        updateProgressUI();
         haptic(12);
+        toast("세트 취소됨");
       }
     }
 
+    /* =========================================================
+      ✅ REP MODAL (AI 추천 + 숫자 버튼)
+    ========================================================= */
+    function openRepModal({logKey, name, setNo, baseRep}){
+      repModalState = {logKey, baseRep};
+
+      document.getElementById('rep-title').textContent = name;
+      document.getElementById('rep-sub').textContent = `${setNo} SET`;
+      document.getElementById('rep-base').textContent = baseRep;
+
+      const curLog = logs.find(l => l.logKey === logKey);
+      const prevLog = curLog ? findLastWeekSameExerciseLog(curLog) : null;
+      const prevRep = prevLog?.repActual ?? prevLog?.plannedRep ?? baseRep;
+
+      renderRepRecommendations(baseRep, prevRep);
+
+      document.getElementById('rep-modal').classList.add('show');
+      haptic(12);
+      showDockTemporarily();
+    }
+
+    function closeRepModal(saved=false){
+      document.getElementById('rep-modal').classList.remove('show');
+      if(!saved){
+        // 저장 안 했으면 해당 log의 repActual null 유지 + (선택적) 취소 안내
+        toast("REP 입력 취소됨");
+      }
+      repModalState = null;
+    }
+
+    function repSkip(){
+      if(!repModalState) return;
+      saveRepToLog(repModalState.logKey, repModalState.baseRep);
+      closeRepModal(true);
+    }
+
+    function repSelect(value){
+      if(!repModalState) return;
+      saveRepToLog(repModalState.logKey, value);
+      closeRepModal(true);
+    }
+
+    function renderRepRecommendations(baseRep, prevRep){
+      // ✅ AI 추천 3개
+      const aiWrap = document.getElementById("rep-ai-reco");
+      aiWrap.innerHTML = "";
+
+      const aiList = [
+        { label:"🔥 동일", value: prevRep, desc:"지난주와 동일" },
+        { label:"✅ +1", value: prevRep + 1, desc:"조금 더" },
+        { label:"⚡ -1", value: Math.max(0, prevRep - 1), desc:"조금 덜" },
+      ];
+
+      aiList.forEach(item => {
+        const btn = document.createElement("button");
+        btn.className = "repBtn";
+        btn.style.height = "72px";
+        btn.innerHTML = `
+          <div class="flex flex-col items-center">
+            <div class="text-sm font-black">${item.label}</div>
+            <div class="text-xl font-black text-white mt-1">${item.value}</div>
+            <div class="text-[9px] font-black text-white/35 mt-1">${item.desc}</div>
+          </div>
+        `;
+        btn.onclick = () => repSelect(item.value);
+        aiWrap.appendChild(btn);
+      });
+
+      // ✅ 숫자 추천 (prevRep 기준 ±5)
+      const grid = document.getElementById("rep-number-grid");
+      grid.innerHTML = "";
+
+      const start = Math.max(0, prevRep - 5);
+      const end = prevRep + 5;
+
+      for(let r = start; r <= end; r++){
+        const btn = document.createElement("button");
+        const isBase = (r === baseRep);
+        btn.className = isBase ? "repBtn primary" : "repBtn";
+        btn.style.height = "46px";
+        btn.style.borderRadius = "16px";
+        btn.innerHTML = `<span class="text-lg font-black">${isBase ? "기본" : r}</span>`;
+
+        btn.onclick = () => {
+          if(isBase) repSkip();
+          else repSelect(r);
+        };
+        grid.appendChild(btn);
+      }
+    }
+
+    
+    /* ✅ AUTO ADVANCE: 운동 세트 전부 완료 시 다음 운동으로 자동 이동 */
+    function maybeAutoAdvance(exerciseId, date){
+      try{
+        const [dayIdx, exIdx] = exerciseId.split('-').map(Number);
+        const w = workoutData[dayIdx]?.list?.[exIdx];
+        if(!w) return;
+        const setTotal = customSets[exerciseId] || w.set;
+        const arr = getProgressArr(date, exerciseId, setTotal);
+        const allDone = arr.length && arr.every(Boolean);
+        if(!allDone) return;
+
+        // 마지막 운동이면 이동하지 않음 (요약은 updateProgressUI에서 처리)
+        const data = workoutData[currentDayIdx];
+        const isLast = (currentSlideIndex >= data.list.length - 1);
+        if(isLast) return;
+
+        // 타이머가 떠있으면 사용자 집중을 위해 즉시 이동하되, 애니메이션만 부드럽게
+        setTimeout(()=>{
+          carouselNext();
+        }, 220);
+      }catch(e){}
+    }
+
+function saveRepToLog(logKey, value){
+      const idx = logs.findIndex(l => l.logKey === logKey);
+      if(idx === -1) return;
+
+      logs[idx].repActual = value;
+      localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+
+      // ✅ 휴식 타이머 시작 (rep 입력 후)
+      const restSec = logs[idx].restPlanned || 0;
+      if(restSec > 0) startTimer(restSec, logKey);
+
+      // ✅ 지난주 비교 토스트
+      const prevLog = findLastWeekSameExerciseLog(logs[idx]);
+      if(prevLog){
+        const prev = prevLog.repActual ?? prevLog.plannedRep ?? null;
+        if(prev !== null){
+          const diff = value - prev;
+          if(diff > 0) toast(`지난주 대비 +${diff} REP 🔥`);
+          else if(diff < 0) toast(`지난주 대비 ${diff} REP`);
+          else toast(`지난주와 동일 REP ✅`);
+        }
+      }else{
+        toast(`REP 기록 완료 ✅`);
+      }
+
+      haptic(18);
+      renderCarousel(false);
+      updateProgressUI();
+      renderCalendar();
+      maybeAutoAdvance(logs[idx].exerciseId, logs[idx].date);
+    }
+
+    /* ✅ 지난주 동일 요일 / 동일 운동 / 동일 세트 찾기 */
+    function findLastWeekSameExerciseLog(cur){
+      const targetDate = cur.date;
+      const prevDate = shiftDate(targetDate, -7);
+      const prevKeyPrefix = `${prevDate}|${cur.exerciseId}|${cur.set}`;
+      return logs.find(l => l.logKey.startsWith(prevKeyPrefix)) || null;
+    }
+
+    function shiftDate(dateStr, deltaDays){
+      const d = new Date(dateStr);
+      d.setDate(d.getDate() + deltaDays);
+      return d.toISOString().split('T')[0];
+    }
+
+    /* ---------- adjust set/rep (딜레이 완화) ---------- */
     function adjust(type, key, val){
       showDockTemporarily();
 
@@ -1767,20 +2572,34 @@
       if(!w) return;
 
       if(type === 'set'){
-        const cur = window.customSets[key] || w.set;
+        const cur = customSets[key] || w.set;
         const next = clamp(cur + val, 1, 12);
-        window.customSets[key] = next;
-        localStorage.setItem(KEY_SETS, JSON.stringify(window.customSets));
+        customSets[key] = next;
+        localStorage.setItem(KEY_SETS, JSON.stringify(customSets));
         getProgressArr(todayStr(), key, next);
       }else{
-        const cur = window.customReps[key] || w.rep;
-        window.customReps[key] = clamp(cur + val, 1, 100);
-        localStorage.setItem(KEY_REPS, JSON.stringify(window.customReps));
+        const cur = customReps[key] || w.rep;
+        customReps[key] = clamp(cur + val, 1, 100);
+        localStorage.setItem(KEY_REPS, JSON.stringify(customReps));
       }
 
-      window.renderCarousel(false);
-      window.updateProgressUI();
-      toast("설정 저장됨");
+      // ✅ 즉시 DOM 숫자 갱신 (새로고침 없이 반영)
+      // ✅ 즉시 DOM 숫자 갱신 (새로고침 없이 반영)
+      const slide = document.querySelector(`.slide[data-slide="${currentSlideIndex}"]`);
+      if(slide){
+        if(type === 'set'){
+          const v = slide.querySelector('[data-role="setTotal"]');
+          if(v) v.textContent = customSets[key] || w.set;
+        }else{
+          const v = slide.querySelector('[data-role="repTotal"]');
+          if(v) v.textContent = customReps[key] || w.rep;
+        }
+      }
+
+      // ✅ GIF 깜빡임 방지: 전체 렌더 말고 현재 슬라이드만 부분 업데이트
+      renderCarousel(false);
+      updateProgressUI();
+      toast(t('messages.toast.settingSaved','설정 저장됨'));
       haptic(10);
     }
 
@@ -1791,38 +2610,47 @@
       const w = workoutData[d]?.list?.[idx];
       if(!w) return;
 
-      if(window.customSets[exerciseId] !== undefined) delete window.customSets[exerciseId];
-      if(window.customReps[exerciseId] !== undefined) delete window.customReps[exerciseId];
-      localStorage.setItem(KEY_SETS, JSON.stringify(window.customSets));
-      localStorage.setItem(KEY_REPS, JSON.stringify(window.customReps));
+      if(customSets[exerciseId] !== undefined) delete customSets[exerciseId];
+      if(customReps[exerciseId] !== undefined) delete customReps[exerciseId];
+      localStorage.setItem(KEY_SETS, JSON.stringify(customSets));
+      localStorage.setItem(KEY_REPS, JSON.stringify(customReps));
+
+
+      // ✅ 즉시 DOM 갱신 (새로고침 불필요)
+      const slide = document.querySelector(`.slide[data-slide="${currentSlideIndex}"]`);
+      if(slide){
+        const setEl = slide.querySelector('[data-role="setTotal"]');
+        const repEl = slide.querySelector('[data-role="repTotal"]');
+        if(setEl) setEl.textContent = w.set;
+        if(repEl) repEl.textContent = w.rep;
+      }
 
       getProgressArr(todayStr(), exerciseId, w.set);
-      window.renderCarousel(false);
-      window.updateProgressUI();
-      toast("기본값으로 복원");
+      renderCarousel(false);
+      updateProgressUI();
+      toast(t('messages.toast.restoredDefault','기본값으로 복원'));
       haptic(18);
     }
 
     function resetExercise(exerciseId){
       showDockTemporarily();
-      if(!confirm("이 운동의 오늘 기록을 초기화할까요?")) return;
+      if(!confirm(t('messages.confirm.resetExercise','이 운동의 오늘 기록을 초기화할까요?'))) return;
       const date = todayStr();
 
-      window.logs = window.logs.filter(l => !(l.date === date && l.exerciseId === exerciseId));
-      localStorage.setItem(KEY_LOGS, JSON.stringify(window.logs));
+      logs = logs.filter(l => !(l.date === date && l.exerciseId === exerciseId));
+      localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
 
       const [d, idx] = exerciseId.split('-').map(Number);
       const w = workoutData[d]?.list?.[idx];
-      const setTotal = window.customSets[exerciseId] || w.set;
-      if(window.progressByDate[date] && window.progressByDate[date][exerciseId]){
-        window.progressByDate[date][exerciseId] = new Array(setTotal).fill(false);
-        localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(window.progressByDate));
+      const setTotal = customSets[exerciseId] || w.set;
+      if(progressByDate[date] && progressByDate[date][exerciseId]){
+        progressByDate[date][exerciseId] = new Array(setTotal).fill(false);
+        localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
       }
 
-      window.renderCarousel(false);
-      window.updateProgressUI();
-      renderCalendar();
-      toast("운동 초기화 완료");
+      renderCarousel(false);
+      updateProgressUI();
+      toast(t('messages.toast.exerciseResetDone','운동 초기화 완료'));
       haptic(22);
     }
 
@@ -1831,18 +2659,19 @@
       if(!confirm('오늘 진행/기록을 모두 초기화할까요?')) return;
       const date = todayStr();
 
-      window.logs = window.logs.filter(l => l.date !== date);
-      localStorage.setItem(KEY_LOGS, JSON.stringify(window.logs));
+      logs = logs.filter(l => l.date !== date);
+      localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
 
-      if(window.progressByDate[date]){ delete window.progressByDate[date]; localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(window.progressByDate)); }
+      if(progressByDate[date]){ delete progressByDate[date]; localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate)); }
+      localStorage.removeItem(KEY_SUMMARY_SHOWN);
 
-      window.renderCarousel(true);
-      window.updateProgressUI();
-      renderCalendar();
-      toast("오늘 초기화 완료");
+      renderCarousel(true);
+      updateProgressUI();
+      toast(t('messages.toast.todayResetDone','오늘 초기화 완료'));
       haptic(25);
     }
 
+    /* ---------- TIMER ---------- */
     function showHUD(on){
       const hud = document.getElementById('timer-hud');
       if(!hud) return;
@@ -1861,6 +2690,7 @@
     function startTimer(sec, logKey=null){
       restRemaining = sec;
       restTotal = sec;
+
       restStartedAt = Date.now();
       restCurrentLogKey = logKey;
 
@@ -1888,7 +2718,7 @@
       modal.classList.remove('opacity-100');
       setTimeout(()=> modal.classList.add('hidden'), 450);
       showHUD(true);
-      toast("타이머 최소화");
+      toast(t('messages.toast.timerMin','타이머 최소화'));
       haptic(10);
     }
 
@@ -1922,10 +2752,10 @@
 
       if(restStartedAt && restCurrentLogKey){
         const used = clamp(Math.round((Date.now() - restStartedAt) / 1000), 0, restTotal);
-        const idx = window.logs.findIndex(l => l.logKey === restCurrentLogKey);
+        const idx = logs.findIndex(l => l.logKey === restCurrentLogKey);
         if(idx !== -1){
-          window.logs[idx].restUsed = used;
-          localStorage.setItem(KEY_LOGS, JSON.stringify(window.logs));
+          logs[idx].restUsed = used;
+          localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
         }
       }
       restStartedAt = null;
@@ -1933,23 +2763,66 @@
 
       if(finished){
         haptic(30);
-        toast("휴식 끝! 다음 세트 ✅");
+        if(restNotifEnabled) restDoneNotify();
+        toast(t('messages.toast.restDone','휴식 끝! 다음 세트 ✅'));
       }
+    }
+
+    /* ✅ 알림음: “알림 사운드 느낌” (비프 X, 짧은 멜로디) */
+    function restDoneNotify(){
+      try{ if(navigator.vibrate) navigator.vibrate([120,80,200,80,220]); }catch(e){}
+
+      try{
+        if(!audioCtx){
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if(audioCtx.state === 'suspended'){
+          audioCtx.resume();
+        }
+
+        const now = audioCtx.currentTime;
+
+        // iOS/Android 알림 느낌: "딩-딩-딩"
+        const pattern = [
+          { t: 0.00, dur: 0.16, freq: 1318 }, // E6
+          { t: 0.20, dur: 0.16, freq: 1567 }, // G6
+          { t: 0.40, dur: 0.18, freq: 2093 }, // C7
+          { t: 0.66, dur: 0.18, freq: 1567 }, // G6
+        ];
+
+        pattern.forEach(p => {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.connect(g);
+          g.connect(audioCtx.destination);
+          o.type = 'sine';
+          o.frequency.setValueAtTime(p.freq, now + p.t);
+
+          g.gain.setValueAtTime(0.0001, now + p.t);
+          g.gain.exponentialRampToValueAtTime(0.25, now + p.t + 0.02);
+          g.gain.exponentialRampToValueAtTime(0.0001, now + p.t + p.dur);
+
+          o.start(now + p.t);
+          o.stop(now + p.t + p.dur);
+        });
+
+      }catch(e){}
     }
 
     function toggleNotif(){
       showDockTemporarily();
-      window.restNotifEnabled = !window.restNotifEnabled;
-      localStorage.setItem(KEY_NOTIF, window.restNotifEnabled ? '1' : '0');
+      restNotifEnabled = !restNotifEnabled;
+      localStorage.setItem(KEY_NOTIF, restNotifEnabled ? '1' : '0');
       const btn = document.getElementById('notif-toggle');
       if(btn){
-        btn.textContent = window.restNotifEnabled ? 'ON' : 'OFF';
-        btn.classList.toggle('cyan', window.restNotifEnabled);
+        btn.textContent = restNotifEnabled ? 'ON' : 'OFF';
+        btn.classList.toggle('cyan', restNotifEnabled);
       }
-      toast(window.restNotifEnabled ? "알림 ON" : "알림 OFF");
+      toast(restNotifEnabled ? t('messages.toast.notifOn','알림 ON') : t('messages.toast.notifOff','알림 OFF'));
       haptic(14);
     }
 
+    /* ---------- CALENDAR ---------- */
     function renderCalendar(){
       document.getElementById('calendar-month').innerText = `${currentYear}.${String(currentMonth + 1).padStart(2,'0')}`;
       const first = new Date(currentYear, currentMonth, 1).getDay();
@@ -1961,7 +2834,7 @@
 
       for(let d=1; d<=last; d++){
         const dStr = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-        const hasLog = window.logs.some(l => l.date === dStr);
+        const hasLog = logs.some(l => l.date === dStr);
 
         const el = document.createElement('div');
         el.className = `calendar-day cursor-pointer ${dStr===todayStr()?'today':''} ${hasLog?'has-log':''}`;
@@ -1970,12 +2843,14 @@
         el.onclick = () => { selectedDate = dStr; renderCalendar(); showDockTemporarily(); };
         body.appendChild(el);
       }
+
       renderHistoryDetail();
     }
 
+    /* ✅ 기록 탭 강화: 날짜 요약 + 운동별 세트/rep/휴식 + 총 시간/평균휴식 */
     function renderHistoryDetail(){
       const area = document.getElementById('history-detail');
-      const dayLogs = window.logs
+      const dayLogs = logs
         .filter(l => l.date === selectedDate)
         .sort((a,b)=> (a.exerciseId > b.exerciseId ? 1 : -1) || (a.set - b.set));
 
@@ -1986,15 +2861,17 @@
         return;
       }
 
+      // ✅ day summary
       const totalSets = dayLogs.length;
       const avgRest = Math.round(dayLogs.reduce((a,c)=> a + (c.restUsed ?? c.restPlanned ?? 0), 0) / totalSets);
+      const approxWorkoutMin = estimateWorkoutDurationMinutes(selectedDate);
 
       area.innerHTML += `
         <div class="glass rounded-[28px] p-6 mb-2">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45">요약</p>
-              <h4 class="text-2xl font-black italic text-white mt-2">${Math.max(1, Math.round((avgRest + 45) * totalSets / 60))}분</h4>
+              <h4 class="text-2xl font-black italic text-white mt-2">${approxWorkoutMin}분</h4>
               <p class="text-[10px] font-black text-white/35 tracking-[0.18em] uppercase mt-2">
                 총 ${totalSets}세트 · 평균 휴식 ${avgRest}s
               </p>
@@ -2014,21 +2891,65 @@
       }, {});
 
       Object.entries(groups).forEach(([exerciseId, data]) => {
+        const name = data[0].name;
+        const plannedRep = data[0].plannedRep ?? "-";
+        const totalSets = data.length;
+
+        const prevDate = shiftDate(selectedDate, -7);
+        const prevGroup = logs.filter(l => l.date === prevDate && l.exerciseId === exerciseId);
+        const prevAvgRep = prevGroup.length ? Math.round(prevGroup.reduce((a,c)=> a + (c.repActual ?? c.plannedRep ?? 0), 0) / prevGroup.length) : null;
+        const curAvgRep = Math.round(data.reduce((a,c)=> a + (c.repActual ?? c.plannedRep ?? 0), 0) / data.length);
+        const repDelta = prevAvgRep !== null ? (curAvgRep - prevAvgRep) : null;
+
         area.innerHTML += `
           <div class="glass rounded-[28px] p-6 border-l-4 border-cyan-400">
-            <h4 class="font-black text-white italic">${data[0].name}</h4>
-            <div class="mt-5 grid grid-cols-2 gap-3">
-              ${data.map(row => `
-                <div class="glass rounded-2xl p-4">
-                  <div class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45">${row.set} SET</div>
-                  <div class="text-3xl font-black text-white mt-2">${row.repActual ?? row.plannedRep ?? "-"}</div>
-                  <div class="text-[10px] font-black tracking-[0.18em] uppercase text-white/35 mt-2">REST ${(row.restUsed ?? row.restPlanned ?? "-")}s</div>
-                </div>
-              `).join('')}
+            <div>
+              <h4 class="font-black text-white italic">${name}</h4>
+              <div class="flex items-center gap-2 mt-3 flex-wrap">
+                <span class="pill cyan">${totalSets} 세트</span>
+                <span class="pill">목표 REP: ${plannedRep}</span>
+                ${repDelta !== null ? `<span class="pill ${repDelta>0?'cyan':''}">지난주 대비 ${repDelta>0?'+':''}${repDelta} REP</span>` : `<span class="pill">지난주 데이터 없음</span>`}
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <table class="log-table">
+                <thead>
+                  <tr>
+                    <th style="width:60px;">세트</th>
+                    <th>REP</th>
+                    <th style="width:90px;">REST</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${data.map(row => {
+                    const repVal = row.repActual ?? row.plannedRep ?? "-";
+                    const repDisplay = `<span class="pill cyan">${repVal}</span>`;
+                    const restDisplay = `<span class="pill">${(row.restUsed ?? row.restPlanned ?? "-")}s</span>`;
+                    return `
+                      <tr class="log-row">
+                        <td><span class="pill">${row.set}</span></td>
+                        <td>${repDisplay}</td>
+                        <td>${restDisplay}</td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
             </div>
           </div>
         `;
       });
+    }
+
+    function estimateWorkoutDurationMinutes(date){
+      // 간단 추정: 세트당 평균 45초 + 평균 휴식
+      const day = logs.filter(l => l.date === date);
+      if(!day.length) return 0;
+      const avgRest = day.reduce((a,c)=> a + (c.restUsed ?? c.restPlanned ?? 0), 0) / day.length;
+      const perSet = 45 + avgRest;
+      const totalSec = perSet * day.length;
+      return Math.max(1, Math.round(totalSec / 60));
     }
 
     function changeMonth(dir){
@@ -2043,20 +2964,21 @@
       showDockTemporarily();
       if(!confirm('선택한 날짜의 기록을 초기화할까요?')) return;
       const date = selectedDate;
-      window.logs = window.logs.filter(l => l.date !== date);
-      localStorage.setItem(KEY_LOGS, JSON.stringify(window.logs));
-      if(window.progressByDate[date]){ delete window.progressByDate[date]; localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(window.progressByDate)); }
-      toast("선택 날짜 초기화");
+      logs = logs.filter(l => l.date !== date);
+      localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+      if(progressByDate[date]){ delete progressByDate[date]; localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate)); }
+      toast(t('messages.toast.selectedDateReset','선택 날짜 초기화'));
       renderCalendar();
       haptic(25);
     }
 
+    /* ---------- STATS ---------- */
     function renderStats(){
       const counts = { push:0, pull:0, leg:0, rest:0 };
-      window.logs.forEach(l => counts[l.type] !== undefined && counts[l.type]++);
+      logs.forEach(l => counts[l.type] !== undefined && counts[l.type]++);
 
-      document.getElementById('stat-total-sets').innerText = window.logs.length;
-      document.getElementById('stat-week-count').innerText = new Set(window.logs.map(l => l.date)).size;
+      document.getElementById('stat-total-sets').innerText = logs.length;
+      document.getElementById('stat-week-count').innerText = new Set(logs.map(l => l.date)).size;
 
       const ctx = document.getElementById('radarChart').getContext('2d');
       if(window.myRadar) window.myRadar.destroy();
@@ -2087,15 +3009,16 @@
       });
     }
 
+    /* ---------- BACKUP / RESET ALL ---------- */
     function backupJSON(){
       showDockTemporarily();
-      const payload = { version: 'v12.2', exportedAt: nowISO(), logs: window.logs, customSets: window.customSets, customReps: window.customReps, progressByDate: window.progressByDate };
+      const payload = { version: 'v12.1', exportedAt: nowISO(), logs, customSets, customReps, progressByDate };
       const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = `dk_fit_backup_${todayStr()}.json`;
       a.click();
-      toast("백업 다운로드");
+      toast(t('messages.toast.backupDownloaded','백업 다운로드'));
       haptic(18);
     }
 
@@ -2107,16 +3030,28 @@
       localStorage.removeItem(KEY_REPS);
       localStorage.removeItem(KEY_PROGRESS_BY_DATE);
       localStorage.removeItem(KEY_SUMMARY_SHOWN);
-      localStorage.removeItem(KEY_NOTIF);
-      window.logs = []; window.customSets = {}; window.customReps = {}; window.progressByDate = {};
-      window.restNotifEnabled = true;
-      window.renderCarousel(true);
-      window.updateProgressUI();
+      logs = []; customSets = {}; customReps = {}; progressByDate = {};
+      renderCarousel(true);
+      updateProgressUI();
       renderCalendar();
-      toast("전체 초기화 완료");
+      toast(t('messages.toast.allResetDone','전체 초기화 완료'));
       haptic(30);
     }
 
+    /* ---------- DRAG / CONTEXT MENU PREVENT ---------- */
+    document.addEventListener("dragstart", e => e.preventDefault(), { passive:false });
+    document.addEventListener("contextmenu", e => e.preventDefault());
+    /* ---------- ZOOM PREVENT ---------- */
+    (function preventZoom(){
+      document.addEventListener('gesturestart', (e)=> e.preventDefault(), {passive:false});
+      document.addEventListener('gesturechange', (e)=> e.preventDefault(), {passive:false});
+      document.addEventListener('gestureend', (e)=> e.preventDefault(), {passive:false});
+
+      let lastTouchEnd = 0;
+      document.addEventListener('dblclick', (e)=> e.preventDefault(), {passive:false});
+    })();
+
+    /* Dock Auto Hide */
     let dockTimer = null;
     function showDockTemporarily(){
       const dock = document.querySelector('.navDockWrap');
@@ -2136,6 +3071,7 @@
       window.addEventListener(ev, showDockTemporarily, {passive:true});
     });
 
+    /* ---------- INIT ---------- */
     window.onload = async () => {
       await loadAppData();
       initIntro();
@@ -2147,8 +3083,8 @@
 
       const btn = document.getElementById('notif-toggle');
       if(btn){
-        btn.textContent = window.restNotifEnabled ? 'ON' : 'OFF';
-        btn.classList.toggle('cyan', window.restNotifEnabled);
+        btn.textContent = restNotifEnabled ? 'ON' : 'OFF';
+        btn.classList.toggle('cyan', restNotifEnabled);
       }
 
       setInterval(()=> {
@@ -2163,7 +3099,156 @@
         dock && dock.classList.add('dock-hide');
       }, 1200);
     };
-  </script>
 
+    document.addEventListener('keydown', (e) => {
+      if(e.key === 'Escape') closeTimer(false);
+    });
+  </script>
+<script>
+/* ===== Touch responsiveness helpers ===== */
+(function(){
+  // Prevent double-tap to zoom on iOS (only on controls, not on inputs)
+  let lastTouchEnd = 0;
+  // Stop "drag cursor" text selection from long-press on controls
+  document.addEventListener('selectstart', function(e){
+    const t = e.target;
+    if(t && t.closest && t.closest('button,[role=\"button\"],.btn,.iconbtn,.chip,.tab,a')){
+      e.preventDefault();
+    }
+  });
+
+  // Convert touch to click reliably on some Android WebViews
+  // Ensure pointer events don't get canceled by small movement
+  document.addEventListener('touchstart', function(e){
+    const t = e.target;
+    if(t && t.closest && t.closest('button,[role=\"button\"],.btn,.iconbtn,.chip,.tab,a')){
+      // Add a pressed class for richer feedback if desired
+      const el = t.closest('button,[role=\"button\"],.btn,.iconbtn,.chip,.tab,a');
+      el.classList.add('is-pressed');
+    }
+  }, {passive:true});
+
+  document.addEventListener('touchcancel', function(e){
+    const t = e.target;
+    if(t && t.closest){
+      const el = t.closest('button,[role=\"button\"],.btn,.iconbtn,.chip,.tab,a');
+      if(el) el.classList.remove('is-pressed');
+    }
+  }, {passive:true});
+
+  document.addEventListener('touchend', function(e){
+    const t = e.target;
+    if(t && t.closest){
+      const el = t.closest('button,[role=\"button\"],.btn,.iconbtn,.chip,.tab,a');
+      if(el) el.classList.remove('is-pressed');
+    }
+  }, {passive:true});
+
+  // iOS momentum + prevent scroll rubber band in nested elements (optional)
+  // document.body.addEventListener('touchmove', function(e){}, {passive:true});
+})();
+</script>
+<script>
+/* ===== Safer fast-tap (no global preventDefault) ===== */
+(function(){
+  const FAST_SELECTOR = 'button,[role="button"],.btn,.iconbtn,.chip,.tab,a';
+  document.querySelectorAll(FAST_SELECTOR).forEach(el=>{
+    el.setAttribute('data-fasttap','1');
+  });
+
+  const addPressed = (el)=> el && el.classList.add('is-pressed');
+  const rmPressed  = (el)=> el && el.classList.remove('is-pressed');
+
+  document.addEventListener('pointerdown', function(e){
+    const el = e.target.closest && e.target.closest('[data-fasttap="1"]');
+    if(!el) return;
+    addPressed(el);
+  }, {capture:true, passive:true});
+
+  document.addEventListener('pointerup', function(e){
+    const el = e.target.closest && e.target.closest('[data-fasttap="1"]');
+    if(!el) return;
+    rmPressed(el);
+  }, {capture:true, passive:true});
+
+  document.addEventListener('pointercancel', function(e){
+    const el = e.target.closest && e.target.closest('[data-fasttap="1"]');
+    if(!el) return;
+    rmPressed(el);
+  }, {capture:true, passive:true});
+
+  })();
+</script>
+<script>
+/* ===== Robust swipe-to-slide (bind after carousel renders) ===== */
+(function(){
+  function bindScroller(scroller){
+    if(!scroller || scroller.__swipeBound) return;
+    scroller.__swipeBound = true;
+
+    const isHScrollable = ()=> scroller.scrollWidth > scroller.clientWidth + 5;
+
+    let isDown=false, startX=0, startScrollLeft=0, pointerId=null, moved=0;
+
+    const onDown=(e)=>{
+      const t=e.target;
+      if(t && t.closest && t.closest('button,[role="button"],.btn,.iconbtn,.chip,.tab,a,input,textarea,select')) return;
+      if(!isHScrollable()) return;
+      isDown=true; moved=0; pointerId=e.pointerId;
+      startX=e.clientX; startScrollLeft=scroller.scrollLeft;
+      try{ scroller.setPointerCapture(pointerId); }catch(_){}
+    };
+    const onMove=(e)=>{
+      if(!isDown || e.pointerId!==pointerId) return;
+      const dx=e.clientX-startX;
+      moved=Math.max(moved, Math.abs(dx));
+      if(moved>6) e.preventDefault();
+      scroller.scrollLeft = startScrollLeft - dx;
+    };
+    const onUp=(e)=>{
+      if(!isDown || e.pointerId!==pointerId) return;
+      isDown=false;
+      try{ scroller.releasePointerCapture(pointerId); }catch(_){}
+      pointerId=null;
+
+      // snap to nearest child (if any)
+      const children = Array.from(scroller.children || []);
+      if(!children.length) return;
+      const cur = scroller.scrollLeft;
+      let nearest = children[0], best = Math.abs(children[0].offsetLeft - cur);
+      for(const ch of children){
+        const d = Math.abs(ch.offsetLeft - cur);
+        if(d < best){ best=d; nearest=ch; }
+      }
+      if(best > 2){
+        scroller.scrollTo({left: nearest.offsetLeft, behavior:'smooth'});
+      }
+    };
+
+    scroller.addEventListener('pointerdown', onDown, {passive:true});
+    scroller.addEventListener('pointermove', onMove, {passive:false});
+    scroller.addEventListener('pointerup', onUp, {passive:true});
+    scroller.addEventListener('pointercancel', onUp, {passive:true});
+  }
+
+  function findAndBind(){
+    // Your carousel element exists from start, but its children are rendered later by JS
+    const car = document.querySelector('.carousel');
+    if(!car) return;
+    // sometimes the scroller is carousel itself; sometimes a child
+    bindScroller(car);
+    const childScroller = car.querySelector('.slides,.track,.slideTrack,.scroller,[data-role="carousel"],[data-carousel]');
+    if(childScroller) bindScroller(childScroller);
+  }
+
+  // Initial attempt (in case already rendered)
+  findAndBind();
+
+  // Observe for renderCarousel() DOM changes and bind when nodes appear
+  const mo = new MutationObserver(()=>{ findAndBind(); });
+  mo.observe(document.body, {childList:true, subtree:true});
+})();
+</script>
 </body>
 </html>
+
