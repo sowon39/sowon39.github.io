@@ -32,6 +32,22 @@
 
     html,body{ height:100%; }
 
+/* --- Tablet WebApp UX Polish (app-like touch) --- */
+*{
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
+  -webkit-tap-highlight-color:transparent;
+}
+img, video{
+  -webkit-user-drag:none;
+  user-drag:none;
+}
+button,a{
+  touch-action: manipulation;
+}
+
+
     html{
       touch-action: manipulation;
       -webkit-text-size-adjust: 100%;
@@ -1946,7 +1962,31 @@
       }
     }
 
-    function saveRepToLog(logKey, value){
+    
+    /* ✅ AUTO ADVANCE: 운동 세트 전부 완료 시 다음 운동으로 자동 이동 */
+    function maybeAutoAdvance(exerciseId, date){
+      try{
+        const [dayIdx, exIdx] = exerciseId.split('-').map(Number);
+        const w = workoutData[dayIdx]?.list?.[exIdx];
+        if(!w) return;
+        const setTotal = customSets[exerciseId] || w.set;
+        const arr = getProgressArr(date, exerciseId, setTotal);
+        const allDone = arr.length && arr.every(Boolean);
+        if(!allDone) return;
+
+        // 마지막 운동이면 이동하지 않음 (요약은 updateProgressUI에서 처리)
+        const data = workoutData[currentDayIdx];
+        const isLast = (currentSlideIndex >= data.list.length - 1);
+        if(isLast) return;
+
+        // 타이머가 떠있으면 사용자 집중을 위해 즉시 이동하되, 애니메이션만 부드럽게
+        setTimeout(()=>{
+          carouselNext();
+        }, 220);
+      }catch(e){}
+    }
+
+function saveRepToLog(logKey, value){
       const idx = logs.findIndex(l => l.logKey === logKey);
       if(idx === -1) return;
 
@@ -1975,6 +2015,7 @@
       renderCarousel(false);
       updateProgressUI();
       renderCalendar();
+      maybeAutoAdvance(logs[idx].exerciseId, logs[idx].date);
     }
 
     /* ✅ 지난주 동일 요일 / 동일 운동 / 동일 세트 찾기 */
@@ -2443,6 +2484,9 @@
       haptic(30);
     }
 
+    /* ---------- DRAG / CONTEXT MENU PREVENT ---------- */
+    document.addEventListener("dragstart", e => e.preventDefault(), { passive:false });
+    document.addEventListener("contextmenu", e => e.preventDefault());
     /* ---------- ZOOM PREVENT ---------- */
     (function preventZoom(){
       document.addEventListener('gesturestart', (e)=> e.preventDefault(), {passive:false});
