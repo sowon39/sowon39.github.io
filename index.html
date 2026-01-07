@@ -2052,6 +2052,19 @@ function saveRepToLog(logKey, value){
         localStorage.setItem(KEY_REPS, JSON.stringify(customReps));
       }
 
+      // ✅ 즉시 DOM 숫자 갱신 (새로고침 없이 반영)
+      // ✅ 즉시 DOM 숫자 갱신 (새로고침 없이 반영)
+      const slide = document.querySelector(`.slide[data-slide="${currentSlideIndex}"]`);
+      if(slide){
+        if(type === 'set'){
+          const v = slide.querySelector('[data-role="setTotal"]');
+          if(v) v.textContent = customSets[key] || w.set;
+        }else{
+          const v = slide.querySelector('[data-role="repTotal"]');
+          if(v) v.textContent = customReps[key] || w.rep;
+        }
+      }
+
       // ✅ GIF 깜빡임 방지: 전체 렌더 말고 현재 슬라이드만 부분 업데이트
       renderCarousel(false);
       updateProgressUI();
