@@ -1,6 +1,6 @@
 {
   "meta": {
-    "version": "2026-01-07.v1-from-backup",
+    "version": "2026-01-07.refactor2",
     "appName": "DK Fit",
     "lang": "ko"
   },
@@ -13,7 +13,6 @@
         "list": [
           {
             "name": "체스트 딥스",
-            "gif": "gifs/dips.gif",
             "set": 4,
             "rep": 10,
             "rest": 90,
@@ -26,7 +25,6 @@
           },
           {
             "name": "스탠다드 푸쉬업",
-            "gif": "gifs/pushup.gif",
             "set": 4,
             "rep": 15,
             "rest": 75,
@@ -39,7 +37,6 @@
           },
           {
             "name": "내로우 딥스",
-            "gif": "gifs/triceps_dips.gif",
             "set": 3,
             "rep": 10,
             "rest": 60,
@@ -59,7 +56,6 @@
         "list": [
           {
             "name": "풀업 (밴드)",
-            "gif": "gifs/pullup_band.gif",
             "set": 4,
             "rep": 8,
             "rest": 120,
@@ -72,7 +68,6 @@
           },
           {
             "name": "인버티드 로우",
-            "gif": "gifs/inverted_row.gif",
             "set": 4,
             "rep": 12,
             "rest": 90,
@@ -85,7 +80,6 @@
           },
           {
             "name": "친업 (밴드)",
-            "gif": "gifs/chinup_band.gif",
             "set": 3,
             "rep": 8,
             "rest": 90,
@@ -105,7 +99,6 @@
         "list": [
           {
             "name": "사이드 레이즈",
-            "gif": "gifs/side_raise.gif",
             "set": 5,
             "rep": 20,
             "rest": 60,
@@ -125,7 +118,6 @@
         "list": [
           {
             "name": "파이크 푸쉬업",
-            "gif": "gifs/pike_pushup.gif",
             "set": 4,
             "rep": 10,
             "rest": 90,
@@ -138,7 +130,6 @@
           },
           {
             "name": "디클라인 푸쉬업",
-            "gif": "gifs/decline_pushup.gif",
             "set": 4,
             "rep": 12,
             "rest": 90,
@@ -151,7 +142,6 @@
           },
           {
             "name": "삼두 딥스",
-            "gif": "gifs/triceps_dips.gif",
             "set": 4,
             "rep": 8,
             "rest": 90,
@@ -171,7 +161,6 @@
         "list": [
           {
             "name": "와이드 풀업",
-            "gif": "gifs/wide_pullup.gif",
             "set": 4,
             "rep": 6,
             "rest": 120,
@@ -184,7 +173,6 @@
           },
           {
             "name": "인버티드 로우",
-            "gif": "gifs/inverted_row.gif",
             "set": 4,
             "rep": 12,
             "rest": 90,
@@ -197,7 +185,6 @@
           },
           {
             "name": "내로우 풀업",
-            "gif": "gifs/narrow_pullup.gif",
             "set": 3,
             "rep": 8,
             "rest": 90,
@@ -217,7 +204,6 @@
         "list": [
           {
             "name": "스쿼트",
-            "gif": "gifs/squat.gif",
             "set": 4,
             "rep": 20,
             "rest": 60,
@@ -230,7 +216,6 @@
           },
           {
             "name": "런지",
-            "gif": "gifs/lunge.gif",
             "set": 3,
             "rep": 10,
             "rest": 60,
@@ -243,7 +228,6 @@
           },
           {
             "name": "플랭크",
-            "gif": "gifs/plank.gif",
             "set": 3,
             "rep": 60,
             "rest": 60,
@@ -263,7 +247,6 @@
         "list": [
           {
             "name": "스트레칭",
-            "gif": "gifs/stretch.gif",
             "set": 1,
             "rep": 15,
             "rest": 0,
@@ -276,18 +259,54 @@
           }
         ]
       }
-    }
+    },
+    "gifMap": [
+      {
+        "kw_ko": "스쿼트",
+        "kw_en": "squat",
+        "gif": "AIR_SQT.gif"
+      },
+      {
+        "kw_ko": "친업",
+        "kw_en": "chin",
+        "gif": "CHIN_UP.gif"
+      },
+      {
+        "kw_ko": "딥스",
+        "kw_en": "dips",
+        "gif": "DIPS.gif"
+      },
+      {
+        "kw_ko": "런지",
+        "kw_en": "lunge",
+        "gif": "LUNGE.gif"
+      },
+      {
+        "kw_ko": "파이크 푸쉬업",
+        "kw_en": "pike",
+        "gif": "PIKE_PUSH_UP.gif"
+      },
+      {
+        "kw_ko": "플랭크",
+        "kw_en": "plank",
+        "gif": "PLANK.gif"
+      }
+    ]
   },
   "ui": {
     "copy": {
       "buttons": {
         "prev": "이전",
         "next": "다음",
-        "resetToday": "오늘 초기화",
+        "todayReset": "오늘 초기화",
         "resetExercise": "초기화",
         "viewHistory": "기록 보기",
         "ok": "확인",
-        "skip": "스킵"
+        "skip": "스킵",
+        "minimize": "최소화",
+        "exportBackup": "백업 다운로드",
+        "resetAll": "전체 초기화",
+        "settings": "설정"
       },
       "messages": {
         "toast": {
@@ -302,7 +321,12 @@
           "exerciseResetDone": "운동 초기화 완료",
           "selectedDateReset": "선택 날짜 초기화",
           "notifOn": "알림 ON",
-          "notifOff": "알림 OFF"
+          "notifOff": "알림 OFF",
+          "setUndone": "세트 취소됨",
+          "repCancel": "REP 입력 취소됨",
+          "pause": "총 운동시간 일시정지",
+          "resume": "총 운동시간 재시작",
+          "repDone": "REP 기록 완료 ✅"
         },
         "confirm": {
           "resetExercise": "이 운동의 오늘 기록을 초기화할까요?",
@@ -312,21 +336,30 @@
         }
       },
       "labels": {
-        "workout": "운동",
-        "analysis": "분석",
-        "history": "기록",
-        "rest": "휴식",
-        "set": "세트",
-        "rep": "REP",
+        "analysisTitle": "분석",
+        "historyTitle": "기록",
+        "sessionTitle": "훈련",
+        "summaryTitle": "오늘 요약",
+        "done": "완료 🎉",
         "doneSets": "완료 세트",
         "doneEx": "완료 운동",
-        "todaySummary": "오늘 요약",
-        "todayMessage": "오늘 한마디"
+        "todayMessage": "오늘 한마디",
+        "noHistory": "기록이 없습니다",
+        "rest": "휴식",
+        "progress": "진행",
+        "set": "세트",
+        "rep": "REP"
       },
       "hints": {
         "setHint": "* 세트 버튼을 눌러 체크합니다",
         "iosMute": "* iOS는 무음모드에서 소리가 제한될 수 있습니다. iPad는 진동이 지원되지 않을 수 있습니다.",
-        "detailGifHint": "* GIF는 동작의 핵심 흐름만 참고하세요. 자세가 흔들리면 횟수보다 폼이 우선입니다."
+        "gifHint": "* GIF는 동작의 핵심 흐름만 참고하세요. 자세가 흔들리면 횟수보다 폼이 우선입니다."
+      },
+      "cueMap": {
+        "push": "푸쉬 데이 — 템포 제어 & 코어 고정",
+        "pull": "풀 데이 — 숄더 패킹 & 광배 수축",
+        "leg": "하체 데이 — 발 전체로 밀기",
+        "rest": "회복 — 호흡 & 리셋"
       }
     },
     "config": {

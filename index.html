@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-  <title>DK MASTER OS v11.3 (Stable+ ScrollFix + Mobile+Dock)</title>
+  <title>DK Fit OS v12.1 (WakeLock + Rep AI Buttons + History Pro)</title>
 
-  <!-- ✅ PWA / iOS Standalone (주소창 숨김) -->
+  <!-- ✅ PWA / iOS Standalone -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="DK MASTER OS">
+  <meta name="apple-mobile-web-app-title" content="DK Fit">
   <meta name="theme-color" content="#050507">
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="manifest" href="manifest.json">
@@ -32,14 +32,12 @@
 
     html,body{ height:100%; }
 
-    /* ✅ 확대/줌 방지 (best effort) */
     html{
       touch-action: manipulation;
       -webkit-text-size-adjust: 100%;
       overscroll-behavior: none;
     }
 
-    /* ✅ 스크롤 복구: 가장 중요한 수정 */
     body{
       font-family:'Pretendard',sans-serif;
       background-color:var(--bg);
@@ -69,7 +67,6 @@
       border:1px solid rgba(255,255,255,0.10);
     }
 
-    /* ✅ 전체 폭 레이아웃 컨테이너 */
     .layoutWrap{
       width:100%;
       max-width: 1100px;
@@ -77,11 +74,9 @@
     }
 
     /* =========================================================
-       ✅ Splash — PRESET A (LUXURY AURORA)
-       ✅ 기존 로직(initIntro) / KEY_SPLASH 방식 유지
-       ✅ HTML/CSS만 교체
+       ✅ NEW Splash (Apple Liquid Glass Style)
     ========================================================= */
-    #splash-screen.splashA{
+    #splash-screen{
       position:fixed; inset:0; z-index:10000;
       display:flex; align-items:center; justify-content:center;
       background:#050507;
@@ -89,117 +84,104 @@
       transition:all 1s cubic-bezier(0.65,0,0.35,1);
     }
 
-    /* Aurora Layer */
-    #splash-screen.splashA::before{
+    #splash-screen::before{
       content:"";
-      position:absolute; inset:-45%;
+      position:absolute; inset:-30%;
       background:
-        radial-gradient(1200px 700px at 15% -10%, rgba(34,211,238,0.30), transparent 55%),
-        radial-gradient(1000px 650px at 100% 0%, rgba(99,102,241,0.36), transparent 60%),
-        radial-gradient(900px 600px at 15% 110%, rgba(12,74,110,0.38), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.98));
-      animation: splashAurora 3.4s ease-in-out infinite alternate;
-      transform: translateZ(0);
+        radial-gradient(1000px 600px at 30% 10%, rgba(34,211,238,0.35), transparent 60%),
+        radial-gradient(900px 650px at 80% 20%, rgba(99,102,241,0.35), transparent 62%),
+        radial-gradient(900px 600px at 20% 90%, rgba(34,211,238,0.25), transparent 65%),
+        linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,1));
+      animation: liquidFloat 5.5s ease-in-out infinite alternate;
+      filter:saturate(1.2);
       opacity:1;
     }
 
-    /* Noise Layer */
-    #splash-screen.splashA::after{
+    #splash-screen::after{
       content:"";
       position:absolute; inset:0;
-      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.24'/%3E%3C/svg%3E");
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.20'/%3E%3C/svg%3E");
       mix-blend-mode: overlay;
-      opacity:.14;
+      opacity:.13;
       pointer-events:none;
     }
 
-    @keyframes splashAurora{
-      0%{ transform: scale(1) translateY(0px); filter: blur(0px); }
-      100%{ transform: scale(1.06) translateY(-18px); filter: blur(0px); }
+    @keyframes liquidFloat{
+      0%{ transform: translateY(0) scale(1); }
+      100%{ transform: translateY(-22px) scale(1.05); }
     }
 
-    #splash-screen.splashA .splash-inner{
-      width:min(520px, calc(100vw - 48px));
-      padding: 42px 26px 40px;
-      border-radius: 34px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.10);
-      backdrop-filter: blur(26px);
-      -webkit-backdrop-filter: blur(26px);
-      box-shadow: 0 40px 120px rgba(0,0,0,0.55);
+    .splash-inner{
+      width:min(540px, calc(100vw - 56px));
+      padding: 56px 26px 46px;
+      border-radius: 38px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      box-shadow: 0 50px 160px rgba(0,0,0,0.6);
       position:relative;
       z-index:2;
       text-align:center;
-      transform: translateY(12px) scale(.98);
+      transform: translateY(14px) scale(.98);
       opacity:0;
       animation: splashIn 1.1s cubic-bezier(.2,.9,.2,1) forwards;
-      overflow: visible !important;
+      overflow: hidden;
+      isolation:isolate;
+    }
+
+    .splash-inner .shine{
+      position:absolute;
+      inset:-30%;
+      background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.35), transparent 40%);
+      filter: blur(10px);
+      opacity:.35;
+      animation: shineMove 3.2s ease-in-out infinite alternate;
+      pointer-events:none;
+      z-index:0;
+    }
+    @keyframes shineMove{
+      0%{ transform: translate(-10px, 10px); }
+      100%{ transform: translate(18px, -18px); }
     }
 
     @keyframes splashIn{
       to{ transform: translateY(0) scale(1); opacity:1; }
     }
 
-    #splash-screen.splashA .splash-logo{
-      font-size: 4.3rem;
+    .splash-logo{
+      font-size: 4.5rem;
       font-weight: 950;
-      font-style: italic;
-      line-height: 1.1 !important;
-      letter-spacing: -0.09em;
-      background: linear-gradient(180deg, #fff 45%, rgba(34,211,238,0.95));
+      letter-spacing: -0.08em;
+      background: linear-gradient(180deg, rgba(255,255,255,1), rgba(34,211,238,0.95));
       -webkit-background-clip:text;
       -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 26px rgba(34,211,238,0.28)) !important;
+      filter: drop-shadow(0 0 24px rgba(34,211,238,0.20));
       position:relative;
+      z-index:2;
       display:inline-block;
-      overflow: visible !important;
-      padding: 6px 12px !important;
+      padding: 6px 14px;
     }
 
-    #splash-screen.splashA .splash-logo::after{
-      content:"";
-      position:absolute;
-      top:-25%;
-      left:-60%;
-      width:40%;
-      height:170%;
-      background:linear-gradient(120deg, transparent, rgba(255,255,255,0.40), transparent);
-      transform:skewX(-18deg);
-      animation: splashShine 1.6s ease-in-out infinite;
-    }
-
-    @keyframes splashShine{
-      0%{ left:-60%; opacity:0; }
-      28%{ opacity:1; }
-      100%{ left:130%; opacity:0; }
-    }
-
-    #splash-screen.splashA .splash-tag{
-      margin-top: 10px;
-      font-size: 10px;
-      font-weight: 900;
-      letter-spacing: .22em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.44);
-    }
-
-    #splash-screen.splashA .splash-loader{
+    .splash-loader{
       margin-top: 26px;
+      position:relative;
+      z-index:2;
     }
 
-    #splash-screen.splashA .splash-line{
-      height: 3px;
+    .splash-line{
+      height: 4px;
       border-radius: 999px;
-      background: rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.10);
       overflow:hidden;
       position:relative;
     }
 
-    #splash-screen.splashA .splash-line span{
+    .splash-line span{
       position:absolute; inset:0;
       width:45%;
-      background: linear-gradient(90deg, rgba(34,211,238,0.0), rgba(34,211,238,1), rgba(99,102,241,1), rgba(34,211,238,0.0));
-      animation: splashScan 1.35s ease-in-out infinite;
+      background: linear-gradient(90deg, rgba(34,211,238,0), rgba(34,211,238,1), rgba(99,102,241,1), rgba(34,211,238,0));
+      animation: splashScan 1.15s ease-in-out infinite;
       filter: drop-shadow(0 0 14px rgba(34,211,238,0.35));
     }
 
@@ -207,36 +189,6 @@
       0%{ transform: translateX(-70%); }
       100%{ transform: translateX(170%); }
     }
-
-    #splash-screen.splashA .splash-dots{
-      display:flex; justify-content:center; gap:8px;
-      margin-top: 16px;
-      opacity:.85;
-    }
-    #splash-screen.splashA .splash-dots i{
-      width:6px; height:6px; border-radius:999px;
-      background: rgba(255,255,255,0.22);
-      animation: splashDot 1s infinite ease-in-out;
-    }
-    #splash-screen.splashA .splash-dots i:nth-child(2){ animation-delay: .14s; }
-    #splash-screen.splashA .splash-dots i:nth-child(3){ animation-delay: .28s; }
-    #splash-screen.splashA .splash-dots i:nth-child(4){ animation-delay: .42s; }
-
-    @keyframes splashDot{
-      0%,100%{ transform: translateY(0); opacity:.35; }
-      50%{ transform: translateY(-4px); opacity:1; background: rgba(34,211,238,0.92); }
-    }
-
-    #splash-screen.splashA .splash-foot{
-      margin-top: 28px;
-      display:flex; justify-content:space-between; gap:12px;
-      font-size: 9px;
-      font-weight: 900;
-      letter-spacing:.18em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.35);
-    }
-    #splash-screen.splashA .splash-auth b{ color: rgba(34,211,238,0.95); }
 
     /* Header */
     header{
@@ -247,7 +199,7 @@
       background: rgba(10,10,12,0.62);
       height: var(--headerH);
       box-sizing:border-box;
-      padding-top: calc(14px + env(safe-area-inset-top)); /* ✅ 노치 안전영역 대응 */
+      padding-top: calc(14px + env(safe-area-inset-top));
     }
 
     .tab-content{ display:none; animation:fadeInContent 0.45s ease-out; }
@@ -267,13 +219,12 @@
     }
     .pill.cyan{ border-color:rgba(34,211,238,0.25); background:rgba(34,211,238,0.10); color:rgba(34,211,238,0.95); }
 
-    /* ✅ Main */
     main{
-      padding-top: calc(var(--headerH) + 18px + env(safe-area-inset-top)); /* ✅ 노치 안전영역 */
+      padding-top: calc(var(--headerH) + 18px + env(safe-area-inset-top));
       padding-bottom: calc(var(--dockH) + env(safe-area-inset-bottom) + 28px);
     }
 
-    /* ✅ Carousel */
+    /* Carousel */
     .carousel{
       display:flex;
       gap:18px;
@@ -307,10 +258,9 @@
       justify-content:space-between;
       border-radius:32px;
       box-shadow: 0 30px 80px rgba(0,0,0,0.55);
-      overflow:hidden; /* ✅ 라운드 잘림 정리 */
+      overflow:hidden;
     }
 
-    /* Right Panel */
     .rightPanel{ border-radius:26px; padding:18px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); }
 
     .stepper{
@@ -329,6 +279,8 @@
       border:1px solid rgba(255,255,255,0.12);
       color:rgba(255,255,255,0.9);
       -webkit-tap-highlight-color:transparent;
+      user-select:none;
+      transition: transform .08s ease;
     }
     .stepperBtn:active{ transform:scale(.98); }
 
@@ -353,19 +305,18 @@
       background:rgba(255,255,255,0.05);
       border:1px solid rgba(255,255,255,0.10);
       user-select:none;
-      overflow:hidden; /* ✅ 삐져나오는 색상 방지 */
+      overflow:hidden;
     }
     .setBtn:active{ transform:scale(0.985); }
     .setBtn.done{ background:linear-gradient(135deg,var(--primary),var(--accent)); color:#000; box-shadow:0 18px 34px rgba(34,211,238,0.24); border:none; }
 
-    /* ✅ 세트 순서 잠금 */
     .setBtn.locked{
       opacity: .35;
       filter: saturate(.6);
       pointer-events: none;
     }
 
-    /* ✅ Floating Dock */
+    /* Floating Dock */
     .navDockWrap{ position:fixed; left:0; right:0; bottom:0; padding: 18px; z-index:60; }
     .nav-dock{
       background:rgba(10,10,12,0.78);
@@ -384,7 +335,7 @@
     .nav-active-dot{ position:absolute; bottom:1px; width:4px; height:4px; background:var(--primary); border-radius:50%; box-shadow:0 0 12px var(--primary); opacity:0; transition:all .25s; }
     .nav-item.active .nav-active-dot{ opacity:1; transform:scale(1.6); }
 
-    /* ✅ Dock Auto Hide */
+    /* Dock Auto Hide */
     .navDockWrap{
       transition: transform .45s cubic-bezier(0.22, 1, 0.36, 1), opacity .35s ease;
       will-change: transform, opacity;
@@ -414,9 +365,9 @@
       background:rgba(255,255,255,0.04);
       flex:0 0 auto;
       user-select:none;
-      overflow:hidden; /* ✅ 삐져나오는 배경/색상 방지 */
+      overflow:hidden;
       position:relative;
-      isolation:isolate; /* ✅ iOS 레이어 안정 */
+      isolation:isolate;
     }
     .day-chip.active{
       background:var(--primary);
@@ -429,7 +380,7 @@
     #timer-modal{ transition:all .65s ease; }
     #timer-sec{ letter-spacing:-0.08em; }
 
-    /* ✅ Timer HUD */
+    /* Timer HUD */
     #timer-hud{
       position:fixed;
       top: calc(var(--headerH) + 10px + env(safe-area-inset-top));
@@ -515,9 +466,7 @@
     .log-row{ background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:16px; overflow:hidden; }
     .log-row td{ padding:12px 10px; font-weight:800; font-size:12px; color:rgba(255,255,255,0.78); }
 
-    /* =========================================================
-       ✅ Bottom Sheet (운동 상세) — iOS 터치/레이어 문제 해결 포함
-    ========================================================= */
+    /* Bottom Sheet (운동 상세) */
     #detail-sheet{
       position: fixed;
       inset: 0;
@@ -653,18 +602,85 @@
       color: rgba(255,255,255,0.45);
       line-height: 1.4;
     }
+
+    /* ✅ 상세 GIF: 너무 크지 않게 적정 사이즈 + 화면에서 탭/내용 같이 보이도록 */
     .sheetGif{
       width: 100%;
+      max-height: 220px;
       border-radius: 18px;
       margin-top: 12px;
       border: 1px solid rgba(255,255,255,0.10);
-      box-shadow: 0 22px 55px rgba(0,0,0,0.65);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.55);
       display:block;
-      object-fit: cover;
+      object-fit: contain;
       background: rgba(255,255,255,0.03);
     }
 
-    /* ✅ Mobile Layout Optimization */
+    /* 카드 GIF */
+    .cardGifSquareWrap{
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 22px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.03);
+      box-shadow: 0 22px 55px rgba(0,0,0,0.55);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform .12s ease;
+    }
+    .cardGifSquareWrap:active{ transform: scale(0.99); }
+    .cardGifSquare{
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      background: rgba(0,0,0,0.15);
+    }
+
+    /* ✅ REP 입력 모달 */
+    #rep-modal{
+      position:fixed; inset:0;
+      z-index: 260;
+      display:none;
+      align-items:center;
+      justify-content:center;
+    }
+    #rep-modal.show{ display:flex; }
+    .repCard{
+      width:min(520px, calc(100vw - 44px));
+      border-radius: 28px;
+      padding: 18px;
+      background: rgba(10,10,12,0.92);
+      border: 1px solid rgba(255,255,255,0.10);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      box-shadow: 0 40px 140px rgba(0,0,0,0.70);
+    }
+    .repBtn{
+      height: 54px;
+      border-radius: 18px;
+      font-weight: 950;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.92);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      transition: transform .08s ease;
+      user-select:none;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .repBtn:active{ transform: scale(.985); }
+    .repBtn.primary{
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border: none;
+      color:#000;
+      box-shadow: 0 18px 34px rgba(34,211,238,0.22);
+    }
+
+    /* Mobile Layout Optimization */
     @media (max-width: 520px){
       .layoutWrap{ padding-left: 0; padding-right: 0; }
       main .layoutWrap.px-4{ padding-left: 14px !important; padding-right: 14px !important; }
@@ -676,7 +692,6 @@
       }
       :root{ --headerH: 88px; --dockH: 92px; }
 
-      /* ✅ (요청) DAY 타이틀 공간 압박 해결 */
       #view-day{
         font-size: 1.38rem !important;
         letter-spacing: -0.02em !important;
@@ -691,12 +706,14 @@
         font-size: 9px !important;
       }
 
-      /* ✅ (요청) 진행률 KPI 크게 */
       #progress-percent{
         font-size: 16px !important;
         font-weight: 950 !important;
-        margin-bottom: 6px !important;
+        margin-bottom: 4px !important;
         letter-spacing: -0.02em;
+      }
+      #progress-text{
+        font-size: 10px !important;
       }
       header .w-28{
         width: 140px !important;
@@ -707,7 +724,6 @@
       .slideCard .p-6{ padding: 14px !important; }
       .slideCard h3{ font-size: 1.55rem !important; }
 
-      /* ✅ 카드 내부 2단(grid) → 1단 */
       .slideCard .md\:grid-cols-2{ grid-template-columns: 1fr !important; }
 
       .rightPanel{
@@ -722,7 +738,6 @@
       }
       .stepperValue{ font-size: 20px !important; }
 
-      /* ✅ 세트 버튼: 2열 → 3열 */
       .rightPanel .grid.grid-cols-2{
         grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
       }
@@ -732,12 +747,10 @@
         border-radius: 18px !important;
       }
 
-      /* ✅ 캐러셀 peek: 폰에서 과하게 넓어지는 것 방지 */
       .carousel > .slide{
         flex: 0 0 calc(100% - 70px) !important;
       }
 
-      /* ✅ Dock 조금 더 컴팩트 */
       .navDockWrap{ padding: 14px !important; }
       .nav-dock{ border-radius: 30px !important; padding: 9px !important; }
       .nav-item{ padding: 10px 0 !important; }
@@ -748,25 +761,61 @@
 
 <body>
 
-  <!-- ✅ Splash (PRESET A 적용, DK Fit 노출) -->
-  <div id="splash-screen" class="splashA">
+  <!-- ✅ Splash -->
+  <div id="splash-screen">
     <div class="splash-inner">
-      <div class="splash-brand">
-        <div class="splash-logo">DK Fit</div>
-        <div class="splash-tag">ELITE TRAINING SYSTEM</div>
-      </div>
-
+      <div class="shine"></div>
+      <div class="splash-logo">DK Fit</div>
       <div class="splash-loader">
         <div class="splash-line"><span></span></div>
-        <div class="splash-dots">
-          <i></i><i></i><i></i><i></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ REP 입력 모달 -->
+  <div id="rep-modal">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-xl" onclick="closeRepModal(false)"></div>
+    <div class="relative repCard">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <p class="text-[10px] font-black tracking-[0.2em] uppercase text-white/45">REP 입력</p>
+          <h3 id="rep-title" class="text-2xl font-black italic text-white mt-1">운동</h3>
+          <p id="rep-sub" class="text-[10px] font-black tracking-[0.2em] uppercase text-white/35 mt-2">1 SET</p>
+        </div>
+        <button class="pill" onclick="closeRepModal(false)"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="mt-5 glass rounded-2xl p-5">
+        <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/40">기본 REP</p>
+        <div class="flex items-end justify-between mt-2">
+          <div id="rep-base" class="text-5xl font-black text-white tracking-tighter">20</div>
+          <div class="text-[10px] font-black tracking-[0.18em] uppercase text-white/35 text-right">
+            추천 입력<br>버튼 클릭만
+          </div>
         </div>
       </div>
 
-      <div class="splash-foot">
-        <div class="splash-auth">AUTHORIZED ACCESS · <b>GRANTED</b></div>
-        <div class="splash-ver">v11.3 · Stable</div>
+      <!-- ✅ AI 추천 + 숫자 그리드 -->
+      <div class="mt-4 glass rounded-2xl p-4">
+        <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45">AI 추천</p>
+        <div id="rep-ai-reco" class="mt-3 grid grid-cols-3 gap-2"></div>
+
+        <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/35 mt-5">추천 숫자</p>
+        <div id="rep-number-grid" class="mt-3 grid grid-cols-5 gap-2"></div>
       </div>
+
+      <div class="mt-4 grid grid-cols-2 gap-3">
+        <button class="repBtn" onclick="closeRepModal(false)">
+          <i class="fa-solid fa-ban"></i> 취소
+        </button>
+        <button class="repBtn primary" onclick="repSkip()">
+          <i class="fa-solid fa-check"></i> 기본 REP 기록
+        </button>
+      </div>
+
+      <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/30 mt-4">
+        * 입력 완료 후 지난주 동일 요일/운동과 비교 결과를 토스트로 표시합니다
+      </p>
     </div>
   </div>
 
@@ -795,15 +844,25 @@
   <header>
     <div class="layoutWrap flex justify-between items-end">
       <div>
-        <h2 id="stopwatch" class="text-3xl font-black font-mono tracking-tighter text-white">00:00</h2>
+        <div class="flex items-center gap-2">
+          <h2 id="stopwatch" class="text-3xl font-black font-mono tracking-tighter text-white">00:00</h2>
+
+          <!-- ✅ 일시정지 버튼 -->
+          <button onclick="toggleStopwatchPause()" class="pill cyan" style="padding:6px 10px;" title="총 운동시간 일시정지">
+            <i id="pause-icon" class="fa-solid fa-pause"></i>
+          </button>
+        </div>
+
         <div class="flex items-center gap-2 mt-1">
           <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-          <p class="text-[9px] font-black text-gray-300 tracking-widest uppercase">엘리트 모드 · DK</p>
+          <p class="text-[9px] font-black text-gray-300 tracking-widest uppercase">ELITE MODE · DK</p>
         </div>
       </div>
+
       <div class="flex flex-col items-end">
-        <span id="progress-percent" class="text-[10px] font-black mb-1.5 text-cyan-300">0%</span>
-        <div class="w-28 h-1.5 bg-white/5 rounded-full overflow-hidden">
+        <span id="progress-percent" class="text-[10px] font-black mb-0.5 text-cyan-300">0%</span>
+        <span id="progress-text" class="text-[9px] font-black text-white/40 tracking-widest uppercase">현재 0% 완료!</span>
+        <div class="w-28 h-1.5 bg-white/5 rounded-full overflow-hidden mt-2">
           <div id="progress-bar" class="h-full bg-cyan-400 shadow-[0_0_12px_#22d3ee] transition-all duration-700" style="width:0%"></div>
         </div>
       </div>
@@ -1022,29 +1081,36 @@
 
   <script>
     /* =========================================================
-      DK MASTER OS v11.3
-      ✅ 로직/기능 유지
-      ✅ 실제 휴식시간(restUsed) 기록
-      ✅ 세트 순서 클릭
-      ✅ iOS/iPadOS 사운드 Unlock 적용
-      ✅ 휴식 알림 강화(4회 패턴 + 화면 플래시)
-      ✅ Dock: 작동할 때만 등장 + 자동 숨김
-      ✅ Mobile: 폰에서 레이아웃 최적화
-      ✅ (추가) 운동 상세 Bottom Sheet + GIF 가이드
+      DK Fit OS v12.1
+      ✅ Wake Lock (screen on)
+      ✅ Stopwatch Pause
+      ✅ Set tap -> instant done UI + REP modal appears
+      ✅ REP modal: previous week based number buttons (no mental math)
+      ✅ Rest sound: notification-like melody (no flash)
+      ✅ Progress percent + "현재 XX% 완료!"
+      ✅ History: daily summary with duration / avg rest / detail
+      ✅ GIF blink fix: avoid full re-render when stepper changes
     ========================================================= */
+
+    /* ---------- GIF 매칭 ---------- */
+    
     /* ---------- DATA ---------- */
 
     /* ---------- APP DATA (JSON) ---------- */
     let appData = null;
     let workoutData = null;
+    let gifMap = null;
     let copy = null;
+    let uiConfig = null;
 
     async function loadAppData(){
       const res = await fetch("./appData.json", {cache:"no-store"});
       if(!res.ok) throw new Error("Failed to load appData.json: " + res.status);
       appData = await res.json();
       workoutData = appData?.data?.workout || {};
+      gifMap = appData?.data?.gifMap || [];
       copy = appData?.ui?.copy || {};
+      uiConfig = appData?.ui?.config || {};
     }
 
     function t(path, fallback=""){
@@ -1054,14 +1120,24 @@
       }catch(e){ return fallback; }
     }
 
-/* ---------- STORAGE KEYS ---------- */
-    const KEY_LOGS = 'dk_os_v113_logs';
-    const KEY_SETS = 'dk_os_v113_sets';
-    const KEY_REPS = 'dk_os_v113_reps';
-    const KEY_PROGRESS_BY_DATE = 'dk_os_v113_progress_by_date';
-    const KEY_SPLASH = 'dk_os_v113_splash_shown';
-    const KEY_SUMMARY_SHOWN = 'dk_os_v113_summary_shown';
-    const KEY_NOTIF = 'dk_os_v113_rest_notif';
+    function getGifByExerciseName(name){
+      const n = (name || '').toLowerCase();
+      for(const r of (gifMap || [])){
+        if(r.kw_ko && n.includes(String(r.kw_ko).toLowerCase())) return r.gif;
+        if(r.kw_en && n.includes(String(r.kw_en).toLowerCase())) return r.gif;
+      }
+      return '';
+    }
+
+
+    /* ---------- STORAGE KEYS ---------- */
+    const KEY_LOGS = 'dk_os_v121_logs';
+    const KEY_SETS = 'dk_os_v121_sets';
+    const KEY_REPS = 'dk_os_v121_reps';
+    const KEY_PROGRESS_BY_DATE = 'dk_os_v121_progress_by_date';
+    const KEY_SPLASH = 'dk_os_v121_splash_shown';
+    const KEY_SUMMARY_SHOWN = 'dk_os_v121_summary_shown';
+    const KEY_NOTIF = 'dk_os_v121_rest_notif';
 
     /* ---------- LOAD ---------- */
     function safeParse(raw, fallback){ try { return raw ? JSON.parse(raw) : fallback; } catch(e){ return fallback; } }
@@ -1072,7 +1148,6 @@
 
     /* ---------- STATE ---------- */
     let timerInt = null;
-    let totalSec = 0;
     let currentDayIdx = new Date().getDay();
     let currentYear = new Date().getFullYear();
     let currentMonth = new Date().getMonth();
@@ -1082,11 +1157,11 @@
     let currentSlideIndex = 0;
     let restNotifEnabled = (localStorage.getItem(KEY_NOTIF) ?? '1') === '1';
 
-    /* ✅ 실제 휴식 기록용 */
+    /* 휴식 기록 */
     let restStartedAt = null;
     let restCurrentLogKey = null;
 
-    /* ✅ iOS/iPadOS 오디오 unlock용 */
+    /* Audio unlock */
     let audioCtx = null;
     function unlockAudio(){
       try{
@@ -1099,6 +1174,32 @@
       }catch(e){}
     }
 
+    /* Stopwatch (pause support) */
+    let workoutStartAt = Date.now();
+    let stopwatchPaused = false;
+    let pauseStartedAt = null;
+    let pausedTotalMs = 0;
+
+    /* Wake Lock */
+    let wakeLock = null;
+    async function requestWakeLock(){
+      try{
+        if('wakeLock' in navigator){
+          wakeLock = await navigator.wakeLock.request('screen');
+        }
+      }catch(e){}
+    }
+    function releaseWakeLock(){
+      try{ wakeLock && wakeLock.release(); }catch(e){}
+      wakeLock = null;
+    }
+    document.addEventListener("visibilitychange", () => {
+      if(document.visibilityState === 'visible') requestWakeLock();
+    });
+
+    /* REP modal state */
+    let repModalState = null;
+
     /* ---------- UTILS ---------- */
     function haptic(ms=18){ if(navigator.vibrate) navigator.vibrate(ms); }
     function nowISO(){ return new Date().toISOString(); }
@@ -1108,7 +1209,6 @@
 
     /* ---------- SPLASH ---------- */
     function initIntro(){
-      /* ✅ 앱을 백그라운드에서 끄고 다시 키면 다시 뜨게: sessionStorage */
       const shown = sessionStorage.getItem(KEY_SPLASH) === '1';
       const splash = document.getElementById('splash-screen');
       if(shown){ splash.style.display = 'none'; return; }
@@ -1116,9 +1216,9 @@
       setTimeout(() => {
         splash.style.opacity = '0';
         splash.style.transform = 'scale(1.08)';
-        setTimeout(()=> splash.style.display='none', 1000);
+        setTimeout(()=> splash.style.display='none', 900);
         sessionStorage.setItem(KEY_SPLASH, '1');
-      }, 3000);
+      }, 2200);
     }
 
     /* ---------- TOAST ---------- */
@@ -1128,7 +1228,7 @@
       el.textContent = msg;
       el.classList.add('show');
       if(toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(()=> el.classList.remove('show'), 1600);
+      toastTimer = setTimeout(()=> el.classList.remove('show'), 1800);
     }
 
     /* ---------- SUMMARY MODAL ---------- */
@@ -1156,7 +1256,6 @@
       if(name === 'history') renderCalendar();
 
       window.scrollTo({top:0, behavior:'smooth'});
-
       showDockTemporarily();
     }
 
@@ -1210,6 +1309,8 @@
       const p = computeProgressForDay(todayStr(), currentDayIdx);
       document.getElementById('progress-bar').style.width = p.pct + '%';
       document.getElementById('progress-percent').innerText = p.pct + '%';
+      document.getElementById('progress-text').innerText = `현재 ${p.pct}% 완료!`;
+
       if(p.pct === 100) maybeShowSummary();
     }
 
@@ -1251,6 +1352,34 @@
       };
     }
 
+    /* ---------- STOPWATCH ---------- */
+    function toggleStopwatchPause(){
+      stopwatchPaused = !stopwatchPaused;
+
+      const icon = document.getElementById('pause-icon');
+      if(stopwatchPaused){
+        pauseStartedAt = Date.now();
+        icon.className = "fa-solid fa-play";
+        toast("총 운동시간 일시정지");
+      }else{
+        if(pauseStartedAt){
+          pausedTotalMs += (Date.now() - pauseStartedAt);
+        }
+        pauseStartedAt = null;
+        icon.className = "fa-solid fa-pause";
+        toast("총 운동시간 재시작");
+      }
+      haptic(14);
+      showDockTemporarily();
+    }
+
+    function getWorkoutElapsedSec(){
+      const now = Date.now();
+      const paused = stopwatchPaused && pauseStartedAt ? (now - pauseStartedAt) : 0;
+      const elapsedMs = (now - workoutStartAt) - pausedTotalMs - paused;
+      return Math.max(0, Math.floor(elapsedMs / 1000));
+    }
+
     /* ---------- CHANGE DAY ---------- */
     function changeDay(d){
       currentDayIdx = d;
@@ -1260,26 +1389,17 @@
       document.getElementById('view-day').innerText = data.day;
       document.getElementById('view-title').innerText = data.title;
 
-      const cueMap = {
-        push: "푸쉬 데이 — 템포 제어 & 코어 고정",
-        pull: "풀 데이 — 숄더 패킹 & 광배 수축",
-        leg:  "하체 데이 — 발 전체로 밀기",
-        rest: "회복 — 호흡 & 리셋"
-      };
-      document.getElementById('view-subcue').innerText = cueMap[data.type] || "훈련 모드";
+      const cueMap = copy?.cueMap || {push:'',pull:'',leg:'',rest:''};
+      document.getElementById('view-subcue').innerText = cueMap[data.type] || '훈련 모드';
 
-      renderCarousel();
+      renderCarousel(true);
       updateProgressUI();
       updateDayNav();
-
       showDockTemporarily();
     }
 
     /* =========================================================
-      ✅ Bottom Sheet 로직 (추가)
-      - 카드의 "핵심큐/호흡/의식/엘리트 가이드"를 탭으로 보기
-      - GIF 동작 가이드 표시
-      - iOS에서 터치 안먹는 문제 해결(레이어/포인터)
+      ✅ Bottom Sheet (운동 상세)
     ========================================================= */
     let mobileActive = { w:null };
 
@@ -1309,23 +1429,13 @@
 
       setSheetTab(tabs[0], tabWrap.querySelector('.sheetTab'));
 
-      const sheetWrap = document.getElementById('detail-sheet');
-      sheetWrap.classList.add('show');
+      document.getElementById('detail-sheet').classList.add('show');
       haptic(14);
       showDockTemporarily();
     }
 
     function closeDetailSheet(){
-      const sheetWrap = document.getElementById('detail-sheet');
-      sheetWrap.classList.remove('show');
-
-      /* ✅ iOS 애니메이션 꼬임 방지 */
-      const sheet = sheetWrap.querySelector('.sheet');
-      if(sheet){
-        sheet.style.transform = 'translateY(100%)';
-        setTimeout(()=> sheet.style.transform = '', 120);
-      }
-
+      document.getElementById('detail-sheet').classList.remove('show');
       haptic(10);
     }
 
@@ -1334,7 +1444,6 @@
       btn.classList.add('active');
 
       const w = mobileActive.w;
-
       const gifBlock = (w.gif) ? `
         <div class="sheetBox">
           <div class="sheetLabel">동작 가이드</div>
@@ -1355,45 +1464,40 @@
       `;
     }
 
-    /* ✅ 초보자도 혼자 할 수 있게: 자연어 확장 함수 */
     function expandCue(w){
       const base = (w.cue || w.tip || '').trim();
       return `
         ${base ? `• ${base}<br><br>` : ''}
         <b>초보자 기준 핵심은 “폼이 무너지지 않는 범위”</b>입니다.<br>
-        1) 힘이 들어가는 부위(타겟)를 느끼고<br>
-        2) 흔들리면 “속도를 줄이고”<br>
-        3) 반동 없이 “정확한 동작”으로만 진행하세요.<br><br>
+        1) 타겟을 느끼고<br>
+        2) 흔들리면 속도를 줄이고<br>
+        3) 반동 없이 정확한 동작으로만 진행하세요.<br><br>
         ✅ <b>체크 포인트</b><br>
         • 어깨가 귀 쪽으로 올라가면 → 어깨 내리고 가슴 열기<br>
-        • 허리가 꺾이면 → 배에 힘(코어) 주기<br>
+        • 허리가 꺾이면 → 코어 고정<br>
         • 반동이 생기면 → 속도 20% 줄이기
       `.trim();
     }
 
     function expandBreath(w){
       return `
-        <b>호흡은 “힘을 쓰는 순간에 내쉬기”가 원칙</b>입니다.<br><br>
+        <b>호흡은 “힘을 쓰는 순간에 내쉬기”</b>가 원칙입니다.<br><br>
         • 기본: <b>${w.breath}</b><br><br>
-        ✅ <b>초보용 요령</b><br>
-        1) 내려갈 때(힘 모으는 구간) → 코로 짧게 들이마시기<br>
-        2) 올라올 때(힘 쓰는 구간) → 입으로 길게 내쉬기<br><br>
-        ✅ <b>호흡이 무너지면</b><br>
-        • 바로 자세가 무너지고 힘이 분산됩니다.<br>
-        • “내쉬는 타이밍”만 맞춰도 기록이 안정됩니다.
+        ✅ <b>요령</b><br>
+        1) 내려갈 때 → 코로 들이마시기<br>
+        2) 올라올 때 → 입으로 길게 내쉬기
       `.trim();
     }
 
     function expandMind(w){
       return `
         <b>${w.mind}</b><br><br>
-        ✅ <b>초보자가 흔히 하는 실수</b><br>
-        • “팔로만” 하려는 것 → 타겟이 안 잡힘<br>
-        • 동작이 빨라짐 → 반동으로 바뀜<br><br>
-        ✅ <b>바로 적용하는 의식 포인트</b><br>
-        1) 타겟 부위를 “수축/늘어남”으로 느끼기<br>
-        2) 동작 중간에 잠깐 멈춰서(0.5초) 정확도 확보<br>
-        3) 힘이 들어가는 부위가 바뀌면 → 그 즉시 속도 ↓
+        ✅ <b>실수</b><br>
+        • 팔로만 하려는 것 → 자극이 흐트러짐<br>
+        • 너무 빠른 템포 → 반동<br><br>
+        ✅ <b>의식 포인트</b><br>
+        1) 타겟 수축/늘어남 느끼기<br>
+        2) 0.5초 정지로 정확도 확보
       `.trim();
     }
 
@@ -1401,150 +1505,209 @@
       return `
         <b>${w.tip}</b><br>
         <span style="opacity:.75;">${w.guide || ''}</span><br><br>
-        ✅ <b>엘리트 체크리스트</b><br>
-        1) 시작 자세에서 몸이 흔들리지 않는다<br>
-        2) “아래-위” 전 구간에서 긴장이 유지된다<br>
-        3) 마지막 2회는 느리게(컨트롤) 수행한다<br><br>
-        ✅ <b>강화 루틴</b><br>
-        • 세트 마지막 3회는 속도를 느리게(2초 내려가고 1초 올라오기)<br>
-        • 쉬운 경우는 “정지(1초)”를 추가해 난이도를 올리세요
+        ✅ <b>엘리트 체크</b><br>
+        1) 시작 자세 흔들림 없음<br>
+        2) 전 구간 긴장 유지<br>
+        3) 마지막 2회는 컨트롤
       `.trim();
     }
 
-    /* ---------- CAROUSEL ---------- */
-    function renderCarousel(){
+    /* =========================================================
+      ✅ CAROUSEL
+      - GIF 깜빡임 방지: 필요할 때만 renderCarousel(full=true)
+      - 세트 완료 시엔 버튼 상태만 즉시 업데이트(부분 업데이트)
+    ========================================================= */
+
+    function renderCarousel(full=true){
       const date = todayStr();
       const data = workoutData[currentDayIdx];
       const carousel = document.getElementById('session-carousel');
-      carousel.innerHTML = '';
 
-      data.list.forEach((w, idx) => {
-        const id = exId(currentDayIdx, idx);
-        const setTotal = customSets[id] || w.set;
-        const repTotal = customReps[id] || w.rep;
-        const doneArr = getProgressArr(date, id, setTotal);
+      if(full){
+        carousel.innerHTML = '';
+        data.list.forEach((w, idx) => {
+          const id = exId(currentDayIdx, idx);
+          const gif = getGifByExerciseName(w.name);
+          w.gif = gif || '';
+
+          const setTotal = customSets[id] || w.set;
+          const repTotal = customReps[id] || w.rep;
+          const doneArr = getProgressArr(date, id, setTotal);
+          const doneCount = doneArr.filter(Boolean).length;
+
+          const slide = document.createElement('div');
+          slide.className = 'slide';
+          slide.setAttribute('data-slide', idx);
+          slide.setAttribute('data-exid', id);
+
+          const detailAction = gif ? `
+            <span class="pill cyan">
+              <i class="fa-solid fa-hand-pointer"></i> GIF 터치로 상세 보기
+            </span>
+          ` : `
+            <button class="pill cyan" onclick='openDetailSheet(${safeStringify(w)})'>
+              <i class="fa-solid fa-circle-info"></i> 운동 상세 보기
+            </button>
+          `;
+
+          slide.innerHTML = `
+            <div class="glass slideCard p-6 md:p-7">
+              <div>
+                <div class="flex items-start justify-between gap-3">
+                  <div class="min-w-0">
+                    <h3 class="text-3xl md:text-4xl font-black italic text-white tracking-tight truncate">${w.name}</h3>
+                    <div class="mt-3 flex items-center gap-2 flex-wrap">
+                      <span class="pill cyan">${w.target}</span>
+                      <span class="pill">휴식 ${w.rest}s</span>
+                      <span class="pill" data-role="progress">진행 ${doneCount}/${setTotal}</span>
+                    </div>
+                  </div>
+                  <button onclick="resetExercise('${id}')" class="pill" title="이 운동(오늘) 초기화">
+                    <i class="fa-solid fa-rotate-left"></i>
+                  </button>
+                </div>
+
+                <div class="mt-4 flex items-center justify-between gap-2">
+                  ${detailAction}
+                </div>
+
+                <div class="mt-5 grid md:grid-cols-2 gap-4">
+                  <div class="space-y-3">
+                    <div class="glass rounded-2xl p-4 border-white/5">
+                      <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45 mb-2">핵심 큐</p>
+                      <p class="text-base md:text-lg font-black text-white/80 leading-relaxed">${w.cue || w.tip || ''}</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                      <div class="bg-white/[0.02] p-4 rounded-2xl border border-white/5">
+                        <p class="text-[10px] font-black tracking-[0.18em] uppercase text-indigo-300 mb-2">호흡</p>
+                        <p class="text-[13px] font-bold text-white/70">${w.breath}</p>
+                      </div>
+                      <div class="bg-white/[0.02] p-4 rounded-2xl border border-white/5">
+                        <p class="text-[10px] font-black tracking-[0.18em] uppercase text-indigo-300 mb-2">의식</p>
+                        <p class="text-[13px] font-bold text-white/70">${w.mind}</p>
+                      </div>
+
+                      <div class="bg-cyan-400/[0.04] p-4 rounded-2xl border border-cyan-400/10 col-span-2">
+                        <p class="text-[10px] font-black tracking-[0.18em] uppercase text-cyan-300 mb-2">엘리트 가이드</p>
+                        <p class="text-[13px] font-bold text-white/75">${w.tip} · <span class="text-white/45">${w.guide}</span></p>
+                      </div>
+
+                      ${gif ? `
+                        <div class="mt-2 col-span-2">
+                          <div class="cardGifSquareWrap" onclick='openDetailSheet(${safeStringify(w)})'>
+                            <img src="${gif}" class="cardGifSquare" loading="lazy" alt="exercise guide"
+                                 onerror="this.parentElement.style.display='none';" />
+                          </div>
+                          <div class="mt-2 text-[10px] font-black tracking-[0.18em] uppercase text-white/35">
+                            GIF 터치하면 운동 상세보기
+                          </div>
+                        </div>
+                      ` : ''}
+                    </div>
+                  </div>
+
+                  <div class="rightPanel space-y-3">
+                    <div class="glass rounded-2xl p-4 border-white/5">
+                      <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45">세트/횟수 설정</p>
+                      <p class="text-[11px] mt-2 font-bold text-white/45">* 세트 버튼을 눌러 체크합니다</p>
+                    </div>
+
+                    <div class="stepper">
+                      <div>
+                        <div class="stepperLabel">SET</div>
+                        <div class="stepperValue" data-role="setTotal">${setTotal}</div>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <button class="stepperBtn" onclick="adjust('set','${id}',-1)"><i class="fa-solid fa-minus"></i></button>
+                        <button class="stepperBtn" onclick="adjust('set','${id}',1)"><i class="fa-solid fa-plus"></i></button>
+                      </div>
+                    </div>
+
+                    <div class="stepper">
+                      <div>
+                        <div class="stepperLabel">REP</div>
+                        <div class="stepperValue" data-role="repTotal">${repTotal}</div>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <button class="stepperBtn" onclick="adjust('rep','${id}',-1)"><i class="fa-solid fa-minus"></i></button>
+                        <button class="stepperBtn" onclick="adjust('rep','${id}',1)"><i class="fa-solid fa-plus"></i></button>
+                      </div>
+                    </div>
+
+                    <button class="bigBtn" onclick="resetSetRepToDefault('${id}')">
+                      <i class="fa-solid fa-wand-magic-sparkles"></i>
+                      세트/횟수 기본값
+                    </button>
+
+                    <div class="grid grid-cols-2 gap-3" data-role="setGrid">
+                      ${renderSetButtonsHTML(id, w, date)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-5 flex items-center justify-between gap-2 flex-wrap">
+                <div class="flex items-center gap-2">
+                  <span class="pill cyan">${idx+1} / ${data.list.length}</span>
+                  <span class="pill">${w.name}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button class="pill" onclick="carouselPrev()"><i class="fa-solid fa-chevron-left"></i> 이전</button>
+                  <button class="pill cyan" onclick="carouselNext()">다음 <i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+              </div>
+            </div>
+          `;
+          carousel.appendChild(slide);
+        });
+
+        bindSetButtons();
+        bindCarouselEvents();
+        updateSlideHUD();
+        requestAnimationFrame(()=> scrollToSlide(currentSlideIndex,false));
+      }else{
+        // 부분 업데이트: 현재 슬라이드 세트 그리드만 갱신
+        const slide = carousel.querySelector(`.slide[data-slide="${currentSlideIndex}"]`);
+        if(!slide) return;
+
+        const data = workoutData[currentDayIdx];
+        const w = data.list[currentSlideIndex];
+        const exid = slide.getAttribute('data-exid');
+        const setTotal = customSets[exid] || w.set;
+        const doneArr = getProgressArr(date, exid, setTotal);
         const doneCount = doneArr.filter(Boolean).length;
 
-        const slide = document.createElement('div');
-        slide.className = 'slide';
-        slide.setAttribute('data-slide', idx);
+        const progressTag = slide.querySelector('[data-role="progress"]');
+        if(progressTag) progressTag.textContent = `진행 ${doneCount}/${setTotal}`;
 
-        slide.innerHTML = `
-          <div class="glass slideCard p-6 md:p-7">
-            <div>
-              <div class="flex items-start justify-between gap-3">
-                <div class="min-w-0">
-                  <h3 class="text-3xl md:text-4xl font-black italic text-white tracking-tight truncate">${w.name}</h3>
-                  <div class="mt-3 flex items-center gap-2 flex-wrap">
-                    <span class="pill cyan">${w.target}</span>
-                    <span class="pill">휴식 ${w.rest}s</span>
-                    <span class="pill">진행 ${doneCount}/${setTotal}</span>
-                  </div>
-                </div>
-                <button onclick="resetExercise('${id}')" class="pill" title="이 운동(오늘) 초기화">
-                  <i class="fa-solid fa-rotate-left"></i>
-                </button>
-              </div>
+        const setGrid = slide.querySelector('[data-role="setGrid"]');
+        if(setGrid){
+          setGrid.innerHTML = renderSetButtonsHTML(exid, w, date);
+        }
+        const setValue = slide.querySelector('[data-role="setTotal"]');
+        if(setValue) setValue.textContent = setTotal;
 
-              <div class="mt-4 flex items-center justify-between gap-2">
-                <button class="pill cyan" onclick='openDetailSheet(${JSON.stringify(w).replace(/'/g,"&#39;")})'>
-                  <i class="fa-solid fa-circle-info"></i> 운동 상세 보기
-                </button>
-              </div>
+        bindSetButtons(); // 새 버튼 바인딩
+      }
+    }
 
-              <div class="mt-5 grid md:grid-cols-2 gap-4">
-                <div class="space-y-3">
-                  <div class="glass rounded-2xl p-4 border-white/5">
-                    <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45 mb-2">핵심 큐</p>
-                    <p class="text-base md:text-lg font-black text-white/80 leading-relaxed">${w.cue || w.tip || ''}</p>
-                  </div>
+    function renderSetButtonsHTML(id, w, date){
+      const setTotal = customSets[id] || w.set;
+      const doneArr = getProgressArr(date, id, setTotal);
 
-                  <div class="grid grid-cols-2 gap-3">
-                    <div class="bg-white/[0.02] p-4 rounded-2xl border border-white/5">
-                      <p class="text-[10px] font-black tracking-[0.18em] uppercase text-indigo-300 mb-2">호흡</p>
-                      <p class="text-[13px] font-bold text-white/70">${w.breath}</p>
-                    </div>
-                    <div class="bg-white/[0.02] p-4 rounded-2xl border border-white/5">
-                      <p class="text-[10px] font-black tracking-[0.18em] uppercase text-indigo-300 mb-2">의식</p>
-                      <p class="text-[13px] font-bold text-white/70">${w.mind}</p>
-                    </div>
-                    <div class="bg-cyan-400/[0.04] p-4 rounded-2xl border border-cyan-400/10 col-span-2">
-                      <p class="text-[10px] font-black tracking-[0.18em] uppercase text-cyan-300 mb-2">엘리트 가이드</p>
-                      <p class="text-[13px] font-bold text-white/75">${w.tip} · <span class="text-white/45">${w.guide}</span></p>
-                    </div>
-                  </div>
-                </div>
+      return Array.from({length:setTotal}).map((_, s)=>{
+        const done = !!doneArr[s];
+        const nextIndex = doneArr.indexOf(false);
+        const isLocked = (!done && nextIndex !== -1 && s !== nextIndex);
 
-                <div class="rightPanel space-y-3">
-                  <div class="glass rounded-2xl p-4 border-white/5">
-                    <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45">세트/횟수 설정</p>
-                    <p class="text-[11px] mt-2 font-bold text-white/45">* 세트 버튼을 눌러 체크합니다</p>
-                  </div>
-
-                  <div class="stepper">
-                    <div>
-                      <div class="stepperLabel">SET</div>
-                      <div class="stepperValue">${setTotal}</div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                      <button class="stepperBtn" onclick="adjust('set','${id}',-1)"><i class="fa-solid fa-minus"></i></button>
-                      <button class="stepperBtn" onclick="adjust('set','${id}',1)"><i class="fa-solid fa-plus"></i></button>
-                    </div>
-                  </div>
-
-                  <div class="stepper">
-                    <div>
-                      <div class="stepperLabel">REP</div>
-                      <div class="stepperValue">${repTotal}</div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                      <button class="stepperBtn" onclick="adjust('rep','${id}',-1)"><i class="fa-solid fa-minus"></i></button>
-                      <button class="stepperBtn" onclick="adjust('rep','${id}',1)"><i class="fa-solid fa-plus"></i></button>
-                    </div>
-                  </div>
-
-                  <button class="bigBtn" onclick="resetSetRepToDefault('${id}')">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i>
-                    세트/횟수 기본값
-                  </button>
-
-                  <div class="grid grid-cols-2 gap-3">
-                    ${Array.from({length:setTotal}).map((_, s)=>{
-                      const done = !!doneArr[s];
-                      const nextIndex = doneArr.indexOf(false);
-                      const isLocked = (!done && nextIndex !== -1 && s !== nextIndex);
-
-                      return `<button class="setBtn ${done?'done':''} ${isLocked?'locked':''}"
-                        ${isLocked ? 'disabled' : ''}
-                        data-date="${date}" data-ex="${id}" data-set="${s}">
-                        ${done ? `<i class='fa-solid fa-check'></i>` : ''}
-                        ${s+1} 세트
-                      </button>`;
-                    }).join('')}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="mt-5 flex items-center justify-between gap-2 flex-wrap">
-              <div class="flex items-center gap-2">
-                <span class="pill cyan">${idx+1} / ${data.list.length}</span>
-                <span class="pill">${w.name}</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <button class="pill" onclick="carouselPrev()"><i class="fa-solid fa-chevron-left"></i> 이전</button>
-                <button class="pill cyan" onclick="carouselNext()">다음 <i class="fa-solid fa-chevron-right"></i></button>
-              </div>
-            </div>
-          </div>
-        `;
-        carousel.appendChild(slide);
-      });
-
-      bindSetButtons();
-      bindCarouselEvents();
-      updateSlideHUD();
-      requestAnimationFrame(()=> scrollToSlide(currentSlideIndex,false));
+        return `<button class="setBtn ${done?'done':''} ${isLocked?'locked':''}"
+          ${isLocked ? 'disabled' : ''}
+          data-date="${date}" data-ex="${id}" data-set="${s}">
+          ${done ? `<i class='fa-solid fa-check'></i>` : ''}
+          ${s+1} 세트
+        </button>`;
+      }).join('');
     }
 
     function bindCarouselEvents(){
@@ -1603,18 +1766,24 @@
       showDockTemporarily();
     }
 
+    function safeStringify(obj){
+      return JSON.stringify(obj).replace(/'/g,"&#39;");
+    }
+
     function bindSetButtons(){
       const buttons = document.querySelectorAll('.setBtn[data-ex]');
       buttons.forEach(btn => {
         const date = btn.getAttribute('data-date');
         const ex = btn.getAttribute('data-ex');
         const setIndex = Number(btn.getAttribute('data-set'));
-        const clone = btn.cloneNode(true);
-        btn.replaceWith(clone);
-        clone.addEventListener('click', () => toggleSetComplete(date, ex, setIndex));
+
+        btn.onclick = () => toggleSetComplete(date, ex, setIndex);
       });
     }
 
+    /* =========================================================
+      ✅ 핵심: 세트 완료 → 즉시 done 반영 + REP 입력 모달
+    ========================================================= */
     function toggleSetComplete(date, exerciseId, setIndex){
       unlockAudio();
       showDockTemporarily();
@@ -1626,6 +1795,7 @@
       const setTotal = customSets[exerciseId] || w.set;
       const doneArr = getProgressArr(date, exerciseId, setTotal);
       const nextIndex = doneArr.indexOf(false);
+
       if(!doneArr[setIndex] && nextIndex !== -1 && setIndex !== nextIndex){
         haptic(10);
         toast(t('messages.toast.nextSetFirst','다음 세트를 먼저 완료하세요'));
@@ -1633,7 +1803,6 @@
       }
 
       const repTotal = customReps[exerciseId] || w.rep;
-
       doneArr[setIndex] = !doneArr[setIndex];
       progressByDate[date][exerciseId] = doneArr;
       localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
@@ -1662,27 +1831,167 @@
           localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
         }
 
-        if(w.rest > 0) startTimer(w.rest, logKey);
+        // ✅ UI 즉시 반영 (새로고침 필요 없음)
+        renderCarousel(false);
+        updateProgressUI();
 
-        if(setNo === setTotal){
-          setTimeout(()=> carouselNext(), 250);
-        }
-        haptic(16);
+        // ✅ REP 입력 모달 열기
+        openRepModal({
+          logKey,
+          name: w.name,
+          setNo,
+          baseRep: repTotal
+        });
+
       }else{
+        // undone
         logs = logs.filter(l => l.logKey !== logKey);
         localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+
+        renderCarousel(false);
+        updateProgressUI();
         haptic(12);
+        toast("세트 취소됨");
       }
-
-      updateProgressUI();
-
-      const keep = currentSlideIndex;
-      renderCarousel();
-      currentSlideIndex = keep;
-      scrollToSlide(currentSlideIndex,false);
-      updateSlideHUD();
     }
 
+    /* =========================================================
+      ✅ REP MODAL (AI 추천 + 숫자 버튼)
+    ========================================================= */
+    function openRepModal({logKey, name, setNo, baseRep}){
+      repModalState = {logKey, baseRep};
+
+      document.getElementById('rep-title').textContent = name;
+      document.getElementById('rep-sub').textContent = `${setNo} SET`;
+      document.getElementById('rep-base').textContent = baseRep;
+
+      const curLog = logs.find(l => l.logKey === logKey);
+      const prevLog = curLog ? findLastWeekSameExerciseLog(curLog) : null;
+      const prevRep = prevLog?.repActual ?? prevLog?.plannedRep ?? baseRep;
+
+      renderRepRecommendations(baseRep, prevRep);
+
+      document.getElementById('rep-modal').classList.add('show');
+      haptic(12);
+      showDockTemporarily();
+    }
+
+    function closeRepModal(saved=false){
+      document.getElementById('rep-modal').classList.remove('show');
+      if(!saved){
+        // 저장 안 했으면 해당 log의 repActual null 유지 + (선택적) 취소 안내
+        toast("REP 입력 취소됨");
+      }
+      repModalState = null;
+    }
+
+    function repSkip(){
+      if(!repModalState) return;
+      saveRepToLog(repModalState.logKey, repModalState.baseRep);
+      closeRepModal(true);
+    }
+
+    function repSelect(value){
+      if(!repModalState) return;
+      saveRepToLog(repModalState.logKey, value);
+      closeRepModal(true);
+    }
+
+    function renderRepRecommendations(baseRep, prevRep){
+      // ✅ AI 추천 3개
+      const aiWrap = document.getElementById("rep-ai-reco");
+      aiWrap.innerHTML = "";
+
+      const aiList = [
+        { label:"🔥 동일", value: prevRep, desc:"지난주와 동일" },
+        { label:"✅ +1", value: prevRep + 1, desc:"조금 더" },
+        { label:"⚡ -1", value: Math.max(0, prevRep - 1), desc:"조금 덜" },
+      ];
+
+      aiList.forEach(item => {
+        const btn = document.createElement("button");
+        btn.className = "repBtn";
+        btn.style.height = "72px";
+        btn.innerHTML = `
+          <div class="flex flex-col items-center">
+            <div class="text-sm font-black">${item.label}</div>
+            <div class="text-xl font-black text-white mt-1">${item.value}</div>
+            <div class="text-[9px] font-black text-white/35 mt-1">${item.desc}</div>
+          </div>
+        `;
+        btn.onclick = () => repSelect(item.value);
+        aiWrap.appendChild(btn);
+      });
+
+      // ✅ 숫자 추천 (prevRep 기준 ±5)
+      const grid = document.getElementById("rep-number-grid");
+      grid.innerHTML = "";
+
+      const start = Math.max(0, prevRep - 5);
+      const end = prevRep + 5;
+
+      for(let r = start; r <= end; r++){
+        const btn = document.createElement("button");
+        const isBase = (r === baseRep);
+        btn.className = isBase ? "repBtn primary" : "repBtn";
+        btn.style.height = "46px";
+        btn.style.borderRadius = "16px";
+        btn.innerHTML = `<span class="text-lg font-black">${isBase ? "기본" : r}</span>`;
+
+        btn.onclick = () => {
+          if(isBase) repSkip();
+          else repSelect(r);
+        };
+        grid.appendChild(btn);
+      }
+    }
+
+    function saveRepToLog(logKey, value){
+      const idx = logs.findIndex(l => l.logKey === logKey);
+      if(idx === -1) return;
+
+      logs[idx].repActual = value;
+      localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+
+      // ✅ 휴식 타이머 시작 (rep 입력 후)
+      const restSec = logs[idx].restPlanned || 0;
+      if(restSec > 0) startTimer(restSec, logKey);
+
+      // ✅ 지난주 비교 토스트
+      const prevLog = findLastWeekSameExerciseLog(logs[idx]);
+      if(prevLog){
+        const prev = prevLog.repActual ?? prevLog.plannedRep ?? null;
+        if(prev !== null){
+          const diff = value - prev;
+          if(diff > 0) toast(`지난주 대비 +${diff} REP 🔥`);
+          else if(diff < 0) toast(`지난주 대비 ${diff} REP`);
+          else toast(`지난주와 동일 REP ✅`);
+        }
+      }else{
+        toast(`REP 기록 완료 ✅`);
+      }
+
+      haptic(18);
+      renderCarousel(false);
+      updateProgressUI();
+      renderCalendar();
+    }
+
+    /* ✅ 지난주 동일 요일 / 동일 운동 / 동일 세트 찾기 */
+    function findLastWeekSameExerciseLog(cur){
+      const targetDate = cur.date;
+      const prevDate = shiftDate(targetDate, -7);
+      const prevKeyPrefix = `${prevDate}|${cur.exerciseId}|${cur.set}`;
+      return logs.find(l => l.logKey.startsWith(prevKeyPrefix)) || null;
+    }
+
+    function shiftDate(dateStr, deltaDays){
+      const d = new Date(dateStr);
+      d.setDate(d.getDate() + deltaDays);
+      return d.toISOString().split('T')[0];
+    }
+
+    /* ---------- adjust set/rep (딜레이 완화) ---------- */
     function adjust(type, key, val){
       showDockTemporarily();
 
@@ -1702,9 +2011,11 @@
         localStorage.setItem(KEY_REPS, JSON.stringify(customReps));
       }
 
-      renderCarousel();
+      // ✅ GIF 깜빡임 방지: 전체 렌더 말고 현재 슬라이드만 부분 업데이트
+      renderCarousel(false);
       updateProgressUI();
       toast(t('messages.toast.settingSaved','설정 저장됨'));
+      haptic(10);
     }
 
     function resetSetRepToDefault(exerciseId){
@@ -1720,7 +2031,7 @@
       localStorage.setItem(KEY_REPS, JSON.stringify(customReps));
 
       getProgressArr(todayStr(), exerciseId, w.set);
-      renderCarousel();
+      renderCarousel(false);
       updateProgressUI();
       toast(t('messages.toast.restoredDefault','기본값으로 복원'));
       haptic(18);
@@ -1742,7 +2053,7 @@
         localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
       }
 
-      renderCarousel();
+      renderCarousel(false);
       updateProgressUI();
       toast(t('messages.toast.exerciseResetDone','운동 초기화 완료'));
       haptic(22);
@@ -1750,7 +2061,7 @@
 
     function resetToday(){
       showDockTemporarily();
-      if(!confirm(t('messages.confirm.resetToday','오늘 진행/기록을 모두 초기화할까요?'))) return;
+      if(!confirm('오늘 진행/기록을 모두 초기화할까요?')) return;
       const date = todayStr();
 
       logs = logs.filter(l => l.date !== date);
@@ -1759,7 +2070,7 @@
       if(progressByDate[date]){ delete progressByDate[date]; localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate)); }
       localStorage.removeItem(KEY_SUMMARY_SHOWN);
 
-      renderCarousel();
+      renderCarousel(true);
       updateProgressUI();
       toast(t('messages.toast.todayResetDone','오늘 초기화 완료'));
       haptic(25);
@@ -1858,22 +2169,13 @@
       if(finished){
         haptic(30);
         if(restNotifEnabled) restDoneNotify();
-        toast("휴식 끝! 다음 세트 ✅");
+        toast(t('messages.toast.restDone','휴식 끝! 다음 세트 ✅'));
       }
     }
 
+    /* ✅ 알림음: “알림 사운드 느낌” (비프 X, 짧은 멜로디) */
     function restDoneNotify(){
       try{ if(navigator.vibrate) navigator.vibrate([120,80,200,80,220]); }catch(e){}
-      try{
-        document.body.animate(
-          [
-            { filter:"brightness(1)" },
-            { filter:"brightness(1.35)" },
-            { filter:"brightness(1)" }
-          ],
-          { duration: 240, iterations: 3 }
-        );
-      }catch(e){}
 
       try{
         if(!audioCtx){
@@ -1884,11 +2186,13 @@
         }
 
         const now = audioCtx.currentTime;
+
+        // iOS/Android 알림 느낌: "딩-딩-딩"
         const pattern = [
-          { t: 0.00, dur: 0.22, freq: 988 },
-          { t: 0.30, dur: 0.22, freq: 880 },
-          { t: 0.60, dur: 0.25, freq: 988 },
-          { t: 0.95, dur: 0.25, freq: 1047 }
+          { t: 0.00, dur: 0.16, freq: 1318 }, // E6
+          { t: 0.20, dur: 0.16, freq: 1567 }, // G6
+          { t: 0.40, dur: 0.18, freq: 2093 }, // C7
+          { t: 0.66, dur: 0.18, freq: 1567 }, // G6
         ];
 
         pattern.forEach(p => {
@@ -1896,11 +2200,11 @@
           const g = audioCtx.createGain();
           o.connect(g);
           g.connect(audioCtx.destination);
-          o.type = 'square';
+          o.type = 'sine';
           o.frequency.setValueAtTime(p.freq, now + p.t);
 
           g.gain.setValueAtTime(0.0001, now + p.t);
-          g.gain.exponentialRampToValueAtTime(0.18, now + p.t + 0.02);
+          g.gain.exponentialRampToValueAtTime(0.25, now + p.t + 0.02);
           g.gain.exponentialRampToValueAtTime(0.0001, now + p.t + p.dur);
 
           o.start(now + p.t);
@@ -1948,6 +2252,7 @@
       renderHistoryDetail();
     }
 
+    /* ✅ 기록 탭 강화: 날짜 요약 + 운동별 세트/rep/휴식 + 총 시간/평균휴식 */
     function renderHistoryDetail(){
       const area = document.getElementById('history-detail');
       const dayLogs = logs
@@ -1961,6 +2266,29 @@
         return;
       }
 
+      // ✅ day summary
+      const totalSets = dayLogs.length;
+      const avgRest = Math.round(dayLogs.reduce((a,c)=> a + (c.restUsed ?? c.restPlanned ?? 0), 0) / totalSets);
+      const approxWorkoutMin = estimateWorkoutDurationMinutes(selectedDate);
+
+      area.innerHTML += `
+        <div class="glass rounded-[28px] p-6 mb-2">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45">요약</p>
+              <h4 class="text-2xl font-black italic text-white mt-2">${approxWorkoutMin}분</h4>
+              <p class="text-[10px] font-black text-white/35 tracking-[0.18em] uppercase mt-2">
+                총 ${totalSets}세트 · 평균 휴식 ${avgRest}s
+              </p>
+            </div>
+            <div class="text-right">
+              <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/35">완료 운동</p>
+              <p class="text-3xl font-black text-cyan-300 mt-2">${new Set(dayLogs.map(l=>l.exerciseId)).size}</p>
+            </div>
+          </div>
+        </div>
+      `;
+
       const groups = dayLogs.reduce((acc, o) => {
         if(!acc[o.exerciseId]) acc[o.exerciseId] = [];
         acc[o.exerciseId].push(o);
@@ -1972,6 +2300,12 @@
         const plannedRep = data[0].plannedRep ?? "-";
         const totalSets = data.length;
 
+        const prevDate = shiftDate(selectedDate, -7);
+        const prevGroup = logs.filter(l => l.date === prevDate && l.exerciseId === exerciseId);
+        const prevAvgRep = prevGroup.length ? Math.round(prevGroup.reduce((a,c)=> a + (c.repActual ?? c.plannedRep ?? 0), 0) / prevGroup.length) : null;
+        const curAvgRep = Math.round(data.reduce((a,c)=> a + (c.repActual ?? c.plannedRep ?? 0), 0) / data.length);
+        const repDelta = prevAvgRep !== null ? (curAvgRep - prevAvgRep) : null;
+
         area.innerHTML += `
           <div class="glass rounded-[28px] p-6 border-l-4 border-cyan-400">
             <div>
@@ -1979,6 +2313,7 @@
               <div class="flex items-center gap-2 mt-3 flex-wrap">
                 <span class="pill cyan">${totalSets} 세트</span>
                 <span class="pill">목표 REP: ${plannedRep}</span>
+                ${repDelta !== null ? `<span class="pill ${repDelta>0?'cyan':''}">지난주 대비 ${repDelta>0?'+':''}${repDelta} REP</span>` : `<span class="pill">지난주 데이터 없음</span>`}
               </div>
             </div>
 
@@ -1993,7 +2328,8 @@
                 </thead>
                 <tbody>
                   ${data.map(row => {
-                    const repDisplay = `<span class="pill">${row.plannedRep ?? "-"}</span>`;
+                    const repVal = row.repActual ?? row.plannedRep ?? "-";
+                    const repDisplay = `<span class="pill cyan">${repVal}</span>`;
                     const restDisplay = `<span class="pill">${(row.restUsed ?? row.restPlanned ?? "-")}s</span>`;
                     return `
                       <tr class="log-row">
@@ -2011,6 +2347,16 @@
       });
     }
 
+    function estimateWorkoutDurationMinutes(date){
+      // 간단 추정: 세트당 평균 45초 + 평균 휴식
+      const day = logs.filter(l => l.date === date);
+      if(!day.length) return 0;
+      const avgRest = day.reduce((a,c)=> a + (c.restUsed ?? c.restPlanned ?? 0), 0) / day.length;
+      const perSet = 45 + avgRest;
+      const totalSec = perSet * day.length;
+      return Math.max(1, Math.round(totalSec / 60));
+    }
+
     function changeMonth(dir){
       showDockTemporarily();
       currentMonth += dir;
@@ -2021,7 +2367,7 @@
 
     function resetSelectedDate(){
       showDockTemporarily();
-      if(!confirm(t('messages.confirm.resetSelectedDate','선택한 날짜의 기록을 초기화할까요?'))) return;
+      if(!confirm('선택한 날짜의 기록을 초기화할까요?')) return;
       const date = selectedDate;
       logs = logs.filter(l => l.date !== date);
       localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
@@ -2071,11 +2417,11 @@
     /* ---------- BACKUP / RESET ALL ---------- */
     function backupJSON(){
       showDockTemporarily();
-      const payload = { version: 'v11.3', exportedAt: nowISO(), logs, customSets, customReps, progressByDate };
+      const payload = { version: 'v12.1', exportedAt: nowISO(), logs, customSets, customReps, progressByDate };
       const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = `dk_master_os_backup_${todayStr()}.json`;
+      a.download = `dk_fit_backup_${todayStr()}.json`;
       a.click();
       toast(t('messages.toast.backupDownloaded','백업 다운로드'));
       haptic(18);
@@ -2083,14 +2429,14 @@
 
     function resetAll(){
       showDockTemporarily();
-      if(!confirm(t('messages.confirm.resetAll','⚠️ 모든 데이터(기록/설정/진행)를 초기화할까요?'))) return;
+      if(!confirm('⚠️ 모든 데이터(기록/설정/진행)를 초기화할까요?')) return;
       localStorage.removeItem(KEY_LOGS);
       localStorage.removeItem(KEY_SETS);
       localStorage.removeItem(KEY_REPS);
       localStorage.removeItem(KEY_PROGRESS_BY_DATE);
       localStorage.removeItem(KEY_SUMMARY_SHOWN);
       logs = []; customSets = {}; customReps = {}; progressByDate = {};
-      renderCarousel();
+      renderCarousel(true);
       updateProgressUI();
       renderCalendar();
       toast(t('messages.toast.allResetDone','전체 초기화 완료'));
@@ -2113,7 +2459,7 @@
       document.addEventListener('dblclick', (e)=> e.preventDefault(), {passive:false});
     })();
 
-    /* ✅ Dock Auto Hide Controller */
+    /* Dock Auto Hide */
     let dockTimer = null;
     function showDockTemporarily(){
       const dock = document.querySelector('.navDockWrap');
@@ -2126,10 +2472,9 @@
       dockTimer = setTimeout(()=>{
         dock.classList.remove('dock-show');
         dock.classList.add('dock-hide');
-      }, 1800);
+      }, 1700);
     }
 
-    /* ✅ 유저 작동 감지: 스크롤/터치/클릭 모두 포함 */
     ['scroll','touchstart','touchmove','click'].forEach(ev=>{
       window.addEventListener(ev, showDockTemporarily, {passive:true});
     });
@@ -2138,6 +2483,8 @@
     window.onload = async () => {
       await loadAppData();
       initIntro();
+      await requestWakeLock();
+
       updateDayNav();
       changeDay(new Date().getDay());
       renderCalendar();
@@ -2148,13 +2495,12 @@
         btn.classList.toggle('cyan', restNotifEnabled);
       }
 
-      const start = Date.now();
       setInterval(()=> {
-        totalSec = Math.floor((Date.now() - start)/1000);
+        const totalSec = getWorkoutElapsedSec();
         const m = Math.floor(totalSec/60).toString().padStart(2,'0');
         const s = (totalSec%60).toString().padStart(2,'0');
         document.getElementById('stopwatch').innerText = `${m}:${s}`;
-      }, 1000);
+      }, 500);
 
       setTimeout(()=> {
         const dock = document.querySelector('.navDockWrap');
