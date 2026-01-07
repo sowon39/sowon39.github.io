@@ -1058,7 +1058,7 @@
           <p id="sum-sets" class="text-3xl font-black text-white mt-2">0</p>
         </div>
         <div class="glass rounded-2xl p-4">
-          <p class="text-[9px] font-black tracking-[0.18em] uppercase text-white/40">${copy.txt_049_완료_${copy.txt_050_운동}}</p>
+          <p class="text-[9px] font-black tracking-[0.18em] uppercase text-white/40">완료 운동</p>
           <p id="sum-ex" class="text-3xl font-black text-white mt-2">0</p>
         </div>
         <div class="glass rounded-2xl p-4 col-span-2">
@@ -1137,6 +1137,15 @@ async function loadAppData() {
   // 2) uiConfig를 기존 appData.ui로 쓰는 코드가 있다면 지원
   appData.uiConfig = uiConfig;
 }
+
+/* ---------- i18n helper ---------- */
+function t(path, fallback=""){
+  try{
+    const val = path.split('.').reduce((o,k)=>o?.[k], copy);
+    return (val === undefined || val === null) ? fallback : val;
+  }catch(e){ return fallback; }
+}
+
 
 /* ---------- STORAGE KEYS ---------- */
     const KEY_LOGS = 'dk_os_v121_logs';
@@ -1347,11 +1356,11 @@ async function loadAppData() {
         if(done === setTotal) exDone++;
       });
       const msgPool = [
-        "${copy.txt_046_오늘도_완벽했다_내일은_더_강해진다}.",
-        "${copy.txt_097_폼이_올라왔다_다음_주는_기록_갱신}.",
-        "${copy.txt_077_집중력이_미쳤다_컨디션_최고}.",
-        "${copy.txt_007_규칙은_배신하지_않는다_계속_간다}.",
-        "${copy.txt_047_오늘은_성공_다음은_진짜_레벨업}."
+        t('legacy.txt_046_오늘도_완벽했다_내일은_더_강해진다','오늘도 완벽했다. 내일은 더 강해진다') + ".",
+        t('legacy.txt_097_폼이_올라왔다_다음_주는_기록_갱신','폼이 올라왔다. 다음 주는 기록 갱신') + ".",
+        t('legacy.txt_077_집중력이_미쳤다_컨디션_최고','집중력이 미쳤다. 컨디션 최고') + ".",
+        t('legacy.txt_007_규칙은_배신하지_않는다_계속_간다','규칙은 배신하지 않는다. 계속 간다') + ".",
+        t('legacy.txt_047_오늘은_성공_다음은_진짜_레벨업','오늘은 성공. 다음은 진짜 레벨업') + "."
       ];
       return {
         sets: setsDone,
@@ -1713,11 +1722,15 @@ async function loadAppData() {
         const done = !!doneArr[s];
         const nextIndex = doneArr.indexOf(false);
         const isLocked = (!done && nextIndex !== -1 && s !== nextIndex);
-
-        return `<button class="setBtn ${done?'done':''} ${isLocked?'locked':''}"
-          ${isLocked ? 'disabled' : ''}
-          data-date="${date}" data-ex="${id}" data-set="${s}">
-          ${done ? `<i class='fa-solid fa-check'></i>` : ''${copy.txt_001_s_1_세트_button_join}'');
+        return `
+          <button class="setBtn ${done?'done':''} ${isLocked?'locked':''}"
+            ${isLocked ? 'disabled' : ''}
+            data-date="${date}" data-ex="${id}" data-set="${s}">
+            ${done ? `<i class='fa-solid fa-check'></i>` : ''}
+            ${s+1} 세트
+          </button>
+        `;
+      }).join("");
     }
 
     function bindCarouselEvents(){
@@ -1740,7 +1753,7 @@ async function loadAppData() {
       const total = data.list.length;
       const idx = clamp(currentSlideIndex, 0, total-1);
       document.getElementById('slide-indicator').innerText = `${idx+1} / ${total}`;
-      document.getElementById('slide-name').innerText = data.list[idx]?.name || '${copy.txt_050_운동}';
+      document.getElementById('slide-name').innerText = data.list[idx]?.name || t('legacy.txt_050_운동','운동');
 
       const carousel = document.getElementById('session-carousel');
       Array.from(carousel.children).forEach((el, i)=>{
@@ -2292,7 +2305,7 @@ async function loadAppData() {
               </p>
             </div>
             <div class="text-right">
-              <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/35">${copy.txt_049_완료_${copy.txt_050_운동}}</p>
+              <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/35">완료 운동</p>
               <p class="text-3xl font-black text-cyan-300 mt-2">${new Set(dayLogs.map(l=>l.exerciseId)).size}</p>
             </div>
           </div>
@@ -2491,8 +2504,12 @@ async function loadAppData() {
 
     /* ---------- INIT ---------- */
     window.onload = async () => {
-      await loadAppData();
-initIntro();
+      try{
+        await loadAppData();
+      }catch(e){
+        console.error(e);
+      }
+      initIntro();
       await requestWakeLock();
 
       updateDayNav();
