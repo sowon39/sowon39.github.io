@@ -773,16 +773,10 @@ button,a{
       .nav-item i{ font-size: 1.15rem !important; }
     }
   
-/* ===== Slide swipe (pan-x) + app-like scrolling ===== */
-.carousel, .slides, .slideTrack, .slideContainer{
-  touch-action: pan-x;
-}
-/* allow vertical scrolling on main content */
-.main, .content, .scrollArea, .list{
-  touch-action: pan-y;
-  -webkit-overflow-scrolling: touch;
-}
-/* stronger pressed feedback (app-like) */
+/* ===== Swipe-friendly touch-action tuning ===== */
+.carousel, .slides, .slideTrack, .slideContainer{ touch-action: pan-x; }
+button, a, [role="button"], .btn, .chip, .tab, .iconbtn{ touch-action: manipulation; }
+.main, .content, .scrollArea, .list{ -webkit-overflow-scrolling: touch; }
 .is-pressed{
   transform: scale(0.97);
   filter: brightness(0.95);
@@ -2690,63 +2684,45 @@ function saveRepToLog(logKey, value){
 })();
 </script>
 <script>
-/* ===== Pointer-based tap unification (reduce missed taps / ghost clicks) ===== */
+/* ===== Safer fast-tap (no global preventDefault) ===== */
 (function(){
-  // Delegate pointerdown to trigger the same handler as click, but instantly.
-  // Works well on mobile/tablet and reduces "double tap needed" cases.
-  const TAP_SELECTOR = 'button,[role="button"],.btn,.iconbtn,.chip,.tab,a';
+  const FAST_SELECTOR = 'button,[role="button"],.btn,.iconbtn,.chip,.tab,a';
+  document.querySelectorAll(FAST_SELECTOR).forEach(el=>{
+    el.setAttribute('data-fasttap','1');
+  });
 
-  function isInteractive(el){
-    return el && el.closest && el.closest(TAP_SELECTOR);
-  }
-
-  // Prevent synthetic ghost clicks after pointer interaction
-  let lastPointerTime = 0;
-  document.addEventListener('click', function(e){
-    if(Date.now() - lastPointerTime < 450){
-      const t = e.target;
-      if(isInteractive(t)){
-        e.stopPropagation();
-        e.preventDefault();
-      }
-    }
-  }, true);
+  const addPressed = (el)=> el && el.classList.add('is-pressed');
+  const rmPressed  = (el)=> el && el.classList.remove('is-pressed');
 
   document.addEventListener('pointerdown', function(e){
-    const t = e.target;
-    const el = isInteractive(t) ? t.closest(TAP_SELECTOR) : null;
+    const el = e.target.closest && e.target.closest('[data-fasttap="1"]');
     if(!el) return;
-
-    // Don't interfere with text inputs
-    if(el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') return;
-
-    // Capture so we win against drag/select
-    lastPointerTime = Date.now();
-    // Important: prevent default to avoid focus/selection/double-tap zoom
-    e.preventDefault();
-
-    // Visual feedback
-    el.classList.add('is-pressed');
-
-    // If element has onclick handler or is a button-like, dispatch click immediately
-    // BUT avoid double firing if the app already handles pointer events.
-    // We dispatch a click and rely on ghost-click blocker above.
-    try{
-      el.click();
-    }catch(_){}
-  }, {capture:true});
+    addPressed(el);
+  }, {capture:true, passive:true});
 
   document.addEventListener('pointerup', function(e){
-    const t = e.target;
-    const el = isInteractive(t) ? t.closest(TAP_SELECTOR) : null;
-    if(el) el.classList.remove('is-pressed');
-  }, {capture:true});
+    const el = e.target.closest && e.target.closest('[data-fasttap="1"]');
+    if(!el) return;
+    rmPressed(el);
+  }, {capture:true, passive:true});
 
   document.addEventListener('pointercancel', function(e){
-    const t = e.target;
-    const el = isInteractive(t) ? t.closest(TAP_SELECTOR) : null;
-    if(el) el.classList.remove('is-pressed');
-  }, {capture:true});
+    const el = e.target.closest && e.target.closest('[data-fasttap="1"]');
+    if(!el) return;
+    rmPressed(el);
+  }, {capture:true, passive:true});
+
+  // Prevent iOS double-tap zoom ONLY on fast-tap elements
+  let lastTouchEnd = 0;
+  document.addEventListener('touchend', function(e){
+    const el = e.target.closest && e.target.closest('[data-fasttap="1"]');
+    if(!el) return;
+    const now = Date.now();
+    if(now - lastTouchEnd <= 300){
+      e.preventDefault();
+    }
+    lastTouchEnd = now;
+  }, {passive:false});
 })();
 </script>
 </body>
