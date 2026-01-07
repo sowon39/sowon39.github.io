@@ -943,8 +943,8 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         <div class="glass rounded-2xl p-4">
           <p class="text-[10px] font-black tracking-[0.18em] uppercase text-white/45">동기화 안내</p>
           <p class="text-[12px] font-black text-white/70 mt-2 leading-relaxed">
-            • Firestore 경로: <span class="text-cyan-300">/users/{uid}</span><br>
-            • 로그아웃 시 <span class="text-red-300">로컬 기록도 함께 초기화</span>됩니다.
+            • 로그인하면 기기 간 기록이 자동 동기화됩니다.<br>
+            • 저장은 네트워크 상태에 따라 지연될 수 있으며, 앱이 다시 열릴 때 자동으로 맞춰집니다.<br>원할 때만 “로컬 초기화”를 실행하세요.
           </p>
         </div>
       </div>
@@ -980,7 +980,11 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         </div>
 
         <button class="modalBtn" style="border-color: rgba(255,255,255,0.18);" onclick="logoutFirebase()">
-          <i class="fa-solid fa-right-from-bracket"></i> 로그아웃 (로컬 초기화)
+          <i class="fa-solid fa-right-from-bracket"></i> 로그아웃
+        </button>
+
+        <button class="modalBtn" style="border-color: rgba(255,255,255,0.18);" onclick="wipeLocalDataOnly()">
+          <i class="fa-solid fa-eraser"></i> 로컬 데이터 초기화
         </button>
       </div>
     </div>
@@ -1364,6 +1368,34 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     let saveTimer = null;
     const CLOUD_DEBOUNCE_MS = 300;
 
+// ✅ Modern Sync: gentle, resilient, and explicit
+const SYNC_BACKOFF = { base: 800, max: 15000 };
+let retryTimer = null;
+let retryDelay = SYNC_BACKOFF.base;
+let dirtySince = 0;
+
+function setSyncStatus(text){
+  const s = document.getElementById("acct-sync");
+  if(s) s.textContent = text;
+}
+function netOkay(){ return navigator.onLine !== false; }
+
+function scheduleRetry(fn){
+  clearTimeout(retryTimer);
+  retryTimer = setTimeout(async ()=>{
+    try{ await fn(); retryDelay = SYNC_BACKOFF.base; }
+    catch(_){ retryDelay = Math.min(SYNC_BACKOFF.max, Math.round(retryDelay * 1.6)); scheduleRetry(fn); }
+  }, retryDelay);
+}
+
+window.addEventListener("online", ()=>{
+  if(cloudEnabled && currentUser?.uid && dirtySince){
+    setSyncStatus("재연결…");
+    scheduleRetry(()=>flushCloudSave("online_recover"));
+  }
+});
+
+
     function userDocRef(uid){ return doc(db, "users", uid); }
 
     function getLocalSnapshot(){
@@ -1445,17 +1477,33 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     }
 
     function scheduleCloudSave(reason="local_change"){
-      if(!cloudEnabled || !currentUser?.uid) return;
-      if(isApplyingRemote) return;
+  if(!cloudEnabled || !currentUser?.uid) return;
+  if(isApplyingRemote) return;
 
-      clearTimeout(saveTimer);
-      saveTimer = setTimeout(async ()=>{
-        try{
-          await pushToCloud(currentUser.uid, reason);
-          // 상태 표시
-          const s = document.getElementById("acct-sync");
-          if(s) s.textContent = "저장됨 ✅";
-        }catch(e){
+  dirtySince = dirtySince || Date.now();
+
+  // ✅ 최신 UX: 오프라인이면 조용히 큐잉만 (자동 재시도)
+  if(!netOkay()){
+    setSyncStatus("오프라인 · 대기 중");
+    scheduleRetry(()=>flushCloudSave("offline_retry"));
+    return;
+  }
+
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async ()=>{
+    try{
+      setSyncStatus("저장 중…");
+      await pushToCloud(currentUser.uid, reason);
+      dirtySince = 0;
+      setSyncStatus("저장됨 ✅");
+    }catch(e){
+      console.error(e);
+      setSyncStatus("저장 대기…");
+      scheduleRetry(()=>flushCloudSave("retry"));
+      toast("네트워크 불안정 · 자동 재시도");
+    }
+  }, CLOUD_DEBOUNCE_MS);
+}catch(e){
           console.error(e);
           toast("클라우드 저장 실패");
           const s = document.getElementById("acct-sync");
@@ -1468,12 +1516,28 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     }
 
     async function flushCloudSave(reason="flush"){
-      if(!cloudEnabled || !currentUser?.uid) return;
-      if(isApplyingRemote) return;
-      clearTimeout(saveTimer);
-      try{
-        await pushToCloud(currentUser.uid, reason);
-      }catch(e){}
+  if(!cloudEnabled || !currentUser?.uid) return;
+  if(isApplyingRemote) return;
+
+  dirtySince = dirtySince || Date.now();
+
+  if(!netOkay()){
+    setSyncStatus("오프라인 · 대기 중");
+    scheduleRetry(()=>flushCloudSave("offline_retry"));
+    return;
+  }
+
+  clearTimeout(saveTimer);
+  try{
+    setSyncStatus("저장 중…");
+    await pushToCloud(currentUser.uid, reason);
+    dirtySince = 0;
+    setSyncStatus("저장됨 ✅");
+  }catch(e){
+    setSyncStatus("저장 대기…");
+    scheduleRetry(()=>flushCloudSave("retry"));
+  }
+}catch(e){}
     }
 
     function startRealtime(uid){
@@ -1501,9 +1565,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         lastAppliedServerMs = serverMs || Date.now();
         if(!fromSameClient){
           applyCloudSnapshot(payload);
-          toast("다른 디바이스 변경사항 동기화 ✅");
-          const s = document.getElementById("acct-sync");
-          if(s) s.textContent = "동기화됨 ✅";
+          setSyncStatus("동기화됨 ✅");
         }else{
           // 내 저장이 서버에서 확정된 상태
           const s = document.getElementById("acct-sync");
@@ -1545,7 +1607,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       if(emailEl) emailEl.textContent = user?.email || "Google 계정";
       if(subEl) subEl.textContent = `UID: ${(user?.uid||"").slice(0,8)}… · 자동 동기화 ON`;
       const s = document.getElementById("acct-sync");
-      if(s) s.textContent = "연결됨";
+      setSyncStatus("연결됨");
     }
 
     function clearLocalAll(){
@@ -1568,18 +1630,30 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     }
 
     window.logoutFirebase = async () => {
-      try{
-        // (1) 로컬 초기화
-        clearLocalAll();
-        // (2) 클라우드 연결 종료
-        await signOut(auth);
-        window.closeAccountModal();
-        toast("로그아웃 & 로컬 초기화 완료");
-      }catch(e){
-        console.error(e);
-        toast("로그아웃 실패");
-      }
-    };
+  try{
+    // ✅ 최신 UX: 로그아웃은 "계정 연결 해제"만 수행 (로컬 기록 유지)
+    await signOut(auth);
+    window.closeAccountModal();
+    toast("로그아웃 완료 (로컬 기록 유지)");
+  }catch(e){
+    console.error(e);
+    toast("로그아웃 실패");
+  }
+};
+
+// ✅ 로컬만 초기화(사용자가 명시적으로 선택할 때만)
+window.wipeLocalDataOnly = async () => {
+  try{
+    if(!confirm("로컬에 저장된 기록/설정을 모두 삭제할까요?
+(클라우드 데이터는 삭제되지 않습니다)")) return;
+    clearLocalAll();
+    window.closeAccountModal();
+    toast("로컬 데이터 초기화 완료");
+  }catch(e){
+    console.error(e);
+    toast("로컬 초기화 실패");
+  }
+};
 
     window.manualCloudPull = async () => {
       if(!currentUser?.uid) return toast("로그인이 필요합니다");
