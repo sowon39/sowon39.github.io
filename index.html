@@ -2565,12 +2565,6 @@ function saveRepToLog(logKey, value){
       document.addEventListener('gestureend', (e)=> e.preventDefault(), {passive:false});
 
       let lastTouchEnd = 0;
-      document.addEventListener('touchend', (e)=>{
-        const now = Date.now();
-        if(now - lastTouchEnd <= 260) e.preventDefault();
-        lastTouchEnd = now;
-      }, {passive:false});
-
       document.addEventListener('dblclick', (e)=> e.preventDefault(), {passive:false});
     })();
 
@@ -2632,18 +2626,6 @@ function saveRepToLog(logKey, value){
 (function(){
   // Prevent double-tap to zoom on iOS (only on controls, not on inputs)
   let lastTouchEnd = 0;
-  document.addEventListener('touchend', function(e){
-    const now = Date.now();
-    if(now - lastTouchEnd <= 300){
-      const t = e.target;
-      // Only block if it's a button-like element
-      if(t && (t.closest('button,[role=\"button\"],.btn,.iconbtn,.chip,.tab,a'))){
-        e.preventDefault();
-      }
-    }
-    lastTouchEnd = now;
-  }, {passive:false});
-
   // Stop "drag cursor" text selection from long-press on controls
   document.addEventListener('selectstart', function(e){
     const t = e.target;
@@ -2712,18 +2694,7 @@ function saveRepToLog(logKey, value){
     rmPressed(el);
   }, {capture:true, passive:true});
 
-  // Prevent iOS double-tap zoom ONLY on fast-tap elements
-  let lastTouchEnd = 0;
-  document.addEventListener('touchend', function(e){
-    const el = e.target.closest && e.target.closest('[data-fasttap="1"]');
-    if(!el) return;
-    const now = Date.now();
-    if(now - lastTouchEnd <= 300){
-      e.preventDefault();
-    }
-    lastTouchEnd = now;
-  }, {passive:false});
-})();
+  })();
 </script>
 </body>
 </html>
