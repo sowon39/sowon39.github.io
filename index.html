@@ -1080,7 +1080,14 @@
   <div id="toast" class="pill cyan"></div>
 
   <script>
-    /* =========================================================
+    
+/************************************************
+ * FIT APP (Single-file) - v4 Standard Layout
+ * - UI/UX는 이 파일에서 자유롭게 수정
+ * - 데이터/문구는 appData.json에서 관리
+ * - loadAppData() / window.onload() 구조는 유지 권장
+ ************************************************/
+/* =========================================================
       DK Fit OS v12.1
       ✅ Wake Lock (screen on)
       ✅ Stopwatch Pause
@@ -1113,10 +1120,24 @@ async function loadAppData() {
   const res = await fetch("./appData.json");
   if(!res.ok) throw new Error("Failed to load appData.json");
   appData = await res.json();
-  workoutData = appData.workoutData;
-  copy = appData.copy;
-  gifMap = appData.gifMap;
+
+  // --- v4 구조 바인딩(권장) ---
+  workoutData = appData?.data?.workout || {};
+  gifMap = appData?.data?.gifMap || [];
+  copy = appData?.ui?.copy || {};
+  const uiConfig = appData?.ui?.config || {};
+
+  // --- 기존 코드 호환(중요): v2/v3 스타일 접근 모두 유지 ---
+  // 1) copy.legacy 키를 평탄화하여 `${copy.txt_...}`도 계속 동작
+  if(copy && copy.legacy){
+    for(const [k,v] of Object.entries(copy.legacy)){
+      if(copy[k] === undefined) copy[k] = v;
+    }
+  }
+  // 2) uiConfig를 기존 appData.ui로 쓰는 코드가 있다면 지원
+  appData.uiConfig = uiConfig;
 }
+
 /* ---------- STORAGE KEYS ---------- */
     const KEY_LOGS = 'dk_os_v121_logs';
     const KEY_SETS = 'dk_os_v121_sets';
