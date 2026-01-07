@@ -2084,6 +2084,16 @@ function saveRepToLog(logKey, value){
       localStorage.setItem(KEY_SETS, JSON.stringify(customSets));
       localStorage.setItem(KEY_REPS, JSON.stringify(customReps));
 
+
+      // ✅ 즉시 DOM 갱신 (새로고침 불필요)
+      const slide = document.querySelector(`.slide[data-slide="${currentSlideIndex}"]`);
+      if(slide){
+        const setEl = slide.querySelector('[data-role="setTotal"]');
+        const repEl = slide.querySelector('[data-role="repTotal"]');
+        if(setEl) setEl.textContent = w.set;
+        if(repEl) repEl.textContent = w.rep;
+      }
+
       getProgressArr(todayStr(), exerciseId, w.set);
       renderCarousel(false);
       updateProgressUI();
