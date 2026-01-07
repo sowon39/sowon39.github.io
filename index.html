@@ -827,25 +827,6 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
-
-<script>
-  // ✅ Failsafe: 어떤 JS 오류가 나도 3초 후 스플래시를 강제로 닫습니다.
-  (function(){
-    function forceHideSplash(){
-      try{
-        var el=document.getElementById('splash-screen');
-        if(!el) return;
-        el.style.opacity='0';
-        el.style.transform='scale(1.08)';
-        setTimeout(function(){ el.style.display='none'; }, 600);
-      }catch(e){}
-    }
-    window.addEventListener('error', function(){ forceHideSplash(); });
-    window.addEventListener('unhandledrejection', function(){ forceHideSplash(); });
-    setTimeout(forceHideSplash, 3200);
-  })();
-</script>
-
 </head>
 
 <body>
@@ -954,13 +935,13 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
           <button id="btn-login" class="pill cyan" onclick="loginWithGoogle()" style="display:none;">
             <i class="fa-brands fa-google"></i> 로그인
           </button>
+          <button id="btn-refresh" class="pill" onclick="manualRefresh()" style="display:none;">
+            <i class="fa-solid fa-rotate-right"></i>
+          </button>
           <div id="user-chip" class="pill" style="display:none; max-width: 200px;">
             <i class="fa-solid fa-user"></i>
             <span id="user-name" class="truncate">User</span>
           </div>
-          <button id="btn-refresh" class="pill" onclick="manualRefresh()" style="display:none;">
-            <i class="fa-solid fa-rotate-right"></i>
-          </button>
           <button id="btn-logout" class="pill" onclick="logout()" style="display:none;">
             <i class="fa-solid fa-right-from-bracket"></i>
           </button>
@@ -1188,14 +1169,12 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
   <script>
     
     /* =========================================================
-      ✅ Firebase Sync Layer (Auth + Firestore)
-      - Google Login
-      - users/{uid} 문서에 로컬 기록을 저장/복원
-      - 기존 로직(localStorage 기반) 유지 + 로그인 시 자동 동기화
-      - UX: 상단에 로그인 버튼(비로그인), 로그인 후 프로필 칩 + 로그아웃
+      ✅ Firebase Sync (STABLE)
+      - 로컬 저장(localStorage) 100% 유지
+      - 로그인 시: 서버 최신 불러오기 → 로컬에 적용(merge 없음, 서버가 최신)
+      - 기록 변경 시: 사용자가 탭 이동/포커스/수동 새로고침할 때만 업로드(안전)
+      - 실시간 구독 없음(다른 기기 화면이 갑자기 바뀌지 않음)
     ========================================================= */
-
-    // ✅ Firebase Config (user provided)
     const firebaseConfig = {
       apiKey: "AIzaSyAIrxl_GDVJYzLZxuSzUt9cLBUCfkUoCaw",
       authDomain: "dk-pit.firebaseapp.com",
@@ -1205,516 +1184,114 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       appId: "1:835447327032:web:6101fd173f5214926359cd"
     };
 
-    let fbApp = null;
-    let fbAuth = null;
-    let fbDb = null;
-    let currentUser = null;
-    let cloudReady = false;
-    let unsubscribeUserDoc = null;
-    let lastRemoteAppliedAt = null;
-    let lastCloudWriteAt = 0;
-    let pendingCloudTimer = null;
+    let fbApp=null, fbAuth=null, fbDb=null;
+    let currentUser=null;
+    let cloudReady=false;
 
     function initFirebase(){
       try{
-        if(!window.firebase || !window.firebase.initializeApp) return;
         fbApp = firebase.initializeApp(firebaseConfig);
         fbAuth = firebase.auth();
         fbDb = firebase.firestore();
-        try{ fbDb.enablePersistence({ synchronizeTabs:true }); }catch(e){}
-      }catch(e){
-        console.warn("Firebase init failed:", e);
-      }
-    }
-
-    function getUserDocRef(uid){
-      return fbDb.collection('users').doc(uid);
+      }catch(e){ console.warn(e); }
     }
 
     function setAuthUI(state){
-      const loginBtn = document.getElementById('btn-login');
-      const logoutBtn = document.getElementById('btn-logout');
-      const userChip = document.getElementById('user-chip');
-      const userName = document.getElementById('user-name');
-
-      if(!loginBtn || !logoutBtn || !userChip) return;
-
-      if(state === 'signed-out'){
-        loginBtn.style.display = '';
-        logoutBtn.style.display = 'none';
-        const refreshBtn=document.getElementById('btn-refresh'); if(refreshBtn) refreshBtn.style.display='none';
-        userChip.style.display = 'none';
-      }else if(state === 'signed-in'){
-        loginBtn.style.display = 'none';
-        logoutBtn.style.display = '';
-        const refreshBtn=document.getElementById('btn-refresh'); if(refreshBtn) refreshBtn.style.display='';
-        userChip.style.display = '';
-        if(userName){
-          const name = currentUser?.displayName || currentUser?.email || "DK User";
-          userName.textContent = name;
-          userName.title = name;
-        }
-      }else if(state === 'loading'){
-        loginBtn.style.display = 'none';
-        logoutBtn.style.display = 'none';
-        const refreshBtn=document.getElementById('btn-refresh'); if(refreshBtn) refreshBtn.style.display='none';
-        userChip.style.display = 'none';
+      const loginBtn=document.getElementById('btn-login');
+      const logoutBtn=document.getElementById('btn-logout');
+      const refreshBtn=document.getElementById('btn-refresh');
+      const userChip=document.getElementById('user-chip');
+      const userName=document.getElementById('user-name');
+      if(state==='out'){
+        loginBtn.style.display='';
+        logoutBtn.style.display='none';
+        refreshBtn.style.display='none';
+        userChip.style.display='none';
+      }else if(state==='in'){
+        loginBtn.style.display='none';
+        logoutBtn.style.display='';
+        refreshBtn.style.display='';
+        userChip.style.display='';
+        const name=currentUser?.displayName || currentUser?.email || "DK User";
+        userName.textContent=name; userName.title=name;
       }
     }
 
     async function loginWithGoogle(){
       try{
-        unlockAudio();
-        haptic(10);
-        toast("Google 로그인 중...");
         const provider = new firebase.auth.GoogleAuthProvider();
-        provider.setCustomParameters({ prompt: 'select_account' });
+        provider.setCustomParameters({ prompt:'select_account' });
         await fbAuth.signInWithPopup(provider);
-      }catch(e){
-        console.warn(e);
-        toast("로그인 실패");
-      }
+      }catch(e){ console.warn(e); }
     }
-
     async function logout(){
-      try{
-        haptic(10);
-        await fbAuth.signOut();
-        toast("로그아웃 완료");
-      }catch(e){
-        console.warn(e);
-        toast("로그아웃 실패");
-      }
+      try{ await fbAuth.signOut(); }catch(e){ console.warn(e); }
     }
 
-
-    // ✅ 로컬 변경 시각 기록 (로그인 전에도 동기화 준비)
-
-    function getDeviceId(){
-      try{
-        let id = localStorage.getItem(KEY_DEVICE_ID);
-        if(!id){
-          id = (crypto?.randomUUID ? crypto.randomUUID() : (Date.now()+"_"+Math.random().toString(16).slice(2)));
-          localStorage.setItem(KEY_DEVICE_ID, id);
-        }
-        return id;
-      }catch(e){
-        return "unknown_device";
-      }
-    }
-
-    function touchLocalUpdatedAt(){
-      try{ localStorage.setItem(KEY_LOCAL_UPDATED_AT, new Date().toISOString()); }catch(e){}
-    }
-    function getLocalUpdatedAt(){
-      try{ return localStorage.getItem(KEY_LOCAL_UPDATED_AT) || null; }catch(e){ return null; }
-    }
-    // ✅ ISO 날짜 비교 (null 안전)
-    function isLater(aISO, bISO){
-      if(!aISO) return false;
-      if(!bISO) return true;
-      return new Date(aISO).getTime() > new Date(bISO).getTime();
-    }
-    // ✅ logs 충돌 병합: logKey 기준으로 최신(ts) 선택
-    function mergeLogs(localArr, cloudArr){
-      const map = new Map();
-      (cloudArr||[]).forEach(item=>{
-        if(!item) return;
-        const k = item.logKey ?? item.id;
-        map.set(k, item);
-      });
-      (localArr||[]).forEach(item=>{
-        if(!item) return;
-        const k = item.logKey ?? item.id;
-        const prev = map.get(k);
-        if(!prev){ map.set(k, item); return; }
-        const prevTs = prev.ts || prev.updatedAt;
-        const curTs = item.ts || item.updatedAt;
-        if(isLater(curTs, prevTs)) map.set(k, item);
-      });
-      return Array.from(map.values()).sort((a,b)=> new Date(b.ts||0)-new Date(a.ts||0));
-    }
-    // ✅ object 충돌 병합: key별 최신(updatedAt/ts) 우선, 없으면 로컬 우선
-    function mergeKeyedObject(localObj, cloudObj){
-      const out = { ...(cloudObj||{}) };
-      const keys = new Set([...Object.keys(cloudObj||{}), ...Object.keys(localObj||{})]);
-      keys.forEach(k=>{
-        const l = localObj?.[k];
-        const c = cloudObj?.[k];
-        if(l==null && c!=null){ out[k]=c; return; }
-        if(c==null && l!=null){ out[k]=l; return; }
-        const lTs = (l && (l.updatedAt || l.ts)) || null;
-        const cTs = (c && (c.updatedAt || c.ts)) || null;
-        if(isLater(lTs, cTs)) out[k]=l; else out[k]=c;
-      });
-      return out;
-    }
-    // ✅ 전체 페이로드 병합(충돌 방지)
-    function mergePayload(localPayload, cloudPayload){
+    function buildPayload(){
       return {
-        version: "dk_fit_cloud_v1",
-        updatedAt: new Date().toISOString(),
-        localUpdatedAt: getLocalUpdatedAt(),
-        lastWriterId: getDeviceId(),
-        lastWriterId: getDeviceId(),
-        localUpdatedAt: getLocalUpdatedAt(),
-        logs: mergeLogs(localPayload?.logs||[], cloudPayload?.logs||[]),
-        customSets: mergeKeyedObject(localPayload?.customSets||{}, cloudPayload?.customSets||{}),
-        customReps: mergeKeyedObject(localPayload?.customReps||{}, cloudPayload?.customReps||{}),
-        progressByDate: mergeKeyedObject(localPayload?.progressByDate||{}, cloudPayload?.progressByDate||{})
+        version:"dk_fit_cloud_v1",
+        updatedAt:new Date().toISOString(),
+        logs, customSets, customReps, progressByDate
       };
     }
 
-
-    /* =========================================================
-      🚀 Advanced Sync (Subcollection for logs)
-      - users/{uid}/logs/{logKey}
-      - 실시간 CRUD 반영 (추가/수정/삭제)
-      - 기존 localStorage 구조(logs 배열) 유지
-    ========================================================= */
-    let unsubscribeLogs = null;
-    let isApplyingRemoteLogs = false;
-    let lastSyncedLogsMap = new Map(); // logKey -> ts
-    let logsSnapshotReady = false; // first onSnapshot loaded
-    let allowDeleteSync = false; // enable delete diff after first snapshot
-    let suppressCloudWritesUntilInit = true;
-
-    function logsColRef(){
-      return fbDb.collection('users').doc(currentUser.uid).collection('logs');
-    }
-
-    function buildLogDoc(log){
-      return {
-        ...log,
-        logKey: log.logKey ?? log.id,
-        ts: log.ts || new Date().toISOString(),
-        updatedAt: log.updatedAt || log.ts || new Date().toISOString(),
-        lastWriterId: getDeviceId()
-      };
-    }
-
-    // ✅ 클라우드 → 로컬 logs 반영 (실시간)
-    function startLogsRealtime(){
-      // ✅ 일반적인 Fit앱 스타일: 실시간 구독 X, 필요할 때만 서버에서 최신 불러오기
-      if(!currentUser || !fbDb) return;
-      fetchLogsOnce();
-    }
-
-    async function manualRefresh(){
-      try{
-        if(typeof haptic==='function') haptic(8);
-        await fetchLogsOnce(true);
-      }catch(e){}
-    }
-
-
-    // ✅ Pull-to-Refresh (모바일: 아래로 당기면 새로고침)
-    
-    // ✅ Pull-to-Refresh (모바일: 아래로 당기면 새로고침)
-    function setupPullToRefresh(){
-      let startY = 0;
-      let pulling = false;
-      const threshold = 80;
-
-      const indicator = document.createElement('div');
-      indicator.id = "ptr-indicator";
-      indicator.style.position = "fixed";
-      indicator.style.top = "-60px";
-      indicator.style.left = "0";
-      indicator.style.right = "0";
-      indicator.style.height = "60px";
-      indicator.style.display = "flex";
-      indicator.style.alignItems = "center";
-      indicator.style.justifyContent = "center";
-      indicator.style.zIndex = "9999";
-      indicator.style.backdropFilter = "blur(10px)";
-      indicator.style.background = "rgba(20,20,24,0.75)";
-      indicator.style.borderBottom = "1px solid rgba(255,255,255,0.08)";
-      indicator.style.transition = "transform .18s ease";
-      indicator.style.transform = "translateY(0px)";
-      indicator.innerHTML = '<div class="pill"><i class="fa-solid fa-arrow-down"></i>&nbsp;당겨서 새로고침</div>';
-      document.body.appendChild(indicator);
-
-      function setPull(dy){
-        const y = Math.min(110, Math.max(0, dy));
-        indicator.style.transform = "translateY(" + y + "px)";
-        if(y > threshold){
-          indicator.innerHTML = '<div class="pill cyan"><i class="fa-solid fa-rotate-right"></i>&nbsp;놓으면 새로고침</div>';
-        }else{
-          indicator.innerHTML = '<div class="pill"><i class="fa-solid fa-arrow-down"></i>&nbsp;당겨서 새로고침</div>';
-        }
-      }
-
-      window.addEventListener('touchstart', function(e){
-        if(window.scrollY > 0) return;
-        startY = e.touches[0].clientY;
-        pulling = true;
-      }, {passive:true});
-
-      window.addEventListener('touchmove', function(e){
-        if(!pulling) return;
-        const dy = e.touches[0].clientY - startY;
-        if(dy <= 0) return;
-        setPull(dy);
-      }, {passive:true});
-
-      window.addEventListener('touchend', async function(){
-        if(!pulling) return;
-        const m = /translateY\(([-0-9.]+)px\)/.exec(indicator.style.transform);
-        const current = m ? parseFloat(m[1]) : 0;
-        pulling = false;
-        if(current > threshold){
-          indicator.innerHTML = '<div class="pill cyan"><i class="fa-solid fa-rotate-right fa-spin"></i>&nbsp;새로고침 중…</div>';
-          try{ await fetchLogsOnce(); }catch(e){}
-        }
-        indicator.style.transform = "translateY(0px)";
-      }, {passive:true});
-    }
-
-
-    async function fetchLogsOnce(forceToast=false){
-      if(!currentUser || !fbDb) return;
-      try{
-        const snap = await logsColRef().orderBy('ts','desc').get();
-        const remoteLogs = [];
-        snap.forEach(doc=>{
-          const d = doc.data();
-          if(d && d.deleted) return;
-          remoteLogs.push(d);
-        });
-        // 서버를 소스 오브 트루스로 사용
-        isApplyingRemoteLogs = true;
-        logs = remoteLogs;
-        localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
-        lastSyncedLogsMap = new Map();
-        logs.forEach(l=>{
-          const k = l.logKey ?? l.id;
-          lastSyncedLogsMap.set(k, l.ts || l.updatedAt || "");
-        });
-        isApplyingRemoteLogs = false;
-
-        logsSnapshotReady = true;
-        suppressCloudWritesUntilInit = false;
-        allowDeleteSync = true;
-
-        try{
-          renderCarousel(true);
-          updateProgressUI();
-          renderCalendar();
-          renderStats();
-        }catch(e){}
-      }catch(e){
-        console.warn("fetchLogsOnce failed:", e);
-      }
-    }
-
-    // ✅ 로컬 logs → 클라우드 반영 (추가/수정/삭제 diff)
-    async function syncLogsToCloud(){
-      // ✅ 초기 스냅샷 전에는 업로드/삭제 금지(빈 로컬이 서버를 덮지 않게)
-      if(suppressCloudWritesUntilInit || !logsSnapshotReady) return;
-      if(!currentUser || !fbDb || !cloudReady) return;
-      if(typeof suppressCloudWritesUntilInit!=='undefined' && suppressCloudWritesUntilInit) return;
-      if(isApplyingRemoteLogs) return;
-
-      try{
-        const col = logsColRef();
-        const localArr = Array.isArray(logs) ? logs : [];
-        const localMap = new Map();
-        localArr.forEach(l=>{
-          const k = l.logKey ?? l.id;
-          if(!k) return;
-          localMap.set(k, l);
-        });
-
-        const batch = fbDb.batch();
-        let ops = 0;
-
-        // upsert new/changed
-        localMap.forEach((log, k)=>{
-          const prevTs = lastSyncedLogsMap.get(k);
-          const curTs = log.ts || log.updatedAt;
-          if(!prevTs || isLater(curTs, prevTs)){
-            const toWrite = { ...buildLogDoc(log), updatedAt: new Date().toISOString(), ts: (log.ts || new Date().toISOString()) };
-            batch.set(col.doc(k), toWrite, { merge:true });
-            ops++;
-          }
-        });
-
-        // delete missing (단, 로컬이 비어있으면 삭제 금지)
-        if(allowDeleteSync && localMap.size>0){
-        lastSyncedLogsMap.forEach((prevTs, k)=>{
-          if(!localMap.has(k)){
-            batch.delete(col.doc(k));
-            ops++;
-          }
-        });
-        }
-
-        if(ops>0){
-          await batch.commit();
-          lastSyncedLogsMap = new Map();
-          localArr.forEach(l=>{
-            const k = l.logKey ?? l.id;
-            lastSyncedLogsMap.set(k, l.ts || l.updatedAt || "");
-          });
-        }
-      }catch(e){
-        console.warn("syncLogsToCloud failed:", e);
-      }
-    }
-
-    // ✅ 로컬 상태 -> 클라우드 페이로드
-    function buildCloudPayload(){
-      return {
-        version: "dk_fit_cloud_v1",
-        updatedAt: new Date().toISOString(),
-        logs,
-        customSets,
-        customReps,
-        progressByDate
-      };
-    }
-
-    // ✅ 클라우드 -> 로컬 상태 적용 (기존 로직/키 유지)
-    function applyCloudPayload(payload){
-      if(!payload) return false;
-
-      // 방어적 파싱
-      const pLogs = Array.isArray(payload.logs) ? payload.logs : [];
-      const pCustomSets = payload.customSets && typeof payload.customSets === 'object' ? payload.customSets : {};
-      const pCustomReps = payload.customReps && typeof payload.customReps === 'object' ? payload.customReps : {};
-      const pProgressByDate = payload.progressByDate && typeof payload.progressByDate === 'object' ? payload.progressByDate : {};
-
-      // 로컬 반영
-      logs = pLogs;
-      customSets = pCustomSets;
-      customReps = pCustomReps;
-      progressByDate = pProgressByDate;
-
-      // 로컬스토리지에도 저장(기존 로직 유지)
+    function applyPayload(p){
+      if(!p) return;
+      logs = Array.isArray(p.logs)? p.logs: [];
+      customSets = p.customSets && typeof p.customSets==='object'? p.customSets: {};
+      customReps = p.customReps && typeof p.customReps==='object'? p.customReps: {};
+      progressByDate = p.progressByDate && typeof p.progressByDate==='object'? p.progressByDate: {};
       localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
       localStorage.setItem(KEY_SETS, JSON.stringify(customSets));
       localStorage.setItem(KEY_REPS, JSON.stringify(customReps));
       localStorage.setItem(KEY_PROGRESS_BY_DATE, JSON.stringify(progressByDate));
-
-      localStorage.setItem(KEY_LOCAL_UPDATED_AT, payload.localUpdatedAt || payload.updatedAt || new Date().toISOString());
-      return true;
     }
 
-    // ✅ 최초 로그인 시: 클라우드 데이터가 있으면 내려받아 적용, 없으면 로컬을 업로드(첫 동기화)
-    async function initialSync(){
-      if(!currentUser || !fbDb) return;
-      setAuthUI('loading');
-
-      try{
-        const ref = getUserDocRef(currentUser.uid);
-        const snap = await ref.get();
-
-        if(snap.exists && snap.data()){
-          const data = snap.data();
-          const hasCloud = data && (data.logs || data.customSets || data.customReps || data.progressByDate);
-          if(hasCloud){
-            const localPayload = buildCloudPayload();
-            const merged = mergePayload({ ...localPayload, logs: localPayload.logs||[] }, { ...data, logs: [] });
-            applyCloudPayload(merged);
-            const { logs: _logs, ...rest } = merged;
-            await ref.set(rest, { merge:true });
-            // (sync toast removed)
-          }else{
-            await ref.set(buildCloudPayload(), { merge:true });
-            // (sync toast removed)
-          }
-        }else{
-          await ref.set(buildCloudPayload(), { merge:true });
-          // (sync toast removed)
-        }
-
-        cloudReady = true;
-        setAuthUI('signed-in');
-        startLogsRealtime();
-        // ✅ 앱 복귀/탭 포커스 시 최신 데이터 다시 불러오기(일반 Fit앱 UX)
-        window.addEventListener('focus', ()=>{ if(currentUser) fetchLogsOnce(); });
-        document.addEventListener('visibilitychange', ()=>{ if(!document.hidden && currentUser) fetchLogsOnce(); });
-
-        // UI 리렌더(기존 로직 호출)
-        try{
-          renderCarousel(true);
-          updateProgressUI();
-          renderCalendar();
-          renderStats();
-        }catch(e){}
-      }catch(e){
-        console.warn("Initial sync failed:", e);
-        setAuthUI('signed-in');
-        toast("동기화 실패(오프라인?)");
+    async function pullFromCloud(){
+      if(!currentUser||!fbDb) return;
+      const ref = fbDb.collection('users').doc(currentUser.uid);
+      const snap = await ref.get();
+      if(snap.exists && snap.data()){
+        applyPayload(snap.data());
+      }else{
+        await ref.set(buildPayload(), {merge:true});
       }
+      cloudReady=true;
+      try{
+        renderCarousel(true);
+        updateProgressUI();
+        renderCalendar();
+        renderStats();
+      }catch(e){}
     }
 
-
-    // ✅ 실시간 반영: 다른 기기에서 변경되면 즉시 로컬/UI 업데이트
-    let toastCooldownUntil = 0;
-    function startRealtimeListener(){ /* 일반형: 실시간 문서 구독 사용 안함 */ }
-
-    // ✅ Debounced Cloud Save: 잦은 writes 방지
-    function scheduleCloudSave(){
-      if(!currentUser || !fbDb || !cloudReady) return;
-      if(typeof suppressCloudWritesUntilInit!=='undefined' && suppressCloudWritesUntilInit) return;
-
-      const now = Date.now();
-      // 너무 자주면 800ms debounce + 최소 간격 2.5s
-      const minGap = 2500;
-      const delay = (now - lastCloudWriteAt < minGap) ? (minGap - (now - lastCloudWriteAt)) : 800;
-
-      if(pendingCloudTimer) clearTimeout(pendingCloudTimer);
-      pendingCloudTimer = setTimeout(async ()=>{
-        try{
-          const ref = getUserDocRef(currentUser.uid);
-          const payload = buildCloudPayload();
-          const { logs: _logs, ...rest } = payload;
-          await ref.set(rest, { merge:true });
-          await syncLogsToCloud();
-          lastCloudWriteAt = Date.now();
-        }catch(e){
-          console.warn("Cloud save failed:", e);
-        }
-      }, delay);
+    async function pushToCloud(){
+      if(!currentUser||!fbDb||!cloudReady) return;
+      const ref = fbDb.collection('users').doc(currentUser.uid);
+      await ref.set(buildPayload(), {merge:true});
     }
 
-    // ✅ localStorage.setItem 가 호출되면 자동으로 scheduleCloudSave 되도록 후킹
-    function hookLocalStorage(){ /* 일반형: localStorage 후킹 비활성화(로컬 저장 안정성 우선) */ }
-      };
-      // removeItem도 반영
-      const _removeItem = localStorage.removeItem.bind(localStorage);
-      localStorage.removeItem = function(k){
-        _removeItem(k);
-        if(k===KEY_LOGS || k===KEY_SETS || k===KEY_REPS || k===KEY_PROGRESS_BY_DATE){
-          touchLocalUpdatedAt();
-          scheduleCloudSave();
-          if(k===KEY_LOGS && typeof suppressCloudWritesUntilInit!=='undefined' && !suppressCloudWritesUntilInit) syncLogsToCloud();
-        }
-      };
+    async function manualRefresh(){
+      try{
+        await pushToCloud();   // 먼저 업로드(내 기록 반영)
+        await pullFromCloud(); // 그 다음 최신 다운로드
+      }catch(e){ console.warn(e); }
     }
 
     function bindAuthState(){
-      if(!fbAuth) return;
-      setAuthUI('loading');
-
       fbAuth.onAuthStateChanged(async (u)=>{
-        currentUser = u || null;
-
-        if(!currentUser){
-          if(unsubscribeUserDoc){ try{ unsubscribeUserDoc(); }catch(e){} unsubscribeUserDoc=null; }
-
-          cloudReady = false;
-          setAuthUI('signed-out');
-          return;
-        }
-
-        setAuthUI('signed-in');
-        // (login toast removed)
-        await initialSync();
-        startRealtimeListener();
+        currentUser=u||null;
+        if(!currentUser){ cloudReady=false; setAuthUI('out'); return; }
+        setAuthUI('in');
+        await pullFromCloud();
       });
+    }
+
+    // ✅ 포커스/탭 전환/탭 이동 시 자동 동기화 (일반 Fit앱 UX)
+    function setupAutoSync(){
+      window.addEventListener('focus', ()=>{ if(currentUser) manualRefresh(); });
+      document.addEventListener('visibilitychange', ()=>{ if(!document.hidden && currentUser) manualRefresh(); });
     }
 
 /* =========================================================
@@ -1772,8 +1349,6 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     const KEY_SETS = 'dk_os_v121_sets';
     const KEY_REPS = 'dk_os_v121_reps';
     const KEY_PROGRESS_BY_DATE = 'dk_os_v121_progress_by_date';
-    const KEY_LOCAL_UPDATED_AT = 'dk_os_v121_local_updated_at';
-    const KEY_DEVICE_ID = 'dk_os_v121_device_id';
     const KEY_SPLASH = 'dk_os_v121_splash_shown';
     const KEY_SUMMARY_SHOWN = 'dk_os_v121_summary_shown';
     const KEY_NOTIF = 'dk_os_v121_rest_notif';
@@ -1883,8 +1458,6 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
 
     /* ---------- TABS ---------- */
     function showTab(name, btn){
-      // ✅ Fit앱 UX: 탭 이동 시 최신 데이터 1회 fetch
-      try{ if(typeof fetchLogsOnce==='function' && currentUser) fetchLogsOnce(); }catch(e){}
       document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
       document.getElementById(`tab-${name}`).classList.add('active');
       document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
@@ -3168,9 +2741,8 @@ function saveRepToLog(logKey, value){
     /* ---------- INIT ---------- */
     window.onload = async () => {
       initFirebase();
-      hookLocalStorage();
       bindAuthState();
-      setupPullToRefresh();
+      setupAutoSync();
 
       await loadAppData();
       initIntro();
