@@ -1350,6 +1350,9 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     let unsubscribeLogs = null;
     let isApplyingRemoteLogs = false;
     let lastSyncedLogsMap = new Map(); // logKey -> ts
+    let logsSnapshotReady = false; // first onSnapshot loaded
+    let allowDeleteSync = false; // enable delete diff after first snapshot
+    let suppressCloudWritesUntilInit = true;
 
     function logsColRef(){
       return fbDb.collection('users').doc(currentUser.uid).collection('logs');
@@ -1371,6 +1374,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       if(unsubscribeLogs){ try{ unsubscribeLogs(); }catch(e){} unsubscribeLogs=null; }
 
       unsubscribeLogs = logsColRef().orderBy('ts','desc').onSnapshot((snap)=>{
+        const isFirst = !logsSnapshotReady;
         const remoteLogs = [];
         snap.forEach(doc=>{
           const d = doc.data();
@@ -1389,6 +1393,12 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
           lastSyncedLogsMap.set(k, l.ts || l.updatedAt || "");
         });
         isApplyingRemoteLogs = false;
+        logsSnapshotReady = true;
+        if(isFirst){
+          // ✅ 이제부터 업로드/삭제 동기화 허용
+          suppressCloudWritesUntilInit = false;
+          allowDeleteSync = true;
+        }
 
         try{
           renderCarousel(true);
@@ -1409,7 +1419,10 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
 
     // ✅ 로컬 logs → 클라우드 반영 (추가/수정/삭제 diff)
     async function syncLogsToCloud(){
+      // ✅ 초기 스냅샷 전에는 업로드/삭제 금지(빈 로컬이 서버를 덮지 않게)
+      if(suppressCloudWritesUntilInit || !logsSnapshotReady) return;
       if(!currentUser || !fbDb || !cloudReady) return;
+      if(suppressCloudWritesUntilInit) return;
       if(isApplyingRemoteLogs) return;
 
       try{
@@ -1436,13 +1449,15 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
           }
         });
 
-        // delete missing
+        // delete missing (단, 로컬이 비어있으면 삭제 금지)
+        if(allowDeleteSync && localMap.size>0){
         lastSyncedLogsMap.forEach((prevTs, k)=>{
           if(!localMap.has(k)){
             batch.delete(col.doc(k));
             ops++;
           }
         });
+        }
 
         if(ops>0){
           await batch.commit();
@@ -1591,6 +1606,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     // ✅ Debounced Cloud Save: 잦은 writes 방지
     function scheduleCloudSave(){
       if(!currentUser || !fbDb || !cloudReady) return;
+      if(suppressCloudWritesUntilInit) return;
 
       const now = Date.now();
       // 너무 자주면 800ms debounce + 최소 간격 2.5s
@@ -1620,7 +1636,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         if(k===KEY_LOGS || k===KEY_SETS || k===KEY_REPS || k===KEY_PROGRESS_BY_DATE){
           touchLocalUpdatedAt();
           scheduleCloudSave();
-          if(k===KEY_LOGS) syncLogsToCloud();
+          if(k===KEY_LOGS && !suppressCloudWritesUntilInit) syncLogsToCloud();
         }
       };
       // removeItem도 반영
@@ -1630,7 +1646,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         if(k===KEY_LOGS || k===KEY_SETS || k===KEY_REPS || k===KEY_PROGRESS_BY_DATE){
           touchLocalUpdatedAt();
           scheduleCloudSave();
-          if(k===KEY_LOGS) syncLogsToCloud();
+          if(k===KEY_LOGS && !suppressCloudWritesUntilInit) syncLogsToCloud();
         }
       };
     }
