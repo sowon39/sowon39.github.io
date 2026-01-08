@@ -3270,25 +3270,37 @@ btnSave && btnSave.addEventListener("click", async () => {
 
       if(cloudMs && localMs && Math.abs(cloudMs - localMs) > 2000){
         if(localMs > cloudMs){
-          // Local seems newer, but we always auto-apply cloud (no prompts)
-          applyPayload(cloudPayload);
-          try{
-            const newTs = (cloudPayload.updatedAt || cloudPayload.ts || new Date().toISOString());
-            localStorage.setItem("LOCAL_UPDATED_AT", newTs);
-            localStorage.setItem("KEY_LOCAL_UPDATED_AT", newTs);
-          }catch(e){}
-          showSnack("복원 완료", {loading:false});
-        }else{
-          // Cloud is newer
-          applyPayload(cloudPayload);
-          try{
-            const newTs = (cloudPayload.updatedAt || cloudPayload.ts || new Date().toISOString());
-            localStorage.setItem("LOCAL_UPDATED_AT", newTs);
-            localStorage.setItem("KEY_LOCAL_UPDATED_AT", newTs);
-          }catch(e){}
-          showSnack("복원 완료", {loading:false});
+          // Local is newer
+          if(policy === "cloudWins"){
+            applyPayload(cloudPayload);
+      // ✅ 강제 리렌더(필요 시): 복원 후 앱 상태가 메모리에 남아 UI가 안 바뀌는 경우를 방지
+      try{
+        if(typeof window.afterGistRestore === "function") window.afterGistRestore();
+        // 마지막 수단: 화면이 갱신되지 않는 환경에서는 1회 자동 리로드
+        if(!window.__GIST_RELOADED_ONCE__){
+          window.__GIST_RELOADED_ONCE__ = true;
+          setTimeout(()=>{ location.reload(); }, 80);
         }
-      }else{
+      }catch(e){}
+
+            showSnack("복원 완료(클라우드 우선)", {loading:false});
+          }else if(policy === "localWins"){
+            showSnack("로컬이 더 최신 · 복원 생략", {loading:false});
+          }else{
+            // ask
+            showSnack("로컬이 더 최신 · 복원할까요?", {loading:false, actionText:"복원", actionFn:()=>{ applyPayload(cloudPayload);
+      // ✅ 강제 리렌더(필요 시): 복원 후 앱 상태가 메모리에 남아 UI가 안 바뀌는 경우를 방지
+      try{
+        if(typeof window.afterGistRestore === "function") window.afterGistRestore();
+        // 마지막 수단: 화면이 갱신되지 않는 환경에서는 1회 자동 리로드
+        if(!window.__GIST_RELOADED_ONCE__){
+          window.__GIST_RELOADED_ONCE__ = true;
+          setTimeout(()=>{ location.reload(); }, 80);
+        }
+      }catch(e){}
+ hideSnack(); toast("복원 완료"); }});
+          }
+        }else{
           // Cloud is newer
           applyPayload(cloudPayload);
       // ✅ 강제 리렌더(필요 시): 복원 후 앱 상태가 메모리에 남아 UI가 안 바뀌는 경우를 방지
