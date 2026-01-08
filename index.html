@@ -1206,7 +1206,22 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
 
 
     const KEY_LOCAL_UPDATED_AT = 'dk_os_v121_local_updatedAt';
-    let silentPushTimer=null;
+    
+    /* =========================================================
+      ✅ Firebase 제거됨 (LocalStorage + Gist Sync만 사용)
+      - 기존 로직을 건드리지 않기 위해, Firebase 관련 참조는 안전한 no-op으로 대체합니다.
+    ========================================================= */
+    let currentUser = null;
+    let fbDb = null;
+    let cloudReady = Promise.resolve(true);
+
+    async function pushToCloud(){ return true; }
+    async function pullFromCloud(){ return null; }
+    function bindAuthState(){ /* removed */ }
+    async function loginWithGoogle(){ try{ toast("Google 로그인 기능 제거됨"); }catch(e){} }
+    async function logout(){ /* removed */ }
+
+let silentPushTimer=null;
     let isApplyingCloud=false;
     function scheduleSilentPush(){
       try{
