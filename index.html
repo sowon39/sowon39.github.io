@@ -1221,7 +1221,6 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         silentPushTimer = setTimeout(async ()=>{
           try{ await pushToCloud(); }catch(e){}
         }, 900);
-      }catch(e){}
     }
 
     function touchLocalUpdate(){
@@ -1236,7 +1235,6 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
           // 이벤트 방식도 지원
           try{ window.dispatchEvent(new Event("app:dataChanged")); }catch(e){}
         }
-      }catch(e){}
     }
 
     function getLocalUpdatedAt(){
@@ -1275,7 +1273,6 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         if(audioCtx.state === 'suspended'){
           audioCtx.resume();
         }
-      }catch(e){}
     }
 
     /* Stopwatch (pause support) */
@@ -1290,7 +1287,6 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
         if('wakeLock' in navigator){
           wakeLock = await navigator.wakeLock.request('screen');
         }
-      }catch(e){}
     }
     function releaseWakeLock(){
       try{ wakeLock && wakeLock.release(); }catch(e){}
@@ -1334,7 +1330,6 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       d.style.cssText="position:fixed;left:50%;bottom:64px;transform:translateX(-50%);background:rgba(0,0,0,.8);color:#fff;padding:10px 12px;border-radius:999px;font-size:12px;z-index:10001";
       document.body.appendChild(d);
       setTimeout(()=>d.remove(),1200);
-    }catch(e){}
   }
 
   fab && fab.addEventListener("click", showSetup);
@@ -1439,7 +1434,6 @@ btnSave && btnSave.addEventListener("click", async () => {
         if(p && !p.updatedAt) p.updatedAt = new Date().toISOString();
         return p;
       }
-    } catch(e){}
 
     // Generic localStorage dump (with explicit updatedAt)
     const out = {};
@@ -1459,7 +1453,6 @@ btnSave && btnSave.addEventListener("click", async () => {
     try {
       if (typeof window.applyBackupPayload === "function") return window.applyBackupPayload(payload);
       if (typeof window.importAll === "function") return window.importAll(payload);
-    } catch(e){}
     if(payload && payload.kind==="localStorageDump" && payload.data) {
       const keep = new Set([LS_GIST_ID, LS_GIST_TOKEN, LS_LAST_BACKUP_AT, LS_LAST_RESTORE_AT, LS_LAST_HASH, LS_SYNC_POLICY]);
       const existingKeys = [];
@@ -1476,7 +1469,6 @@ btnSave && btnSave.addEventListener("click", async () => {
       // force listeners
       try{ window.dispatchEvent(new Event('storage')); }catch(e){}
       try{ window.dispatchEvent(new Event('app:dataRestored')); }catch(e){}
-    } catch(e){}
   }
 
   // ----- GitHub API helpers
@@ -1558,7 +1550,6 @@ btnSave && btnSave.addEventListener("click", async () => {
         const v = payload.data["LOCAL_UPDATED_AT"] || payload.data["KEY_LOCAL_UPDATED_AT"] || payload.data["updatedAt"] || payload.data["localUpdatedAt"];
         if(v) return Date.parse(v) || 0;
       }
-    }catch(e){}
     return 0;
   }
 
@@ -1599,7 +1590,6 @@ btnSave && btnSave.addEventListener("click", async () => {
           window.__GIST_RELOADED_ONCE__ = true;
           setTimeout(()=>{ location.reload(); }, 80);
         }
-      }catch(e){}
 
             showSnack("복원 완료(클라우드 우선)", {loading:false});
           }else if(policy === "localWins"){
@@ -1614,7 +1604,6 @@ btnSave && btnSave.addEventListener("click", async () => {
           window.__GIST_RELOADED_ONCE__ = true;
           setTimeout(()=>{ location.reload(); }, 80);
         }
-      }catch(e){}
  hideSnack(); toast("복원 완료"); }});
           }
         }else{
@@ -1627,7 +1616,6 @@ btnSave && btnSave.addEventListener("click", async () => {
           window.__GIST_RELOADED_ONCE__ = true;
           setTimeout(()=>{ location.reload(); }, 80);
         }
-      }catch(e){}
 
           showSnack("복원 완료 · 최신 반영", {loading:false});
         }
@@ -1641,7 +1629,6 @@ btnSave && btnSave.addEventListener("click", async () => {
           window.__GIST_RELOADED_ONCE__ = true;
           setTimeout(()=>{ location.reload(); }, 80);
         }
-      }catch(e){}
 
         showSnack("복원 완료", {loading:false});
       }
