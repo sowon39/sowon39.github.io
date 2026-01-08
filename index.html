@@ -1436,6 +1436,7 @@ btnSave && btnSave.addEventListener("click", async () => {
         if(p && !p.updatedAt) p.updatedAt = new Date().toISOString();
         return p;
       }
+    } catch(e) {}
 
     // Generic localStorage dump (with explicit updatedAt)
     const out = {};
