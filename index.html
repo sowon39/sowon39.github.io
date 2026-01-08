@@ -853,6 +853,26 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
 /* Disable double-tap zoom on iOS for controls */
 *{ -webkit-tap-highlight-color: transparent; }
 </style>
+
+<style id="quiet-sync-overrides">
+/* Quiet sync UX: keep things automatic + minimal */
+#toast, .toast, .sync-toast, #syncToast, #notification, .notification, .snackbar, #snackbar {
+  font-size: 12px !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translateY(-6px) !important;
+  transition: opacity .18s ease, transform .18s ease !important;
+  height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+}
+/* If any element shows status text in big area, hide text but keep layout stable */
+.sync-message, #syncMessage, #statusMessage, .status-message {
+  display:none !important;
+}
+</style>
+
 </head>
 
 <body>
@@ -2935,7 +2955,7 @@ function saveRepToLog(logKey, value){
   #ptrHint .box{display:inline-block;background:rgba(255,255,255,.96);padding:8px 12px;border-radius:999px;box-shadow:0 10px 30px rgba(0,0,0,.15)}
 </style>
 
-<div id="ptrHint"><div class="box">↓ 당겨서 새로고침 (Gist 복원)</div></div>
+<div id="ptrHint"><div class="box">↓ 새로고침 (Gist 복원)</div></div>
 
 <div id="gistSnack">
   <div class="spin" id="gistSnackSpin"></div>
@@ -3457,7 +3477,7 @@ btnSave && btnSave.addEventListener("click", async () => {
     if(ptrDot) ptrDot.style.opacity = String(1 - progress*0.9);
 
     if(ptrText){
-      ptrText.textContent = (eased >= THRESHOLD) ? "놓으면 새로고침" : "당겨서 새로고침";
+      ptrText.textContent = (eased >= THRESHOLD) ? "업데이트" : "새로고침";
     }
     // subtle "ready" emphasis
     if(ptrDot) ptrDot.style.background = (eased >= THRESHOLD) ? "rgba(0,0,0,.45)" : "rgba(0,0,0,.15)";
@@ -3468,7 +3488,7 @@ btnSave && btnSave.addEventListener("click", async () => {
     ptrHint.style.opacity = "0";
     if(ptrRing){ ptrRing.style.opacity = "0"; ptrRing.style.transform = "rotate(0deg)"; }
     if(ptrDot){ ptrDot.style.opacity = "1"; }
-    if(ptrText){ ptrText.textContent = "당겨서 새로고침"; }
+    if(ptrText){ ptrText.textContent = "새로고침"; }
   }
 
   window.addEventListener("touchstart", (e)=> {
@@ -3498,7 +3518,7 @@ btnSave && btnSave.addEventListener("click", async () => {
       // lock hint in visible state while refreshing
       ptrHint.style.opacity = "1";
       ptrHint.style.transform = "translateY(42px)";
-      if(ptrText) ptrText.textContent = "새로고침 중…";
+      if(ptrText) ptrText.textContent = "업데이트…";
       if(ptrDot) ptrDot.style.display = "none";
       if(ptrRing){
         ptrRing.style.opacity = "1";
