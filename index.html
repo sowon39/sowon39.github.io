@@ -702,11 +702,11 @@ button,a{
       main .layoutWrap.px-4{ padding-left: 14px !important; padding-right: 14px !important; }
 
       header{
-        padding: 12px 14px 10px !important;
-        height: 76px;
-        padding-top: calc(4px + env(safe-area-inset-top)) !important;
+        padding: 14px 14px 10px !important;
+        height: 88px;
+        padding-top: calc(10px + env(safe-area-inset-top)) !important;
       }
-      :root{ --headerH: 76px; --dockH: 92px; }
+      :root{ --headerH: 88px; --dockH: 92px; }
 
       #view-day{
         font-size: 1.38rem !important;
@@ -931,8 +931,18 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
 
       <div class="flex flex-col items-end">
         <!-- ✅ Auth UI -->
-        <div id="auth-bar" style="display:none;"></div>
-<button id="btn-logout" class="pill" onclick="logout()" style="display:none;">
+        <div id="auth-bar" class="mt-2 flex items-center gap-2">
+          <button id="btn-login" class="pill cyan" onclick="loginWithGoogle()" style="display:none;">
+            <i class="fa-brands fa-google"></i> 로그인
+          </button>
+          <button id="btn-refresh" class="pill" onclick="manualRefresh()" style="display:none;">
+            <i class="fa-solid fa-rotate-right"></i>
+          </button>
+          <div id="user-chip" class="pill" style="display:none; max-width: 200px;">
+            <i class="fa-solid fa-user"></i>
+            <span id="user-name" class="truncate">User</span>
+          </div>
+          <button id="btn-logout" class="pill" onclick="logout()" style="display:none;">
             <i class="fa-solid fa-right-from-bracket"></i>
           </button>
         </div>
@@ -1187,32 +1197,27 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     }
 
     function setAuthUI(state){
-      // Google 로그인 UI를 제거했기 때문에, 요소가 없으면 조용히 종료
       const loginBtn=document.getElementById('btn-login');
       const logoutBtn=document.getElementById('btn-logout');
       const refreshBtn=document.getElementById('btn-refresh');
       const userChip=document.getElementById('user-chip');
       const userName=document.getElementById('user-name');
-
-      // 요소가 없으면(=로그인 UI 제거 상태) 에러 방지
-      if(!loginBtn && !logoutBtn && !refreshBtn && !userChip) return;
-
       if(state==='out'){
-        if(loginBtn) loginBtn.style.display='';
-        if(logoutBtn) logoutBtn.style.display='none';
-        if(refreshBtn) refreshBtn.style.display='none';
-        if(userChip) userChip.style.display='none';
-      }else{
-        if(loginBtn) loginBtn.style.display='none';
-        if(logoutBtn) logoutBtn.style.display='';
-        if(refreshBtn) refreshBtn.style.display='';
-        if(userChip) userChip.style.display='';
-        if(userName) userName.textContent = (currentUser && (currentUser.displayName || currentUser.email)) ? (currentUser.displayName || currentUser.email) : 'User';
+        loginBtn.style.display='';
+        logoutBtn.style.display='none';
+        refreshBtn.style.display='none';
+        userChip.style.display='none';
+      }else if(state==='in'){
+        loginBtn.style.display='none';
+        logoutBtn.style.display='';
+        refreshBtn.style.display='';
+        userChip.style.display='';
+        const name=currentUser?.displayName || currentUser?.email || "DK User";
+        userName.textContent=name; userName.title=name;
       }
     }
-    }
 
-    async function /*loginWithGoogle removed*/{
+    async function loginWithGoogle(){
       try{
         const provider = new firebase.auth.GoogleAuthProvider();
         provider.setCustomParameters({ prompt:'select_account' });
@@ -3065,18 +3070,6 @@ function saveRepToLog(logKey, value){
   #gistModal .primary{background:#111;color:#fff}
   #gistModal .ghost{background:#eee}
   #gistModal small{display:block;color:#666;margin-top:6px;line-height:1.4}
-
-  #gistModal .head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
-  #gistModal .sub{margin:4px 0 0 0;color:#555;font-size:12px}
-  #gistModal .iconBtn{border:0;background:#f1f1f1;border-radius:12px;width:36px;height:36px;cursor:pointer}
-  #gistModal .card{background:#fafafa;border:1px solid #eee;border-radius:16px;padding:14px}
-  #gistModal .hint{margin:0 0 10px 0;color:#333}
-  #gistModal .err{min-height:16px;margin-top:6px;color:#b00020;font-size:12px}
-  #gistModal .note{display:block;color:#666;margin-top:8px;line-height:1.4}
-  #gistModal .footer{margin-top:10px;text-align:center}
-  #gistModal .muted{color:#777}
-  #gistModal button[disabled]{opacity:.45;cursor:not-allowed}
-
   #gistModal .danger{color:#b00020}
 
   /* Pull-to-refresh hint */
@@ -3095,41 +3088,24 @@ function saveRepToLog(logKey, value){
 
 <button id="gistFab" type="button" title="Gist 동기화 설정">⚙️</button>
 
-
 <div id="gistModalOverlay">
   <div id="gistModal">
-    <div class="head">
-      <div>
-        <h3>Gist 동기화 설정</h3>
-        <p class="sub">한 번만 설정하면 자동 백업/복원이 켜집니다.</p>
-      </div>
-      <button id="gistModalCancelX" class="iconBtn" type="button" aria-label="닫기">✕</button>
-    </div>
+    <h3>Gist 동기화 설정</h3>
+    <p><b>로컬 우선</b>으로 즉시 저장하고, 10분마다 + 기록 변경 시 <b>Gist</b>로 자동 백업합니다.</p>
 
-    <div class="card">
-      <p class="hint"><b>로컬 우선</b>으로 즉시 저장하고, 10분마다 + 기록 변경 시 <b>Gist</b>로 자동 백업합니다.</p>
+    <label>Gist ID</label>
+    <input id="gistIdInput" placeholder="예: ad5ab1d6edecb14c530b30d524144dbc" />
 
-      <label>Gist ID</label>
-      <input id="gistIdInput" placeholder="예: ad5ab1d6edecb14c530b30d524144dbc" autocomplete="off" />
-      <div id="gistIdErr" class="err"></div>
+    <label>GitHub Token (PAT) <span class="danger">*</span></label>
+    <input id="gistTokenInput" placeholder="ghp_..." />
+    <small>권한(scope): <b>gist</b> (Read/Write). 토큰은 이 브라우저에만 저장됩니다(localStorage).</small>
 
-      <label>GitHub Token (PAT)</label>
-      <input id="gistTokenInput" placeholder="ghp_..." autocomplete="off" />
-      <div id="gistTokErr" class="err"></div>
-      <small class="note">권한(scope): <b>gist</b> (Read/Write). 토큰은 이 브라우저에만 저장됩니다(localStorage).</small>
-
-      <div class="row">
-        <button id="gistModalCancel" class="ghost" type="button">취소</button>
-        <button id="gistModalSave" class="primary" type="button" disabled>저장</button>
-      </div>
-    </div>
-
-    <div class="footer">
-      <small class="muted">※ 값이 올바르지 않으면 저장되지 않습니다.</small>
+    <div class="row">
+      <button id="gistModalCancel" class="ghost" type="button">닫기</button>
+      <button id="gistModalSave" class="primary" type="button">저장</button>
     </div>
   </div>
 </div>
-
 
 <script>
 (function(){
@@ -3154,10 +3130,6 @@ function saveRepToLog(logKey, value){
   const inputToken = document.getElementById("gistTokenInput");
   const btnSave = document.getElementById("gistModalSave");
   const btnCancel = document.getElementById("gistModalCancel");
-  const btnCancelX = document.getElementById("gistModalCancelX");
-  const idErr = document.getElementById("gistIdErr");
-  const tokErr = document.getElementById("gistTokErr");
-
   const ptrHint = document.getElementById("ptrHint");
 
   function getGistId(){ return localStorage.getItem(LS_GIST_ID) || DEFAULT_GIST_ID; }
@@ -3190,7 +3162,6 @@ function saveRepToLog(logKey, value){
     inputId.value = getGistId();
     inputToken.value = getToken();
     overlay.style.display = "flex";
-    setTimeout(updateSaveState,0);
   }
   function hideSetup(){ overlay.style.display = "none"; }
 
@@ -3207,126 +3178,14 @@ function saveRepToLog(logKey, value){
 
   fab && fab.addEventListener("click", showSetup);
   btnCancel && btnCancel.addEventListener("click", hideSetup);
-  btnCancelX && btnCancelX.addEventListener("click", hideSetup);
-  
-  function validateGistId(v){
-    const s = (v||"").trim();
-    // GitHub Gist id is usually 20+ hex chars; often 32 hex
-    if(!s) return {ok:false, msg:"Gist ID를 입력해주세요."};
-    if(!/^[0-9a-fA-F]{20,40}$/.test(s)) return {ok:false, msg:"Gist ID 형식이 올바르지 않습니다. (hex 20~40자)"};
-    return {ok:true, msg:""};
-  }
-  function validateToken(v){
-    const s = (v||"").trim();
-    if(!s) return {ok:false, msg:"Token을 입력해주세요."};
-    // Fine-grained: github_pat_..., Classic: ghp_...
-    if(!/^(ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,})$/.test(s)) return {ok:false, msg:"Token 형식이 올바르지 않습니다."};
-    return {ok:true, msg:""};
-  }
-  function updateSaveState(){
-    const idV = validateGistId(inputId.value);
-    const tokV = validateToken(inputToken.value);
-    if(idErr) idErr.textContent = idV.msg;
-    if(tokErr) tokErr.textContent = tokV.msg;
-    btnSave.disabled = !(idV.ok && tokV.ok);
-  }
-  inputId && inputId.addEventListener("input", updateSaveState);
-  inputToken && inputToken.addEventListener("input", updateSaveState);
-
-btnSave && btnSave.addEventListener("click", async () => {
-    const idCheck = validateGistId(inputId.value);
-    const tokCheck = validateToken(inputToken.value);
-    if(!idCheck.ok || !tokCheck.ok){ updateSaveState(); toast("입력값을 확인해주세요"); return; }
-
-    const id = (inputId.value || "").trim();
+  btnSave && btnSave.addEventListener("click", () => {
+    const id = (inputId.value || "").trim() || DEFAULT_GIST_ID;
     const tok = (inputToken.value || "").trim();
-
-    // UI: loading state
-    const prevText = btnSave.textContent;
-    btnSave.textContent = "검증 중…";
-    btnSave.disabled = true;
-
-    try{
-      // 1) Validate gist exists (no token)
-      const res1 = await fetch(`https://api.github.com/gists/${id}`, { headers: { "Accept":"application/vnd.github+json" }});
-      if(res1.status === 404){
-        if(idErr) idErr.textContent = "해당 Gist ID를 찾을 수 없습니다. (404)";
-        throw new Error("Gist ID가 존재하지 않습니다.");
-      }
-      if(!res1.ok){
-        throw new Error("Gist 확인 실패: " + res1.status);
-      }
-
-      // 2) Validate token can access gist (auth)
-      const res2 = await fetch(`https://api.github.com/gists/${id}`, {
-        headers: {
-          "Accept":"application/vnd.github+json",
-          "Authorization":"token " + tok
-        }
-      });
-
-      if(res2.status === 401){
-        if(tokErr) tokErr.textContent = "Token이 유효하지 않거나 만료되었습니다. (401)";
-        throw new Error("Token 인증 실패");
-      }
-      if(res2.status === 403){
-        if(tokErr) tokErr.textContent = "권한이 부족합니다. Token 권한에 gist(Read/Write)가 필요합니다. (403)";
-        throw new Error("Token 권한 부족");
-      }
-      if(!res2.ok){
-        throw new Error("Token 확인 실패: " + res2.status);
-      }
-
-      // 3) Validate write permission by doing a dry-run PATCH (no-op) on a hidden file key
-      // (PATCH with same content is effectively a no-op; safer than creating new data)
-      const j = await res2.json();
-      const files = j && j.files ? Object.keys(j.files) : [];
-      // Ensure target file exists (or allow creation)
-      // We will patch with identical content to avoid data changes
-      let targetName = (files.includes("workout_backup.json") ? "workout_backup.json" : (files[0] || "workout_backup.json"));
-      let current = j.files && j.files[targetName] ? (j.files[targetName].content || "{}") : "{}";
-
-      const res3 = await fetch(`https://api.github.com/gists/${id}`, {
-        method:"PATCH",
-        headers:{
-          "Accept":"application/vnd.github+json",
-          "Content-Type":"application/json",
-          "Authorization":"token " + tok
-        },
-        body: JSON.stringify({ files: { [targetName]: { content: current } } })
-      });
-
-      if(res3.status === 401){
-        if(tokErr) tokErr.textContent = "Token이 유효하지 않거나 만료되었습니다. (401)";
-        throw new Error("Token 인증 실패");
-      }
-      if(res3.status === 403){
-        if(tokErr) tokErr.textContent = "쓰기 권한이 없습니다. Token 권한에 gist(Read/Write)가 필요합니다. (403)";
-        throw new Error("쓰기 권한 부족");
-      }
-      if(!res3.ok){
-        const t = await res3.text().catch(()=> "");
-        throw new Error("쓰기 권한 확인 실패: " + res3.status + " " + t);
-      }
-
-      // Passed all checks -> save
-      localStorage.setItem(LS_GIST_ID, id);
-      localStorage.setItem(LS_GIST_TOKEN, tok);
-      hideSetup();
-      toast("설정 완료 ✅");
-      updateFabVisibility();
-      showSnack("동기화 설정 완료", {loading:false});
-    }catch(e){
-      console.error(e);
-      // re-enable to allow retry
-      updateSaveState();
-      btnSave.textContent = prevText;
-      toast(e.message || "검증 실패");
-      return;
-    }finally{
-      btnSave.textContent = prevText;
-      updateSaveState();
-    }
+    localStorage.setItem(LS_GIST_ID, id);
+    if(tok) localStorage.setItem(LS_GIST_TOKEN, tok);
+    hideSetup();
+    toast("Gist 설정 저장됨");
+    updateFabVisibility();
   });
 
   function updateFabVisibility(){
