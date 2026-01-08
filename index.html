@@ -917,18 +917,17 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
           </button>
         </div>
 
-        <div class="flex items-center gap-2 mt-1">
-          <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-          <p class="text-[9px] font-black text-gray-300 tracking-widest uppercase">ELITE MODE · DK</p>
-        </div>
-      </div>
+        
+          <div class="flex items-center gap-2 mt-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+            <p class="text-[9px] font-black text-gray-300 tracking-widest uppercase">ELITE MODE · DK</p>
+            <span id="sync-indicator" class="pill" style="margin-left:6px;padding:5px 10px;">
+              <span id="sync-dot" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.35);display:inline-block;box-shadow:0 0 10px rgba(255,255,255,0.12);"></span>
+              <span id="sync-text" style="opacity:.85;">SYNC</span>
+            </span>
+          </div>
 
-      <div class="flex flex-col items-end">
-        <span id="progress-percent" class="text-[10px] font-black mb-0.5 text-cyan-300">0%</span>
-        <span id="progress-text" class="text-[9px] font-black text-white/40 tracking-widest uppercase">현재 0% 완료!</span>
-        <div class="w-28 h-1.5 bg-white/5 rounded-full overflow-hidden mt-2">
-          <div id="progress-bar" class="h-full bg-cyan-400 shadow-[0_0_12px_#22d3ee] transition-all duration-700" style="width:0%"></div>
-        </div>
+      </div>
       </div>
     </div>
   </header>
@@ -2891,13 +2890,20 @@ function saveRepToLog(logKey, value){
 
   #gistModal .danger{color:#b00020}
 
-  /* Pull-to-refresh hint */
-  #ptrHint{position:fixed;top:calc(env(safe-area-inset-top, 0px) - 40px);left:0;right:0;text-align:center;z-index:9997;
-    color:#111;font-size:12px;transition:top .2s;}
-  #ptrHint .box{display:inline-block;background:rgba(255,255,255,.96);padding:8px 12px;border-radius:999px;box-shadow:0 10px 30px rgba(0,0,0,.15)}
+  
+  /* Pull-to-refresh hint (Fit app style) */
+  #ptrHint{position:fixed;top:calc(env(safe-area-inset-top, 0px) - 52px);left:0;right:0;text-align:center;z-index:9997;
+    color:#111;font-size:12px;transition:transform .18s ease, opacity .18s ease;pointer-events:none;opacity:0;transform:translateY(0)}
+  #ptrHint .box{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.96);padding:10px 14px;border-radius:999px;box-shadow:0 10px 30px rgba(0,0,0,.15)}
+  #ptrArrow{font-size:13px;line-height:1;transition:transform .12s ease, opacity .12s ease;opacity:.85}
+  #ptrDot{width:10px;height:10px;border-radius:50%;background:rgba(0,0,0,.15);display:inline-block}
+  #ptrRing{width:18px;height:18px;border-radius:50%;border:2px solid rgba(0,0,0,.12);border-top-color:rgba(0,0,0,.55);
+    display:inline-block;transform:rotate(0deg);transition:transform .05s linear;opacity:0}
+  @keyframes ptrSpin{to{transform:rotate(360deg)}}
+
 </style>
 
-<div id="ptrHint"><div class="box">↓ 당겨서 새로고침 (Gist 복원)</div></div>
+<div id="ptrHint"><div class="box"><span id="ptrArrow">↓</span><span id="ptrDot"></span><span id="ptrRing"></span><span id="ptrText">당겨서 새로고침</span></div></div>
 
 <div id="gistSnack">
   <div class="spin" id="gistSnackSpin"></div>
@@ -2971,12 +2977,40 @@ function saveRepToLog(logKey, value){
   const tokErr = document.getElementById("gistTokErr");
   const ptrHint = document.getElementById("ptrHint");
 
+  // ===== Sync Indicator (header pill) =====
+  const syncDot = document.getElementById("sync-dot");
+  const syncText = document.getElementById("sync-text");
+  function setSyncState(state){
+    // state: idle | backup | restore | ok | err
+    if(!syncDot || !syncText) return;
+    const map = {
+      idle: {c:"rgba(255,255,255,0.35)", t:"SYNC"},
+      backup:{c:"rgba(34,211,238,0.95)", t:"BACKUP"},
+      restore:{c:"rgba(99,102,241,0.95)", t:"RESTORE"},
+      ok:{c:"rgba(34,197,94,0.95)", t:"OK"},
+      err:{c:"rgba(239,68,68,0.95)", t:"ERR"},
+    };
+    const v = map[state] || map.idle;
+    syncDot.style.background = v.c;
+    syncDot.style.boxShadow = `0 0 12px ${v.c}`;
+    syncText.textContent = v.t;
+  }
+  window.__setSyncState = setSyncState;
+  setSyncState("idle");
+
+
   function getGistId(){ return localStorage.getItem(LS_GIST_ID) || DEFAULT_GIST_ID; }
   function getToken(){ return localStorage.getItem(LS_GIST_TOKEN) || ""; }
   function getPolicy(){ return localStorage.getItem(LS_SYNC_POLICY) || "ask"; }
 
   function showSnack(msg, {loading=false, actionText="", actionFn=null, autoHideMs=2200} = {}){
     snackMsg.textContent = msg;
+    try{
+      if(loading) window.__setSyncState && window.__setSyncState(/백업/.test(msg)?'backup':(/복원|다운로드/.test(msg)?'restore':'idle'));
+      else if(/완료|설정 완료/.test(msg)) window.__setSyncState && window.__setSyncState('ok');
+      else if(/실패|오류|필요/.test(msg)) window.__setSyncState && window.__setSyncState('err');
+    }catch(e){}
+
     snack.style.display = "flex";
     requestAnimationFrame(()=>snack.classList.add("show"));
     snackSpin.style.display = loading ? "inline-block" : "none";
@@ -3201,6 +3235,7 @@ btnSave && btnSave.addEventListener("click", async () => {
     if(isSyncing) return;
 
     isSyncing = true;
+    try{ window.__setSyncState && window.__setSyncState('backup'); }catch(e){}
     showSnack(`백업 중… ${reason ? "(" + reason + ")" : ""}`, {loading:true, autoHideMs:0});
 
     try {
@@ -3288,7 +3323,7 @@ btnSave && btnSave.addEventListener("click", async () => {
             showSnack("로컬이 더 최신 · 복원 생략", {loading:false});
           }else{
             // ask
-            showSnack("로컬이 더 최신 · 복원할까요?", {loading:false, actionText:"복원", actionFn:()=>{ applyPayload(cloudPayload);
+            showSnack("복원 완료", {loading:false, actionText:"복원", actionFn:()=>{ applyPayload(cloudPayload);
       // ✅ 강제 리렌더(필요 시): 복원 후 앱 상태가 메모리에 남아 UI가 안 바뀌는 경우를 방지
       try{
         if(typeof window.afterGistRestore === "function") window.afterGistRestore();
@@ -3329,6 +3364,7 @@ btnSave && btnSave.addEventListener("click", async () => {
       }catch(e){}
 
         showSnack("복원 완료", {loading:false});
+        try{ window.__setSyncState && window.__setSyncState('ok'); }catch(e){}
       }
 
       const at = new Date().toISOString();
@@ -3468,6 +3504,118 @@ btnSave && btnSave.addEventListener("click", async () => {
 <!-- ===================== /GitHub Gist Backup/Restore ===================== -->
 
 
+<script>
+
+  // Pull-to-refresh (Fit app style)
+  (function(){
+    const ptrHint = document.getElementById("ptrHint");
+    const ptrText = document.getElementById("ptrText");
+    const ptrDot = document.getElementById("ptrDot");
+    const ptrRing = document.getElementById("ptrRing");
+    const ptrArrow = document.getElementById("ptrArrow");
+    if(!ptrHint) return;
+
+    const THRESHOLD = 72;
+    const MAX = 140;
+    let startY = null;
+    let pulling = false;
+    let maxPull = 0;
+    let rafId = null;
+    let refreshing = false;
+
+    const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+
+    function setPtr(y){
+      const eased = y < THRESHOLD ? y : THRESHOLD + (y-THRESHOLD)*0.35;
+      const shown = clamp(eased - 10, 0, 64);
+      ptrHint.style.transform = `translateY(${shown}px)`;
+      ptrHint.style.opacity = String(Math.min(1, eased/60));
+
+      const progress = clamp(eased/THRESHOLD, 0, 1);
+      if(ptrRing){
+        ptrRing.style.opacity = String(progress);
+        ptrRing.style.transform = `rotate(${Math.floor(progress*320)}deg)`;
+      }
+      if(ptrDot) ptrDot.style.opacity = String(1 - progress*0.9);
+
+      if(ptrArrow){
+        ptrArrow.style.transform = (eased>=THRESHOLD) ? "rotate(180deg)" : "rotate(0deg)";
+        ptrArrow.style.opacity = String(0.65 + progress*0.35);
+      }
+      if(ptrText){
+        ptrText.textContent = (eased>=THRESHOLD) ? "놓으면 새로고침" : "당겨서 새로고침";
+      }
+    }
+
+    function resetPtr(){
+      ptrHint.style.transform = "translateY(0px)";
+      ptrHint.style.opacity = "0";
+      if(ptrRing){ ptrRing.style.opacity="0"; ptrRing.style.transform="rotate(0deg)"; ptrRing.style.animation="none"; }
+      if(ptrDot){ ptrDot.style.opacity="1"; ptrDot.style.display="inline-block"; }
+      if(ptrArrow){ ptrArrow.style.opacity="1"; ptrArrow.style.display="inline-block"; ptrArrow.style.transform="rotate(0deg)"; }
+      if(ptrText){ ptrText.textContent="당겨서 새로고침"; }
+    }
+
+    async function doRefresh(){
+      if(refreshing) return;
+      refreshing = true;
+
+      ptrHint.style.opacity = "1";
+      ptrHint.style.transform = "translateY(46px)";
+      if(ptrText) ptrText.textContent = "새로고침 중…";
+      if(ptrDot) ptrDot.style.display = "none";
+      if(ptrArrow) ptrArrow.style.display = "none";
+      if(ptrRing){
+        ptrRing.style.opacity = "1";
+        ptrRing.style.animation = "ptrSpin .8s linear infinite";
+      }
+      try{ if(navigator.vibrate) navigator.vibrate(8); }catch(e){}
+
+      try{
+        if(typeof window.restoreFromGist === "function"){
+          await window.restoreFromGist(true);
+        }
+      }catch(e){
+        console.error(e);
+      }
+
+      if(ptrRing) ptrRing.style.animation = "none";
+      resetPtr();
+      refreshing = false;
+    }
+
+    window.addEventListener("touchstart", (e)=>{
+      if(refreshing) return;
+      if(window.scrollY === 0) startY = e.touches[0].clientY;
+    }, {passive:true});
+
+    window.addEventListener("touchmove", (e)=>{
+      if(refreshing) return;
+      if(startY==null) return;
+      const dy = e.touches[0].clientY - startY;
+      if(dy<=0 || window.scrollY !== 0) return;
+      pulling = true;
+      maxPull = Math.max(maxPull, dy);
+      const y = clamp(dy,0,MAX);
+      if(rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(()=>setPtr(y));
+    }, {passive:true});
+
+    window.addEventListener("touchend", ()=>{
+      if(refreshing) { startY=null; pulling=false; maxPull=0; return; }
+      if(!pulling){ startY=null; maxPull=0; return; }
+      const ready = maxPull >= THRESHOLD;
+      pulling=false;
+      startY=null;
+      maxPull=0;
+      if(ready) doRefresh();
+      else resetPtr();
+    });
+
+    resetPtr();
+  })();
+
+</script>
 </body>
 </html>
 
