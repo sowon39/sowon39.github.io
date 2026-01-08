@@ -3034,43 +3034,69 @@ function saveRepToLog(logKey, value){
 })();
 </script>
 
+
 <!-- ===================== GitHub Gist Backup/Restore (Local-first Sync) ===================== -->
 <style>
-  #gistSyncBar{position:fixed;left:0;right:0;bottom:0;z-index:9999;background:rgba(0,0,0,.75);color:#fff;
-    font-size:12px;padding:8px 12px;display:none;gap:10px;align-items:center}
-  #gistSyncBar button{background:#fff;border:0;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer}
-  #gistModalOverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;z-index:10000;align-items:center;justify-content:center}
-  #gistModal{background:#fff;border-radius:16px;max-width:420px;width:92%;padding:18px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
-  #gistModal h3{margin:0 0 10px 0;font-size:18px}
-  #gistModal p{margin:6px 0;font-size:13px;line-height:1.4;color:#333}
+  /* Top app-like snackbar */
+  #gistSnack{position:fixed;left:50%;top:10px;transform:translateX(-50%);z-index:9999;
+    background:rgba(20,20,20,.92);color:#fff;border-radius:14px;
+    padding:10px 12px;display:none;align-items:center;gap:10px;min-width:240px;max-width:92vw;
+    box-shadow:0 14px 40px rgba(0,0,0,.25)}
+  #gistSnack .msg{font-size:12px;line-height:1.25;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #gistSnack .btn{background:rgba(255,255,255,.14);border:0;color:#fff;border-radius:10px;
+    padding:6px 10px;font-size:12px;cursor:pointer}
+  #gistSnack .spin{width:14px;height:14px;border-radius:50%;
+    border:2px solid rgba(255,255,255,.25);border-top-color:#fff;animation:gistSpin .8s linear infinite;display:none}
+  @keyframes gistSpin{to{transform:rotate(360deg)}}
+
+  /* Small floating settings button (hidden if configured) */
+  #gistFab{position:fixed;right:14px;bottom:14px;z-index:9998;width:44px;height:44px;border-radius:16px;
+    border:0;background:rgba(20,20,20,.92);color:#fff;display:none;cursor:pointer;
+    box-shadow:0 14px 40px rgba(0,0,0,.25);font-size:20px;line-height:44px}
+  #gistFab:active{transform:scale(.98)}
+
+  /* Modal */
+  #gistModalOverlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;z-index:10000;align-items:center;justify-content:center}
+  #gistModal{background:#fff;border-radius:18px;max-width:420px;width:92%;padding:18px 18px 14px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+  #gistModal h3{margin:0 0 8px 0;font-size:18px}
+  #gistModal p{margin:6px 0;font-size:13px;line-height:1.5;color:#333}
   #gistModal label{display:block;margin-top:10px;font-size:12px;color:#222}
-  #gistModal input{width:100%;padding:10px;border:1px solid #ddd;border-radius:10px;font-size:13px}
+  #gistModal input{width:100%;padding:10px;border:1px solid #ddd;border-radius:12px;font-size:13px}
   #gistModal .row{display:flex;gap:10px;margin-top:12px}
   #gistModal .row button{flex:1;border:0;border-radius:12px;padding:10px 12px;font-size:13px;cursor:pointer}
   #gistModal .primary{background:#111;color:#fff}
   #gistModal .ghost{background:#eee}
-  #ptrHint{position:fixed;top:-40px;left:0;right:0;text-align:center;z-index:9998;
+  #gistModal small{display:block;color:#666;margin-top:6px;line-height:1.4}
+  #gistModal .danger{color:#b00020}
+
+  /* Pull-to-refresh hint */
+  #ptrHint{position:fixed;top:-40px;left:0;right:0;text-align:center;z-index:9997;
     color:#111;font-size:12px;transition:top .2s;}
-  #ptrHint .box{display:inline-block;background:rgba(255,255,255,.95);padding:8px 12px;border-radius:999px;box-shadow:0 10px 30px rgba(0,0,0,.15)}
+  #ptrHint .box{display:inline-block;background:rgba(255,255,255,.96);padding:8px 12px;border-radius:999px;box-shadow:0 10px 30px rgba(0,0,0,.15)}
 </style>
 
 <div id="ptrHint"><div class="box">↓ 당겨서 새로고침 (Gist 복원)</div></div>
 
-<div id="gistSyncBar">
-  <span id="gistSyncText">Gist Sync</span>
-  <button id="gistSyncRestoreBtn" type="button">지금 복원</button>
-  <button id="gistSyncSetupBtn" type="button">설정</button>
+<div id="gistSnack">
+  <div class="spin" id="gistSnackSpin"></div>
+  <div class="msg" id="gistSnackMsg">Sync</div>
+  <button class="btn" id="gistSnackAction" type="button" style="display:none">복원</button>
 </div>
+
+<button id="gistFab" type="button" title="Gist 동기화 설정">⚙️</button>
 
 <div id="gistModalOverlay">
   <div id="gistModal">
-    <h3>GitHub Gist 백업/복원 설정</h3>
-    <p>앱 데이터는 <b>로컬</b>에 즉시 저장되고, 10분마다 + 기록 변경 시 <b>Gist</b>로 자동 백업됩니다.</p>
+    <h3>Gist 동기화 설정</h3>
+    <p><b>로컬 우선</b>으로 즉시 저장하고, 10분마다 + 기록 변경 시 <b>Gist</b>로 자동 백업합니다.</p>
+
     <label>Gist ID</label>
     <input id="gistIdInput" placeholder="예: ad5ab1d6edecb14c530b30d524144dbc" />
-    <label>GitHub Token (PAT) - scope: gist (Read/Write)</label>
+
+    <label>GitHub Token (PAT) <span class="danger">*</span></label>
     <input id="gistTokenInput" placeholder="ghp_..." />
-    <p style="color:#666;margin-top:8px">토큰은 이 브라우저에만 저장됩니다(localStorage). 코드/깃허브에는 저장되지 않습니다.</p>
+    <small>권한(scope): <b>gist</b> (Read/Write). 토큰은 이 브라우저에만 저장됩니다(localStorage).</small>
+
     <div class="row">
       <button id="gistModalCancel" class="ghost" type="button">닫기</button>
       <button id="gistModalSave" class="primary" type="button">저장</button>
@@ -3085,14 +3111,17 @@ function saveRepToLog(logKey, value){
   const LS_LAST_BACKUP_AT = "GIST_LAST_BACKUP_AT";
   const LS_LAST_RESTORE_AT = "GIST_LAST_RESTORE_AT";
   const LS_LAST_HASH = "GIST_LAST_HASH";
-
+  const LS_SYNC_POLICY = "GIST_SYNC_POLICY"; // "ask" | "cloudWins" | "localWins"
   const DEFAULT_GIST_ID = "ad5ab1d6edecb14c530b30d524144dbc";
   const TARGET_FILENAME = "workout_backup.json";
 
-  const bar = document.getElementById("gistSyncBar");
-  const text = document.getElementById("gistSyncText");
-  const btnRestore = document.getElementById("gistSyncRestoreBtn");
-  const btnSetup = document.getElementById("gistSyncSetupBtn");
+  // UI
+  const snack = document.getElementById("gistSnack");
+  const snackMsg = document.getElementById("gistSnackMsg");
+  const snackSpin = document.getElementById("gistSnackSpin");
+  const snackAction = document.getElementById("gistSnackAction");
+  const fab = document.getElementById("gistFab");
+
   const overlay = document.getElementById("gistModalOverlay");
   const inputId = document.getElementById("gistIdInput");
   const inputToken = document.getElementById("gistTokenInput");
@@ -3102,27 +3131,33 @@ function saveRepToLog(logKey, value){
 
   function getGistId(){ return localStorage.getItem(LS_GIST_ID) || DEFAULT_GIST_ID; }
   function getToken(){ return localStorage.getItem(LS_GIST_TOKEN) || ""; }
-  function setStatus(msg){ if(text) text.textContent = msg; }
-  function showBar(){ if(bar) bar.style.display = "flex"; }
-  function hideBar(){ if(bar) bar.style.display = "none"; }
+  function getPolicy(){ return localStorage.getItem(LS_SYNC_POLICY) || "ask"; }
+
+  function showSnack(msg, {loading=false, actionText="", actionFn=null, autoHideMs=2200} = {}){
+    snackMsg.textContent = msg;
+    snack.style.display = "flex";
+    snackSpin.style.display = loading ? "inline-block" : "none";
+    if(actionText && actionFn){
+      snackAction.textContent = actionText;
+      snackAction.style.display = "inline-block";
+      snackAction.onclick = actionFn;
+      autoHideMs = 0; // don't auto hide if action exists
+    }else{
+      snackAction.style.display = "none";
+      snackAction.onclick = null;
+    }
+    if(autoHideMs){
+      setTimeout(()=> { snack.style.display = "none"; }, autoHideMs);
+    }
+  }
+  function hideSnack(){ snack.style.display = "none"; }
+
   function showSetup(){
     inputId.value = getGistId();
     inputToken.value = getToken();
     overlay.style.display = "flex";
   }
   function hideSetup(){ overlay.style.display = "none"; }
-
-  btnSetup && btnSetup.addEventListener("click", showSetup);
-  btnCancel && btnCancel.addEventListener("click", hideSetup);
-  btnSave && btnSave.addEventListener("click", () => {
-    const id = (inputId.value || "").trim() || DEFAULT_GIST_ID;
-    const tok = (inputToken.value || "").trim();
-    localStorage.setItem(LS_GIST_ID, id);
-    if(tok) localStorage.setItem(LS_GIST_TOKEN, tok);
-    hideSetup();
-    toast("Gist 설정 저장됨");
-  });
-  btnRestore && btnRestore.addEventListener("click", () => restoreFromGist(true));
 
   function toast(msg){
     try{
@@ -3135,12 +3170,31 @@ function saveRepToLog(logKey, value){
     }catch(e){}
   }
 
+  fab && fab.addEventListener("click", showSetup);
+  btnCancel && btnCancel.addEventListener("click", hideSetup);
+  btnSave && btnSave.addEventListener("click", () => {
+    const id = (inputId.value || "").trim() || DEFAULT_GIST_ID;
+    const tok = (inputToken.value || "").trim();
+    localStorage.setItem(LS_GIST_ID, id);
+    if(tok) localStorage.setItem(LS_GIST_TOKEN, tok);
+    hideSetup();
+    toast("Gist 설정 저장됨");
+    updateFabVisibility();
+  });
+
+  function updateFabVisibility(){
+    // Hide FAB if token exists (one-time setup). Show if missing or backup errors.
+    const tok = getToken();
+    fab.style.display = tok ? "none" : "block";
+  }
+
   async function sha256(str){
     const enc = new TextEncoder().encode(str);
     const buf = await crypto.subtle.digest('SHA-256', enc);
     return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
   }
 
+  // ----- Gather current app payload (prefer app's export if present)
   function getLocalPayload() {
     try {
       if (typeof window.buildBackupPayload === "function") return window.buildBackupPayload();
@@ -3150,7 +3204,7 @@ function saveRepToLog(logKey, value){
     for (let i=0;i<localStorage.length;i++) {
       const k = localStorage.key(i);
       if(!k) continue;
-      if([LS_GIST_ID, LS_GIST_TOKEN, LS_LAST_BACKUP_AT, LS_LAST_RESTORE_AT, LS_LAST_HASH].includes(k)) continue;
+      if([LS_GIST_ID, LS_GIST_TOKEN, LS_LAST_BACKUP_AT, LS_LAST_RESTORE_AT, LS_LAST_HASH, LS_SYNC_POLICY].includes(k)) continue;
       out[k] = localStorage.getItem(k);
     }
     return { kind:"localStorageDump", ts:new Date().toISOString(), data: out };
@@ -3162,7 +3216,7 @@ function saveRepToLog(logKey, value){
       if (typeof window.importAll === "function") return window.importAll(payload);
     } catch(e){}
     if(payload && payload.kind==="localStorageDump" && payload.data) {
-      const keep = new Set([LS_GIST_ID, LS_GIST_TOKEN, LS_LAST_BACKUP_AT, LS_LAST_RESTORE_AT, LS_LAST_HASH]);
+      const keep = new Set([LS_GIST_ID, LS_GIST_TOKEN, LS_LAST_BACKUP_AT, LS_LAST_RESTORE_AT, LS_LAST_HASH, LS_SYNC_POLICY]);
       const existingKeys = [];
       for (let i=0;i<localStorage.length;i++) {
         const k = localStorage.key(i); if(k && !keep.has(k)) existingKeys.push(k);
@@ -3177,6 +3231,7 @@ function saveRepToLog(logKey, value){
     } catch(e){}
   }
 
+  // ----- GitHub API helpers
   async function gistGet(id) {
     const res = await fetch(`https://api.github.com/gists/${id}`, {
       headers: { "Accept": "application/vnd.github+json" }
@@ -3204,21 +3259,21 @@ function saveRepToLog(logKey, value){
     return await res.json();
   }
 
+  // ----- Backup & Restore core
   let backupTimer = null;
   let isSyncing = false;
 
   async function backupToGist(reason="") {
     const token = getToken();
     if(!token) {
-      showBar();
-      setStatus("토큰이 없어 백업 비활성 (설정 필요)");
+      updateFabVisibility();
+      showSnack("Gist 자동 백업: 설정 필요", {loading:false, actionText:"설정", actionFn:showSetup});
       return;
     }
     if(isSyncing) return;
 
     isSyncing = true;
-    showBar();
-    setStatus("백업 중… " + (reason ? `(${reason})` : ""));
+    showSnack(`백업 중… ${reason ? "(" + reason + ")" : ""}`, {loading:true, autoHideMs:0});
 
     try {
       const payload = getLocalPayload();
@@ -3227,7 +3282,7 @@ function saveRepToLog(logKey, value){
 
       const lastHash = localStorage.getItem(LS_LAST_HASH);
       if(lastHash === h) {
-        setStatus("변경 없음 (백업 생략)");
+        showSnack("변경 없음 · 백업 생략", {loading:false});
         isSyncing = false;
         return;
       }
@@ -3236,43 +3291,90 @@ function saveRepToLog(logKey, value){
       localStorage.setItem(LS_LAST_HASH, h);
       const at = new Date().toISOString();
       localStorage.setItem(LS_LAST_BACKUP_AT, at);
-      setStatus("백업 완료 · " + new Date(at).toLocaleTimeString());
+      showSnack("백업 완료 · " + new Date(at).toLocaleTimeString(), {loading:false});
+      updateFabVisibility();
     } catch(e) {
       console.error(e);
-      setStatus("백업 실패: " + (e.message || e));
+      updateFabVisibility();
+      fab.style.display = "block"; // allow reconfigure quickly
+      showSnack("백업 실패: " + (e.message || e), {loading:false, actionText:"설정", actionFn:showSetup});
     } finally {
       isSyncing = false;
-      setTimeout(()=>hideBar(), 2500);
     }
+  }
+
+  function extractTs(payload){
+    // Prefer your app's updatedAt key if present
+    try{
+      if(payload && payload.data){
+        const possible = payload.data["KEY_LOCAL_UPDATED_AT"] || payload.data["LOCAL_UPDATED_AT"] || payload.data["updatedAt"];
+        if(possible) return Date.parse(possible) || 0;
+      }
+      if(payload && payload.updatedAt) return Date.parse(payload.updatedAt) || 0;
+    }catch(e){}
+    // fallback: use payload.ts
+    return payload && payload.ts ? (Date.parse(payload.ts) || 0) : 0;
   }
 
   async function restoreFromGist(manual=false) {
     if(isSyncing) return;
     isSyncing = true;
-    showBar();
-    setStatus("복원 중…");
+    showSnack("복원 중…", {loading:true, autoHideMs:0});
+
     try {
       const data = await gistGet(getGistId());
       const f = data.files && data.files[TARGET_FILENAME];
       if(!f) throw new Error("Gist에 " + TARGET_FILENAME + " 파일이 없습니다.");
+
       let content = f.content;
       if(f.truncated && f.raw_url) {
         const r = await fetch(f.raw_url);
         content = await r.text();
       }
-      const payload = JSON.parse(content || "{}");
-      applyPayload(payload);
+      const cloudPayload = JSON.parse(content || "{}");
+
+      // Compare recency (best effort)
+      const localPayload = getLocalPayload();
+      const cloudMs = extractTs(cloudPayload);
+      const localMs = extractTs(localPayload);
+
+      const policy = getPolicy();
+
+      if(cloudMs && localMs && Math.abs(cloudMs - localMs) > 2000){
+        if(localMs > cloudMs){
+          // Local is newer
+          if(policy === "cloudWins"){
+            applyPayload(cloudPayload);
+            showSnack("복원 완료(클라우드 우선)", {loading:false});
+          }else if(policy === "localWins"){
+            showSnack("로컬이 더 최신 · 복원 생략", {loading:false});
+          }else{
+            // ask
+            showSnack("로컬이 더 최신 · 복원할까요?", {loading:false, actionText:"복원", actionFn:()=>{ applyPayload(cloudPayload); hideSnack(); toast("복원 완료"); }});
+          }
+        }else{
+          // Cloud is newer
+          applyPayload(cloudPayload);
+          showSnack("복원 완료 · 최신 반영", {loading:false});
+        }
+      }else{
+        // No reliable timestamps -> default apply (cloud is source of truth on restore)
+        applyPayload(cloudPayload);
+        showSnack("복원 완료", {loading:false});
+      }
+
       const at = new Date().toISOString();
       localStorage.setItem(LS_LAST_RESTORE_AT, at);
-      setStatus("복원 완료 · " + new Date(at).toLocaleTimeString());
       if(manual) toast("복원 완료");
+      updateFabVisibility();
     } catch(e) {
       console.error(e);
-      setStatus("복원 실패: " + (e.message || e));
+      updateFabVisibility();
+      fab.style.display = "block";
+      showSnack("복원 실패: " + (e.message || e), {loading:false, actionText:"설정", actionFn:showSetup});
       if(manual) toast("복원 실패: " + (e.message || e));
     } finally {
       isSyncing = false;
-      setTimeout(()=>hideBar(), 2500);
     }
   }
 
@@ -3281,30 +3383,25 @@ function saveRepToLog(logKey, value){
     backupTimer = setTimeout(()=>backupToGist(reason), 2000);
   }
 
+  // Expose for app hooks
   window.gistScheduleBackup = scheduleBackup;
   window.gistBackupNow = backupToGist;
   window.gistRestoreNow = restoreFromGist;
 
-  // App start: render local immediately, then restore in background
-  setTimeout(()=>restoreFromGist(false), 800);
+  // Auto: start restore in background shortly after load
+  setTimeout(()=>restoreFromGist(false), 900);
 
   // Every 10 minutes (foreground only)
-  setInterval(()=> {
-    if(!document.hidden) backupToGist("10분 주기");
-  }, 10*60*1000);
+  setInterval(()=> { if(!document.hidden) backupToGist("10분 주기"); }, 10*60*1000);
 
   // On background / page hide
-  document.addEventListener("visibilitychange", ()=> {
-    if(document.hidden) backupToGist("백그라운드 전환");
-  });
+  document.addEventListener("visibilitychange", ()=> { if(document.hidden) backupToGist("백그라운드 전환"); });
   window.addEventListener("pagehide", ()=> backupToGist("페이지 종료"));
 
   // Pull-to-refresh (in-app)
   let startY = null;
   let pulling = false;
-  window.addEventListener("touchstart", (e)=> {
-    if(window.scrollY === 0) startY = e.touches[0].clientY;
-  }, {passive:true});
+  window.addEventListener("touchstart", (e)=> { if(window.scrollY === 0) startY = e.touches[0].clientY; }, {passive:true});
   window.addEventListener("touchmove", (e)=> {
     if(startY==null) return;
     const dy = e.touches[0].clientY - startY;
@@ -3321,16 +3418,14 @@ function saveRepToLog(logKey, value){
     await restoreFromGist(true);
   });
 
-  // If app emits this event, it will auto-backup
+  // If app emits this event, auto-backup
   window.addEventListener("app:dataChanged", ()=> scheduleBackup("데이터 변경"));
 
-  if(!getToken()) {
-    showBar();
-    setStatus("Gist 자동 백업: 설정 필요 (토큰 입력)");
-  }
+  updateFabVisibility();
 })();
 </script>
 <!-- ===================== /GitHub Gist Backup/Restore ===================== -->
+
 
 </body>
 </html>
