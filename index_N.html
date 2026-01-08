@@ -372,7 +372,7 @@
 
       <div class="grid md:grid-cols-3 gap-3 mt-5">
         <button class="btn gradient md:col-span-2" id="homeStartBtn"><i class="fa-solid fa-play"></i> 오늘 훈련 시작</button>
-        <button class="btn" id="homeRestBtn"><i class="fa-solid fa-hourglass-half"></i> 휴식</button>
+        <button class="btn" id="homeRestBtn"><i class="fa-solid fa-hourglass-hal"></i> 휴식</button>
       </div>
     </div>
 
@@ -452,7 +452,7 @@
 
         <!-- Big CTA -->
         <div class="grid md:grid-cols-3 gap-3 mt-4">
-          <button class="btn gradient md:col-span-2" id="btnRestNow"><i class="fa-solid fa-hourglass-half"></i> 휴식 타이머 시작</button>
+          <button class="btn gradient md:col-span-2" id="btnRestNow"><i class="fa-solid fa-hourglass-hal"></i> 휴식 타이머 시작</button>
           <button class="btn" id="btnFinish"><i class="fa-solid fa-flag-checkered"></i> 오늘 마무리</button>
         </div>
 
@@ -769,7 +769,7 @@
         <button class="pill" id="detailClose"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="mt-4 gifWrap">
-        <img id="detailGif" alt="gif">
+        <img id="detailGi" alt="gi">
       </div>
       <div class="grid gap-3 mt-4" id="detailBoxes"></div>
       <div class="mt-4">
@@ -1441,7 +1441,7 @@ function scrollToSlide(targetIdx){
   function openDetailModal(routine, ex){
     setText("#detailTitle", ex.name);
     setText("#detailMeta", `${routine.day} · ${(routine.type||"").toUpperCase()} · ${ex.set} SET · ${ex.rep} REP · REST ${ex.rest}s`);
-    $("#detailGif").src = getGif(ex.name);
+    $("#detailGi").src = getGif(ex.name);
     const boxes=$("#detailBoxes");
     boxes.innerHTML="";
 
@@ -2159,7 +2159,7 @@ $("#monthSave").onclick = ()=> { challenge.month = monthKey(todayStr()); persist
       localStorage.setItem(KEY.NOTIF, notifEnabled ? "1":"0");
       $("#notifToggle").textContent = notifEnabled ? "ON":"OFF";
       $("#notifToggle").classList.toggle("primary", notifEnabled);
-      toast(notifEnabled ? t("messages.toast.notifOn","알림 ON") : t("messages.toast.notifOff","알림 OFF"));
+      toast(notifEnabled ? t("messages.toast.notifOn","알림 ON") : t("messages.toast.notifOf","알림 OFF"));
     };
     $("#notifToggle").textContent = notifEnabled ? "ON":"OFF";
 
@@ -2382,7 +2382,7 @@ async function makePosterBlob(){
 
     text(140,730,"SCORE",22,900,"rgba(255,255,255,0.45)");
     text(140,820,score,100,900,"rgba(255,255,255,0.95)");
-    text(140,950,f"GRADE {grade}",34,900,"rgba(255,255,255,0.70)")
+    text(140,950,`GRADE ${grade}`,34,900,"rgba(255,255,255,0.70)")
 
     // right stats column
     ctx.fillStyle="rgba(255,255,255,0.04)";
