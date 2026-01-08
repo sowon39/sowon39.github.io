@@ -1375,7 +1375,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
 
       if(name === 'stats') renderStats();
       if(name === 'history') renderHistory();
-    })();
+    }
 </script>
 <script>
 /* ===== Safer fast-tap (no global preventDefault) ===== */
@@ -1629,34 +1629,6 @@ try{
       snackAction.style.display = "inline-block";
       snackAction.onclick = actionFn;
       autoHideMs = 0; // don't auto hide if action exists
-    }else{
-      snackAction.style.display = "none";
-      snackAction.onclick = null;
-    }
-
-    // dismiss/secondary action
-    if(dismissText && dismissFn){
-      snackDismiss.textContent = dismissText;
-      snackDismiss.style.display = "inline-block";
-      snackDismiss.onclick = dismissFn;
-      autoHideMs = 0;
-    }else{
-      snackDismiss.style.display = "none";
-      snackDismiss.onclick = null;
-    }
-
-    if(autoHideMs){
-      setTimeout(()=> { snack.classList.remove("show"); setTimeout(()=>{snack.style.display="none";}, 180); }, autoHideMs);
-    }
-  }else{
-      snackAction.style.display = "none";
-      snackAction.onclick = null;
-    }
-    if(autoHideMs){
-      setTimeout(()=> { snack.classList.remove("show");
-    setTimeout(()=>{snack.style.display="none";},180); }, autoHideMs);
-    }
-  }
   function hideSnack(){ snack.classList.remove("show");
     setTimeout(()=>{snack.style.display="none";},180); }
 
