@@ -1323,14 +1323,16 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     /* ---------- TOAST ---------- */
     let toastTimer=null;
     function toast(msg){
-    try{
-      if(typeof window.toast === "function") return window.toast(msg);
-      const d=document.createElement("div");
-      d.textContent=msg;
-      d.style.cssText="position:fixed;left:50%;bottom:64px;transform:translateX(-50%);background:rgba(0,0,0,.8);color:#fff;padding:10px 12px;border-radius:999px;font-size:12px;z-index:10001";
-      document.body.appendChild(d);
-      setTimeout(()=>d.remove(),1200);
-  }
+      try{
+        if(typeof window.toast === "function") return window.toast(msg);
+        const d=document.createElement("div");
+        d.textContent=msg;
+        d.style.cssText="position:fixed;left:50%;bottom:64px;transform:translateX(-50%);background:rgba(0,0,0,.8);color:#fff;padding:10px 12px;border-radius:999px;font-size:12px;z-index:10001";
+        document.body.appendChild(d);
+        clearTimeout(toastTimer);
+        toastTimer=setTimeout(()=>{ try{d.remove()}catch(e){} },1200);
+      }catch(e){}
+    }
 
   fab && fab.addEventListener("click", showSetup);
   btnCancel && btnCancel.addEventListener("click", hideSetup);
