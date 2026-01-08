@@ -1583,6 +1583,8 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
 
 
 <script>
+try{
+
 (function(){
   const LS_GIST_ID = "GIST_SYNC_ID";
   const LS_GIST_TOKEN = "GIST_SYNC_TOKEN";
@@ -2125,6 +2127,8 @@ btnSave && btnSave.addEventListener("click", async () => {
 
   updateFabVisibility();
 })();
+
+}catch(e){console.error('GistSync init error', e);}
 </script>
 <!-- ===================== /GitHub Gist Backup/Restore ===================== -->
 
