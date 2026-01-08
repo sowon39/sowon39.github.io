@@ -1179,7 +1179,6 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     }
 
     function t(path, fallback=""){
-      try{
         const val = path.split('.').reduce((o,k)=>o?.[k], copy);
         return (val===undefined||val===null) ? fallback : val;
       }catch(e){ return fallback; }
@@ -1209,7 +1208,6 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     let silentPushTimer=null;
     let isApplyingCloud=false;
     function scheduleSilentPush(){
-      try{
         if(!currentUser || !fbDb || !cloudReady) return;
         if(isApplyingCloud) return;
 
@@ -1224,7 +1222,6 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     }
 
     function touchLocalUpdate(){
-      try{
         // 기존 로컬 변경 타임스탬프 + Firebase(있다면) 업로드 스케줄
         localStorage.setItem(KEY_LOCAL_UPDATED_AT, new Date().toISOString());
         scheduleSilentPush();
@@ -1269,7 +1266,6 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     /* Audio unlock */
     let audioCtx = null;
     function unlockAudio(){
-      try{
         if(!audioCtx){
           audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         }
@@ -1288,7 +1284,6 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     /* Wake Lock */
     let wakeLock = null;
     async function requestWakeLock(){
-      try{
         if('wakeLock' in navigator){
           wakeLock = await navigator.wakeLock.request('screen');
         }
@@ -1350,7 +1345,6 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     /* ---------- TABS ---------- */
     function showTab(name, btn){
       // Double-tap on the same tab => refresh/restore like typical fitness apps
-      try{
         const now = Date.now();
         const last = window.__TAB_LAST__ || {name:null, t:0};
         if(last.name === name && (now - last.t) < 650){
@@ -1583,7 +1577,6 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
 
 
 <script>
-try{
 
 (function(){
   const LS_GIST_ID = "GIST_SYNC_ID";
@@ -1641,7 +1634,6 @@ try{
   function hideSetup(){ overlay.style.display = "none"; }
 
   function toast(msg){
-    try{
       if(typeof window.toast === "function") return window.toast(msg);
       const d=document.createElement("div");
       d.textContent=msg;
@@ -1689,7 +1681,6 @@ btnSave && btnSave.addEventListener("click", async () => {
   btnSave.textContent = "검증 중…";
   btnSave.disabled = true;
 
-  try{
     const res1 = await fetch(`https://api.github.com/gists/${id}`, { headers: { "Accept":"application/vnd.github+json" }});
     if(res1.status === 404){ if(idErr) idErr.textContent="해당 Gist ID를 찾을 수 없습니다. (404)"; throw new Error("Gist ID가 존재하지 않습니다."); }
     if(!res1.ok){ throw new Error("Gist 확인 실패: " + res1.status); }
@@ -1867,7 +1858,6 @@ btnSave && btnSave.addEventListener("click", async () => {
   }
 
   function extractTs(payload){
-    try{
       if(payload && payload.updatedAt) return Date.parse(payload.updatedAt) || 0;
       if(payload && payload.ts) return Date.parse(payload.ts) || 0;
       if(payload && payload.data){
@@ -1909,7 +1899,6 @@ btnSave && btnSave.addEventListener("click", async () => {
           if(policy === "cloudWins"){
             applyPayload(cloudPayload);
       // ✅ 강제 리렌더(필요 시): 복원 후 앱 상태가 메모리에 남아 UI가 안 바뀌는 경우를 방지
-      try{
         if(typeof window.afterGistRestore === "function") window.afterGistRestore();
         // 마지막 수단: 화면이 갱신되지 않는 환경에서는 1회 자동 리로드
         if(!window.__GIST_RELOADED_ONCE__){
@@ -1925,7 +1914,6 @@ btnSave && btnSave.addEventListener("click", async () => {
             // ask
             showSnack("로컬이 더 최신 · 복원할까요?", {loading:false, actionText:"복원", actionFn:()=>{ applyPayload(cloudPayload);
       // ✅ 강제 리렌더(필요 시): 복원 후 앱 상태가 메모리에 남아 UI가 안 바뀌는 경우를 방지
-      try{
         if(typeof window.afterGistRestore === "function") window.afterGistRestore();
         // 마지막 수단: 화면이 갱신되지 않는 환경에서는 1회 자동 리로드
         if(!window.__GIST_RELOADED_ONCE__){
@@ -1939,7 +1927,6 @@ btnSave && btnSave.addEventListener("click", async () => {
           // Cloud is newer
           applyPayload(cloudPayload);
       // ✅ 강제 리렌더(필요 시): 복원 후 앱 상태가 메모리에 남아 UI가 안 바뀌는 경우를 방지
-      try{
         if(typeof window.afterGistRestore === "function") window.afterGistRestore();
         // 마지막 수단: 화면이 갱신되지 않는 환경에서는 1회 자동 리로드
         if(!window.__GIST_RELOADED_ONCE__){
@@ -1954,7 +1941,6 @@ btnSave && btnSave.addEventListener("click", async () => {
         // No reliable timestamps -> default apply (cloud is source of truth on restore)
         applyPayload(cloudPayload);
       // ✅ 강제 리렌더(필요 시): 복원 후 앱 상태가 메모리에 남아 UI가 안 바뀌는 경우를 방지
-      try{
         if(typeof window.afterGistRestore === "function") window.afterGistRestore();
         // 마지막 수단: 화면이 갱신되지 않는 환경에서는 1회 자동 리로드
         if(!window.__GIST_RELOADED_ONCE__){
@@ -2100,11 +2086,9 @@ btnSave && btnSave.addEventListener("click", async () => {
   updateFabVisibility();
 })();
 
-}catch(e){console.error('GistSync init error', e);}
 </script>
 <!-- ===================== /GitHub Gist Backup/Restore ===================== -->
 
 
 </body>
 </html>
-
