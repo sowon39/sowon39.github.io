@@ -3228,100 +3228,17 @@ function saveRepToLog(logKey, value){
   inputId && inputId.addEventListener("input", updateSaveState);
   inputToken && inputToken.addEventListener("input", updateSaveState);
 
-btnSave && btnSave.addEventListener("click", async () => {
+btnSave && btnSave.addEventListener("click", () => {
     const idCheck = validateGistId(inputId.value);
     const tokCheck = validateToken(inputToken.value);
     if(!idCheck.ok || !tokCheck.ok){ updateSaveState(); toast("입력값을 확인해주세요"); return; }
-
     const id = (inputId.value || "").trim();
     const tok = (inputToken.value || "").trim();
-
-    // UI: loading state
-    const prevText = btnSave.textContent;
-    btnSave.textContent = "검증 중…";
-    btnSave.disabled = true;
-
-    try{
-      // 1) Validate gist exists (no token)
-      const res1 = await fetch(`https://api.github.com/gists/${id}`, { headers: { "Accept":"application/vnd.github+json" }});
-      if(res1.status === 404){
-        if(idErr) idErr.textContent = "해당 Gist ID를 찾을 수 없습니다. (404)";
-        throw new Error("Gist ID가 존재하지 않습니다.");
-      }
-      if(!res1.ok){
-        throw new Error("Gist 확인 실패: " + res1.status);
-      }
-
-      // 2) Validate token can access gist (auth)
-      const res2 = await fetch(`https://api.github.com/gists/${id}`, {
-        headers: {
-          "Accept":"application/vnd.github+json",
-          "Authorization":"token " + tok
-        }
-      });
-
-      if(res2.status === 401){
-        if(tokErr) tokErr.textContent = "Token이 유효하지 않거나 만료되었습니다. (401)";
-        throw new Error("Token 인증 실패");
-      }
-      if(res2.status === 403){
-        if(tokErr) tokErr.textContent = "권한이 부족합니다. Token 권한에 gist(Read/Write)가 필요합니다. (403)";
-        throw new Error("Token 권한 부족");
-      }
-      if(!res2.ok){
-        throw new Error("Token 확인 실패: " + res2.status);
-      }
-
-      // 3) Validate write permission by doing a dry-run PATCH (no-op) on a hidden file key
-      // (PATCH with same content is effectively a no-op; safer than creating new data)
-      const j = await res2.json();
-      const files = j && j.files ? Object.keys(j.files) : [];
-      // Ensure target file exists (or allow creation)
-      // We will patch with identical content to avoid data changes
-      let targetName = (files.includes("workout_backup.json") ? "workout_backup.json" : (files[0] || "workout_backup.json"));
-      let current = j.files && j.files[targetName] ? (j.files[targetName].content || "{}") : "{}";
-
-      const res3 = await fetch(`https://api.github.com/gists/${id}`, {
-        method:"PATCH",
-        headers:{
-          "Accept":"application/vnd.github+json",
-          "Content-Type":"application/json",
-          "Authorization":"token " + tok
-        },
-        body: JSON.stringify({ files: { [targetName]: { content: current } } })
-      });
-
-      if(res3.status === 401){
-        if(tokErr) tokErr.textContent = "Token이 유효하지 않거나 만료되었습니다. (401)";
-        throw new Error("Token 인증 실패");
-      }
-      if(res3.status === 403){
-        if(tokErr) tokErr.textContent = "쓰기 권한이 없습니다. Token 권한에 gist(Read/Write)가 필요합니다. (403)";
-        throw new Error("쓰기 권한 부족");
-      }
-      if(!res3.ok){
-        const t = await res3.text().catch(()=> "");
-        throw new Error("쓰기 권한 확인 실패: " + res3.status + " " + t);
-      }
-
-      // Passed all checks -> save
-      localStorage.setItem(LS_GIST_ID, id);
-      localStorage.setItem(LS_GIST_TOKEN, tok);
-      hideSetup();
-      toast("설정 완료 ✅");
-      updateFabVisibility();
-      showSnack("동기화 설정 완료", {loading:false});
-    }catch(e){
-      console.error(e);
-      // re-enable to allow retry
-      updateSaveState();
-      btnSave.textContent = prevText;
-      toast(e.message || "검증 실패");
-      return;
-    }finally{
-      btnSave.textContent = prevText;
-      updateSaveState();
-    }
+    localStorage.setItem(LS_GIST_ID, id);
+    localStorage.setItem(LS_GIST_TOKEN, tok);
+    hideSetup();
+    toast("Gist 설정 저장됨");
+    updateFabVisibility();
   });
 
   function updateFabVisibility(){
