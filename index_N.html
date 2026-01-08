@@ -39,7 +39,7 @@
       --w:#FFCC00;     /* warn */
       --r:#FF4D6D;     /* danger */
 
-      --radius:26px;
+      --radius:28px;
       --radius2:20px;
 
       --headerH: 78px;
@@ -52,9 +52,9 @@
       font-family:Pretendard, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
       color:var(--txt);
       background:
-        radial-gradient(1200px 700px at 15% -10%, rgba(32,227,255,0.18), transparent 55%),
-        radial-gradient(1000px 700px at 100% 10%, rgba(124,77,255,0.20), transparent 58%),
-        radial-gradient(900px 700px at 10% 110%, rgba(25,255,163,0.14), transparent 60%),
+        radial-gradient(1200px 700px at 12% -10%, rgba(32,227,255,0.22), transparent 55%),
+        radial-gradient(1000px 700px at 100% 6%, rgba(124,77,255,0.24), transparent 58%),
+        radial-gradient(900px 700px at 10% 110%, rgba(25,255,163,0.18), transparent 60%),
         linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0));
       background-color: var(--bg);
       background-attachment: fixed;
@@ -76,6 +76,9 @@
     }
     .shadowSoft{ box-shadow: 0 28px 80px rgba(0,0,0,.55); }
     .layout{ max-width:1100px; margin:0 auto; }
+    .select{ background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); color:rgba(255,255,255,.85); padding:10px 12px; border-radius:16px; font-weight:900; outline:none; }
+    .select option{ color:#111; }
+
     .pill{
       display:inline-flex; align-items:center; gap:8px;
       padding:8px 12px;
@@ -92,6 +95,7 @@
     .pill.good{ background:rgba(25,255,163,.12); border-color:rgba(25,255,163,.20); color:rgba(25,255,163,.95); }
     .btn{
       height:56px;
+      cursor:pointer;
       border-radius:20px;
       padding:0 18px;
       display:flex; align-items:center; justify-content:center; gap:10px;
@@ -110,6 +114,7 @@
     }
     .iconBtn{
       width:46px;height:46px;border-radius:16px;
+      cursor:pointer;
       display:flex; align-items:center; justify-content:center;
       background:rgba(255,255,255,.06);
       border:1px solid rgba(255,255,255,.12);
@@ -209,7 +214,7 @@
       color:#000;
       box-shadow: 0 18px 40px rgba(32,227,255,.15);
     }
-    .setBtn.locked{ opacity:.35; pointer-events:none; filter:saturate(.6); }
+    .setBtn.locked{ opacity:.55; pointer-events:none; filter:saturate(.6); }
     .miniTag{
       font-size:10px;
       font-weight:900;
@@ -257,10 +262,23 @@
     #toast{ position:fixed; left:50%; bottom: calc(var(--dockH) + 22px); transform: translateX(-50%); z-index: 260;
       opacity:0; pointer-events:none; transition: opacity .2s ease, transform .2s ease; }
     #toast.show{ opacity:1; transform: translateX(-50%) translateY(-6px); }
+/* Motion */
+.motion-in{ animation: motionIn .55s cubic-bezier(.2,.8,.2,1); }
+@keyframes motionIn{ from{opacity:0; transform: translateY(12px) scale(.985);} to{opacity:1; transform:none;} }
+.pop{ animation: pop .28s cubic-bezier(.2,.9,.2,1); }
+@keyframes pop{ 0%{transform:scale(.96);} 60%{transform:scale(1.02);} 100%{transform:scale(1);} }
+.dockBtn:active{ transform: translateY(-2px) scale(.98); }
+@media(hover:hover){
+  .btn:hover{ filter:brightness(1.06); transform: translateY(-1px); }
+  .iconBtn:hover{ filter:brightness(1.06); transform: translateY(-1px); }
+  .glass:hover{ border-color: rgba(255,255,255,.14); }
+}
   </style>
 </head>
 
 <body>
+  <canvas id="confetti" style="position:fixed;inset:0;z-index:300;pointer-events:none;display:none;"></canvas>
+
   <!-- Header -->
   <header>
     <div class="layout flex items-end justify-between gap-3">
@@ -319,8 +337,89 @@
   <main>
     <div class="layout px-4">
 
+<!-- PAGE: HOME -->
+<section id="page-home" class="page active">
+  <div class="mb-6">
+    <div class="text-5xl md:text-6xl font-black italic tracking-tighter leading-none">READY.</div>
+    <div class="text-lg font-black text-white/75 mt-3 tracking-wide">오늘의 훈련을 시작할 시간.</div>
+    <div class="text-[11px] font-black tracking-[0.22em] uppercase text-white/40 mt-3" id="homeSub">—</div>
+  </div>
+
+  <div class="grid lg:grid-cols-3 gap-4">
+    <!-- Today card -->
+    <div class="glass rounded-[32px] p-6 shadowSoft lg:col-span-2">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <div class="miniTag">TODAY</div>
+          <div class="text-2xl font-black italic mt-2" id="homeTodayTitle">—</div>
+          <div class="text-sm font-semibold text-white/55 mt-2" id="homeTodayMeta">—</div>
+        </div>
+        <span class="pill primary" id="homeProgressPill"><i class="fa-solid fa-bolt"></i><span id="homeProgressTxt">0%</span></span>
+      </div>
+
+      <div class="mt-6 grid md:grid-cols-2 gap-3">
+        <div class="glass2 rounded-[26px] p-5">
+          <div class="miniTag">NEXT</div>
+          <div class="text-xl font-black mt-2" id="homeNextName">—</div>
+          <div class="text-sm font-semibold text-white/55 mt-2" id="homeNextHint">—</div>
+        </div>
+        <div class="glass2 rounded-[26px] p-5">
+          <div class="miniTag">STREAK</div>
+          <div class="text-5xl font-black tracking-tight mt-2" id="homeStreak">0</div>
+          <div class="text-sm font-semibold text-white/55 mt-2">연속 훈련일</div>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-3 mt-5">
+        <button class="btn gradient md:col-span-2" id="homeStartBtn"><i class="fa-solid fa-play"></i> 오늘 훈련 시작</button>
+        <button class="btn" id="homeRestBtn"><i class="fa-solid fa-hourglass-half"></i> 휴식</button>
+      </div>
+    </div>
+
+    <!-- Quick actions -->
+    <div class="grid gap-4">
+      <div class="glass rounded-[32px] p-6">
+        <div class="miniTag">QUICK</div>
+        <div class="text-xl font-black mt-2">빠른 이동</div>
+        <div class="grid gap-3 mt-4">
+          <button class="btn" style="height:52px;border-radius:18px" id="homeGoTrain"><i class="fa-solid fa-dumbbell"></i> 훈련 보기</button>
+          <button class="btn" style="height:52px;border-radius:18px" id="homeGoHistory"><i class="fa-solid fa-calendar-days"></i> 기록 보기</button>
+          <button class="btn" style="height:52px;border-radius:18px" id="homeGoAnalytics"><i class="fa-solid fa-chart-simple"></i> 분석 보기</button>
+        </div>
+      </div>
+
+      <div class="glass rounded-[32px] p-6">
+        <div class="miniTag">TIP</div>
+        <div class="text-xl font-black mt-2" id="homeTipTitle">폼 먼저</div>
+        <div class="text-sm font-semibold text-white/55 mt-3 leading-relaxed" id="homeTipBody">
+          첫 세트는 가볍게, 자세를 맞추고 호흡을 잡아주세요.
+        </div>
+        <div class="flex gap-2 mt-5">
+          <span class="pill"><i class="fa-solid fa-heart"></i> Consistency</span>
+          <span class="pill"><i class="fa-solid fa-brain"></i> Mind-Muscle</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Spotlight: This week -->
+  <div class="glass rounded-[32px] p-6 mt-4">
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <div class="miniTag">THIS WEEK</div>
+        <div class="text-xl font-black mt-2">밸런스 미리보기</div>
+        <div class="text-sm font-semibold text-white/55 mt-2">최근 7일 PUSH/PULL/LEGS/REST 흐름을 확인하세요.</div>
+      </div>
+      <button class="pill primary" id="homeOpenAnalytics"><i class="fa-solid fa-chart-pie"></i> 보기</button>
+    </div>
+    <div class="mt-6">
+      <canvas id="homeMiniRadar" style="max-height:280px"></canvas>
+    </div>
+  </div>
+</section>
+
       <!-- PAGE: TRAIN -->
-      <section id="page-train" class="page active">
+      <section id="page-train" class="page">
         <div class="flex items-end justify-between gap-3 mb-4">
           <div>
             <div class="text-6xl font-black italic tracking-tighter leading-none" id="dayLabel">DAY</div>
@@ -396,6 +495,19 @@
             </div>
           </div>
 
+          <div class="glass rounded-[28px] p-6 shadowSoft lg:col-span-2">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="miniTag">SCORE TREND</div>
+                <div class="text-xl font-black mt-2">최근 30일 점수</div>
+              </div>
+              <span class="pill"><i class="fa-solid fa-star"></i> 0~100</span>
+            </div>
+            <div class="mt-6">
+              <canvas id="scoreTrend"></canvas>
+            </div>
+          </div>
+
           <div class="grid gap-4">
             <div class="glass rounded-[28px] p-6">
               <div class="miniTag">TOTAL SETS</div>
@@ -411,6 +523,13 @@
         </div>
 
         <div class="glass rounded-[28px] p-6 mt-4">
+          <div class="miniTag">TREND</div>
+          <div class="text-xl font-black mt-2">최근 30일 PR 성장</div>
+          <div class="text-sm font-semibold text-white/55 mt-2">하루 최고 REP(전체 운동 기준)를 표시합니다.</div>
+          <div class="mt-5"><canvas id="prTrend" style="max-height:260px"></canvas></div>
+        </div>
+
+        <div class="glass rounded-[28px] p-6 mt-4">
           <div class="flex items-center justify-between gap-4">
             <div>
               <div class="miniTag">REST NOTIFICATION</div>
@@ -421,8 +540,9 @@
           </div>
         </div>
 
-        <div class="grid md:grid-cols-2 gap-3 mt-4">
+        <div class="grid md:grid-cols-3 gap-3 mt-4">
           <button class="btn" id="btnBackup"><i class="fa-solid fa-download"></i> 백업(JSON)</button>
+          <button class="btn" id="btnImport"><i class="fa-solid fa-upload"></i> 불러오기(JSON)</button>
           <button class="btn" id="btnResetAll" style="border-color:rgba(255,255,255,.22)"><i class="fa-solid fa-triangle-exclamation"></i> 전체 초기화</button>
         </div>
       </section>
@@ -457,6 +577,45 @@
           </div>
         </div>
       </section>
+
+<!-- PAGE: PR -->
+<section id="page-pr" class="page">
+  <div class="mb-6">
+    <div class="text-3xl font-black italic uppercase tracking-tight">PR</div>
+    <div class="text-[11px] font-black tracking-[0.22em] uppercase text-white/40 mt-2">운동별 기록 · 최고 REP · 누적 세트</div>
+  </div>
+
+  <div class="glass rounded-[28px] p-6 shadowSoft">
+    <div class="flex items-center justify-between gap-4">
+      <div>
+        <div class="miniTag">HIGHLIGHTS</div>
+        <div class="text-xl font-black mt-2" id="prTopTitle">—</div>
+        <div class="text-sm font-semibold text-white/55 mt-2" id="prTopMeta">—</div>
+      </div>
+      <span class="pill primary"><i class="fa-solid fa-trophy"></i> BEST</span>
+    </div>
+  </div>
+
+  <div class="glass rounded-[28px] p-6 mt-4">
+    <div class="flex items-center justify-between gap-3">
+      <div>
+        <div class="miniTag">LEADERBOARD</div>
+        <div class="text-xl font-black mt-2">운동별 최고 REP</div>
+      </div>
+      <span class="pill" id="prCount">0</span>
+    </div>
+
+    <div class="mt-5 grid gap-3" id="prList"></div>
+  </div>
+
+  <div class="glass2 rounded-[28px] p-6 mt-4">
+    <div class="miniTag">INSIGHT</div>
+    <div class="text-base font-black mt-2">PR은 “폼 + 일관성”의 결과입니다.</div>
+    <div class="text-sm font-semibold text-white/55 mt-2 leading-relaxed">
+      무게보다 먼저, 정확한 동작으로 반복을 누적하세요. PR은 자연스럽게 따라옵니다.
+    </div>
+  </div>
+</section>
 
       <!-- PAGE: SETTINGS -->
       <section id="page-settings" class="page">
@@ -524,27 +683,37 @@
   <div class="dockWrap">
     <div class="layout">
       <nav class="dock">
-        <button class="dockBtn active" data-page="train">
-          <i class="fa-solid fa-bolt-lightning text-xl"></i>
-          <div class="text-[9px] font-black tracking-tight uppercase">훈련</div>
-          <div class="dockDot"></div>
-        </button>
-        <button class="dockBtn" data-page="analytics">
-          <i class="fa-solid fa-chart-simple text-xl"></i>
-          <div class="text-[9px] font-black tracking-tight uppercase">분석</div>
-          <div class="dockDot"></div>
-        </button>
-        <button class="dockBtn" data-page="history">
-          <i class="fa-solid fa-calendar-days text-xl"></i>
-          <div class="text-[9px] font-black tracking-tight uppercase">기록</div>
-          <div class="dockDot"></div>
-        </button>
-        <button class="dockBtn" data-page="settings">
-          <i class="fa-solid fa-sliders text-xl"></i>
-          <div class="text-[9px] font-black tracking-tight uppercase">설정</div>
-          <div class="dockDot"></div>
-        </button>
-      </nav>
+<button class="dockBtn active" data-page="home">
+  <i class="fa-solid fa-house text-xl"></i>
+  <div class="text-[9px] font-black tracking-tight uppercase">홈</div>
+  <div class="dockDot"></div>
+</button>
+<button class="dockBtn" data-page="train">
+  <i class="fa-solid fa-bolt-lightning text-xl"></i>
+  <div class="text-[9px] font-black tracking-tight uppercase">훈련</div>
+  <div class="dockDot"></div>
+</button>
+<button class="dockBtn" data-page="analytics">
+  <i class="fa-solid fa-chart-simple text-xl"></i>
+  <div class="text-[9px] font-black tracking-tight uppercase">분석</div>
+  <div class="dockDot"></div>
+</button>
+<button class="dockBtn" data-page="pr">
+  <i class="fa-solid fa-trophy text-xl"></i>
+  <div class="text-[9px] font-black tracking-tight uppercase">PR</div>
+  <div class="dockDot"></div>
+</button>
+<button class="dockBtn" data-page="history">
+  <i class="fa-solid fa-calendar-days text-xl"></i>
+  <div class="text-[9px] font-black tracking-tight uppercase">기록</div>
+  <div class="dockDot"></div>
+</button>
+<button class="dockBtn" data-page="settings">
+  <i class="fa-solid fa-sliders text-xl"></i>
+  <div class="text-[9px] font-black tracking-tight uppercase">설정</div>
+  <div class="dockDot"></div>
+</button>
+</nav>
     </div>
   </div>
 
@@ -658,7 +827,124 @@
     </div>
   </div>
 
+<div id="modalBadges" class="modal">
+  <div class="backdrop"></div>
+  <div class="modalCard" style="max-height: 88vh; overflow:auto;">
+    <div class="flex items-start justify-between gap-3">
+      <div>
+        <div class="miniTag">배지</div>
+        <div class="text-2xl font-black italic mt-1">Achievements</div>
+        <div class="text-[10px] font-black tracking-[0.22em] uppercase text-white/35 mt-2" id="badgeMeta">—</div>
+      </div>
+      <button class="pill" id="badgeClose"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="grid gap-3 mt-5" id="badgeGrid"></div>
+
+    <div class="glass2 rounded-2xl p-5 mt-5">
+      <div class="miniTag">주간 목표</div>
+      <div class="flex items-center justify-between gap-3 mt-2">
+        <div class="text-sm font-semibold text-white/70">이번 주 운동 목표(일수)</div>
+        <div class="flex items-center gap-2">
+          <button class="iconBtn !w-10 !h-10 !rounded-xl" id="goalMinus"><i class="fa-solid fa-minus text-xs"></i></button>
+          <div class="text-xl font-black w-10 text-center" id="goalVal">3</div>
+          <button class="iconBtn !w-10 !h-10 !rounded-xl" id="goalPlus"><i class="fa-solid fa-plus text-xs"></i></button>
+        </div>
+      </div>
+      <button class="btn gradient w-full mt-4" style="height:52px;border-radius:18px" id="goalSave"><i class="fa-solid fa-check"></i> 목표 저장</button>
+    </div>
+  </div>
+</div>
+
+<div id="badgePop" class="modal" style="align-items:flex-end;justify-content:center;">
+  <div class="backdrop" style="background:rgba(0,0,0,.35);"></div>
+  <div class="modalCard" style="width:min(520px, calc(100vw - 28px)); margin-bottom: calc(var(--dockH) + 18px); padding:16px; border-radius:28px;">
+    <div class="flex items-center gap-4">
+      <div class="w-14 h-14 rounded-3xl flex items-center justify-center" id="badgePopIcon"
+           style="background:linear-gradient(135deg, var(--p), var(--a)); color:#000;">
+        <i class="fa-solid fa-medal text-2xl"></i>
+      </div>
+      <div class="flex-1">
+        <div class="miniTag">NEW BADGE</div>
+        <div class="text-xl font-black mt-1" id="badgePopTitle">—</div>
+        <div class="text-sm font-semibold text-white/60 mt-1" id="badgePopDesc">—</div>
+      </div>
+      <button class="pill" id="badgePopClose"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+  </div>
+</div>
+
+<div id="modalGrade" class="modal">
+  <div class="backdrop"></div>
+  <div class="modalCard text-center">
+    <div class="miniTag">TODAY SCORE</div>
+    <div class="text-[6rem] font-black italic tracking-tighter leading-none mt-2" id="gradeLetter">S</div>
+    <div class="text-2xl font-black mt-2" id="gradeScore">100</div>
+    <div class="text-sm font-semibold text-white/55 mt-3" id="gradeMsg">완벽한 루틴!</div>
+
+    <div class="grid grid-cols-3 gap-3 mt-6">
+      <div class="glass2 rounded-2xl p-4">
+        <div class="miniTag">SETS</div>
+        <div class="text-2xl font-black mt-2" id="gradeSets">0</div>
+      </div>
+      <div class="glass2 rounded-2xl p-4">
+        <div class="miniTag">TIME</div>
+        <div class="text-2xl font-black mt-2" id="gradeTime">00:00</div>
+      </div>
+      <div class="glass2 rounded-2xl p-4">
+        <div class="miniTag">XP</div>
+        <div class="text-2xl font-black mt-2" id="gradeXP">+0</div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3 mt-6">
+      <button class="btn gradient" id="gradeOk"><i class="fa-solid fa-check"></i> 확인</button>
+      <button class="btn" id="gradeShare"><i class="fa-solid fa-share-nodes"></i> 공유</button>
+    </div>
+    <div class="text-[10px] font-black tracking-[0.22em] uppercase text-white/30 mt-5">* 이미지 캡처로 공유하세요</div>
+  </div>
+</div>
+
   <!-- Toast -->
+<div id="modalMonth" class="modal">
+  <div class="backdrop"></div>
+  <div class="modalCard">
+    <div class="flex items-start justify-between gap-3">
+      <div>
+        <div class="miniTag">월간 챌린지</div>
+        <div class="text-2xl font-black italic mt-1">Goal Settings</div>
+        <div class="text-[10px] font-black tracking-[0.22em] uppercase text-white/35 mt-2" id="monthEditMeta">—</div>
+      </div>
+      <button class="pill" id="monthClose"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="grid gap-4 mt-5">
+      <div class="glass2 rounded-2xl p-5 flex items-center justify-between">
+        <div>
+          <div class="miniTag">SETS TARGET</div>
+          <div class="text-5xl font-black mt-2" id="monthTargetSets">200</div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button class="iconBtn" id="monthSetsMinus"><i class="fa-solid fa-minus"></i></button>
+          <button class="iconBtn" id="monthSetsPlus"><i class="fa-solid fa-plus"></i></button>
+        </div>
+      </div>
+      <div class="glass2 rounded-2xl p-5 flex items-center justify-between">
+        <div>
+          <div class="miniTag">DAYS TARGET</div>
+          <div class="text-5xl font-black mt-2" id="monthTargetDays">12</div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button class="iconBtn" id="monthDaysMinus"><i class="fa-solid fa-minus"></i></button>
+          <button class="iconBtn" id="monthDaysPlus"><i class="fa-solid fa-plus"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn gradient w-full mt-6" id="monthSave"><i class="fa-solid fa-check"></i> 저장</button>
+  </div>
+</div>
+
   <div id="toast" class="pill primary"></div>
 
   <script>
@@ -679,6 +965,11 @@
     SETTINGS: 'dkfit_settings_v2',
     THEME: 'dkfit_theme_v2',
     NOTIF: 'dkfit_notif_v2',
+    GAMIFY: 'dkfit_gamify_v1',
+    BADGES: 'dkfit_badges_v1',
+    PRS: 'dkfit_prs_v1',
+    CHALLENGE: 'dkfit_challenge_v1',
+    SCORES: 'dkfit_scores_v1',
   };
 
   const DEFAULT_SETTINGS = { defaultRestSec: 60 };
@@ -690,16 +981,83 @@
   let settings = safeParse(localStorage.getItem(KEY.SETTINGS), DEFAULT_SETTINGS);
   let notifEnabled = (localStorage.getItem(KEY.NOTIF) ?? "1") === "1";
 
+let gamify = safeParse(localStorage.getItem(KEY.GAMIFY), {
+  xp: 0,
+  level: 1,
+  weeklyGoalDays: 3,
+  lastXpDate: null
+});
+let unlockedBadges = safeParse(localStorage.getItem(KEY.BADGES), {});
+
   function safeParse(raw, fallback){ try{ return raw ? JSON.parse(raw) : fallback; }catch(e){ return fallback; } }
   function persist(){
     localStorage.setItem(KEY.LOGS, JSON.stringify(logs));
     localStorage.setItem(KEY.PROGRESS, JSON.stringify(progressByDate));
     localStorage.setItem(KEY.REPS, JSON.stringify(repsByDate));
     localStorage.setItem(KEY.SETTINGS, JSON.stringify(settings));
+    localStorage.setItem(KEY.GAMIFY, JSON.stringify(gamify));
+    localStorage.setItem(KEY.BADGES, JSON.stringify(unlockedBadges));
+    localStorage.setItem(KEY.PRS, JSON.stringify(prs));
+    localStorage.setItem(KEY.CHALLENGE, JSON.stringify(challenge));
+    localStorage.setItem(KEY.SCORES, JSON.stringify(scoresByDate));
   }
   function todayStr(d=new Date()){ return d.toISOString().split('T')[0]; }
   function nowISO(){ return new Date().toISOString(); }
   function clamp(n,min,max){ return Math.max(min, Math.min(max,n)); }
+
+function weekKey(dateStr){
+  const d = new Date(dateStr+"T00:00:00");
+  // ISO week year-week
+  const tmp = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const dayNum = tmp.getUTCDay() || 7;
+  tmp.setUTCDate(tmp.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(tmp.getUTCFullYear(),0,1));
+  const weekNo = Math.ceil((((tmp - yearStart) / 86400000) + 1)/7);
+  return `${tmp.getUTCFullYear()}-W${String(weekNo).padStart(2,"0")}`;
+}
+function xpNeeded(level){ return Math.round(100 * Math.pow(1.18, level-1)); }
+function addXP(amount, reason=""){
+  amount = Math.max(0, Math.round(amount));
+  gamify.xp += amount;
+  // level up loop
+  while(gamify.xp >= xpNeeded(gamify.level)){
+    gamify.xp -= xpNeeded(gamify.level);
+    gamify.level += 1;
+    toast(`레벨업! Lv.${gamify.level} 🔥`);
+  }
+  persist();
+  if(reason) toast(`${reason} +${amount}XP`);
+}
+const BADGE_DEFS = [
+  {id:"first_set", icon:"fa-seedling", title:"첫 세트", desc:"처음으로 세트를 기록했습니다.", check:()=> logs.length>=1},
+  {id:"first_day", icon:"fa-calendar-check", title:"첫 기록", desc:"첫 운동 기록을 남겼습니다.", check:()=> new Set(logs.map(l=>l.date)).size>=1},
+  {id:"streak_3", icon:"fa-fire", title:"3일 연속", desc:"연속 3일 운동을 달성했습니다.", check:()=> calcStreak()>=3},
+  {id:"streak_7", icon:"fa-fire-flame-curved", title:"7일 연속", desc:"연속 7일 운동을 달성했습니다.", check:()=> calcStreak()>=7},
+  {id:"sets_50", icon:"fa-bolt", title:"50 세트", desc:"누적 50세트를 완료했습니다.", check:()=> logs.length>=50},
+  {id:"sets_200", icon:"fa-bolt-lightning", title:"200 세트", desc:"누적 200세트를 완료했습니다.", check:()=> logs.length>=200},
+  {id:"week_goal", icon:"fa-bullseye", title:"주간 목표", desc:"이번 주 목표 일수를 달성했습니다.", check:()=> weeklyProgress().doneDays>=weeklyProgress().goalDays && weeklyProgress().goalDays>0},
+    {id:"pr_20", icon:"fa-trophy", title:"PR 20+", desc:"어떤 운동이든 20REP 이상 기록했습니다.", check:()=> logs.some(l=>Number(l.rep||0)>=20)},
+    {id:"month_sets", icon:"fa-crown", title:"월간 챌린지", desc:"이번 달 세트 목표를 달성했습니다.", check:()=> monthProgress().doneSets>=monthProgress().targetSets},
+];
+function unlockBadges(){
+  let unlockedNow=0;
+  BADGE_DEFS.forEach(b=>{
+    if(!unlockedBadges[b.id] && b.check()){
+      unlockedBadges[b.id]= {unlockedAt: nowISO()};
+      unlockedNow++;
+    }
+  });
+  if(unlockedNow){
+    persist();
+    toast(`배지 ${unlockedNow}개 획득! 🏅`);
+  }
+}
+function weeklyProgress(){
+  const wk = weekKey(todayStr());
+  const byWeek = logs.filter(l=>weekKey(l.date)===wk);
+  const doneDays = new Set(byWeek.map(l=>l.date)).size;
+  return {week:wk, doneDays, goalDays: gamify.weeklyGoalDays||3};
+}
 
   async function loadAppData(){
     const res = await fetch("./appData.json", {cache:"no-store"});
@@ -761,6 +1119,64 @@
   // Chart
   let radarChart=null;
 
+let homeMiniChart=null;
+
+function computeNextExercise(date, dayIdx){
+  const routine = workout[String(dayIdx)];
+  if(!routine) return null;
+  const done = getLogsByDate(date).filter(l=>l.dayIdx===dayIdx);
+  // find first exercise with remaining sets
+  for(const ex of routine.list){
+    const exDone = done.filter(l=>l.exName===ex.name).length;
+    const total = ex.set||0;
+    if(exDone < total){
+      return {ex, remaining: total-exDone, done: exDone, total};
+    }
+  }
+  return null;
+}
+
+function renderHome(){
+  const routine = workout[String(currentDayIdx)];
+  const date = todayStr();
+  const p = calcDayProgress(date, currentDayIdx);
+  const streak = calcStreak();
+
+  setText("#homeSub", new Date().toLocaleDateString('ko-KR', {weekday:'long', month:'long', day:'numeric'}));
+  setText("#homeTodayTitle", routine?.title || "오늘 루틴");
+  setText("#homeTodayMeta", `${(routine?.type||'').toUpperCase()} · ${p.done}/${p.total} 세트 완료`);
+  setText("#homeProgressTxt", `${p.percent}%`);
+  setText("#homeStreak", streak);
+
+  const next = computeNextExercise(date, currentDayIdx);
+  if(next){
+    setText("#homeNextName", next.ex.name);
+    setText("#homeNextHint", `${next.done}/${next.total} SET 완료 · 남은 ${next.remaining} SET`);
+  }else{
+    setText("#homeNextName", "완료 🎉");
+    setText("#homeNextHint", "오늘 루틴을 모두 끝냈습니다.");
+  }
+
+  renderHomeMiniRadar();
+}
+
+function renderHomeMiniRadar(){
+  const st = computeStats();
+  const ctx = $("#homeMiniRadar")?.getContext("2d");
+  if(!ctx) return;
+  const cfg = {
+    type:"radar",
+    data:{ labels: st.labels, datasets:[{ data: st.data, fill:true, borderWidth:2, pointRadius:2 }] },
+    options:{
+      responsive:true,
+      plugins:{ legend:{display:false} },
+      scales:{ r:{ angleLines:{color:"rgba(255,255,255,.12)"}, grid:{color:"rgba(255,255,255,.10)"}, pointLabels:{color:"rgba(255,255,255,.75)", font:{weight:800}}, ticks:{display:false} } }
+    }
+  };
+  if(homeMiniChart) homeMiniChart.destroy();
+  homeMiniChart = new Chart(ctx, cfg);
+}
+
   /* ------------------------- DOM helpers ------------------------- */
   const $ = (sel)=> document.querySelector(sel);
   const $$ = (sel)=> Array.from(document.querySelectorAll(sel));
@@ -813,7 +1229,7 @@
     $("#progressBar").style.width = `${p.percent}%`;
     setText("#progressLabel", `현재 ${p.percent}% 완료`);
     if(routine) setText("#todayTitle", routine.title);
-    setText("#progressPill span", `${p.percent}%`);
+    setText("#progressTxt", `${p.percent}%`);
   }
 
   function calcStreak(){
@@ -846,7 +1262,7 @@
       b.className = "pill " + (active? "primary":"");
       b.style.minWidth="48px";
       b.style.justifyContent="center";
-      b.textContent = wd[(idx+6)%7]; // map 1->월 etc.
+      b.textContent = wd[idx===0?6:idx-1]; // map 1->월 ... 6->토, 0->일
       b.onclick=()=>{ selectedDayIdx=idx; slideIndex=0; renderTrainPage(); };
       wrap.appendChild(b);
     });
@@ -856,6 +1272,23 @@
     const cueMap = copy?.cueMap || {};
     return cueMap[type] || "오늘도 좋은 훈련을!";
   }
+
+
+function scrollToSlide(targetIdx){
+  const routine = getTodayRoutine(selectedDayIdx);
+  if(!routine) return;
+  const max = (routine.list?.length||1)-1;
+  slideIndex = clamp(targetIdx, 0, max);
+  const car = $("#carousel");
+  const slide = car?.children?.[slideIndex];
+  if(slide){
+    car.scrollTo({left: slide.offsetLeft, behavior:"smooth"});
+    setText("#slideIndicator", `${slideIndex+1} / ${routine.list.length}`);
+    setText("#slideName", routine.list[slideIndex]?.name || "");
+  }else{
+    renderTrainPage();
+  }
+}
 
   function renderTrainPage(){
     const routine = getTodayRoutine(selectedDayIdx);
@@ -982,7 +1415,10 @@
     }, 0);
 
     // update slideIndex on scroll
+    let __raf=null;
     car.onscroll = ()=> {
+      if(__raf) return;
+      __raf=requestAnimationFrame(()=>{ __raf=null;
       const slides=[...car.children];
       if(!slides.length) return;
       const cur = car.scrollLeft + car.clientWidth/2;
@@ -997,6 +1433,7 @@
         setText("#slideIndicator", `${slideIndex+1} / ${routine.list.length}`);
         setText("#slideName", routine.list[slideIndex]?.name || "");
       }
+      });
     };
   }
 
@@ -1100,6 +1537,8 @@
     if(!repState) return;
     const {routine, ex, setIdx} = repState;
 
+    updatePR(ex.name, Number(rep));
+
     addLog({
       date: selectedDate,
       dayIdx: selectedDayIdx,
@@ -1115,6 +1554,12 @@
     repsByDate[selectedDate][ex.name] ??= {};
     repsByDate[selectedDate][ex.name][String(setIdx)] = Number(rep);
     persist();
+
+    // XP: per set + bonus for first set of day
+    addXP(10, "세트");
+    const dayKey = selectedDate;
+    if(gamify.lastXpDate !== dayKey){ gamify.lastXpDate = dayKey; addXP(20, "출석"); }
+    unlockBadges();
 
     toast(t("messages.toast.repDone","REP 기록 완료 ✅"));
     closeModal("#modalRep");
@@ -1132,13 +1577,28 @@
     }
   }
 
+function openGradeModal(){
+  const r = calcTodayScore();
+  setText("#gradeLetter", r.grade);
+  setText("#gradeScore", `${r.score}점`);
+  setText("#gradeMsg", r.msg);
+  setText("#gradeSets", r.sets);
+  setText("#gradeTime", r.time);
+  setText("#gradeXP", "+50");
+  openModal("#modalGrade");
+  confetti.start(1200);
+}
+
   function openSummaryModal(){
     const routine = getTodayRoutine(selectedDayIdx);
     const p = calcDayProgress(selectedDate, selectedDayIdx);
     setText("#sumSets", p.done);
     setText("#sumEx", routine?.list?.length || 0);
     setText("#sumMsg", "오늘도 한 단계 성장했습니다. 🔥");
+    addXP(50, "루틴 완료");
+    unlockBadges();
     openModal("#modalSummary");
+    setTimeout(()=>{ openGradeModal(); }, 450);
   }
 
   /* ------------------------- Rest Timer ------------------------- */
@@ -1241,6 +1701,112 @@
     return {totalSets, activeDays, labels, data};
   }
 
+// ------------------------- PR Page -------------------------
+function renderPRPage(){
+  const entries = Object.entries(prs || {});
+  entries.sort((a,b)=>(b[1].maxRep||0)-(a[1].maxRep||0));
+  setText("#prCount", `${entries.length}`);
+
+  const top = entries[0];
+  if(top){
+    setText("#prTopTitle", top[0]);
+    setText("#prTopMeta", `최고 ${top[1].maxRep} REP · 누적 ${top[1].totalSets||0} SET`);
+  }else{
+    setText("#prTopTitle","아직 PR이 없습니다");
+    setText("#prTopMeta","훈련을 시작하면 자동으로 기록됩니다.");
+  }
+
+  const list=$("#prList");
+  list.innerHTML="";
+  entries.slice(0,60).forEach(([name,p], idx)=>{
+    const card=document.createElement("div");
+    card.className="glass2 rounded-[26px] p-5 flex items-center justify-between gap-4";
+    card.innerHTML = `
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-2xl flex items-center justify-center"
+             style="background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);">
+          <div class="text-sm font-black text-white/80">#${idx+1}</div>
+        </div>
+        <div>
+          <div class="text-lg font-black">${name}</div>
+          <div class="text-sm font-semibold text-white/55 mt-1">누적 ${p.totalSets||0} set · 업데이트 ${String(p.updatedAt||'').split('T')[0]||'—'}</div>
+        </div>
+      </div>
+      <div class="text-right">
+        <div class="text-3xl font-black">${p.maxRep||0}</div>
+        <div class="miniTag mt-1">REP</div>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+// ------------------------- Confetti (no deps) -------------------------
+const confetti = {
+  running:false,
+  parts:[],
+  start(durationMs=1400){
+    const c=$("#confetti");
+    const ctx=c.getContext("2d");
+    const dpr=window.devicePixelRatio||1;
+    const w=window.innerWidth, h=window.innerHeight;
+    c.width=w*dpr; c.height=h*dpr; c.style.display="block";
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+
+    this.parts=[];
+    const colors=["#20E3FF","#7C4DFF","#19FFA3","#FFCC00","#FF4D6D","#FFFFFF"];
+    for(let i=0;i<140;i++){
+      this.parts.push({
+        x: Math.random()*w,
+        y: -20 - Math.random()*h*0.2,
+        r: 2+Math.random()*4,
+        vx: -2 + Math.random()*4,
+        vy: 2 + Math.random()*6,
+        rot: Math.random()*Math.PI,
+        vr: -0.2 + Math.random()*0.4,
+        col: colors[Math.floor(Math.random()*colors.length)],
+        shape: Math.random()<0.5 ? "rect":"circle"
+      });
+    }
+    this.running=true;
+    const startT=performance.now();
+    const tick=(t)=>{
+      if(!this.running) return;
+      ctx.clearRect(0,0,w,h);
+      this.parts.forEach(p=>{
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.04;
+        p.rot += p.vr;
+
+        ctx.save();
+        ctx.translate(p.x,p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle=p.col;
+        if(p.shape==="rect"){
+          ctx.fillRect(-p.r, -p.r, p.r*2.2, p.r*1.1);
+        }else{
+          ctx.beginPath();
+          ctx.arc(0,0,p.r,0,Math.PI*2);
+          ctx.fill();
+        }
+        ctx.restore();
+      });
+      if(t-startT < durationMs){
+        requestAnimationFrame(tick);
+      }else{
+        this.stop();
+      }
+    };
+    requestAnimationFrame(tick);
+  },
+  stop(){
+    this.running=false;
+    const c=$("#confetti");
+    if(c) c.style.display="none";
+  }
+};
+
   function renderAnalytics(){
     const st = computeStats();
     setText("#statTotalSets", st.totalSets);
@@ -1271,9 +1837,21 @@
           }
         }
       }
+      });
     };
     if(radarChart) radarChart.destroy();
     radarChart = new Chart(ctx, cfg);
+
+    // Score trend
+    const sctx = $("#scoreTrend")?.getContext("2d");
+    if(sctx){
+      const s = scoreSeries(30);
+      const scfg={type:"line", data:{labels:s.labels, datasets:[{data:s.data, borderWidth:2, pointRadius:2, tension:0.35, fill:true}]},
+        options:{responsive:true, plugins:{legend:{display:false}}, scales:{x:{ticks:{color:"rgba(255,255,255,.55)",maxRotation:0}, grid:{color:"rgba(255,255,255,.08)"}}, y:{ticks:{color:"rgba(255,255,255,.55)", suggestedMin:0, suggestedMax:100}, grid:{color:"rgba(255,255,255,.08)"}}}}
+      };
+      if(window.__scoreChart) window.__scoreChart.destroy();
+      window.__scoreChart = new Chart(sctx, scfg);
+    }
   }
 
   /* ------------------------- History ------------------------- */
@@ -1305,6 +1883,14 @@
     }
 
     const dateHasLog=(date)=> logs.some(l=>l.date===date);
+    const dateCompleted=(date)=>{
+      const di=new Date(date).getDay();
+      const r=workout[String(di)];
+      if(!r) return false;
+      const total=r.list.reduce((a,e)=>a+(e.set||0),0);
+      const done=getLogsByDate(date).filter(l=>l.dayIdx===di).length;
+      return total>0 && done>=total;
+    };
 
     for(let day=1; day<=total; day++){
       const date = new Date(calYear, calMonth, day);
@@ -1321,9 +1907,11 @@
       b.textContent = day;
 
       if(has){
-        const dot=document.createElement("div");
-        dot.style.cssText="position:absolute;bottom:10px;width:6px;height:6px;border-radius:50%;background:var(--p);box-shadow:0 0 12px rgba(32,227,255,.5)";
-        b.appendChild(dot);
+        const stamp=document.createElement("div");
+        stamp.style.cssText="position:absolute;bottom:8px;right:8px;font-size:14px;filter:drop-shadow(0 0 10px rgba(32,227,255,.35))";
+        stamp.textContent = dateCompleted(ds) ? "⭐" : "•";
+        stamp.style.color = "var(--p)";
+        b.appendChild(stamp);
       }
 
       b.onclick=()=>{
@@ -1399,10 +1987,34 @@
   }
 
   /* ------------------------- Backup / Reset ------------------------- */
+async function importJSON(file){
+  try{
+    const text = await file.text();
+    const payload = JSON.parse(text);
+    if(!payload || !payload.logs) throw new Error("형식이 올바르지 않습니다.");
+    if(!confirm("현재 데이터에 덮어쓰고 불러올까요?")) return;
+    logs = payload.logs || [];
+    progressByDate = payload.progressByDate || {};
+    repsByDate = payload.repsByDate || {};
+    settings = payload.settings || settings;
+    gamify = payload.gamify || gamify;
+    unlockedBadges = payload.unlockedBadges || unlockedBadges;
+    prs = payload.prs || prs;
+    challenge = payload.challenge || challenge;
+    persist();
+    toast("불러오기 완료 ✅");
+    unlockBadges();
+    renderAll();
+  }catch(e){
+    toast("불러오기 실패: " + e.message);
+  }
+}
+
   function backupJSON(){
     const payload = {
       meta: {app:"DK Fit", version:"refactor-v2", exportedAt: nowISO()},
       logs, progressByDate, repsByDate, settings,
+      gamify, unlockedBadges, prs, challenge,
     };
     const blob = new Blob([JSON.stringify(payload,null,2)], {type:"application/json"});
     const url = URL.createObjectURL(blob);
@@ -1445,10 +2057,14 @@
   /* ------------------------- Pages / Navigation ------------------------- */
   function showPage(name){
     $$(".page").forEach(p=>p.classList.remove("active"));
-    $("#page-"+name).classList.add("active");
+    const pg=$("#page-"+name);
+    pg.classList.add("active","motion-in");
+    setTimeout(()=>pg.classList.remove("motion-in"), 650);
     $$(".dockBtn").forEach(b=>b.classList.toggle("active", b.dataset.page===name));
 
+    if(name==="home") renderHome();
     if(name==="analytics") renderAnalytics();
+    if(name==="pr") renderPRPage();
     if(name==="history") renderHistory();
     if(name==="settings") renderSettings();
   }
@@ -1501,6 +2117,24 @@
     // Dock
     $$(".dockBtn").forEach(b=> b.onclick=()=> showPage(b.dataset.page));
 
+    // Home actions
+$("#homeStartBtn").onclick = ()=> { showPage("train"); toast("오늘 훈련 시작!"); };
+$("#homeRestBtn").onclick = ()=> { startRest(settings.defaultRestSec); openTimer(); };
+$("#homeGoTrain").onclick = ()=> showPage("train");
+$("#homeGoHistory").onclick = ()=> showPage("history");
+$("#homeGoAnalytics").onclick = ()=> showPage("analytics");
+$("#homeOpenAnalytics").onclick = ()=> showPage("analytics");
+
+// Monthly challenge
+$("#monthEditBtn").onclick = ()=> { renderMonthModal(); openModal("#modalMonth"); };
+$("#monthClose").onclick = ()=> closeModal("#modalMonth");
+$("#modalMonth .backdrop").onclick = ()=> closeModal("#modalMonth");
+$("#monthSetsMinus").onclick = ()=> { challenge.targetSets = clamp((challenge.targetSets||200)-20, 0, 5000); renderMonthModal(); };
+$("#monthSetsPlus").onclick = ()=> { challenge.targetSets = clamp((challenge.targetSets||200)+20, 0, 5000); renderMonthModal(); };
+$("#monthDaysMinus").onclick = ()=> { challenge.targetDays = clamp((challenge.targetDays||12)-1, 0, 31); renderMonthModal(); };
+$("#monthDaysPlus").onclick = ()=> { challenge.targetDays = clamp((challenge.targetDays||12)+1, 0, 31); renderMonthModal(); };
+$("#monthSave").onclick = ()=> { challenge.month = monthKey(todayStr()); persist(); toast("월간 목표 저장됨"); unlockBadges(); renderHome(); closeModal("#modalMonth"); };
+
     // Buttons
     $("#pauseBtn").onclick = togglePause;
     $("#btnPrev").onclick = ()=> { slideIndex=Math.max(0, slideIndex-1); renderTrainPage(); };
@@ -1513,6 +2147,8 @@
     $("#btnResetToday").onclick = resetToday;
     $("#btnQuickSettings").onclick = ()=> showPage("settings");
     $("#btnBackup").onclick = backupJSON;
+    $("#btnImport").onclick = ()=> $("#importFile").click();
+    $("#importFile").onchange = (e)=>{ const f=e.target.files?.[0]; if(f) importJSON(f); e.target.value=""; };
     $("#btnResetAll").onclick = resetAll;
     $("#btnRestNow").onclick = ()=> { startRest(settings.defaultRestSec); openTimer(); };
     $("#btnFinish").onclick = openSummaryModal;
@@ -1532,7 +2168,9 @@
     $("#monthNext").onclick = ()=> changeMonth(1);
     $("#btnResetSelected").onclick = resetSelectedDate;
 
-    // Settings rest
+    // Settings
+    $("#posterStyle").value = settings.posterStyle || "neon";
+    $("#posterStyle").onchange = (e)=>{ settings.posterStyle = e.target.value; persist(); toast("포스터 스타일 저장됨"); }; rest
     $("#restMinus").onclick = ()=> { settings.defaultRestSec = clamp((settings.defaultRestSec||60)-5, 10, 600); renderSettings(); };
     $("#restPlus").onclick = ()=> { settings.defaultRestSec = clamp((settings.defaultRestSec||60)+5, 10, 600); renderSettings(); };
     $("#btnSaveSettings").onclick = ()=> { saveSettings(); };
@@ -1566,6 +2204,320 @@
     $("#hudOpen").onclick = ()=> openTimer();
     $("#hudSkip").onclick = ()=> { restRemaining=0; clearInterval(restTimer); updateTimerUI(); toast("휴식 스킵"); };
 
+async function makePosterBlob(){
+  const c=document.createElement("canvas");
+  const w=1080, h=1920;
+  c.width=w; c.height=h;
+  const ctx=c.getContext("2d");
+
+  const style = (settings.posterStyle || "neon");
+
+  // data
+  const grade=$("#gradeLetter").textContent;
+  const score=$("#gradeScore").textContent;
+  const msg=$("#gradeMsg").textContent;
+  const sets=$("#gradeSets").textContent;
+  const time=$("#gradeTime").textContent;
+  const date=new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'short'});
+
+  const di = new Date(todayStr()+"T00:00:00").getDay();
+  const routine = workout[String(di)];
+  const routineTitle = routine?.title || "TODAY ROUTINE";
+  const exNames = (routine?.list||[]).slice(0,6).map(x=>x.name);
+
+  // helpers
+  function fillGrad(stops){
+    const g=ctx.createLinearGradient(0,0,w,h);
+    stops.forEach(([p,col])=>g.addColorStop(p,col));
+    ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+  }
+  function blob(x,y,r,col,alpha){
+    const rg=ctx.createRadialGradient(x,y,0,x,y,r);
+    rg.addColorStop(0, col);
+    rg.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.globalAlpha=alpha;
+    ctx.fillStyle=rg; ctx.fillRect(0,0,w,h);
+    ctx.globalAlpha=1;
+  }
+  function text(x,y,str,fs,fw=900,fill="rgba(255,255,255,.92)",align="left"){
+    ctx.fillStyle=fill;
+    ctx.font=`${fw} ${fs}px Pretendard, system-ui`;
+    ctx.textAlign=align;
+    ctx.fillText(str,x,y);
+    ctx.textAlign="left";
+  }
+
+  // QR code
+  const url = location.href.split("#")[0];
+  let qrImg=null;
+  try{
+    const dataUrl = await QRCode.toDataURL(url, {margin:0, width:260, color:{dark:"#FFFFFF", light:"#00000000"}});
+    qrImg = await new Promise(res=>{ const im=new Image(); im.onload=()=>res(im); im.src=dataUrl; });
+  }catch(e){ qrImg=null; }
+
+  // ------- TEMPLATE: NEON (Card + blobs + list) -------
+  async function drawNeon(){
+    fillGrad([[0,"#0B0B10"],[0.35,"#111125"],[1,"#0B0B10"]]);
+    blob(240,220,520,"rgba(32,227,255,1)",0.25);
+    blob(920,300,620,"rgba(124,77,255,1)",0.22);
+    blob(260,1720,700,"rgba(25,255,163,1)",0.18);
+
+    ctx.fillStyle="rgba(255,255,255,0.06)";
+    roundRect(ctx, 90, 210, 900, 1400, 60); ctx.fill();
+    ctx.strokeStyle="rgba(255,255,255,0.12)"; ctx.lineWidth=2; ctx.stroke();
+
+    text(150,320,"DK FIT · SCORE POSTER",28,800,"rgba(255,255,255,0.55)");
+    text(150,392,routineTitle,52,900,"rgba(255,255,255,0.92)");
+    text(150,640,grade,220,900,"rgba(255,255,255,0.95)");
+    text(150,725,score,80,900,"rgba(32,227,255,0.95)");
+    text(150,804,msg,44,800,"rgba(255,255,255,0.85)");
+    text(150,860,date,30,800,"rgba(255,255,255,0.45)");
+
+    // stats
+    ctx.fillStyle="rgba(255,255,255,0.06)";
+    roundRect(ctx, 150, 930, 780, 250, 44); ctx.fill();
+    ctx.strokeStyle="rgba(255,255,255,0.10)"; ctx.stroke();
+
+    const stat=(x,label,val)=>{
+      text(x,995,label,24,900,"rgba(255,255,255,0.45)");
+      text(x,1075,val,64,900,"rgba(255,255,255,0.92)");
+    };
+    stat(190,"SETS",sets);
+    stat(490,"TIME",time);
+    stat(760,"XP","+50");
+
+    // list
+    text(150,1260,"TODAY EXERCISES",22,900,"rgba(255,255,255,0.55)");
+    ctx.fillStyle="rgba(255,255,255,0.90)";
+    ctx.font="900 34px Pretendard, system-ui";
+    exNames.forEach((n,i)=>ctx.fillText(`• ${n}`, 150, 1320 + i*52));
+
+    text(150,1605,"Consistency beats intensity.",26,900,"rgba(255,255,255,0.35)");
+
+    if(qrImg){
+      ctx.fillStyle="rgba(255,255,255,0.06)";
+      roundRect(ctx, 750, 1500, 210, 210, 36); ctx.fill();
+      ctx.drawImage(qrImg, 760, 1510, 190, 190);
+      drawQRLogo(760+95,1510+95);
+      text(785,1740,"OPEN APP",20,900,"rgba(255,255,255,0.45)");
+    }
+  }
+
+  // ------- TEMPLATE: NIKE (Bold mono, diagonal cut, minimal list) -------
+  async function drawNike(){
+    fillGrad([[0,"#050507"],[0.55,"#101012"],[1,"#050507"]]);
+    // subtle light beams
+    blob(240,260,640,"rgba(255,255,255,1)",0.08);
+    blob(980,420,740,"rgba(255,255,255,1)",0.05);
+
+    // diagonal slab
+    ctx.save();
+    ctx.translate(-120, 0);
+    ctx.rotate(-0.08);
+    ctx.fillStyle="rgba(255,255,255,0.06)";
+    roundRect(ctx, 140, 260, 980, 1100, 64); ctx.fill();
+    ctx.strokeStyle="rgba(255,255,255,0.12)"; ctx.lineWidth=2; ctx.stroke();
+    ctx.restore();
+
+    // big grade as watermark
+    ctx.globalAlpha=0.10;
+    text(820,430,grade,320,900,"#FFFFFF","right");
+    ctx.globalAlpha=1;
+
+    text(110,220,"JUST DO IT.",34,900,"rgba(255,255,255,0.50)");
+    text(110,310,routineTitle,60,900,"rgba(255,255,255,0.94)");
+    text(110,430,score,92,900,"rgba(255,255,255,0.95)");
+    text(110,495,msg,38,900,"rgba(255,255,255,0.75)");
+    text(110,550,date,28,800,"rgba(255,255,255,0.40)");
+
+    // stats row
+    ctx.fillStyle="rgba(255,255,255,0.06)";
+    roundRect(ctx, 110, 640, 860, 170, 44); ctx.fill();
+    ctx.strokeStyle="rgba(255,255,255,0.10)"; ctx.stroke();
+
+    text(150,710,"SETS",20,900,"rgba(255,255,255,0.45)");
+    text(150,775,sets,62,900,"rgba(255,255,255,0.95)");
+    text(450,710,"TIME",20,900,"rgba(255,255,255,0.45)");
+    text(450,775,time,62,900,"rgba(255,255,255,0.95)");
+    text(750,710,"XP",20,900,"rgba(255,255,255,0.45)");
+    text(750,775,"+50",62,900,"rgba(255,255,255,0.95)");
+
+    // list minimal
+    text(110,930,"EXERCISES",22,900,"rgba(255,255,255,0.45)");
+    ctx.fillStyle="rgba(255,255,255,0.92)";
+    ctx.font="900 34px Pretendard, system-ui";
+    exNames.slice(0,4).forEach((n,i)=>ctx.fillText(n.toUpperCase(), 110, 990 + i*54));
+
+    // qr + footer
+    if(qrImg){
+      ctx.fillStyle="rgba(255,255,255,0.06)";
+      roundRect(ctx, 110, 1540, 300, 300, 60); ctx.fill();
+      ctx.drawImage(qrImg, 130, 1560, 260, 260);
+      drawQRLogo(130+130,1560+130,26);
+    }
+    text(960,1820,"DK FIT",34,900,"rgba(255,255,255,0.35)","right");
+  }
+
+  // ------- TEMPLATE: MONO (Clean grid, premium magazine) -------
+  async function drawMono(){
+    fillGrad([[0,"#0B0B0C"],[0.5,"#121214"],[1,"#0B0B0C"]]);
+    blob(260,260,700,"rgba(255,255,255,1)",0.08);
+    blob(920,420,820,"rgba(255,255,255,1)",0.05);
+
+    // top bar
+    ctx.fillStyle="rgba(255,255,255,0.06)";
+    roundRect(ctx, 80, 90, 920, 140, 36); ctx.fill();
+    text(120,170,"DK FIT",40,900,"rgba(255,255,255,0.92)");
+    text(960,170,date,22,900,"rgba(255,255,255,0.45)","right");
+
+    // split layout
+    ctx.fillStyle="rgba(255,255,255,0.06)";
+    roundRect(ctx, 80, 260, 920, 980, 54); ctx.fill();
+    ctx.strokeStyle="rgba(255,255,255,0.12)"; ctx.lineWidth=2; ctx.stroke();
+
+    // left content
+    text(140,360,"TODAY",22,900,"rgba(255,255,255,0.45)");
+    text(140,430,routineTitle,54,900,"rgba(255,255,255,0.95)");
+    text(140,560,msg,36,800,"rgba(255,255,255,0.78)");
+
+    text(140,730,"SCORE",22,900,"rgba(255,255,255,0.45)");
+    text(140,820,score,100,900,"rgba(255,255,255,0.95)");
+    text(140,950,f"GRADE {grade}",34,900,"rgba(255,255,255,0.70)")
+
+    // right stats column
+    ctx.fillStyle="rgba(255,255,255,0.04)";
+    roundRect(ctx, 660, 340, 280, 820, 44); ctx.fill();
+
+    text(700,430,"SETS",18,900,"rgba(255,255,255,0.45)");
+    text(700,510,sets,72,900,"rgba(255,255,255,0.95)");
+    text(700,620,"TIME",18,900,"rgba(255,255,255,0.45)");
+    text(700,700,time,56,900,"rgba(255,255,255,0.95)");
+    text(700,810,"XP",18,900,"rgba(255,255,255,0.45)");
+    text(700,890,"+50",56,900,"rgba(255,255,255,0.95)");
+
+    // exercises bottom
+    ctx.fillStyle="rgba(255,255,255,0.06)";
+    roundRect(ctx, 80, 1280, 920, 520, 54); ctx.fill();
+    text(120,1370,"EXERCISES",22,900,"rgba(255,255,255,0.45)");
+    ctx.fillStyle="rgba(255,255,255,0.92)";
+    ctx.font="900 34px Pretendard, system-ui";
+    exNames.forEach((n,i)=>{
+      const col = i<3? 0: 1
+      const row = i<3? i: i-3
+      ctx.fillText(`• ${n}`, 120 + col*460, 1440 + row*72);
+    });
+
+    if(qrImg){
+      ctx.fillStyle="rgba(255,255,255,0.06)";
+      roundRect(ctx, 760, 90, 240, 240, 48); ctx.fill();
+      ctx.drawImage(qrImg, 780, 110, 200, 200);
+      drawQRLogo(780+100,110+100,22);
+    }
+  }
+
+  // ------- TEMPLATE: WARM (Festival energy, rounded poster) -------
+  async function drawWarm(){
+    fillGrad([[0,"#120A0A"],[0.5,"#20110B"],[1,"#120A0A"]]);
+    blob(260,260,640,"rgba(255,140,64,1)",0.25);
+    blob(920,320,720,"rgba(255,64,128,1)",0.20);
+    blob(260,1720,740,"rgba(255,210,64,1)",0.12);
+
+    // big rounded frame
+    ctx.fillStyle="rgba(255,255,255,0.06)";
+    roundRect(ctx, 70, 120, 940, 1680, 80); ctx.fill();
+    ctx.strokeStyle="rgba(255,255,255,0.12)"; ctx.lineWidth=2; ctx.stroke();
+
+    // ribbon
+    ctx.fillStyle="rgba(255,210,64,0.18)";
+    roundRect(ctx, 110, 170, 860, 110, 44); ctx.fill();
+    text(150,240,"MONTHLY ENERGY",28,900,"rgba(255,255,255,0.80)");
+
+    // center grade
+    ctx.globalAlpha=0.16;
+    text(960,620,grade,420,900,"rgba(255,255,255,1)","right");
+    ctx.globalAlpha=1;
+
+    text(150,360,routineTitle,58,900,"rgba(255,255,255,0.95)");
+    text(150,455,date,28,900,"rgba(255,255,255,0.55)");
+    text(150,575,score,110,900,"rgba(255,210,64,0.95)");
+    text(150,645,msg,40,900,"rgba(255,255,255,0.80)");
+
+    // stats chips
+    const chip=(x,y,label,val)=>{
+      ctx.fillStyle="rgba(255,255,255,0.06)";
+      roundRect(ctx,x,y,260,150,48); ctx.fill();
+      text(x+34,y+56,label,20,900,"rgba(255,255,255,0.55)");
+      text(x+34,y+118,val,62,900,"rgba(255,255,255,0.95)");
+    };
+    chip(150,730,"SETS",sets);
+    chip(435,730,"TIME",time);
+    chip(720,730,"XP","+50");
+
+    // list
+    text(150,980,"TODAY EXERCISES",22,900,"rgba(255,255,255,0.55)");
+    ctx.fillStyle="rgba(255,255,255,0.92)";
+    ctx.font="900 34px Pretendard, system-ui";
+    exNames.forEach((n,i)=>ctx.fillText(`• ${n}`,150,1045+i*56));
+
+    // qr
+    if(qrImg){
+      ctx.fillStyle="rgba(0,0,0,0.20)";
+      roundRect(ctx, 720, 1500, 240, 240, 64); ctx.fill();
+      ctx.drawImage(qrImg, 740, 1520, 200, 200);
+      drawQRLogo(740+100,1520+100,24);
+      text(770,1770,"OPEN",22,900,"rgba(255,255,255,0.55)");
+    }
+    text(150,1760,"Be consistent. Be unstoppable.",26,900,"rgba(255,255,255,0.45)");
+  }
+
+  function drawQRLogo(cx,cy,r=28){
+    ctx.save();
+    ctx.globalAlpha=0.95;
+    ctx.fillStyle="rgba(0,0,0,0.78)";
+    ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle="rgba(255,255,255,0.35)"; ctx.lineWidth=2; ctx.stroke();
+    ctx.fillStyle="rgba(255,255,255,0.92)";
+    ctx.font=`900 ${Math.round(r*0.85)}px Pretendard, system-ui`;
+    ctx.textAlign="center"; ctx.textBaseline="middle";
+    ctx.fillText("DK", cx, cy+1);
+    ctx.restore();
+  }
+
+  if(style==="nike") await drawNike();
+  else if(style==="mono") await drawMono();
+  else if(style==="warm") await drawWarm();
+  else await drawNeon();
+
+  return await new Promise(res=>c.toBlob(res,"image/png",0.92));
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+
+    // Badge pop
+$("#badgePopClose").onclick = ()=> $("#badgePop").classList.remove("show");
+$("#badgePop .backdrop").onclick = ()=> $("#badgePop").classList.remove("show");
+
+// Grade modal
+$("#gradeOk").onclick = ()=> closeModal("#modalGrade");
+$("#modalGrade .backdrop").onclick = ()=> closeModal("#modalGrade");
+$("#gradeShare").onclick = async ()=>{
+  try{
+    if(navigator.share){
+      await navigator.share({title:"DK Fit", text:`오늘 점수 ${$("#gradeScore").textContent} (${ $("#gradeLetter").textContent })`});
+    }else{
+      toast("공유는 캡처로 가능합니다.");
+    }
+  }catch(e){}
+};
+
     // Summary
     $("#sumClose").onclick = ()=> closeModal("#modalSummary");
     $("#sumOk").onclick = ()=> closeModal("#modalSummary");
@@ -1579,11 +2531,13 @@
   /* ------------------------- Boot ------------------------- */
   function renderAll(){
     renderWeekChips();
+    renderHome();
     renderTrainPage();
     updateProgressUI();
     updateStreakUI();
     $("#notifToggle").textContent = notifEnabled ? "ON":"OFF";
     $("#notifToggle").classList.toggle("primary", notifEnabled);
+    showPage("home");
   }
 
   (async function boot(){
@@ -1593,6 +2547,7 @@
       await loadAppData();
       bindEvents();
       startStopwatch();
+      unlockBadges();
       renderAll();
     }catch(e){
       console.error(e);
@@ -1604,5 +2559,6 @@
     }
   })();
   </script>
+  <input id="importFile" type="file" accept="application/json" style="display:none"/>
 </body>
 </html>
