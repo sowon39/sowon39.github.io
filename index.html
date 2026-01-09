@@ -827,8 +827,10 @@ button, a, [role="button"], .btn, .chip, .tab, .iconbtn{ touch-action: manipulat
 /* --- Cloud Sync status (always-on) --- */
 .sync-badge{
   position: fixed;
-  top: 10px;
-  left: 12px;
+  /* Multi-device safe positioning */
+  top: calc(env(safe-area-inset-top, 0px) + 10px);
+  right: calc(env(safe-area-inset-right, 0px) + 12px);
+  left: auto;
   z-index: 9999;
   display: inline-flex;
   align-items: center;
@@ -842,6 +844,7 @@ button, a, [role="button"], .btn, .chip, .tab, .iconbtn{ touch-action: manipulat
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   user-select: none;
+  pointer-events: none; /* never block taps/clicks */
 }
 .sync-dot{
   font-size: 12px;
@@ -853,6 +856,17 @@ button, a, [role="button"], .btn, .chip, .tab, .iconbtn{ touch-action: manipulat
 .sync-state-ok     #syncDot{ color: #2ecc71; } /* ok: green */
 .sync-state-err    #syncDot{ color: #ff5c5c; } /* err: red */
 .sync-state-off    #syncDot{ color: #9aa0a6; } /* offline/fallback: gray */
+
+
+/* Responsive tweaks */
+@media (max-width: 480px){
+  .sync-badge{
+    font-size: 11px;
+    padding: 5px 9px;
+    top: calc(env(safe-area-inset-top, 0px) + 8px);
+    right: calc(env(safe-area-inset-right, 0px) + 10px);
+  }
+}
 
 </style>
 <style>
@@ -3071,12 +3085,13 @@ function saveRepToLog(logKey, value){
   function getPolicy(){ return localStorage.getItem(LS_SYNC_POLICY) || "ask"; }
 
   function showSnack(msg, {loading=false, actionText="", actionFn=null, autoHideMs=2200} = {}){
+  // action button removed (cloud-first).
+
     snackMsg.textContent = msg;
     snack.style.display = "flex";
     requestAnimationFrame(()=>snack.classList.add("show"));
     snackSpin.style.display = loading ? "inline-block" : "none";
     if(actionText && actionFn){
-      snackAction.textContent = actionText;
       autoHideMs = 0; // don't auto hide if action exists
     }else{
     }
