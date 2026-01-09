@@ -367,7 +367,7 @@ function requestCloudRefresh(reason=""){
 document.addEventListener("click",(e)=>{
   const t=e.target;
   if(!t) return;
-  if(t.closest && t.closest(".navDockWrap,.navDock,.dayNav,.tabRow,.tabBtn")){
+  if(t.closest && t.closest(".navDockWrap,.nav-dock,#navDockWrap,#navDock,.dayNav,.tabRow,.tabBtn")){
     requestCloudRefresh("nav");
   }
 }, true);
@@ -3290,7 +3290,6 @@ btnSave && btnSave.addEventListener("click", async () => {
       window.__syncHideT = setTimeout(()=>{ __syncEl.classList.remove("show"); }, hideAfter);
     }
   }
-  }
 
   async function backupToGist(reason="") {
     setSyncState('syncing','BACKUP');
@@ -3490,6 +3489,7 @@ btnSave && btnSave.addEventListener("click", async () => {
   let pulling = false;
   let maxPull = 0;
   let rafId = null;
+  const ptrHint = document.getElementById("ptrHint");
   const ptrText = document.getElementById("ptrText");
   const ptrDot = document.getElementById("ptrDot");
   const ptrRing = document.getElementById("ptrRing");
