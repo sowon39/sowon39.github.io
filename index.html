@@ -3051,7 +3051,10 @@ function saveRepToLog(logKey, value){
   const tokErr = document.getElementById("gistTokErr");
   const ptrHint = document.getElementById("ptrHint");
 
-  function getGistId(){ return localStorage.getItem(LS_GIST_ID) || DEFAULT_GIST_ID; }
+  
+  // ensure hidden on boot
+  if(ptrHint){ ptrHint.style.opacity="0"; ptrHint.style.transform="translateY(0px)"; }
+function getGistId(){ return localStorage.getItem(LS_GIST_ID) || DEFAULT_GIST_ID; }
   function getToken(){ return localStorage.getItem(LS_GIST_TOKEN) || ""; }
   function getPolicy(){ return localStorage.getItem(LS_SYNC_POLICY) || "ask"; }
 
@@ -3272,20 +3275,21 @@ btnSave && btnSave.addEventListener("click", async () => {
   let isSyncing = false;
 
   /* ✅ Sync indicator helpers (added, no logic changes) */
-  const __syncEl = document.getElementById("syncIndicator");
-  const __syncLabel = document.getElementById("syncLabel");
   function setSyncState(state,label){
+    const __syncEl = document.getElementById("syncIndicator");
+    const __syncLabel = document.getElementById("syncLabel");
     if(!__syncEl) return;
     __syncEl.classList.remove("ok","syncing","err","dl","local","cloud","pulse","show");
     if(state) __syncEl.classList.add(state);
     if(state==="syncing"||state==="dl") __syncEl.classList.add("pulse");
-    if(label) __syncLabel.textContent = label;
+    if(label && __syncLabel) __syncLabel.textContent = label;
     __syncEl.classList.add("show");
     clearTimeout(window.__syncHideT);
-    const hideAfter = (state==="syncing"||state==="dl") ? 0 : 1200;
+    const hideAfter = (state==="syncing"||state==="dl") ? 0 : 1400;
     if(hideAfter){
       window.__syncHideT = setTimeout(()=>{ __syncEl.classList.remove("show"); }, hideAfter);
     }
+  }
   }
 
   async function backupToGist(reason="") {
@@ -3517,6 +3521,7 @@ btnSave && btnSave.addEventListener("click", async () => {
   }
 
   function resetPtr(){
+    if(!ptrHint) return;
     ptrHint.style.transform = "translateY(0px)";
     ptrHint.style.opacity = "0";
     if(ptrRing){ ptrRing.style.opacity = "0"; ptrRing.style.transform = "rotate(0deg)"; }
@@ -3539,6 +3544,8 @@ btnSave && btnSave.addEventListener("click", async () => {
     if(rafId) cancelAnimationFrame(rafId);
     rafId = requestAnimationFrame(()=> setPtr(y));
   }, {passive:true});
+
+  resetPtr();
 
   window.addEventListener("touchend", async ()=> {
     if(!pulling) { startY=null; maxPull=0; return; }
