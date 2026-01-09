@@ -351,27 +351,7 @@ button,a{
     .nav-active-dot{ position:absolute; bottom:1px; width:4px; height:4px; background:var(--primary); border-radius:50%; box-shadow:0 0 12px var(--primary); opacity:0; transition:all .25s; }
     .nav-item.active .nav-active-dot{ opacity:1; transform:scale(1.6); }
 
-    
-/* ----- Cloud auto-refresh triggers ----- */
-let __cloudRefreshT = null;
-function requestCloudRefresh(reason=""){
-  try{
-    if(__cloudRefreshT) clearTimeout(__cloudRefreshT);
-    __cloudRefreshT = setTimeout(()=> {
-      if(document.hidden) return;
-      restoreFromGist(false);
-    }, 180);
-  }catch(e){}
-}
-// navigation dock 탭/버튼 클릭 시 즉시 최신화
-document.addEventListener("click",(e)=>{
-  const t=e.target;
-  if(!t) return;
-  if(t.closest && t.closest(".navDockWrap,.nav-dock,#navDockWrap,#navDock,.dayNav,.tabRow,.tabBtn")){
-    requestCloudRefresh("nav");
-  }
-}, true);
-/* Dock Auto Hide */
+    /* Dock Auto Hide */
     .navDockWrap{
       transition: transform .45s cubic-bezier(0.22, 1, 0.36, 1), opacity .35s ease;
       will-change: transform, opacity;
@@ -835,8 +815,6 @@ button, a, [role="button"], .btn, .chip, .tab, .iconbtn{ touch-action: manipulat
 .sync-indicator.syncing .dot{background:#60a5fa;}
 .sync-indicator.err .dot{background:#fb7185;}
 .sync-indicator.dl .dot{background:#a78bfa;}
-.sync-indicator.local .dot{background:#fbbf24;} /* amber: local wins */
-.sync-indicator.cloud .dot{background:#22c55e;} /* green: cloud applied */
 </style>
 <style>
 /* ===== Mobile / Tablet app-like touch tuning ===== */
@@ -1460,7 +1438,23 @@ let silentPushTimer=null;
       showDockTemporarily();
     }
 
-    /* ---------- DAY NAV ---------- */
+    
+    // ✅ Gist 복원/새로고침 후 현재 탭 UI를 즉시 최신 데이터로 재렌더
+    window.afterGistRestore = function(){
+      try{
+        const activeTab = document.querySelector('.tab-content.active');
+        const activeId = activeTab ? activeTab.id : '';
+        if(activeId === 'tab-history'){
+          if(typeof renderCalendar === 'function') renderCalendar();
+          if(typeof renderHistoryDetail === 'function') renderHistoryDetail();
+        }else if(activeId === 'tab-stats'){
+          if(typeof renderStats === 'function') renderStats();
+        }else if(activeId === 'tab-session'){
+          if(typeof renderDay === 'function') renderDay(selectedDate || (new Date()).toISOString().slice(0,10));
+        }
+      }catch(e){}
+    };
+/* ---------- DAY NAV ---------- */
     function updateDayNav(){
       const nav = document.getElementById('day-nav');
       nav.innerHTML = '';
@@ -3051,10 +3045,7 @@ function saveRepToLog(logKey, value){
   const tokErr = document.getElementById("gistTokErr");
   const ptrHint = document.getElementById("ptrHint");
 
-  
-  // ensure hidden on boot
-  if(ptrHint){ ptrHint.style.opacity="0"; ptrHint.style.transform="translateY(0px)"; }
-function getGistId(){ return localStorage.getItem(LS_GIST_ID) || DEFAULT_GIST_ID; }
+  function getGistId(){ return localStorage.getItem(LS_GIST_ID) || DEFAULT_GIST_ID; }
   function getToken(){ return localStorage.getItem(LS_GIST_TOKEN) || ""; }
   function getPolicy(){ return localStorage.getItem(LS_SYNC_POLICY) || "ask"; }
 
@@ -3275,17 +3266,17 @@ btnSave && btnSave.addEventListener("click", async () => {
   let isSyncing = false;
 
   /* ✅ Sync indicator helpers (added, no logic changes) */
+  const __syncEl = document.getElementById("syncIndicator");
+  const __syncLabel = document.getElementById("syncLabel");
   function setSyncState(state,label){
-    const __syncEl = document.getElementById("syncIndicator");
-    const __syncLabel = document.getElementById("syncLabel");
     if(!__syncEl) return;
-    __syncEl.classList.remove("ok","syncing","err","dl","local","cloud","pulse","show");
+    __syncEl.classList.remove("ok","syncing","err","dl","pulse","show");
     if(state) __syncEl.classList.add(state);
     if(state==="syncing"||state==="dl") __syncEl.classList.add("pulse");
-    if(label && __syncLabel) __syncLabel.textContent = label;
+    if(label) __syncLabel.textContent = label;
     __syncEl.classList.add("show");
     clearTimeout(window.__syncHideT);
-    const hideAfter = (state==="syncing"||state==="dl") ? 0 : 1400;
+    const hideAfter = (state==="syncing"||state==="dl") ? 0 : 1200;
     if(hideAfter){
       window.__syncHideT = setTimeout(()=>{ __syncEl.classList.remove("show"); }, hideAfter);
     }
@@ -3379,12 +3370,7 @@ btnSave && btnSave.addEventListener("click", async () => {
       // ✅ 강제 리렌더(필요 시): 복원 후 앱 상태가 메모리에 남아 UI가 안 바뀌는 경우를 방지
       try{
         if(typeof window.afterGistRestore === "function") window.afterGistRestore();
-        // 마지막 수단: 화면이 갱신되지 않는 환경에서는 1회 자동 리로드
-        if(!window.__GIST_RELOADED_ONCE__){
-          window.__GIST_RELOADED_ONCE__ = true;
-          setTimeout(()=>{ location.reload(); }, 80);
-        }
-      }catch(e){}
+              }catch(e){}
 
             setSyncState("ok","SYNC");
         showSnack("복원 완료(클라우드 우선)", {loading:false});
@@ -3392,8 +3378,12 @@ btnSave && btnSave.addEventListener("click", async () => {
             showSnack("로컬이 더 최신 · 복원 생략", {loading:false});
           }else{
             // ask
-            showSnack("로컬이 더 최신 · 유지됨", {loading:false});
-            setSyncState("local","LOCAL");
+            showSnack("로컬이 더 최신 · 유지됨", {loading:false, actionText:"복원", actionFn:()=>{ applyPayload(cloudPayload);
+      // ✅ 강제 리렌더(필요 시): 복원 후 앱 상태가 메모리에 남아 UI가 안 바뀌는 경우를 방지
+      try{
+        if(typeof window.afterGistRestore === "function") window.afterGistRestore();
+              }catch(e){}
+ hideSnack(); toast("복원 완료"); }});
           }
         }else{
           // Cloud is newer
@@ -3401,25 +3391,7 @@ btnSave && btnSave.addEventListener("click", async () => {
       // ✅ 강제 리렌더(필요 시): 복원 후 앱 상태가 메모리에 남아 UI가 안 바뀌는 경우를 방지
       try{
         if(typeof window.afterGistRestore === "function") window.afterGistRestore();
-        // 마지막 수단: 화면이 갱신되지 않는 환경에서는 1회 자동 리로드
-        if(!window.__GIST_RELOADED_ONCE__){
-          window.__GIST_RELOADED_ONCE__ = true;
-          setTimeout(()=>{ location.reload(); }, 80);
-        }
-      }catch(e){}
-          }
-        }else{
-          // Cloud is newer
-          applyPayload(cloudPayload);
-      // ✅ 강제 리렌더(필요 시): 복원 후 앱 상태가 메모리에 남아 UI가 안 바뀌는 경우를 방지
-      try{
-        if(typeof window.afterGistRestore === "function") window.afterGistRestore();
-        // 마지막 수단: 화면이 갱신되지 않는 환경에서는 1회 자동 리로드
-        if(!window.__GIST_RELOADED_ONCE__){
-          window.__GIST_RELOADED_ONCE__ = true;
-          setTimeout(()=>{ location.reload(); }, 80);
-        }
-      }catch(e){}
+              }catch(e){}
 
           setSyncState("ok","SYNC");
         showSnack("복원 완료 · 최신 반영", {loading:false});
@@ -3430,12 +3402,7 @@ btnSave && btnSave.addEventListener("click", async () => {
       // ✅ 강제 리렌더(필요 시): 복원 후 앱 상태가 메모리에 남아 UI가 안 바뀌는 경우를 방지
       try{
         if(typeof window.afterGistRestore === "function") window.afterGistRestore();
-        // 마지막 수단: 화면이 갱신되지 않는 환경에서는 1회 자동 리로드
-        if(!window.__GIST_RELOADED_ONCE__){
-          window.__GIST_RELOADED_ONCE__ = true;
-          setTimeout(()=>{ location.reload(); }, 80);
-        }
-      }catch(e){}
+              }catch(e){}
 
         setSyncState("ok","SYNC");
         showSnack("복원 완료", {loading:false});
@@ -3474,14 +3441,7 @@ btnSave && btnSave.addEventListener("click", async () => {
   setInterval(()=> { if(!document.hidden) backupToGist("10분 주기"); }, 10*60*1000);
 
   // On background / page hide
-  document.addEventListener("visibilitychange", ()=> {
-    if(document.hidden){
-      backupToGist("백그라운드 전환");
-    }else{
-      // 돌아왔을 때 즉시 최신 클라우드 반영
-      restoreFromGist(false);
-    }
-  });
+  document.addEventListener("visibilitychange", ()=> { if(document.hidden) backupToGist("백그라운드 전환"); });
   window.addEventListener("pagehide", ()=> backupToGist("페이지 종료"));
 
   // Pull-to-refresh (in-app) — app-like
@@ -3489,7 +3449,6 @@ btnSave && btnSave.addEventListener("click", async () => {
   let pulling = false;
   let maxPull = 0;
   let rafId = null;
-  const ptrHint = document.getElementById("ptrHint");
   const ptrText = document.getElementById("ptrText");
   const ptrDot = document.getElementById("ptrDot");
   const ptrRing = document.getElementById("ptrRing");
@@ -3521,7 +3480,6 @@ btnSave && btnSave.addEventListener("click", async () => {
   }
 
   function resetPtr(){
-    if(!ptrHint) return;
     ptrHint.style.transform = "translateY(0px)";
     ptrHint.style.opacity = "0";
     if(ptrRing){ ptrRing.style.opacity = "0"; ptrRing.style.transform = "rotate(0deg)"; }
@@ -3544,8 +3502,6 @@ btnSave && btnSave.addEventListener("click", async () => {
     if(rafId) cancelAnimationFrame(rafId);
     rafId = requestAnimationFrame(()=> setPtr(y));
   }, {passive:true});
-
-  resetPtr();
 
   window.addEventListener("touchend", async ()=> {
     if(!pulling) { startY=null; maxPull=0; return; }
