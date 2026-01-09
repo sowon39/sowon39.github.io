@@ -14,7 +14,15 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
 
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com">
+function setSyncState(state, labelText){
+  document.body.classList.remove('sync-state-sync','sync-state-ok','sync-state-err','sync-state-off');
+  document.body.classList.add('sync-state-' + state);
+  const lbl = document.getElementById('syncLabel');
+  if(lbl && labelText) lbl.textContent = labelText;
+}
+
+</script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
@@ -815,6 +823,37 @@ button, a, [role="button"], .btn, .chip, .tab, .iconbtn{ touch-action: manipulat
 .sync-indicator.syncing .dot{background:#60a5fa;}
 .sync-indicator.err .dot{background:#fb7185;}
 .sync-indicator.dl .dot{background:#a78bfa;}
+
+/* --- Cloud Sync status (always-on) --- */
+.sync-badge{
+  position: fixed;
+  top: 10px;
+  left: 12px;
+  z-index: 9999;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 1;
+  background: rgba(0,0,0,.65);
+  color: #fff;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  user-select: none;
+}
+.sync-dot{
+  font-size: 12px;
+  line-height: 1;
+  opacity: .95;
+}
+/* states */
+.sync-state-sync   #syncDot{ color: #f7c948; } /* syncing: yellow */
+.sync-state-ok     #syncDot{ color: #2ecc71; } /* ok: green */
+.sync-state-err    #syncDot{ color: #ff5c5c; } /* err: red */
+.sync-state-off    #syncDot{ color: #9aa0a6; } /* offline/fallback: gray */
+
 </style>
 <style>
 /* ===== Mobile / Tablet app-like touch tuning ===== */
@@ -877,10 +916,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
 
 <body>
   <!-- Sync Indicator (added) -->
-  <div id="syncIndicator" class="sync-indicator" aria-live="polite">
-    <span id="syncDot" class="dot"></span>
-    <span id="syncLabel">SYNC</span>
-  </div>
+  <div id="syncIndicator" class="sync-badge" aria-live="polite" aria-atomic="true"><span id="syncDot" class="sync-dot" aria-hidden="true">●</span><span id="syncLabel">SYNC</span></div>
 
 
   <!-- ✅ Splash -->
@@ -1240,7 +1276,10 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       try{
         const val = path.split('.').reduce((o,k)=>o?.[k], copy);
         return (val===undefined||val===null) ? fallback : val;
-      }catch(e){ return fallback; }
+      }catch(e){
+    try{ setSyncState('err','SYNC ERR'); }catch(_){}
+ return fallback; 
+}
     }
 
     function getGifByExerciseName(name){
@@ -2955,12 +2994,11 @@ function saveRepToLog(logKey, value){
   #ptrHint .box{display:inline-block;background:rgba(255,255,255,.96);padding:8px 12px;border-radius:999px;box-shadow:0 10px 30px rgba(0,0,0,.15)}
 </style>
 
-<div id="ptrHint"><div class="box">↓ 새로고침 (Gist 복원)</div></div>
+<div id="ptrHint"><div class="box">↓ 새로고침 (Cloud 최신 반영)</div></div>
 
 <div id="gistSnack">
   <div class="spin" id="gistSnackSpin"></div>
   <div class="msg" id="gistSnackMsg">Sync</div>
-  <button class="btn" id="gistSnackAction" type="button" style="display:none">복원</button>
 </div>
 
 <button id="gistFab" type="button" title="Gist 동기화 설정">⚙️</button>
@@ -3016,7 +3054,6 @@ function saveRepToLog(logKey, value){
   const snack = document.getElementById("gistSnack");
   const snackMsg = document.getElementById("gistSnackMsg");
   const snackSpin = document.getElementById("gistSnackSpin");
-  const snackAction = document.getElementById("gistSnackAction");
   const fab = document.getElementById("gistFab");
 
   const overlay = document.getElementById("gistModalOverlay");
@@ -3040,12 +3077,8 @@ function saveRepToLog(logKey, value){
     snackSpin.style.display = loading ? "inline-block" : "none";
     if(actionText && actionFn){
       snackAction.textContent = actionText;
-      snackAction.style.display = "inline-block";
-      snackAction.onclick = actionFn;
       autoHideMs = 0; // don't auto hide if action exists
     }else{
-      snackAction.style.display = "none";
-      snackAction.onclick = null;
     }
     if(autoHideMs){
       setTimeout(()=> { snack.classList.remove("show");
