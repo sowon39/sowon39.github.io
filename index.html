@@ -1438,23 +1438,7 @@ let silentPushTimer=null;
       showDockTemporarily();
     }
 
-    
-    // ✅ Gist 복원/새로고침 후 현재 탭 UI를 즉시 최신 데이터로 재렌더
-    window.afterGistRestore = function(){
-      try{
-        const activeTab = document.querySelector('.tab-content.active');
-        const activeId = activeTab ? activeTab.id : '';
-        if(activeId === 'tab-history'){
-          if(typeof renderCalendar === 'function') renderCalendar();
-          if(typeof renderHistoryDetail === 'function') renderHistoryDetail();
-        }else if(activeId === 'tab-stats'){
-          if(typeof renderStats === 'function') renderStats();
-        }else if(activeId === 'tab-session'){
-          if(typeof renderDay === 'function') renderDay(selectedDate || (new Date()).toISOString().slice(0,10));
-        }
-      }catch(e){}
-    };
-/* ---------- DAY NAV ---------- */
+    /* ---------- DAY NAV ---------- */
     function updateDayNav(){
       const nav = document.getElementById('day-nav');
       nav.innerHTML = '';
@@ -3370,7 +3354,12 @@ btnSave && btnSave.addEventListener("click", async () => {
       // ✅ 강제 리렌더(필요 시): 복원 후 앱 상태가 메모리에 남아 UI가 안 바뀌는 경우를 방지
       try{
         if(typeof window.afterGistRestore === "function") window.afterGistRestore();
-              }catch(e){}
+        // 마지막 수단: 화면이 갱신되지 않는 환경에서는 1회 자동 리로드
+        if(!window.__GIST_RELOADED_ONCE__){
+          window.__GIST_RELOADED_ONCE__ = true;
+          setTimeout(()=>{ location.reload(); }, 80);
+        }
+      }catch(e){}
 
             setSyncState("ok","SYNC");
         showSnack("복원 완료(클라우드 우선)", {loading:false});
@@ -3382,7 +3371,12 @@ btnSave && btnSave.addEventListener("click", async () => {
       // ✅ 강제 리렌더(필요 시): 복원 후 앱 상태가 메모리에 남아 UI가 안 바뀌는 경우를 방지
       try{
         if(typeof window.afterGistRestore === "function") window.afterGistRestore();
-              }catch(e){}
+        // 마지막 수단: 화면이 갱신되지 않는 환경에서는 1회 자동 리로드
+        if(!window.__GIST_RELOADED_ONCE__){
+          window.__GIST_RELOADED_ONCE__ = true;
+          setTimeout(()=>{ location.reload(); }, 80);
+        }
+      }catch(e){}
  hideSnack(); toast("복원 완료"); }});
           }
         }else{
@@ -3391,7 +3385,12 @@ btnSave && btnSave.addEventListener("click", async () => {
       // ✅ 강제 리렌더(필요 시): 복원 후 앱 상태가 메모리에 남아 UI가 안 바뀌는 경우를 방지
       try{
         if(typeof window.afterGistRestore === "function") window.afterGistRestore();
-              }catch(e){}
+        // 마지막 수단: 화면이 갱신되지 않는 환경에서는 1회 자동 리로드
+        if(!window.__GIST_RELOADED_ONCE__){
+          window.__GIST_RELOADED_ONCE__ = true;
+          setTimeout(()=>{ location.reload(); }, 80);
+        }
+      }catch(e){}
 
           setSyncState("ok","SYNC");
         showSnack("복원 완료 · 최신 반영", {loading:false});
@@ -3402,7 +3401,12 @@ btnSave && btnSave.addEventListener("click", async () => {
       // ✅ 강제 리렌더(필요 시): 복원 후 앱 상태가 메모리에 남아 UI가 안 바뀌는 경우를 방지
       try{
         if(typeof window.afterGistRestore === "function") window.afterGistRestore();
-              }catch(e){}
+        // 마지막 수단: 화면이 갱신되지 않는 환경에서는 1회 자동 리로드
+        if(!window.__GIST_RELOADED_ONCE__){
+          window.__GIST_RELOADED_ONCE__ = true;
+          setTimeout(()=>{ location.reload(); }, 80);
+        }
+      }catch(e){}
 
         setSyncState("ok","SYNC");
         showSnack("복원 완료", {loading:false});
