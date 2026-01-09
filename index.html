@@ -3140,7 +3140,9 @@ btnSave && btnSave.addEventListener("click", async () => {
     localStorage.setItem(LS_GIST_TOKEN, tok);
     hideSetup();
     toast("설정 완료 ✅");
-    updateFabVisibility();
+    forceCloudFirstOnLoad();
+
+  updateFabVisibility();
     showSnack("동기화 설정 완료", {loading:false});
   }catch(e){
     console.error(e);
@@ -3540,6 +3542,49 @@ btnSave && btnSave.addEventListener("click", async () => {
     maxPull = 0;
   });
 
+
+
+  /* ===================== NEW: Cloud-first on refresh =====================
+     - 로컬이 더 최신 유지되는 방식 제거
+     - 새로고침 시 항상 Gist(클라우드) 데이터를 먼저 적용
+     - 적용 후 1회 reload하여 앱 초기 상태부터 최신 클라우드 기반으로 시작
+  ====================================================================== */
+  const SS_APPLIED = "GIST_CLOUD_APPLIED_ONCE";
+  async function forceCloudFirstOnLoad(){
+    try{
+      const tok = getToken();
+      const gid = getGistId();
+      if(!tok || !gid) return;
+      if(sessionStorage.getItem(SS_APPLIED)==="1") return;
+
+      setSyncState("dl","SYNC");
+      showSnack("CLOUD SYNC…", {loading:true, autoHideMs:0});
+
+      const res = await fetch(`https://api.github.com/gists/${gid}`, {
+        headers:{ "Accept":"application/vnd.github+json", "Authorization":"token "+tok }
+      });
+      if(!res.ok) throw new Error("Gist fetch failed: " + res.status);
+      const j = await res.json();
+      const files = j && j.files ? Object.keys(j.files) : [];
+      const name = files.includes(TARGET_FILENAME) ? TARGET_FILENAME : (files[0] || TARGET_FILENAME);
+      const content = j.files && j.files[name] ? (j.files[name].content || "{}") : "{}";
+      const payload = JSON.parse(content || "{}");
+
+      // ✅ 항상 클라우드가 우선
+      applyPayload(payload);
+
+      sessionStorage.setItem(SS_APPLIED, "1");
+      setSyncState("ok","SYNC OK");
+      showSnack("CLOUD APPLIED ✓", {loading:false, autoHideMs:900});
+      // reload to re-init app state from updated localStorage
+      setTimeout(()=> location.reload(), 450);
+    }catch(e){
+      console.error(e);
+      setSyncState("err","SYNC ERR");
+      showSnack("CLOUD SYNC ERR", {loading:false, autoHideMs:1400});
+      // 실패 시 로컬로 계속 (앱은 정상 동작)
+    }
+  }
 
   // If app emits this event, auto-backup
   window.addEventListener("app:dataChanged", ()=> scheduleBackup("데이터 변경"));
