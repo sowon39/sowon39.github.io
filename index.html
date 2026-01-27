@@ -458,6 +458,58 @@ button,a{
     #toast{ position:fixed; left:50%; bottom:130px; transform:translateX(-50%); z-index:250; opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; }
     #toast.show{ opacity:1; transform:translateX(-50%) translateY(-6px); }
 
+    /* Compare Alert (big overlay) */
+    #compare-alert{
+      position:fixed; inset:0; z-index:270;
+      display:flex; align-items:center; justify-content:center;
+      opacity:0; pointer-events:none;
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    #compare-alert.show{ opacity:1; pointer-events:auto; }
+    #compare-alert .backdrop{
+      position:absolute; inset:0;
+      background: rgba(0,0,0,0.76);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    #compare-alert .card{
+      position:relative;
+      width:min(560px, calc(100vw - 44px));
+      border-radius: 30px;
+      padding: 22px 20px;
+      background: rgba(10,10,12,0.92);
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 50px 160px rgba(0,0,0,0.75);
+      transform: translateY(8px) scale(0.98);
+      transition: transform .18s ease;
+      text-align:center;
+    }
+    #compare-alert.show .card{ transform: translateY(0) scale(1); }
+    #compare-alert .label{
+      font-size: 10px;
+      font-weight: 950;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.45);
+    }
+    #compare-alert .msg{
+      margin-top: 10px;
+      font-size: 28px;
+      line-height: 1.15;
+      font-weight: 950;
+      letter-spacing: -0.04em;
+      color: white;
+    }
+    #compare-alert .sub{
+      margin-top: 12px;
+      font-size: 12px;
+      font-weight: 850;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(34,211,238,0.85);
+    }
+
+
     /* History layout */
     .historyLayout{
       display:grid;
@@ -1088,10 +1140,19 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
       <section id="tab-history" class="tab-content">
         <div class="mb-6 px-2 flex justify-between items-end">
           <h2 class="text-3xl font-black italic uppercase">기록</h2>
-          <div class="flex items-center gap-4 glass rounded-2xl px-5 py-2.5">
+          <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3 glass rounded-2xl px-5 py-2.5">
+              <div>
+                <p class="text-[9px] font-black tracking-[0.18em] uppercase text-white/45">지난주 비교 알림</p>
+                <p class="text-[11px] font-black text-white/35 mt-1">세트 REP 입력 후 1회 표시</p>
+              </div>
+              <button id="compare-toggle" class="pill cyan" onclick="toggleCompareAlert()">ON</button>
+            </div>
+            <div class="flex items-center gap-4 glass rounded-2xl px-5 py-2.5">
             <button onclick="changeMonth(-1)" class="p-1 hover:text-cyan-300 transition-colors"><i class="fa-solid fa-chevron-left text-xs"></i></button>
             <span id="calendar-month" class="text-xs font-black w-20 text-center tracking-widest">2026.01</span>
             <button onclick="changeMonth(1)" class="p-1 hover:text-cyan-300 transition-colors"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+          </div>
           </div>
         </div>
 
@@ -1198,6 +1259,16 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     </div>
   </div>
 
+    <!-- Compare Alert -->
+  <div id="compare-alert" aria-live="polite">
+    <div class="backdrop"></div>
+    <div class="card">
+      <div class="label">지난주 비교</div>
+      <div id="compare-alert-text" class="msg">기록</div>
+      <div id="compare-alert-sub" class="sub">자동으로 닫힙니다</div>
+    </div>
+  </div>
+
   <!-- Toast -->
   <div id="toast" class="pill cyan"></div>
 
@@ -1261,6 +1332,7 @@ button:active, a:active, [role="button"]:active, .btn:active, .iconbtn:active, .
     const KEY_SPLASH = 'dk_os_v121_splash_shown';
     const KEY_SUMMARY_SHOWN = 'dk_os_v121_summary_shown';
     const KEY_NOTIF = 'dk_os_v121_rest_notif';
+    const KEY_COMPARE_ALERT = 'dk_os_v121_compare_alert';
 
 
     const KEY_LOCAL_UPDATED_AT = 'dk_os_v121_local_updatedAt';
@@ -1334,6 +1406,7 @@ let silentPushTimer=null;
     let restTotal = 0;
     let currentSlideIndex = 0;
     let restNotifEnabled = (localStorage.getItem(KEY_NOTIF) ?? '1') === '1';
+    let compareAlertEnabled = (localStorage.getItem(KEY_COMPARE_ALERT) ?? '1') === '1';
 
     /* 휴식 기록 */
     let restStartedAt = null;
@@ -2166,17 +2239,29 @@ function saveRepToLog(logKey, value){
       const restSec = logs[idx].restPlanned || 0;
       if(restSec > 0) startTimer(restSec, logKey);
 
-      // ✅ 지난주 비교 토스트
+      // ✅ 지난주 비교 토스트 (+ 큰 알림)
       const prevLog = findLastWeekSameExerciseLog(logs[idx]);
       if(prevLog){
         const prev = prevLog.repActual ?? prevLog.plannedRep ?? null;
         if(prev !== null){
           const diff = value - prev;
+
+          // 큰 알림: "지난주 몇번 / 더/덜"을 한 번에 크게 표시
+          const diffLabel = (diff > 0) ? `+${diff}` : String(diff);
+          if(diff > 0) showCompareAlert(`지난주 ${prev} → 오늘 ${value}  (${diffLabel})`, '더 많이 했음 🔥');
+          else if(diff < 0) showCompareAlert(`지난주 ${prev} → 오늘 ${value}  (${diffLabel})`, '적게 했음');
+          else showCompareAlert(`지난주 ${prev} → 오늘 ${value}  (0)`, '동일 ✅');
+
+          // 기존 토스트는 유지
           if(diff > 0) toast(`지난주 대비 +${diff} REP 🔥`);
           else if(diff < 0) toast(`지난주 대비 ${diff} REP`);
           else toast(`지난주와 동일 REP ✅`);
+        }else{
+          showCompareAlert('지난주 기록 없음', '이번 주 기준이 저장됨');
+          toast(`REP 기록 완료 ✅`);
         }
       }else{
+        showCompareAlert('지난주 기록 없음', '이번 주 기준이 저장됨');
         toast(`REP 기록 완료 ✅`);
       }
 
@@ -2469,6 +2554,49 @@ function saveRepToLog(logKey, value){
       haptic(14);
     }
 
+    /* =========================================================
+      ✅ 지난주 비교 '큰 알림' (History 탭에서 ON/OFF)
+      - 기존 toast 로직은 유지하고, 추가로 큰 1회 알림을 띄웁니다.
+    ========================================================= */
+    let compareAlertTimer = null;
+
+    function updateCompareToggleUI(){
+      const btn = document.getElementById('compare-toggle');
+      if(!btn) return;
+      btn.textContent = compareAlertEnabled ? 'ON' : 'OFF';
+      btn.classList.toggle('cyan', compareAlertEnabled);
+    }
+
+    function toggleCompareAlert(){
+      showDockTemporarily();
+      compareAlertEnabled = !compareAlertEnabled;
+      localStorage.setItem(KEY_COMPARE_ALERT, compareAlertEnabled ? '1' : '0');
+      updateCompareToggleUI();
+      toast(compareAlertEnabled ? '지난주 비교 알림 ON' : '지난주 비교 알림 OFF');
+      haptic(14);
+    }
+
+    function showCompareAlert(msg, sub=null){
+      try{
+        if(!compareAlertEnabled) return;
+        const wrap = document.getElementById('compare-alert');
+        const textEl = document.getElementById('compare-alert-text');
+        const subEl = document.getElementById('compare-alert-sub');
+        if(!wrap || !textEl) return;
+
+        textEl.textContent = msg || '';
+        if(subEl){
+          subEl.textContent = sub || '자동으로 닫힙니다';
+          subEl.style.display = sub ? 'block' : '';
+        }
+
+        wrap.classList.add('show');
+        if(compareAlertTimer) clearTimeout(compareAlertTimer);
+        compareAlertTimer = setTimeout(()=> wrap.classList.remove('show'), 1400);
+      }catch(e){}
+    }
+
+
     /* ---------- CALENDAR ---------- */
     function renderCalendar(){
       document.getElementById('calendar-month').innerText = `${currentYear}.${String(currentMonth + 1).padStart(2,'0')}`;
@@ -2735,6 +2863,7 @@ function saveRepToLog(logKey, value){
         btn.textContent = restNotifEnabled ? 'ON' : 'OFF';
         btn.classList.toggle('cyan', restNotifEnabled);
       }
+      updateCompareToggleUI();
 
       setInterval(()=> {
         const totalSec = getWorkoutElapsedSec();
