@@ -1,6 +1,6 @@
 {
   "meta": {
-    "version": "2026-03-04.benchdips.final1.hammercurl.opt4.latraise_unified",
+    "version": "2026-03-04.benchdips.final1.mixcurl.final",
     "appName": "DK Fit",
     "lang": "ko"
   },
@@ -248,16 +248,16 @@
             "cue": "팔꿈치 뒤로"
           },
           {
-            "name": "덤벨 해머 컬",
+            "name": "덤벨 컬",
             "set": 3,
             "rep": 12,
             "rest": 60,
             "breath": "올리며 호기 / 내리며 흡기",
-            "target": "팔 두께(상완근/전완) + 이두",
-            "mind": "3초 하강",
-            "tip": "HOW\n1) 중립그립\n2) 팔꿈치 고정\n3) 3초 하강",
-            "guide": "POINT\n- 팔 두께 마무리",
-            "cue": "천천히 내려라"
+            "target": "이두",
+            "mind": "반동 없이 이두로만",
+            "tip": "HOW\n1) 팔꿈치 몸통 옆 고정\n2) 정점 1초 수축\n3) 내려갈 때 3초",
+            "guide": "POINT\n- 금요일은 덤벨 컬(회외)로 이두 피크/수축을 만든다.",
+            "cue": "팔꿈치 고정 + 3초 하강"
           },
           {
             "name": "덤벨 레터럴 레이즈",
@@ -336,6 +336,7 @@
 
       { "kw_ko": "덤벨 로우", "kw_en": "dumbbell row", "gif": "DB_ROW.gif" },
       { "kw_ko": "덤벨 해머 컬", "kw_en": "dumbbell hammer curl", "gif": "DB_HAMMER_CURL.gif" },
+      { "kw_ko": "덤벨 컬", "kw_en": "dumbbell curl", "gif": "DB_CURL.gif" },
 
       { "kw_ko": "덤벨 고블릿 스쿼트", "kw_en": "goblet squat", "gif": "DB_GOBLET_SQT.gif" },
       { "kw_ko": "덤벨 루마니안 데드리프트", "kw_en": "romanian deadlift", "gif": "DB_RDL.gif" },
