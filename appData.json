@@ -1,6 +1,6 @@
 {
   "meta": {
-    "version": "2026-01-07.refactor5.final",
+    "version": "2026-03-04.benchdips.final1.hammercurl.opt4.latraise_unified",
     "appName": "DK Fit",
     "lang": "ko"
   },
@@ -9,7 +9,7 @@
       "1": {
         "day": "월요일",
         "type": "push",
-        "title": "가슴 & 삼두 (Strength)",
+        "title": "가슴 & 삼두 (Safe Strength)",
         "list": [
           {
             "name": "덤벨 벤치프레스",
@@ -17,23 +17,23 @@
             "rep": 8,
             "rest": 90,
             "breath": "내려가며 흡기 / 밀며 호기",
-            "target": "가슴 전체",
-            "mind": "견갑을 고정하고 가슴으로 밀어낸다",
-            "tip": "HOW\n1) 견갑 후인\n2) 팔꿈치 45도\n3) 천천히 하강\n4) 가슴 수축",
-            "guide": "UPGRADE\n- 가슴 두께 핵심 운동",
-            "cue": "가슴으로 밀어라"
+            "target": "가슴 두께 & 삼두",
+            "mind": "견갑 고정하고 가슴으로 밀어낸다",
+            "tip": "HOW\n1) 견갑 후인/하강(가슴 열기)\n2) 팔꿈치 45도\n3) 하강 2초\n4) 상단 1초 수축",
+            "guide": "UPGRADE\n- 8회가 쉬우면 +1~2kg 또는 10~12회",
+            "cue": "견갑 고정 + 가슴 프레스"
           },
           {
-            "name": "체스트 딥스",
-            "set": 4,
-            "rep": 10,
-            "rest": 90,
-            "breath": "내려가며 흡기 / 가슴으로 밀어 올리며 호기",
-            "target": "가슴 하부",
-            "mind": "가슴을 늘렸다가 폭발적으로 밀어라",
-            "tip": "HOW\n1) 상체 15도 숙이기\n2) 3초 하강\n3) 가슴 수축",
-            "guide": "POINT\n- 가슴 자극 집중",
-            "cue": "가슴으로 밀기"
+            "name": "덤벨 플라이",
+            "set": 3,
+            "rep": 12,
+            "rest": 75,
+            "breath": "내려가며 흡기 / 모으며 호기",
+            "target": "가슴 전체(스트레치)",
+            "mind": "가슴을 길게 늘렸다가 모아준다",
+            "tip": "HOW\n1) 팔꿈치 살짝 굽힘 유지\n2) 가슴이 늘어나는 지점까지만\n3) 상단에서 가슴 조이기 1초",
+            "guide": "CHECK\n- 어깨 통증 나면 가동범위 줄이기",
+            "cue": "가슴 늘리고 모아라"
           },
           {
             "name": "스탠다드 푸쉬업",
@@ -41,23 +41,35 @@
             "rep": 15,
             "rest": 60,
             "breath": "내려가며 흡기 / 밀며 호기",
-            "target": "가슴 전체",
-            "mind": "가슴 중앙을 조인다",
-            "tip": "HOW\n1) 몸 일직선\n2) 깊게 하강\n3) 상단 수축",
-            "guide": "CHECK\n- 엉덩이 처짐 금지",
-            "cue": "몸 일직선"
+            "target": "가슴 펌핑",
+            "mind": "마무리 펌핑. 개수 줄어도 정상",
+            "tip": "HOW\n1) 몸 일직선 유지\n2) 가슴 바닥 직전까지 하강\n3) 상단에서 가슴 수축",
+            "guide": "POINT\n- 앞 운동(벤치/플라이) 후에는 15회를 못 채워도 정상. 폼 유지 가능한 만큼 수행하세요.",
+            "cue": "몸 일직선 + 가슴 수축"
+          },
+          {
+            "name": "벤치 딥스",
+            "set": 3,
+            "rep": 12,
+            "rest": 75,
+            "breath": "밀 때 호기",
+            "target": "삼두 중심",
+            "mind": "어깨 말리지 않게, 삼두로 밀어낸다",
+            "tip": "HOW\n1) 손은 엉덩이 옆/뒤, 가슴 펴기\n2) 상체 10~20도 살짝 숙여도 OK\n3) 팔꿈치 뒤로, 깊이는 팔꿈치 90도까지만\n4) 위에서 완전히 잠그지 말고 95%만",
+            "guide": "SAFETY\n- 어깨 앞쪽 통증 있으면 즉시 깊이 줄이거나 중단. 견갑(어깨) 내리고 가슴 열기 유지.",
+            "cue": "90도까지만 + 어깨 내리기"
           },
           {
             "name": "덤벨 오버헤드 트라이셉스 익스텐션",
             "set": 3,
             "rep": 10,
             "rest": 60,
-            "breath": "올리며 호기",
+            "breath": "올리며 호기 / 내리며 흡기",
             "target": "삼두 장두",
-            "mind": "팔꿈치 고정",
-            "tip": "HOW\n1) 팔꿈치 좁게\n2) 천천히 하강\n3) 삼두 수축",
-            "guide": "POINT\n- 삼두 볼륨 핵심",
-            "cue": "팔꿈치 고정"
+            "mind": "팔꿈치 고정, 삼두로만 펴라",
+            "tip": "HOW\n1) 덤벨 1개를 양손으로\n2) 팔꿈치 좁게 고정\n3) 2~3초 하강\n4) 정점 1초 수축",
+            "guide": "CHECK\n- 어깨가 아프면 가동범위 줄이고 팔꿈치 더 좁게",
+            "cue": "팔꿈치 고정 + 3초 하강"
           }
         ]
       },
@@ -65,7 +77,7 @@
       "2": {
         "day": "화요일",
         "type": "pull",
-        "title": "등 두께",
+        "title": "등 두께 + 이두 (Thickness)",
         "list": [
           {
             "name": "풀업 (밴드)",
@@ -73,11 +85,23 @@
             "rep": 8,
             "rest": 120,
             "breath": "당길 때 호기",
-            "target": "광배",
-            "mind": "팔꿈치를 아래로 찍는다",
-            "tip": "HOW\n1) 숄더패킹\n2) 팔꿈치 하강\n3) 천천히 하강",
-            "guide": "POINT\n- 등 시작 운동",
-            "cue": "팔꿈치 아래"
+            "target": "광배 바깥",
+            "mind": "숄더패킹 유지",
+            "tip": "HOW\n1) 숄더패킹\n2) 팔꿈치 아래로 찍기\n3) 하강 2초",
+            "guide": "UPGRADE\n- 밴드 점진 제거",
+            "cue": "팔꿈치 아래로"
+          },
+          {
+            "name": "덤벨 로우",
+            "set": 4,
+            "rep": 12,
+            "rest": 90,
+            "breath": "당길 때 호기",
+            "target": "등 중앙",
+            "mind": "광배를 접고 날개뼈를 모은다",
+            "tip": "HOW\n1) 상체 30~45도 고정\n2) 팔꿈치 뒤로 길게\n3) 정점 1초\n4) 하강 2초",
+            "guide": "POINT\n- 반동 금지",
+            "cue": "팔꿈치 뒤로"
           },
           {
             "name": "친업 (밴드)",
@@ -87,33 +111,21 @@
             "breath": "올라갈 때 호기",
             "target": "등 하부 & 이두",
             "mind": "가슴을 봉으로",
-            "tip": "HOW\n1) 언더그립\n2) 가슴 접근\n3) 하강 통제",
+            "tip": "HOW\n1) 언더그립\n2) 가슴을 봉으로\n3) 하강 컨트롤",
             "guide": "CHECK\n- 턱만 넘기지 말 것",
             "cue": "가슴 봉 접근"
           },
           {
-            "name": "덤벨 로우",
-            "set": 4,
-            "rep": 12,
-            "rest": 75,
-            "breath": "당길 때 호기",
-            "target": "등 중앙",
-            "mind": "광배를 접는다",
-            "tip": "HOW\n1) 상체 30~45도\n2) 팔꿈치 뒤로 당기기\n3) 정점 1초 정지",
-            "guide": "POINT\n- 등 두께 핵심 운동",
-            "cue": "팔꿈치 뒤로"
-          },
-          {
-            "name": "덤벨 컬",
+            "name": "덤벨 해머 컬",
             "set": 4,
             "rep": 10,
             "rest": 60,
-            "breath": "올리며 호기",
-            "target": "이두",
-            "mind": "반동 금지",
-            "tip": "HOW\n1) 팔꿈치 고정\n2) 천천히 하강",
-            "guide": "POINT\n- 이두 직접 자극",
-            "cue": "팔꿈치 고정"
+            "breath": "올리며 호기 / 내리며 흡기",
+            "target": "팔 두께(상완근/전완) + 이두",
+            "mind": "반동 없이 팔 두께를 만든다",
+            "tip": "HOW\n1) 손바닥 서로 마주보기(중립)\n2) 팔꿈치 몸통 옆 고정\n3) 정점 1초 수축\n4) 내려갈 때 3초",
+            "guide": "UPGRADE\n- 10회 쉬우면 +1~2kg 또는 12~15회",
+            "cue": "중립그립 + 3초 하강"
           }
         ]
       },
@@ -121,19 +133,19 @@
       "3": {
         "day": "수요일",
         "type": "leg",
-        "title": "하체 & 어깨",
+        "title": "하체 + 측면 어깨 (Foundation+Load)",
         "list": [
           {
-            "name": "스쿼트",
+            "name": "덤벨 고블릿 스쿼트",
             "set": 5,
-            "rep": 15,
+            "rep": 12,
             "rest": 90,
             "breath": "내려가며 흡기 / 밀며 호기",
-            "target": "하체",
-            "mind": "발바닥으로 지면 밀기",
-            "tip": "HOW\n1) 고관절 접기\n2) 무릎 발끝 방향",
-            "guide": "POINT\n- 하체 핵심",
-            "cue": "지면 밀기"
+            "target": "허벅지/둔근",
+            "mind": "덤벨로 하체에 부하를 건다",
+            "tip": "HOW\n1) 덤벨을 가슴 앞에 고정\n2) 무릎은 발끝 방향\n3) 바닥을 밀며 올라오기\n4) 하강 2초",
+            "guide": "UPGRADE\n- 12회 쉬우면 +무게 또는 +1세트",
+            "cue": "가슴 들고 깊게"
           },
           {
             "name": "런지",
@@ -141,23 +153,23 @@
             "rep": 12,
             "rest": 60,
             "breath": "올라오며 호기",
-            "target": "둔근",
-            "mind": "뒤꿈치 힘",
-            "tip": "HOW\n1) 상체 살짝 숙임\n2) 수직 하강",
-            "guide": "CHECK\n- 무릎 방향",
+            "target": "엉덩이",
+            "mind": "뒤꿈치 80%",
+            "tip": "HOW\n1) 상체 살짝 숙임\n2) 수직 하강\n3) 뒤꿈치로 밀기",
+            "guide": "POINT\n- 무릎 방향 주의",
             "cue": "뒤꿈치 밀기"
           },
           {
-            "name": "사이드 레이즈",
+            "name": "덤벨 레터럴 레이즈",
             "set": 5,
             "rep": 20,
             "rest": 60,
             "breath": "올릴 때 호기",
-            "target": "측면 어깨",
-            "mind": "팔꿈치로 들어라",
-            "tip": "HOW\n1) 승모 억제\n2) 천천히 하강",
-            "guide": "POINT\n- 어깨 넓이",
-            "cue": "팔꿈치 리드"
+            "target": "측면 삼각근",
+            "mind": "팔꿈치를 던진다",
+            "tip": "HOW\n1) 승모 억제\n2) 옆으로 멀리\n3) 저항 하강",
+            "guide": "UPGRADE\n- 고반복 펌핑",
+            "cue": "옆으로 던져라"
           }
         ]
       },
@@ -165,7 +177,7 @@
       "4": {
         "day": "목요일",
         "type": "push",
-        "title": "어깨 & 가슴 상부",
+        "title": "어깨 + 상부가슴 + 삼두 (Safe Volume)",
         "list": [
           {
             "name": "파이크 푸쉬업",
@@ -175,33 +187,33 @@
             "breath": "밀 때 호기",
             "target": "전면 어깨",
             "mind": "수직 프레스",
-            "tip": "HOW\n1) 역V\n2) 정수리 하강",
-            "guide": "CHECK\n- 팔꿈치 벌어짐",
-            "cue": "어깨로 밀기"
+            "tip": "HOW\n1) 역V자\n2) 정수리 하강\n3) 어깨로 밀기",
+            "guide": "MISTAKE\n- 팔꿈치 벌어짐 주의",
+            "cue": "어깨로 밀어라"
           },
           {
             "name": "디클라인 푸쉬업",
-            "set": 4,
+            "set": 3,
             "rep": 12,
             "rest": 90,
             "breath": "밀 때 호기",
             "target": "상부 가슴",
-            "mind": "윗가슴 수축",
-            "tip": "HOW\n1) 발 높임\n2) 몸 일직선",
-            "guide": "POINT\n- 상부 가슴",
-            "cue": "윗가슴 밀기"
+            "mind": "윗가슴 펌핑. 개수 줄어도 정상",
+            "tip": "HOW\n1) 발 높임\n2) 몸 일직선\n3) 윗가슴 수축",
+            "guide": "POINT\n- 12회를 못 채워도 정상. 폼 유지 가능한 만큼 수행하세요.",
+            "cue": "윗가슴으로 밀어라"
           },
           {
-            "name": "삼두 딥스",
+            "name": "벤치 딥스",
             "set": 3,
             "rep": 12,
-            "rest": 60,
+            "rest": 75,
             "breath": "밀 때 호기",
             "target": "삼두",
-            "mind": "삼두 수축",
-            "tip": "HOW\n1) 팔꿈치 고정\n2) 수축 1초",
-            "guide": "POINT\n- 삼두 펌핑",
-            "cue": "삼두 쥐어짜기"
+            "mind": "어깨 보호가 우선",
+            "tip": "HOW\n1) 견갑 내리고 가슴 열기\n2) 팔꿈치 90도까지만\n3) 위에서 95%만 펴기",
+            "guide": "SAFETY\n- 어깨 앞쪽 불편하면 깊이를 즉시 줄이세요.",
+            "cue": "90도까지만"
           }
         ]
       },
@@ -209,7 +221,7 @@
       "5": {
         "day": "금요일",
         "type": "pull",
-        "title": "등 넓이",
+        "title": "등 넓이 + 어깨 (Width+Delts)",
         "list": [
           {
             "name": "와이드 풀업",
@@ -231,32 +243,20 @@
             "breath": "당길 때 호기",
             "target": "등 전체",
             "mind": "광배를 접는다",
-            "tip": "HOW\n1) 가슴 펴기\n2) 팔꿈치 뒤로 당기기\n3) 정점 1초 정지",
+            "tip": "HOW\n1) 가슴 펴기\n2) 팔꿈치 뒤로\n3) 정점 1초",
             "guide": "POINT\n- 등 수축 집중",
             "cue": "팔꿈치 뒤로"
           },
           {
-            "name": "내로우 풀업",
-            "set": 3,
-            "rep": 8,
-            "rest": 90,
-            "breath": "올라갈 때 호기",
-            "target": "등 중앙",
-            "mind": "가슴 봉 접근",
-            "tip": "HOW\n1) 가슴 접근\n2) 1초 정지",
-            "guide": "POINT\n- 마무리 자극",
-            "cue": "가슴 붙이기"
-          },
-          {
-            "name": "덤벨 컬",
+            "name": "덤벨 해머 컬",
             "set": 3,
             "rep": 12,
             "rest": 60,
-            "breath": "올리며 호기",
-            "target": "이두",
-            "mind": "천천히",
-            "tip": "HOW\n1) 반동 금지\n2) 3초 하강",
-            "guide": "POINT\n- 이두 마무리",
+            "breath": "올리며 호기 / 내리며 흡기",
+            "target": "팔 두께(상완근/전완) + 이두",
+            "mind": "3초 하강",
+            "tip": "HOW\n1) 중립그립\n2) 팔꿈치 고정\n3) 3초 하강",
+            "guide": "POINT\n- 팔 두께 마무리",
             "cue": "천천히 내려라"
           },
           {
@@ -264,11 +264,11 @@
             "set": 3,
             "rep": 20,
             "rest": 45,
-            "breath": "올릴 때 호기",
-            "target": "측면 어깨",
-            "mind": "팔꿈치 리드",
-            "tip": "HOW\n1) 가벼운 덤벨\n2) 정점 1초\n3) 천천히 하강",
-            "guide": "POINT\n- 어깨 폭 증가",
+            "breath": "올릴 때 호기 / 내릴 때 흡기",
+            "target": "측면 삼각근",
+            "mind": "승모 빼고 팔꿈치 리드",
+            "tip": "HOW\n1) 덤벨 가볍게\n2) 정점 1초\n3) 2초 하강",
+            "guide": "UPGRADE\n- 어깨 폭은 주 2회가 빠르다",
             "cue": "팔꿈치로 들어라"
           }
         ]
@@ -277,19 +277,19 @@
       "6": {
         "day": "토요일",
         "type": "leg",
-        "title": "하체 & 코어",
+        "title": "하체 & 코어 (Conditioning+Hinge)",
         "list": [
           {
-            "name": "스쿼트",
+            "name": "덤벨 루마니안 데드리프트",
             "set": 4,
-            "rep": 20,
-            "rest": 60,
-            "breath": "일정",
-            "target": "하체",
-            "mind": "리듬 유지",
-            "tip": "HOW\n1) 깊게\n2) 리듬",
-            "guide": "POINT\n- 지구력",
-            "cue": "리듬"
+            "rep": 12,
+            "rest": 75,
+            "breath": "내려가며 흡기 / 올라오며 호기",
+            "target": "햄스트링/둔근/하체 후면",
+            "mind": "엉덩이를 뒤로 빼며 힙힌지",
+            "tip": "HOW\n1) 무릎 살짝 굽힘\n2) 엉덩이 뒤로\n3) 허리 중립\n4) 햄스트링 늘어나는 지점까지만",
+            "guide": "POINT\n- 하체 라인/힙업 핵심",
+            "cue": "엉덩이 뒤로 + 허리 중립"
           },
           {
             "name": "런지",
@@ -298,22 +298,22 @@
             "rest": 60,
             "breath": "올라오며 호기",
             "target": "하체",
-            "mind": "균형",
+            "mind": "버티기",
             "tip": "HOW\n1) 균형 유지",
-            "guide": "CHECK\n- 코어",
-            "cue": "둔근 수축"
+            "guide": "CHECK\n- 코어 흔들림",
+            "cue": "둔근 조이기"
           },
           {
             "name": "플랭크",
             "set": 3,
             "rep": 60,
             "rest": 60,
-            "breath": "일정",
-            "target": "코어",
-            "mind": "일직선",
-            "tip": "HOW\n1) 복부 긴장",
-            "guide": "CHECK\n- 허리 꺾임",
-            "cue": "판자 유지"
+            "breath": "짧고 일정",
+            "target": "전신 코어",
+            "mind": "판자",
+            "tip": "HOW\n1) 배 당김",
+            "guide": "MISTAKE\n- 허리 꺾임",
+            "cue": "강철 일직선"
           }
         ]
       }
@@ -322,20 +322,98 @@
     "gifMap": [
       { "kw_ko": "스쿼트", "kw_en": "squat", "gif": "AIR_SQT.gif" },
       { "kw_ko": "친업", "kw_en": "chin", "gif": "CHIN_UP.gif" },
-      { "kw_ko": "체스트 딥스", "kw_en": "chest dips", "gif": "DIPS.gif" },
-      { "kw_ko": "삼두 딥스", "kw_en": "triceps dips", "gif": "DIPS.gif" },
       { "kw_ko": "스탠다드 푸쉬업", "kw_en": "standard push", "gif": "PUSH_UP.gif" },
       { "kw_ko": "디클라인 푸쉬업", "kw_en": "decline push", "gif": "DECLINE_PUSH_UP.gif" },
       { "kw_ko": "파이크 푸쉬업", "kw_en": "pike", "gif": "PIKE_PUSH_UP.gif" },
       { "kw_ko": "풀업 (밴드)", "kw_en": "band pull", "gif": "PULL_UP.gif" },
       { "kw_ko": "와이드 풀업", "kw_en": "wide pull", "gif": "PULL_UP.gif" },
-      { "kw_ko": "내로우 풀업", "kw_en": "narrow pull", "gif": "PULL_UP.gif" },
+      { "kw_ko": "플랭크", "kw_en": "plank", "gif": "PLANK.gif" },
+
       { "kw_ko": "덤벨 벤치프레스", "kw_en": "dumbbell bench press", "gif": "DB_BENCH_PRESS.gif" },
-      { "kw_ko": "덤벨 컬", "kw_en": "dumbbell curl", "gif": "DB_CURL.gif" },
-      { "kw_ko": "덤벨 오버헤드 트라이셉스 익스텐션", "kw_en": "db triceps extension", "gif": "DB_OH_TRICEPS_EXT.gif" },
+      { "kw_ko": "덤벨 플라이", "kw_en": "dumbbell fly", "gif": "DB_FLY.gif" },
+      { "kw_ko": "벤치 딥스", "kw_en": "bench dips", "gif": "BENCH_DIPS.gif" },
+      { "kw_ko": "덤벨 오버헤드 트라이셉스 익스텐션", "kw_en": "db overhead triceps extension", "gif": "DB_OH_TRICEPS_EXT.gif" },
+
       { "kw_ko": "덤벨 로우", "kw_en": "dumbbell row", "gif": "DB_ROW.gif" },
-      { "kw_ko": "덤벨 레터럴 레이즈", "kw_en": "db lateral raise", "gif": "DB_LAT_RAISE.gif" },
-      { "kw_ko": "플랭크", "kw_en": "plank", "gif": "PLANK.gif" }
+      { "kw_ko": "덤벨 해머 컬", "kw_en": "dumbbell hammer curl", "gif": "DB_HAMMER_CURL.gif" },
+
+      { "kw_ko": "덤벨 고블릿 스쿼트", "kw_en": "goblet squat", "gif": "DB_GOBLET_SQT.gif" },
+      { "kw_ko": "덤벨 루마니안 데드리프트", "kw_en": "romanian deadlift", "gif": "DB_RDL.gif" },
+      { "kw_ko": "덤벨 레터럴 레이즈", "kw_en": "db lateral raise", "gif": "DB_LAT_RAISE.gif" }
     ]
+  },
+  "ui": {
+    "copy": {
+      "buttons": {
+        "prev": "이전",
+        "next": "다음",
+        "todayReset": "오늘 초기화",
+        "resetExercise": "초기화",
+        "viewHistory": "기록 보기",
+        "ok": "확인",
+        "skip": "스킵",
+        "minimize": "최소화",
+        "exportBackup": "백업 다운로드",
+        "resetAll": "전체 초기화",
+        "settings": "설정"
+      },
+      "messages": {
+        "toast": {
+          "settingSaved": "설정 저장됨",
+          "restoredDefault": "기본값으로 복원",
+          "nextSetFirst": "다음 세트를 먼저 완료하세요",
+          "restDone": "휴식 끝! 다음 세트 ✅",
+          "timerMin": "타이머 최소화",
+          "backupDownloaded": "백업 다운로드",
+          "allResetDone": "전체 초기화 완료",
+          "todayResetDone": "오늘 초기화 완료",
+          "exerciseResetDone": "운동 초기화 완료",
+          "selectedDateReset": "선택 날짜 초기화",
+          "notifOn": "알림 ON",
+          "notifOff": "알림 OFF",
+          "setUndone": "세트 취소됨",
+          "repCancel": "REP 입력 취소됨",
+          "pause": "총 운동시간 일시정지",
+          "resume": "총 운동시간 재시작",
+          "repDone": "REP 기록 완료 ✅"
+        },
+        "confirm": {
+          "resetExercise": "이 운동의 오늘 기록을 초기화할까요?",
+          "resetToday": "오늘 진행/기록을 모두 초기화할까요?",
+          "resetSelectedDate": "선택한 날짜의 기록을 초기화할까요?",
+          "resetAll": "⚠️ 모든 데이터(기록/설정/진행)를 초기화할까요?"
+        }
+      },
+      "labels": {
+        "analysisTitle": "분석",
+        "historyTitle": "기록",
+        "sessionTitle": "훈련",
+        "summaryTitle": "오늘 요약",
+        "done": "완료 🎉",
+        "doneSets": "완료 세트",
+        "doneEx": "완료 운동",
+        "todayMessage": "오늘 한마디",
+        "noHistory": "기록이 없습니다",
+        "rest": "휴식",
+        "progress": "진행",
+        "set": "세트",
+        "rep": "REP"
+      },
+      "hints": {
+        "setHint": "* 세트 버튼을 눌러 체크합니다",
+        "iosMute": "* iOS는 무음모드에서 소리가 제한될 수 있습니다. iPad는 진동이 지원되지 않을 수 있습니다.",
+        "gifHint": "* GIF는 동작의 핵심 흐름만 참고하세요. 자세가 흔들리면 횟수보다 폼이 우선입니다."
+      },
+      "cueMap": {
+        "push": "푸쉬 데이 — 템포 제어 & 코어 고정",
+        "pull": "풀 데이 — 숄더 패킹 & 광배 수축",
+        "leg": "하체 데이 — 발 전체로 밀기",
+        "rest": "회복 — 호흡 & 리셋"
+      }
+    },
+    "config": {
+      "weekDays": ["월", "화", "수", "목", "금", "토", "일"],
+      "chartLabels": ["PUSH", "PULL", "LEGS", "REST"]
+    }
   }
 }
