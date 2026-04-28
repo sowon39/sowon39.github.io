@@ -2070,6 +2070,275 @@
       cursor: grab;
     }
 
+  
+    body.bw-mode .main-img,
+    body.bw-mode .thumb,
+    body.bw-mode .grid-tile img,
+    body.bw-mode .modal img {
+      filter: grayscale(1) contrast(1.04) brightness(1.02);
+    }
+
+    body.bw-mode .main-img {
+      transition: opacity .32s ease, transform .42s ease, filter .42s ease;
+    }
+
+  
+    /* 확대보기 핀치줌/드래그 최종 보정 */
+    .modal {
+      touch-action: none;
+    }
+
+    .modal img.zoomable {
+      touch-action: none;
+      user-select: none;
+      -webkit-user-drag: none;
+      transform-origin: center center;
+      will-change: transform, opacity;
+    }
+
+    .modal img.zoomable.is-zoomed {
+      cursor: grab;
+    }
+
+  
+    /* 🎬 시네마틱 자동 슬라이드 강화 */
+    body.immersive .main-img {
+      max-width: 88vw !important;
+      max-height: 76dvh !important;
+      overflow: visible;
+    }
+
+    body.immersive .main-img.slide-in {
+      animation-duration: 1.28s, 4.7s !important;
+      animation-timing-function: cubic-bezier(.22,.72,.22,1), cubic-bezier(.25,.1,.25,1) !important;
+      animation-fill-mode: both, forwards !important;
+    }
+
+    body.immersive .main-img.cine-drift-right {
+      animation-name: cineFadeRight, cineDriftRight !important;
+    }
+
+    body.immersive .main-img.cine-drift-left {
+      animation-name: cineFadeLeft, cineDriftLeft !important;
+    }
+
+    body.immersive .main-img.cine-rise {
+      animation-name: cineFadeRise, cineRise !important;
+    }
+
+    body.immersive .main-img.cine-push-in {
+      animation-name: cineFadeSoft, cinePushIn !important;
+    }
+
+    body.immersive .main-img.cine-pull-back {
+      animation-name: cineFadeSoft, cinePullBack !important;
+    }
+
+    body.immersive .main-img.cine-tilt {
+      animation-name: cineFadeSoft, cineTilt !important;
+    }
+
+    body.immersive .main-img.cine-orbit {
+      animation-name: cineFadeSoft, cineOrbit !important;
+    }
+
+    @keyframes cineFadeRight {
+      0% { opacity: 0; transform: translateX(36px) scale(.992); filter: brightness(1.14) saturate(.95); }
+      100% { opacity: 1; transform: translateX(0) scale(1); filter: brightness(1) saturate(1); }
+    }
+
+    @keyframes cineFadeLeft {
+      0% { opacity: 0; transform: translateX(-36px) scale(.992); filter: brightness(1.14) saturate(.95); }
+      100% { opacity: 1; transform: translateX(0) scale(1); filter: brightness(1) saturate(1); }
+    }
+
+    @keyframes cineFadeRise {
+      0% { opacity: 0; transform: translateY(28px) scale(.992); filter: brightness(1.12) saturate(.96); }
+      100% { opacity: 1; transform: translateY(0) scale(1); filter: brightness(1) saturate(1); }
+    }
+
+    @keyframes cineFadeSoft {
+      0% { opacity: 0; filter: brightness(1.12) saturate(.95); }
+      100% { opacity: 1; filter: brightness(1) saturate(1); }
+    }
+
+    @keyframes cineDriftRight {
+      from { transform: translateX(-18px) scale(1.012); }
+      to { transform: translateX(18px) scale(1.018); }
+    }
+
+    @keyframes cineDriftLeft {
+      from { transform: translateX(18px) scale(1.012); }
+      to { transform: translateX(-18px) scale(1.018); }
+    }
+
+    @keyframes cineRise {
+      from { transform: translateY(18px) scale(1.012); }
+      to { transform: translateY(-12px) scale(1.018); }
+    }
+
+    @keyframes cinePushIn {
+      from { transform: scale(1); }
+      to { transform: scale(1.035); }
+    }
+
+    @keyframes cinePullBack {
+      from { transform: scale(1.035); }
+      to { transform: scale(1.004); }
+    }
+
+    @keyframes cineTilt {
+      from { transform: rotate(-.42deg) translateX(-8px) scale(1.012); }
+      to { transform: rotate(.42deg) translateX(8px) scale(1.018); }
+    }
+
+    @keyframes cineOrbit {
+      0% { transform: translate(-10px, 8px) scale(1.014); }
+      100% { transform: translate(10px, -8px) scale(1.02); }
+    }
+
+    @media (max-width: 520px) {
+      body.immersive .main-img {
+        max-width: 86vw !important;
+        max-height: 74dvh !important;
+      }
+
+      @keyframes cineDriftRight {
+        from { transform: translateX(-13px) scale(1.01); }
+        to { transform: translateX(13px) scale(1.016); }
+      }
+
+      @keyframes cineDriftLeft {
+        from { transform: translateX(13px) scale(1.01); }
+        to { transform: translateX(-13px) scale(1.016); }
+      }
+    }
+
+  
+    /* 모바일 우측 잘림/가로 넘침 방지 */
+    html,
+    body {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
+    .app,
+    .sidebar,
+    .viewer,
+    .topbar,
+    .stage,
+    .caption {
+      max-width: 100%;
+    }
+
+    @media (max-width: 920px) {
+      .app {
+        width: 100%;
+        max-width: 100vw;
+        overflow-x: hidden;
+      }
+
+      .sidebar,
+      .viewer {
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .topbar {
+        width: 100%;
+        overflow: hidden;
+      }
+
+      .actions {
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+      }
+
+      .action-group {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 2px;
+      }
+
+      .icon-btn {
+        flex: 0 0 auto;
+      }
+
+      .stage {
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+      }
+
+      .frame {
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .main-img {
+        max-width: 100%;
+        max-height: 100%;
+      }
+
+      .caption {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        overflow: hidden;
+        gap: 10px;
+      }
+
+      .progress-wrap {
+        min-width: 58px;
+        flex: 1 1 auto;
+      }
+
+      .dots {
+        flex: 0 1 120px;
+        min-width: 0;
+        max-width: 120px;
+      }
+
+      .nav-arrow.next {
+        right: 8px;
+      }
+
+      .nav-arrow.prev {
+        left: 8px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .app {
+        padding-left: 8px;
+        padding-right: 8px;
+      }
+
+      .topbar {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .stage {
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+
+      .caption {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .dots {
+        max-width: 104px;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -2129,14 +2398,14 @@
             <button id="favoriteBtn" class="icon-btn compact" type="button" title="좋아요">♡</button>
             <button id="filterBtn" class="icon-btn" type="button" title="좋아요한 사진만 보기">♥ 모아보기</button>
             <button id="gridBtn" class="icon-btn" type="button" title="전체 사진 보기">☷ 전체보기</button>
-            <button id="slideshowBtn" class="icon-btn" type="button" title="자동 재생">▶ 자동</button>
+            <button id="slideshowBtn" class="icon-btn" type="button" title="시네마틱 슬라이드">🎬 시네마틱</button>
           </div>
           <div class="action-group utility-actions">
             <button id="musicBtn" class="icon-btn" type="button" title="음악 재생/일시정지">♪ 재생</button>
-            <button id="downloadBtn" class="icon-btn compact" type="button" title="사진 다운로드">↓</button>
-            <button id="themeBtn" class="icon-btn theme-toggle" type="button" title="다크모드">☾ 다크모드</button>
+            <button id="downloadBtn" class="icon-btn" type="button" title="사진 저장">사진 저장</button>
+            <button id="bwBtn" class="icon-btn" type="button" title="흑백 감성 보기">◐ 흑백</button>
             <button id="shareBtn" class="icon-btn compact" type="button" title="공유">🔗</button>
-            <button id="homeBtn" class="icon-btn compact" type="button" title="홈화면 추가">＋</button>
+            <button id="homeBtn" class="icon-btn" type="button" title="홈화면 추가">App</button>
             <button id="fullBtn" class="icon-btn compact" type="button" title="크게 보기">⛶</button>
           </div>
         </div>
@@ -2215,7 +2484,7 @@
       slideshowBtn: document.getElementById("slideshowBtn"),
       musicBtn: document.getElementById("musicBtn"),
       downloadBtn: document.getElementById("downloadBtn"),
-      themeBtn: document.getElementById("themeBtn"),
+      bwBtn: document.getElementById("bwBtn"),
       shareBtn: document.getElementById("shareBtn"),
       homeBtn: document.getElementById("homeBtn"),
       fullBtn: document.getElementById("fullBtn"),
@@ -2245,7 +2514,7 @@
       filterFavorites: false,
       slideshow: null,
       musicOn: false,
-      darkMode: localStorage.getItem("weddingDarkMode") === "true",
+      bw: localStorage.getItem("weddingBwMode") === "true",
       lastClock: {},
       gestureStartX: 0,
       gestureStartY: 0,
@@ -2275,6 +2544,12 @@
       lastEffectIndex: -1,
       deferredInstallPrompt: null,
       modalScale: 1,
+      modalTranslateX: 0,
+      modalTranslateY: 0,
+      modalPanStartX: 0,
+      modalPanStartY: 0,
+      modalStartTranslateX: 0,
+      modalStartTranslateY: 0,
       modalPinching: false,
       modalPinchStartDistance: 0,
       modalPinchStartScale: 1
@@ -2357,11 +2632,11 @@
       setTimeout(() => els.toast.classList.remove("show"), 1400);
     }
 
-    function applyTheme() {
-      document.body.classList.toggle("dark", state.darkMode);
-      els.themeBtn.textContent = state.darkMode ? "☀ 기본모드" : "☾ 다크모드";
-      els.themeBtn.title = state.darkMode ? "기본모드" : "다크모드";
-      localStorage.setItem("weddingDarkMode", String(state.darkMode));
+    function applyBwMode() {
+      document.body.classList.toggle("bw-mode", state.bw);
+      els.bwBtn.textContent = state.bw ? "◑ 컬러" : "◐ 흑백";
+      els.bwBtn.title = state.bw ? "컬러로 보기" : "흑백 감성 보기";
+      localStorage.setItem("weddingBwMode", String(state.bw));
     }
 
     function renderList() {
@@ -2461,7 +2736,14 @@
         "movie-pan-left",
         "movie-pan-right",
         "movie-float-up",
-        "movie-soft-tilt"
+        "movie-soft-tilt",
+        "cine-drift-right",
+        "cine-drift-left",
+        "cine-rise",
+        "cine-push-in",
+        "cine-pull-back",
+        "cine-tilt",
+        "cine-orbit"
       );
     }
 
@@ -2470,22 +2752,23 @@
 
       if (!document.body.classList.contains("immersive")) return;
 
-      const movieEffects = [
-        "movie-zoom-in",
-        "movie-zoom-out",
-        "movie-pan-left",
-        "movie-pan-right",
-        "movie-float-up",
-        "movie-soft-tilt"
+      const cinematicEffects = [
+        "cine-drift-right",
+        "cine-drift-left",
+        "cine-rise",
+        "cine-push-in",
+        "cine-pull-back",
+        "cine-tilt",
+        "cine-orbit"
       ];
 
-      let nextEffectIndex = Math.floor(Math.random() * movieEffects.length);
+      let nextEffectIndex = Math.floor(Math.random() * cinematicEffects.length);
       if (nextEffectIndex === state.lastEffectIndex) {
-        nextEffectIndex = (nextEffectIndex + 1) % movieEffects.length;
+        nextEffectIndex = (nextEffectIndex + 1) % cinematicEffects.length;
       }
 
       state.lastEffectIndex = nextEffectIndex;
-      els.mainImg.classList.add(movieEffects[nextEffectIndex]);
+      els.mainImg.classList.add(cinematicEffects[nextEffectIndex]);
     }
 
     function selectPhoto(index) {
@@ -2667,9 +2950,9 @@
       toast("사진 저장 시작");
     }
 
-    function toggleTheme() {
-      state.darkMode = !state.darkMode;
-      applyTheme();
+    function toggleBwMode() {
+      state.bw = !state.bw;
+      applyBwMode();
     }
 
 
@@ -2801,7 +3084,7 @@
 
         exitImmersiveMode();
 
-        els.slideshowBtn.textContent = "▶ 자동";
+        els.slideshowBtn.textContent = "🎬 시네마틱";
         toast("자동 재생 정지");
       } else {
         enterImmersiveMode();
@@ -2818,6 +3101,12 @@
 
     function resetModalZoom() {
       state.modalScale = 1;
+      state.modalTranslateX = 0;
+      state.modalTranslateY = 0;
+      state.modalPanStartX = 0;
+      state.modalPanStartY = 0;
+      state.modalStartTranslateX = 0;
+      state.modalStartTranslateY = 0;
       state.modalPinching = false;
       state.modalPinchStartDistance = 0;
       state.modalPinchStartScale = 1;
@@ -2832,10 +3121,28 @@
       return Math.hypot(dx, dy);
     }
 
+    function applyModalTransform() {
+      if (state.modalScale <= 1.01) {
+        els.modalImg.classList.remove("is-zoomed");
+        els.modalImg.style.transform = "";
+        return;
+      }
+
+      els.modalImg.classList.add("is-zoomed");
+      els.modalImg.style.transform =
+        `translate3d(${state.modalTranslateX}px, ${state.modalTranslateY}px, 0) scale(${state.modalScale})`;
+    }
+
     function applyModalZoom(scale) {
-      state.modalScale = Math.min(Math.max(scale, 1), 3);
-      els.modalImg.classList.toggle("is-zoomed", state.modalScale > 1.01);
-      els.modalImg.style.transform = state.modalScale > 1.01 ? `scale(${state.modalScale})` : "";
+      state.modalScale = Math.min(Math.max(scale, 1), 3.2);
+
+      if (state.modalScale <= 1.01) {
+        state.modalScale = 1;
+        state.modalTranslateX = 0;
+        state.modalTranslateY = 0;
+      }
+
+      applyModalTransform();
     }
 
     function handleModalTouchStart(event) {
@@ -2849,6 +3156,15 @@
         state.modalPinchStartScale = state.modalScale || 1;
         els.modal.classList.remove("hint");
         els.modalImg.classList.remove("swiping");
+        return;
+      }
+
+      if (event.touches.length === 1 && state.modalScale > 1.01) {
+        event.preventDefault();
+        state.modalPanStartX = event.touches[0].clientX;
+        state.modalPanStartY = event.touches[0].clientY;
+        state.modalStartTranslateX = state.modalTranslateX;
+        state.modalStartTranslateY = state.modalTranslateY;
       }
     }
 
@@ -2857,25 +3173,39 @@
 
       if (state.modalPinching && event.touches.length === 2) {
         event.preventDefault();
+        event.stopPropagation();
         const currentDistance = getTouchDistance(event.touches);
         if (!state.modalPinchStartDistance) return;
 
         const nextScale = state.modalPinchStartScale * (currentDistance / state.modalPinchStartDistance);
         applyModalZoom(nextScale);
+        return;
+      }
+
+      if (event.touches.length === 1 && state.modalScale > 1.01) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const dx = event.touches[0].clientX - state.modalPanStartX;
+        const dy = event.touches[0].clientY - state.modalPanStartY;
+        const maxX = Math.min(window.innerWidth * .34, 180) * (state.modalScale - 1);
+        const maxY = Math.min(window.innerHeight * .34, 220) * (state.modalScale - 1);
+
+        state.modalTranslateX = Math.max(Math.min(state.modalStartTranslateX + dx, maxX), -maxX);
+        state.modalTranslateY = Math.max(Math.min(state.modalStartTranslateY + dy, maxY), -maxY);
+        applyModalTransform();
       }
     }
 
     function handleModalTouchEnd(event) {
-      if (!state.modalPinching) return;
-
-      if (event.touches.length < 2) {
+      if (state.modalPinching && event.touches.length < 2) {
         state.modalPinching = false;
-
         if (state.modalScale < 1.04) {
           applyModalZoom(1);
         }
       }
     }
+
 
 
     function lockPageScroll() {
@@ -3149,7 +3479,7 @@
     function resetModalDragStyle() {
       els.modalImg.classList.remove("swiping");
       if (state.modalScale > 1.01) {
-        els.modalImg.style.transform = `scale(${state.modalScale})`;
+        applyModalTransform();
       } else {
         els.modalImg.style.transform = "";
       }
@@ -3270,7 +3600,7 @@
     els.gridBtn.addEventListener("click", openGrid);
     els.musicBtn.addEventListener("click", toggleMusic);
     els.downloadBtn.addEventListener("click", downloadCurrentPhoto);
-    els.themeBtn.addEventListener("click", toggleTheme);
+    els.bwBtn.addEventListener("click", toggleBwMode);
     els.shareBtn.addEventListener("click", sharePage);
     els.homeBtn.addEventListener("click", addToHomeScreen);
     els.slideshowBtn.addEventListener("click", toggleSlideshow);
@@ -3340,7 +3670,7 @@
     hideIntro();
     setupPwaManifest();
     setupInstallPrompt();
-    applyTheme();
+    applyBwMode();
     enableFirstTouchMusic();
     enablePullToRefresh();
     preloadInitialImages();
