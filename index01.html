@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <title>Wedding Gallery</title>
+  <title>DK&HL Wedding Gallery</title>
   <meta name="description" content="2026.08.30 DK&HL Wedding Photos" />
   <link rel="canonical" href="https://sowon39.github.io/index01.html" />
   <link rel="image_src" href="https://sowon39.github.io/wedding/og.jpg?v=5" />
@@ -220,9 +220,11 @@
       display: grid;
       gap: 12px;
       scrollbar-width: thin;
+      scroll-behavior: smooth;
     }
 
     .photo-item {
+      scroll-margin: 14px;
       display: grid;
       grid-template-columns: 86px 1fr;
       gap: 14px;
@@ -368,7 +370,25 @@
       z-index: 2;
     }
 
-    .main-img.changing { opacity: 0; transform: scale(.985); }
+    .main-img.changing {
+      opacity: 0;
+      transform: translateX(var(--slide-from, 0px)) scale(.985);
+    }
+
+    .main-img.slide-in {
+      animation: photoSlideIn .42s cubic-bezier(.22, .72, .22, 1) both;
+    }
+
+    @keyframes photoSlideIn {
+      from {
+        opacity: 0;
+        transform: translateX(var(--slide-from, 18px)) scale(.985);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+      }
+    }
     .main-img.zoomed { transform: scale(1.55); cursor: zoom-out; }
     .main-img.fit-cover { width: 100%; height: 100%; object-fit: cover; }
     .main-img.bw { filter: grayscale(1) contrast(1.05); }
@@ -756,7 +776,8 @@
       pullActive: false,
       pullDistance: 0,
       imageCache: new Map(),
-      thumbCache: new Map()
+      thumbCache: new Map(),
+      slideDirection: 1
     };
 
     function pad(value, length = 2) {
@@ -841,12 +862,29 @@
         const button = document.createElement("button");
         button.className = `photo-item ${active ? "active" : ""}`;
         button.type = "button";
+        button.dataset.index = String(photo.originalIndex);
         button.innerHTML = `
           <img class="thumb" src="${photo.thumb}" alt="${photo.title}" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='${photo.file}';">
           <span><span class="item-title">${liked ? "♥ " : ""}${photo.title}</span></span>
         `;
-        button.addEventListener("click", () => selectPhoto(photo.originalIndex));
+        button.addEventListener("click", () => {
+          state.slideDirection = photo.originalIndex >= state.index ? 1 : -1;
+          selectPhoto(photo.originalIndex);
+        });
         els.list.appendChild(button);
+      });
+    }
+
+    function syncActiveThumbnail() {
+      requestAnimationFrame(() => {
+        const activeItem = els.list.querySelector(`.photo-item[data-index="${state.index}"]`);
+        if (!activeItem) return;
+
+        activeItem.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+          inline: "center"
+        });
       });
     }
 
@@ -861,6 +899,10 @@
       const nextSrc = cached && cached.complete ? cached.src : photo.file;
 
       const showImage = () => {
+        const direction = state.slideDirection >= 0 ? 1 : -1;
+        els.mainImg.style.setProperty("--slide-from", `${direction * 22}px`);
+        els.mainImg.classList.remove("slide-in");
+
         els.mainImg.src = nextSrc;
         els.mainImg.alt = photo.title;
         els.currentName.textContent = photo.title;
@@ -869,9 +911,15 @@
         els.progress.style.width = `${((state.index + 1) / photos.length) * 100}%`;
         updateFavoriteButton();
         renderList();
+        syncActiveThumbnail();
         preloadAround(state.index);
-        els.mainImg.classList.remove("changing");
-        els.frame.classList.remove("is-loading");
+
+        requestAnimationFrame(() => {
+          els.mainImg.classList.remove("changing");
+          void els.mainImg.offsetWidth;
+          els.mainImg.classList.add("slide-in");
+          els.frame.classList.remove("is-loading");
+        });
       };
 
       if (cached && cached.complete) {
@@ -919,6 +967,7 @@
     }
 
     function move(step) {
+      state.slideDirection = step >= 0 ? 1 : -1;
       const list = filteredPhotos();
       if (!list.length) return;
 
@@ -1219,6 +1268,9 @@
     els.frame.addEventListener("pointercancel", handlePointerCancel);
 
     els.modal.addEventListener("click", () => els.modal.classList.remove("open"));
+    els.mainImg.addEventListener("animationend", () => {
+      els.mainImg.classList.remove("slide-in");
+    });
 
     els.fitBtn.addEventListener("click", () => {
       state.cover = !state.cover;
