@@ -5,22 +5,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <title>Wedding Gallery</title>
-  <meta name="description" content="2026.08.30 우리의 웨딩 갤러리" />
+  <meta name="description" content="2026.08.30 동구♥호림 웨딩 사진" />
+  <link rel="canonical" href="https://sowon39.github.io/index01.html" />
+  <link rel="image_src" href="https://sowon39.github.io/wedding/og.jpg?v=5" />
+
+  <!-- 빠른 첫 화면 로딩 -->
+  <link rel="preload" as="image" href="wedding/wedding01.jpg" fetchpriority="high" />
+  <link rel="preload" as="image" href="wedding/thumb/wedding01.jpg" />
 
   <!-- 카카오톡/문자/공유 미리보기 설정
-       GitHub Pages에 올린 뒤 아래 YOUR_GITHUB_ID / YOUR_REPO_NAME만 실제 값으로 바꾸세요.
-       og:image는 카카오톡 썸네일로 보일 이미지입니다. wedding01.jpg를 추천합니다. -->
+       중요: wedding/og.jpg 파일을 실제로 업로드하세요.
+       권장: 1200x630px JPG, 가급적 300KB~1MB 이하 -->
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Wedding Gallery" />
-  <meta property="og:description" content="2026.08.30 우리의 웨딩 사진을 담았습니다." />
-  <meta property="og:image" content="https://YOUR_GITHUB_ID.github.io/YOUR_REPO_NAME/wedding/wedding01.jpg" />
-  <meta property="og:url" content="https://YOUR_GITHUB_ID.github.io/YOUR_REPO_NAME/index01.html" />
+  <meta property="og:description" content="2026.08.30 동구♥호림 웨딩 사진" />
+  <meta property="og:url" content="https://sowon39.github.io/index01.html" />
   <meta property="og:site_name" content="Wedding Gallery" />
+  <meta property="og:locale" content="ko_KR" />
+  <meta property="og:image" content="https://sowon39.github.io/wedding/og.jpg?v=5" />
+  <meta property="og:image:secure_url" content="https://sowon39.github.io/wedding/og.jpg?v=5" />
+  <meta property="og:image:type" content="image/jpeg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Wedding Gallery" />
 
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Wedding Gallery" />
-  <meta name="twitter:description" content="2026.08.30 우리의 웨딩 사진을 담았습니다." />
-  <meta name="twitter:image" content="https://YOUR_GITHUB_ID.github.io/YOUR_REPO_NAME/wedding/wedding01.jpg" />
+  <meta name="twitter:description" content="2026.08.30 동구♥호림 웨딩 사진" />
+  <meta name="twitter:image" content="https://sowon39.github.io/wedding/og.jpg?v=5" />
 
   <style>
     :root {
@@ -325,6 +337,7 @@
       justify-content: center;
       overflow: hidden;
       background: rgba(255,255,255,.35);
+      touch-action: pan-y;
     }
 
     .main-img {
@@ -338,7 +351,21 @@
       box-shadow: 0 18px 60px rgba(60,35,40,.22);
       user-select: none;
       -webkit-user-drag: none;
-      transition: opacity .25s ease, transform .25s ease, filter .25s ease;
+      cursor: zoom-in;
+      touch-action: pan-y;
+      transition: opacity .18s ease, transform .22s ease, filter .25s ease;
+    }
+
+    .frame.is-loading::after {
+      content: "";
+      position: absolute;
+      width: 34px;
+      height: 34px;
+      border: 3px solid rgba(44,35,36,.16);
+      border-top-color: var(--brand-dark);
+      border-radius: 999px;
+      animation: spin .75s linear infinite;
+      z-index: 2;
     }
 
     .main-img.changing { opacity: 0; transform: scale(.985); }
@@ -430,6 +457,60 @@
     }
 
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    .pull-refresh {
+      position: fixed;
+      left: 50%;
+      top: 16px;
+      z-index: 80;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.9);
+      box-shadow: 0 14px 36px rgba(77, 40, 48, 0.18);
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-50%) translateY(-26px) scale(.96);
+      transition: opacity .18s ease, transform .18s ease;
+    }
+
+    .pull-refresh.show {
+      opacity: 1;
+    }
+
+    .pull-refresh.ready {
+      transform: translateX(-50%) translateY(16px) scale(1);
+    }
+
+    .pull-refresh.loading {
+      opacity: 1;
+      transform: translateX(-50%) translateY(16px) scale(1);
+    }
+
+    .pull-refresh span {
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(44,35,36,.22);
+      border-top-color: var(--brand-dark);
+      border-radius: 999px;
+      transform: rotate(0deg);
+    }
+
+    .pull-refresh.loading span {
+      animation: spin .75s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
 
     @keyframes flipTick {
       0% { transform: rotateX(0deg); filter: brightness(1); }
@@ -592,7 +673,7 @@
       <div class="stage">
         <button class="nav-arrow prev" id="prevBtn" type="button" aria-label="이전 사진">‹</button>
         <div class="frame" id="frame">
-          <img id="mainImg" class="main-img" src="" alt="웨딩 사진" />
+          <img id="mainImg" class="main-img" src="" alt="웨딩 사진" decoding="async" fetchpriority="high" />
         </div>
         <button class="nav-arrow next" id="nextBtn" type="button" aria-label="다음 사진">›</button>
       </div>
@@ -608,17 +689,19 @@
   <div id="modal" class="modal" role="dialog" aria-modal="true" aria-label="원본 크게 보기">
     <img id="modalImg" src="" alt="크게 본 웨딩 사진" />
   </div>
+  <div id="pullRefresh" class="pull-refresh" aria-hidden="true"><span></span><b>새로고침</b></div>
   <div id="toast" class="toast"></div>
   <audio id="bgm" src="wedding/ae.mp3" loop preload="none"></audio>
 
   <script>
     const weddingDate = "2026-08-30T14:30:00";
-    const MUSIC_START_TIME = 72;
+    const MUSIC_START_TIME = 85;
 
     const photos = Array.from({ length: 22 }, (_, index) => {
       const number = String(index + 1).padStart(2, "0");
       return {
         file: `wedding/wedding${number}.jpg`,
+        thumb: `wedding/thumb/wedding${number}.jpg`,
         title: `Photo ${number}`
       };
     });
@@ -626,6 +709,7 @@
     const els = {
       list: document.getElementById("photoList"),
       mainImg: document.getElementById("mainImg"),
+      frame: document.getElementById("frame"),
       currentName: document.getElementById("currentName"),
       currentMeta: document.getElementById("currentMeta"),
       counter: document.getElementById("counter"),
@@ -645,6 +729,7 @@
       modal: document.getElementById("modal"),
       modalImg: document.getElementById("modalImg"),
       toast: document.getElementById("toast"),
+      pullRefresh: document.getElementById("pullRefresh"),
       bgm: document.getElementById("bgm"),
       ddayDays: document.getElementById("ddayDays"),
       ddayHours: document.getElementById("ddayHours"),
@@ -661,7 +746,17 @@
       bw: false,
       musicOn: false,
       darkMode: localStorage.getItem("weddingDarkMode") === "true",
-      lastClock: {}
+      lastClock: {},
+      gestureStartX: 0,
+      gestureStartY: 0,
+      gestureStartTime: 0,
+      pointerActive: false,
+      activePointerId: null,
+      pullStartY: 0,
+      pullActive: false,
+      pullDistance: 0,
+      imageCache: new Map(),
+      thumbCache: new Map()
     };
 
     function pad(value, length = 2) {
@@ -747,7 +842,7 @@
         button.className = `photo-item ${active ? "active" : ""}`;
         button.type = "button";
         button.innerHTML = `
-          <img class="thumb" src="${photo.file}" alt="${photo.title}" loading="lazy" onerror="this.style.opacity=.25">
+          <img class="thumb" src="${photo.thumb}" alt="${photo.title}" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='${photo.file}';">
           <span><span class="item-title">${liked ? "♥ " : ""}${photo.title}</span></span>
         `;
         button.addEventListener("click", () => selectPhoto(photo.originalIndex));
@@ -758,10 +853,15 @@
     function selectPhoto(index) {
       state.index = (index + photos.length) % photos.length;
       const photo = photos[state.index];
+
+      els.frame.classList.add("is-loading");
       els.mainImg.classList.add("changing");
 
-      setTimeout(() => {
-        els.mainImg.src = photo.file;
+      const cached = state.imageCache.get(photo.file);
+      const nextSrc = cached && cached.complete ? cached.src : photo.file;
+
+      const showImage = () => {
+        els.mainImg.src = nextSrc;
         els.mainImg.alt = photo.title;
         els.currentName.textContent = photo.title;
         els.currentMeta.textContent = `${state.index + 1} / ${photos.length}`;
@@ -769,8 +869,21 @@
         els.progress.style.width = `${((state.index + 1) / photos.length) * 100}%`;
         updateFavoriteButton();
         renderList();
+        preloadAround(state.index);
         els.mainImg.classList.remove("changing");
-      }, 140);
+        els.frame.classList.remove("is-loading");
+      };
+
+      if (cached && cached.complete) {
+        showImage();
+      } else {
+        const img = new Image();
+        img.decoding = "async";
+        img.onload = showImage;
+        img.onerror = showImage;
+        img.src = photo.file;
+        state.imageCache.set(photo.file, img);
+      }
     }
 
     function updateFavoriteButton() {
@@ -942,6 +1055,154 @@
       els.modal.classList.add("open");
     }
 
+
+    function preloadImage(index) {
+      const safeIndex = (index + photos.length) % photos.length;
+      const photo = photos[safeIndex];
+      if (!photo || state.imageCache.has(photo.file)) return;
+
+      const img = new Image();
+      img.decoding = "async";
+      img.src = photo.file;
+      state.imageCache.set(photo.file, img);
+    }
+
+    function preloadThumb(index) {
+      const safeIndex = (index + photos.length) % photos.length;
+      const photo = photos[safeIndex];
+      if (!photo || state.thumbCache.has(photo.thumb)) return;
+
+      const img = new Image();
+      img.decoding = "async";
+      img.src = photo.thumb;
+      state.thumbCache.set(photo.thumb, img);
+    }
+
+    function preloadAround(index) {
+      preloadImage(index);
+      preloadImage(index + 1);
+      preloadImage(index + 2);
+      preloadImage(index - 1);
+      preloadThumb(index);
+      preloadThumb(index + 1);
+      preloadThumb(index + 2);
+      preloadThumb(index - 1);
+    }
+
+    function preloadInitialImages() {
+      [0, 1, 2, 3, 4].forEach((index) => {
+        preloadImage(index);
+        preloadThumb(index);
+      });
+    }
+
+    function handlePointerDown(event) {
+      if (event.button !== undefined && event.button !== 0) return;
+
+      state.pointerActive = true;
+      state.activePointerId = event.pointerId;
+      state.gestureStartX = event.clientX;
+      state.gestureStartY = event.clientY;
+      state.gestureStartTime = Date.now();
+
+      try {
+        els.frame.setPointerCapture(event.pointerId);
+      } catch (error) {}
+    }
+
+    function handlePointerMove(event) {
+      if (!state.pointerActive || event.pointerId !== state.activePointerId) return;
+    }
+
+    function handlePointerUp(event) {
+      if (!state.pointerActive || event.pointerId !== state.activePointerId) return;
+
+      const diffX = event.clientX - state.gestureStartX;
+      const diffY = event.clientY - state.gestureStartY;
+      const elapsed = Date.now() - state.gestureStartTime;
+
+      state.pointerActive = false;
+      state.activePointerId = null;
+
+      const isHorizontalSwipe = Math.abs(diffX) > 34 && Math.abs(diffX) > Math.abs(diffY) * 1.15;
+      if (isHorizontalSwipe) {
+        move(diffX < 0 ? 1 : -1);
+        return;
+      }
+
+      const isTap = Math.abs(diffX) < 12 && Math.abs(diffY) < 12 && elapsed < 520;
+      if (isTap) {
+        openModal();
+      }
+    }
+
+    function handlePointerCancel() {
+      state.pointerActive = false;
+      state.activePointerId = null;
+    }
+
+    function isPageAtTop() {
+      return window.scrollY <= 0 && document.documentElement.scrollTop <= 0;
+    }
+
+    function showPullRefresh(distance) {
+      const threshold = 92;
+      const progress = Math.min(distance / threshold, 1);
+      els.pullRefresh.classList.add("show");
+      els.pullRefresh.classList.toggle("ready", distance >= threshold);
+      els.pullRefresh.style.opacity = String(Math.min(progress + .15, 1));
+      els.pullRefresh.style.transform = `translateX(-50%) translateY(${Math.min(distance * .42, 42) - 26}px) scale(${.96 + progress * .04})`;
+    }
+
+    function resetPullRefresh() {
+      els.pullRefresh.classList.remove("show", "ready", "loading");
+      els.pullRefresh.style.opacity = "";
+      els.pullRefresh.style.transform = "";
+      state.pullActive = false;
+      state.pullDistance = 0;
+    }
+
+    function enablePullToRefresh() {
+      window.addEventListener("touchstart", (event) => {
+        if (!event.touches || event.touches.length !== 1) return;
+        if (!isPageAtTop()) return;
+
+        state.pullStartY = event.touches[0].clientY;
+        state.pullActive = true;
+        state.pullDistance = 0;
+      }, { passive: true });
+
+      window.addEventListener("touchmove", (event) => {
+        if (!state.pullActive || !event.touches || event.touches.length !== 1) return;
+
+        const distance = event.touches[0].clientY - state.pullStartY;
+        if (distance > 0 && isPageAtTop()) {
+          state.pullDistance = Math.min(distance, 140);
+          showPullRefresh(state.pullDistance);
+          if (distance > 18) event.preventDefault();
+        }
+      }, { passive: false });
+
+      window.addEventListener("touchend", () => {
+        if (!state.pullActive) return;
+
+        if (state.pullDistance >= 92) {
+          els.pullRefresh.classList.remove("ready");
+          els.pullRefresh.classList.add("show", "loading");
+          els.pullRefresh.style.opacity = "1";
+          els.pullRefresh.style.transform = "translateX(-50%) translateY(18px) scale(1)";
+          setTimeout(() => window.location.reload(), 420);
+        } else {
+          resetPullRefresh();
+        }
+      }, { passive: true });
+    }
+
+
+
+
+
+
     els.favoriteBtn.addEventListener("click", toggleFavorite);
     els.filterBtn.addEventListener("click", toggleFilterFavorites);
     els.musicBtn.addEventListener("click", toggleMusic);
@@ -952,7 +1213,11 @@
     els.prevBtn.addEventListener("click", () => move(-1));
     els.nextBtn.addEventListener("click", () => move(1));
     els.fullBtn.addEventListener("click", openModal);
-    els.mainImg.addEventListener("dblclick", () => els.mainImg.classList.toggle("zoomed"));
+    els.frame.addEventListener("pointerdown", handlePointerDown);
+    els.frame.addEventListener("pointermove", handlePointerMove);
+    els.frame.addEventListener("pointerup", handlePointerUp);
+    els.frame.addEventListener("pointercancel", handlePointerCancel);
+
     els.modal.addEventListener("click", () => els.modal.classList.remove("open"));
 
     els.fitBtn.addEventListener("click", () => {
@@ -980,6 +1245,8 @@
 
     applyTheme();
     enableFirstTouchMusic();
+    enablePullToRefresh();
+    preloadInitialImages();
     renderDateCounts();
     updateFilterButton();
     setInterval(renderDateCounts, 1000);
