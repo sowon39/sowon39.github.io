@@ -1011,30 +1011,6 @@
       }
     }
 
-
-    /* 인트로 안전 종료 보정: JS가 늦어도 화면을 막지 않음 */
-    .intro {
-      animation: introAutoRelease 1.45s ease forwards;
-    }
-
-    .intro.force-hide {
-      opacity: 0 !important;
-      visibility: hidden !important;
-      pointer-events: none !important;
-    }
-
-    @keyframes introAutoRelease {
-      0%, 62% {
-        opacity: 1;
-        visibility: visible;
-      }
-      100% {
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
-      }
-    }
-
     .install-modal {
       position: fixed;
       inset: 0;
@@ -1724,143 +1700,6 @@
       }
     }
 
-
-    /* 🎬 최종 무비 슬라이드 보정: 중앙 정렬 + 안 잘림 */
-    body.immersive .app {
-      height: 100svh;
-      min-height: 100svh;
-      overflow: hidden;
-    }
-
-    body.immersive .viewer {
-      width: 100vw;
-      height: 100svh;
-      min-height: 100svh;
-      overflow: hidden;
-    }
-
-    body.immersive .stage {
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      width: 100vw;
-      height: 100svh;
-      min-height: 100svh;
-      padding: clamp(18px, 4vw, 44px) !important;
-      overflow: hidden;
-    }
-
-    body.immersive .frame {
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      width: 100%;
-      height: 100%;
-      overflow: visible;
-      background: transparent;
-      border-radius: 0;
-    }
-
-    body.immersive .main-img {
-      width: auto !important;
-      height: auto !important;
-      max-width: 94vw !important;
-      max-height: 84svh !important;
-      object-fit: contain !important;
-      object-position: center center !important;
-      margin: auto !important;
-      transform-origin: center center;
-      will-change: opacity, transform, filter;
-    }
-
-    body.immersive .main-img.movie-zoom-in {
-      animation-name: movieFadeIn, movieZoomIn !important;
-    }
-
-    body.immersive .main-img.movie-zoom-out {
-      animation-name: movieFadeInZoomOut, movieZoomOut !important;
-    }
-
-    body.immersive .main-img.movie-pan-left {
-      animation-name: movieFadeIn, moviePanLeft !important;
-    }
-
-    body.immersive .main-img.movie-pan-right {
-      animation-name: movieFadeIn, moviePanRight !important;
-    }
-
-    body.immersive .main-img.movie-float-up {
-      animation-name: movieFadeInFloat, movieFloatUp !important;
-    }
-
-    body.immersive .main-img.movie-soft-tilt {
-      animation-name: movieFadeIn, movieSoftTilt !important;
-    }
-
-    @keyframes movieFadeIn {
-      0% { opacity: 0; transform: scale(1.006); filter: brightness(1.12) saturate(.94); }
-      48% { opacity: .9; filter: brightness(1.04) saturate(.98); }
-      100% { opacity: 1; transform: scale(1); filter: brightness(1) saturate(1); }
-    }
-
-    @keyframes movieFadeInZoomOut {
-      0% { opacity: 0; transform: scale(1.022); filter: brightness(1.12) saturate(.94); }
-      100% { opacity: 1; transform: scale(1.012); filter: brightness(1) saturate(1); }
-    }
-
-    @keyframes movieFadeInFloat {
-      0% { opacity: 0; transform: translateY(7px) scale(1.006); filter: brightness(1.1) saturate(.96); }
-      100% { opacity: 1; transform: translateY(0) scale(1); filter: brightness(1) saturate(1); }
-    }
-
-    @keyframes movieZoomIn {
-      from { transform: scale(1); }
-      to { transform: scale(1.014); }
-    }
-
-    @keyframes movieZoomOut {
-      from { transform: scale(1.014); }
-      to { transform: scale(1); }
-    }
-
-    @keyframes moviePanLeft {
-      from { transform: translateX(7px) scale(1.008); }
-      to { transform: translateX(-7px) scale(1.008); }
-    }
-
-    @keyframes moviePanRight {
-      from { transform: translateX(-7px) scale(1.008); }
-      to { transform: translateX(7px) scale(1.008); }
-    }
-
-    @keyframes movieFloatUp {
-      from { transform: translateY(5px) scale(1.008); }
-      to { transform: translateY(-5px) scale(1.012); }
-    }
-
-    @keyframes movieSoftTilt {
-      from { transform: rotate(-.22deg) scale(1.006); }
-      to { transform: rotate(.22deg) scale(1.006); }
-    }
-
-    @media (max-width: 920px) {
-      body.immersive .main-img {
-        max-width: 94vw !important;
-        max-height: 82svh !important;
-      }
-    }
-
-    @media (max-width: 520px) {
-      body.immersive .stage {
-        padding: 18px 10px !important;
-      }
-
-      body.immersive .main-img {
-        max-width: 94vw !important;
-        max-height: 80svh !important;
-      }
-    }
-
     @media (max-width: 920px) {
       body.immersive .main-img {
         max-width: 94vw;
@@ -1981,143 +1820,6 @@
       to { transform: translateY(-4px) scale(1.018); }
     }
 
-
-    /* 🎬 최종 무비 슬라이드 보정: 중앙 정렬 + 안 잘림 */
-    body.immersive .app {
-      height: 100svh;
-      min-height: 100svh;
-      overflow: hidden;
-    }
-
-    body.immersive .viewer {
-      width: 100vw;
-      height: 100svh;
-      min-height: 100svh;
-      overflow: hidden;
-    }
-
-    body.immersive .stage {
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      width: 100vw;
-      height: 100svh;
-      min-height: 100svh;
-      padding: clamp(18px, 4vw, 44px) !important;
-      overflow: hidden;
-    }
-
-    body.immersive .frame {
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      width: 100%;
-      height: 100%;
-      overflow: visible;
-      background: transparent;
-      border-radius: 0;
-    }
-
-    body.immersive .main-img {
-      width: auto !important;
-      height: auto !important;
-      max-width: 94vw !important;
-      max-height: 84svh !important;
-      object-fit: contain !important;
-      object-position: center center !important;
-      margin: auto !important;
-      transform-origin: center center;
-      will-change: opacity, transform, filter;
-    }
-
-    body.immersive .main-img.movie-zoom-in {
-      animation-name: movieFadeIn, movieZoomIn !important;
-    }
-
-    body.immersive .main-img.movie-zoom-out {
-      animation-name: movieFadeInZoomOut, movieZoomOut !important;
-    }
-
-    body.immersive .main-img.movie-pan-left {
-      animation-name: movieFadeIn, moviePanLeft !important;
-    }
-
-    body.immersive .main-img.movie-pan-right {
-      animation-name: movieFadeIn, moviePanRight !important;
-    }
-
-    body.immersive .main-img.movie-float-up {
-      animation-name: movieFadeInFloat, movieFloatUp !important;
-    }
-
-    body.immersive .main-img.movie-soft-tilt {
-      animation-name: movieFadeIn, movieSoftTilt !important;
-    }
-
-    @keyframes movieFadeIn {
-      0% { opacity: 0; transform: scale(1.006); filter: brightness(1.12) saturate(.94); }
-      48% { opacity: .9; filter: brightness(1.04) saturate(.98); }
-      100% { opacity: 1; transform: scale(1); filter: brightness(1) saturate(1); }
-    }
-
-    @keyframes movieFadeInZoomOut {
-      0% { opacity: 0; transform: scale(1.022); filter: brightness(1.12) saturate(.94); }
-      100% { opacity: 1; transform: scale(1.012); filter: brightness(1) saturate(1); }
-    }
-
-    @keyframes movieFadeInFloat {
-      0% { opacity: 0; transform: translateY(7px) scale(1.006); filter: brightness(1.1) saturate(.96); }
-      100% { opacity: 1; transform: translateY(0) scale(1); filter: brightness(1) saturate(1); }
-    }
-
-    @keyframes movieZoomIn {
-      from { transform: scale(1); }
-      to { transform: scale(1.014); }
-    }
-
-    @keyframes movieZoomOut {
-      from { transform: scale(1.014); }
-      to { transform: scale(1); }
-    }
-
-    @keyframes moviePanLeft {
-      from { transform: translateX(7px) scale(1.008); }
-      to { transform: translateX(-7px) scale(1.008); }
-    }
-
-    @keyframes moviePanRight {
-      from { transform: translateX(-7px) scale(1.008); }
-      to { transform: translateX(7px) scale(1.008); }
-    }
-
-    @keyframes movieFloatUp {
-      from { transform: translateY(5px) scale(1.008); }
-      to { transform: translateY(-5px) scale(1.012); }
-    }
-
-    @keyframes movieSoftTilt {
-      from { transform: rotate(-.22deg) scale(1.006); }
-      to { transform: rotate(.22deg) scale(1.006); }
-    }
-
-    @media (max-width: 920px) {
-      body.immersive .main-img {
-        max-width: 94vw !important;
-        max-height: 82svh !important;
-      }
-    }
-
-    @media (max-width: 520px) {
-      body.immersive .stage {
-        padding: 18px 10px !important;
-      }
-
-      body.immersive .main-img {
-        max-width: 94vw !important;
-        max-height: 80svh !important;
-      }
-    }
-
     @media (max-width: 920px) {
       body.immersive .stage {
         min-height: 100svh;
@@ -2139,143 +1841,6 @@
       body.immersive .main-img {
         max-width: 94vw;
         max-height: 76svh;
-      }
-    }
-
-
-    /* 🎬 최종 무비 슬라이드 보정: 중앙 정렬 + 안 잘림 */
-    body.immersive .app {
-      height: 100svh;
-      min-height: 100svh;
-      overflow: hidden;
-    }
-
-    body.immersive .viewer {
-      width: 100vw;
-      height: 100svh;
-      min-height: 100svh;
-      overflow: hidden;
-    }
-
-    body.immersive .stage {
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      width: 100vw;
-      height: 100svh;
-      min-height: 100svh;
-      padding: clamp(18px, 4vw, 44px) !important;
-      overflow: hidden;
-    }
-
-    body.immersive .frame {
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      width: 100%;
-      height: 100%;
-      overflow: visible;
-      background: transparent;
-      border-radius: 0;
-    }
-
-    body.immersive .main-img {
-      width: auto !important;
-      height: auto !important;
-      max-width: 94vw !important;
-      max-height: 84svh !important;
-      object-fit: contain !important;
-      object-position: center center !important;
-      margin: auto !important;
-      transform-origin: center center;
-      will-change: opacity, transform, filter;
-    }
-
-    body.immersive .main-img.movie-zoom-in {
-      animation-name: movieFadeIn, movieZoomIn !important;
-    }
-
-    body.immersive .main-img.movie-zoom-out {
-      animation-name: movieFadeInZoomOut, movieZoomOut !important;
-    }
-
-    body.immersive .main-img.movie-pan-left {
-      animation-name: movieFadeIn, moviePanLeft !important;
-    }
-
-    body.immersive .main-img.movie-pan-right {
-      animation-name: movieFadeIn, moviePanRight !important;
-    }
-
-    body.immersive .main-img.movie-float-up {
-      animation-name: movieFadeInFloat, movieFloatUp !important;
-    }
-
-    body.immersive .main-img.movie-soft-tilt {
-      animation-name: movieFadeIn, movieSoftTilt !important;
-    }
-
-    @keyframes movieFadeIn {
-      0% { opacity: 0; transform: scale(1.006); filter: brightness(1.12) saturate(.94); }
-      48% { opacity: .9; filter: brightness(1.04) saturate(.98); }
-      100% { opacity: 1; transform: scale(1); filter: brightness(1) saturate(1); }
-    }
-
-    @keyframes movieFadeInZoomOut {
-      0% { opacity: 0; transform: scale(1.022); filter: brightness(1.12) saturate(.94); }
-      100% { opacity: 1; transform: scale(1.012); filter: brightness(1) saturate(1); }
-    }
-
-    @keyframes movieFadeInFloat {
-      0% { opacity: 0; transform: translateY(7px) scale(1.006); filter: brightness(1.1) saturate(.96); }
-      100% { opacity: 1; transform: translateY(0) scale(1); filter: brightness(1) saturate(1); }
-    }
-
-    @keyframes movieZoomIn {
-      from { transform: scale(1); }
-      to { transform: scale(1.014); }
-    }
-
-    @keyframes movieZoomOut {
-      from { transform: scale(1.014); }
-      to { transform: scale(1); }
-    }
-
-    @keyframes moviePanLeft {
-      from { transform: translateX(7px) scale(1.008); }
-      to { transform: translateX(-7px) scale(1.008); }
-    }
-
-    @keyframes moviePanRight {
-      from { transform: translateX(-7px) scale(1.008); }
-      to { transform: translateX(7px) scale(1.008); }
-    }
-
-    @keyframes movieFloatUp {
-      from { transform: translateY(5px) scale(1.008); }
-      to { transform: translateY(-5px) scale(1.012); }
-    }
-
-    @keyframes movieSoftTilt {
-      from { transform: rotate(-.22deg) scale(1.006); }
-      to { transform: rotate(.22deg) scale(1.006); }
-    }
-
-    @media (max-width: 920px) {
-      body.immersive .main-img {
-        max-width: 94vw !important;
-        max-height: 82svh !important;
-      }
-    }
-
-    @media (max-width: 520px) {
-      body.immersive .stage {
-        padding: 18px 10px !important;
-      }
-
-      body.immersive .main-img {
-        max-width: 94vw !important;
-        max-height: 80svh !important;
       }
     }
 
@@ -2371,6 +1936,140 @@
       .flip-caption { font-size: 9px; }
       .current-title strong { font-size: 16px; }
     }
+  
+    /* ✅ 자동슬라이드 이미지 위치/잘림 최종 보정 */
+    body.immersive {
+      overflow: hidden !important;
+    }
+
+    body.immersive .topbar,
+    body.immersive .caption,
+    body.immersive .sidebar,
+    body.immersive .nav-arrow {
+      display: none !important;
+    }
+
+    body.immersive .app {
+      display: block !important;
+      width: 100vw !important;
+      height: 100dvh !important;
+      min-height: 100dvh !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+    }
+
+    body.immersive .viewer {
+      position: fixed !important;
+      inset: 0 !important;
+      display: block !important;
+      width: 100vw !important;
+      height: 100dvh !important;
+      min-height: 100dvh !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      overflow: hidden !important;
+      z-index: 1;
+    }
+
+    body.immersive .stage {
+      position: fixed !important;
+      inset: 0 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 100vw !important;
+      height: 100dvh !important;
+      min-height: 100dvh !important;
+      padding:
+        calc(env(safe-area-inset-top, 0px) + 14px)
+        12px
+        calc(env(safe-area-inset-bottom, 0px) + 14px) !important;
+      overflow: visible !important;
+    }
+
+    body.immersive .frame {
+      position: relative !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 100vw !important;
+      max-height: 100dvh !important;
+      overflow: visible !important;
+      background: transparent !important;
+      border-radius: 0 !important;
+    }
+
+    body.immersive .main-img {
+      display: block !important;
+      width: auto !important;
+      height: auto !important;
+      max-width: calc(100vw - 24px) !important;
+      max-height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 34px) !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      margin: auto !important;
+      transform-origin: center center !important;
+    }
+
+    @supports not (height: 100dvh) {
+      body.immersive .app,
+      body.immersive .viewer,
+      body.immersive .stage {
+        height: 100vh !important;
+        min-height: 100vh !important;
+      }
+
+      body.immersive .main-img {
+        max-height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 34px) !important;
+      }
+    }
+
+    /* 무비 효과는 감성 유지하되 잘림 방지를 위해 움직임을 안전 범위로 제한 */
+    @keyframes movieZoomIn {
+      from { transform: scale(1); }
+      to { transform: scale(1.008); }
+    }
+
+    @keyframes movieZoomOut {
+      from { transform: scale(1.008); }
+      to { transform: scale(1); }
+    }
+
+    @keyframes moviePanLeft {
+      from { transform: translateX(4px) scale(1.004); }
+      to { transform: translateX(-4px) scale(1.004); }
+    }
+
+    @keyframes moviePanRight {
+      from { transform: translateX(-4px) scale(1.004); }
+      to { transform: translateX(4px) scale(1.004); }
+    }
+
+    @keyframes movieFloatUp {
+      from { transform: translateY(3px) scale(1.004); }
+      to { transform: translateY(-3px) scale(1.006); }
+    }
+
+    @keyframes movieSoftTilt {
+      from { transform: rotate(-.12deg) scale(1.003); }
+      to { transform: rotate(.12deg) scale(1.003); }
+    }
+
+  
+    /* 확대보기 핀치줌 */
+    .modal img.zoomable {
+      cursor: grab;
+      transform-origin: center center;
+    }
+
+    .modal img.zoomable.is-zoomed {
+      cursor: grab;
+    }
+
   </style>
 </head>
 <body>
@@ -2575,34 +2274,24 @@
       lockedScrollY: 0,
       lastEffectIndex: -1,
       deferredInstallPrompt: null,
-      introHideTimer: null,
-      introRemoveTimer: null
+      modalScale: 1,
+      modalPinching: false,
+      modalPinchStartDistance: 0,
+      modalPinchStartScale: 1
     };
 
 
-    function hideIntro(delay = 1050) {
+    function hideIntro() {
       const intro = document.getElementById("intro");
       if (!intro) return;
 
-      window.clearTimeout(state.introHideTimer);
-      window.clearTimeout(state.introRemoveTimer);
-
-      state.introHideTimer = window.setTimeout(() => {
-        intro.classList.add("hide", "force-hide");
-      }, delay);
-
-      state.introRemoveTimer = window.setTimeout(() => {
-        if (intro && intro.parentNode) intro.remove();
-      }, delay + 520);
-    }
-
-    function releaseIntroImmediately() {
-      const intro = document.getElementById("intro");
-      if (!intro) return;
-      intro.classList.add("hide", "force-hide");
       window.setTimeout(() => {
-        if (intro && intro.parentNode) intro.remove();
-      }, 180);
+        intro.classList.add("hide");
+      }, 920);
+
+      window.setTimeout(() => {
+        intro.remove();
+      }, 1400);
     }
 
     function pad(value, length = 2) {
@@ -3126,6 +2815,69 @@
     }
 
 
+
+    function resetModalZoom() {
+      state.modalScale = 1;
+      state.modalPinching = false;
+      state.modalPinchStartDistance = 0;
+      state.modalPinchStartScale = 1;
+      els.modalImg.classList.remove("is-zoomed");
+      els.modalImg.style.transform = "";
+      els.modalImg.style.opacity = "";
+    }
+
+    function getTouchDistance(touches) {
+      const dx = touches[0].clientX - touches[1].clientX;
+      const dy = touches[0].clientY - touches[1].clientY;
+      return Math.hypot(dx, dy);
+    }
+
+    function applyModalZoom(scale) {
+      state.modalScale = Math.min(Math.max(scale, 1), 3);
+      els.modalImg.classList.toggle("is-zoomed", state.modalScale > 1.01);
+      els.modalImg.style.transform = state.modalScale > 1.01 ? `scale(${state.modalScale})` : "";
+    }
+
+    function handleModalTouchStart(event) {
+      if (!els.modal.classList.contains("open")) return;
+
+      if (event.touches.length === 2) {
+        event.preventDefault();
+        state.modalPinching = true;
+        state.modalPointerActive = false;
+        state.modalPinchStartDistance = getTouchDistance(event.touches);
+        state.modalPinchStartScale = state.modalScale || 1;
+        els.modal.classList.remove("hint");
+        els.modalImg.classList.remove("swiping");
+      }
+    }
+
+    function handleModalTouchMove(event) {
+      if (!els.modal.classList.contains("open")) return;
+
+      if (state.modalPinching && event.touches.length === 2) {
+        event.preventDefault();
+        const currentDistance = getTouchDistance(event.touches);
+        if (!state.modalPinchStartDistance) return;
+
+        const nextScale = state.modalPinchStartScale * (currentDistance / state.modalPinchStartDistance);
+        applyModalZoom(nextScale);
+      }
+    }
+
+    function handleModalTouchEnd(event) {
+      if (!state.modalPinching) return;
+
+      if (event.touches.length < 2) {
+        state.modalPinching = false;
+
+        if (state.modalScale < 1.04) {
+          applyModalZoom(1);
+        }
+      }
+    }
+
+
     function lockPageScroll() {
       state.lockedScrollY = window.scrollY || document.documentElement.scrollTop || 0;
       document.body.style.top = `-${state.lockedScrollY}px`;
@@ -3140,8 +2892,10 @@
 
     function updateModalImage() {
       const photo = photos[state.index];
+      resetModalZoom();
       els.modalImg.src = photo.file;
       els.modalImg.alt = photo.title;
+      els.modalImg.classList.add("zoomable");
     }
 
     function showModalSwipeHint() {
@@ -3171,6 +2925,7 @@
 
     function closeModal() {
       clearTimeout(state.modalHintTimer);
+      resetModalZoom();
       els.modal.classList.remove("open", "hint");
       unlockPageScroll();
     }
@@ -3341,6 +3096,7 @@
 
     function handleModalPointerDown(event) {
       if (!els.modal.classList.contains("open")) return;
+      if (state.modalPinching || state.modalScale > 1.01) return;
       if (event.button !== undefined && event.button !== 0) return;
 
       state.modalPointerActive = true;
@@ -3365,6 +3121,7 @@
       if (els.modal.classList.contains("open")) {
         event.preventDefault();
       }
+      if (state.modalPinching || state.modalScale > 1.01) return;
       if (!state.modalPointerActive) return;
 
       const now = Date.now();
@@ -3391,7 +3148,11 @@
 
     function resetModalDragStyle() {
       els.modalImg.classList.remove("swiping");
-      els.modalImg.style.transform = "";
+      if (state.modalScale > 1.01) {
+        els.modalImg.style.transform = `scale(${state.modalScale})`;
+      } else {
+        els.modalImg.style.transform = "";
+      }
       els.modalImg.style.opacity = "";
     }
 
@@ -3403,6 +3164,10 @@
     }
 
     function handleModalPointerUp(event) {
+      if (state.modalPinching || state.modalScale > 1.01) {
+        state.modalPointerActive = false;
+        return;
+      }
       if (!state.modalPointerActive) return;
 
       const diffX = event.clientX - state.modalStartX;
@@ -3522,6 +3287,9 @@
     els.modal.addEventListener("pointerup", handleModalPointerUp);
     els.modal.addEventListener("pointercancel", handleModalPointerCancel);
     els.modal.addEventListener("lostpointercapture", handleModalPointerCancel);
+    els.modal.addEventListener("touchstart", handleModalTouchStart, { passive: false });
+    els.modal.addEventListener("touchmove", handleModalTouchMove, { passive: false });
+    els.modal.addEventListener("touchend", handleModalTouchEnd, { passive: false });
     els.modal.addEventListener("touchmove", preventModalScrollLeak, { passive: false });
     els.modal.addEventListener("wheel", preventModalScrollLeak, { passive: false });
     els.gridCloseBtn.addEventListener("click", closeGrid);
@@ -3569,10 +3337,7 @@
       }
     });
 
-    hideIntro(1050);
-    window.addEventListener("load", () => hideIntro(180), { once: true });
-    document.addEventListener("pointerdown", releaseIntroImmediately, { once: true });
-    document.addEventListener("keydown", releaseIntroImmediately, { once: true });
+    hideIntro();
     setupPwaManifest();
     setupInstallPrompt();
     applyTheme();
