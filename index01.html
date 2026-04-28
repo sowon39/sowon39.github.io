@@ -4,8 +4,18 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <title>DK&HL Wedding Gallery</title>
-  <meta name="description" content="2026.08.30 DK&HL Wedding Photos" />
+  <title>DK&HL Wedding Book</title>
+  <!-- 모바일 홈화면 추가 / PWA 기본 설정 -->
+  <meta name="application-name" content="DK&HL Wedding Book" />
+  <meta name="apple-mobile-web-app-title" content="DK&HL Wedding Book" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#fbe7ec" />
+  <link rel="icon" type="image/png" sizes="192x192" href="wedding/app-icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="wedding/app-icon-512.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="wedding/apple-touch-icon.png" />
+  <meta name="description" content="2026.08.30 DK&HL Wedding Book" />
   <link rel="canonical" href="https://sowon39.github.io/index01.html" />
   <link rel="image_src" href="https://sowon39.github.io/wedding/og.jpg?v=5" />
 
@@ -17,21 +27,21 @@
        중요: wedding/og.jpg 파일을 실제로 업로드하세요.
        권장: 1200x630px JPG, 가급적 300KB~1MB 이하 -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Wedding Gallery" />
-  <meta property="og:description" content="2026.08.30 DK&HL Wedding Photos" />
+  <meta property="og:title" content="DK&HL Wedding Book" />
+  <meta property="og:description" content="2026.08.30 DK&HL Wedding Book" />
   <meta property="og:url" content="https://sowon39.github.io/index01.html" />
-  <meta property="og:site_name" content="Wedding Gallery" />
+  <meta property="og:site_name" content="DK&HL Wedding Book" />
   <meta property="og:locale" content="ko_KR" />
   <meta property="og:image" content="https://sowon39.github.io/wedding/og.jpg?v=5" />
   <meta property="og:image:secure_url" content="https://sowon39.github.io/wedding/og.jpg?v=5" />
   <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="Wedding Gallery" />
+  <meta property="og:image:alt" content="DK&HL Wedding Book" />
 
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Wedding Gallery" />
-  <meta name="twitter:description" content="2026.08.30 DK&HL Wedding Photos" />
+  <meta name="twitter:title" content="DK&HL Wedding Book" />
+  <meta name="twitter:description" content="2026.08.30 DK&HL Wedding Book" />
   <meta name="twitter:image" content="https://sowon39.github.io/wedding/og.jpg?v=5" />
 
   <style>
@@ -774,6 +784,221 @@
       box-shadow: 0 28px 90px rgba(0,0,0,.45);
     }
 
+
+    /* 크게 보기 좌우 스와이프 힌트 */
+    .modal::before,
+    .modal::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      z-index: 2;
+      width: 26px;
+      height: 26px;
+      border-top: 2px solid rgba(255,255,255,.68);
+      border-right: 2px solid rgba(255,255,255,.68);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .42s ease, transform .42s ease;
+      filter: drop-shadow(0 6px 14px rgba(0,0,0,.22));
+    }
+
+    .modal::before {
+      left: clamp(18px, 4vw, 46px);
+      transform: translateY(-50%) translateX(8px) rotate(-135deg);
+    }
+
+    .modal::after {
+      right: clamp(18px, 4vw, 46px);
+      transform: translateY(-50%) translateX(-8px) rotate(45deg);
+    }
+
+    .modal.hint::before {
+      opacity: .9;
+      transform: translateY(-50%) translateX(0) rotate(-135deg);
+      animation: hintLeft 1.6s ease both;
+    }
+
+    .modal.hint::after {
+      opacity: .9;
+      transform: translateY(-50%) translateX(0) rotate(45deg);
+      animation: hintRight 1.6s ease both;
+    }
+
+    @keyframes hintLeft {
+      0%, 100% { opacity: 0; transform: translateY(-50%) translateX(8px) rotate(-135deg); }
+      18%, 72% { opacity: .82; transform: translateY(-50%) translateX(0) rotate(-135deg); }
+    }
+
+    @keyframes hintRight {
+      0%, 100% { opacity: 0; transform: translateY(-50%) translateX(-8px) rotate(45deg); }
+      18%, 72% { opacity: .82; transform: translateY(-50%) translateX(0) rotate(45deg); }
+    }
+
+
+
+    /* 🌸 짧은 웨딩북 인트로 */
+    .intro {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(255, 212, 219, .78), transparent 30%),
+        radial-gradient(circle at 80% 15%, rgba(255, 236, 206, .72), transparent 30%),
+        linear-gradient(135deg, #fff9fa 0%, #fbe7ec 55%, #fff2ee 100%);
+      color: #2c2324;
+      transition: opacity .42s ease, visibility .42s ease;
+    }
+
+    .intro.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .intro-card {
+      text-align: center;
+      transform: translateY(8px);
+      animation: introCardIn .72s cubic-bezier(.22,.72,.22,1) both;
+    }
+
+    .intro-logo {
+      display: block;
+      font-family: ui-serif, Georgia, "Times New Roman", "Apple SD Gothic Neo", "Noto Serif KR", serif;
+      font-size: clamp(28px, 6vw, 48px);
+      font-weight: 500;
+      letter-spacing: .22em;
+      opacity: 0;
+      transform: translateY(12px);
+      animation: introTextUp .62s ease forwards;
+    }
+
+    .intro-sub {
+      display: block;
+      margin-top: 12px;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: clamp(12px, 2.8vw, 15px);
+      font-weight: 800;
+      letter-spacing: .26em;
+      text-transform: uppercase;
+      color: rgba(139,116,120,.9);
+      opacity: 0;
+      transform: translateY(10px);
+      animation: introTextUp .62s ease forwards;
+      animation-delay: .18s;
+    }
+
+    .intro-card::after {
+      content: "";
+      display: block;
+      width: 56px;
+      height: 1px;
+      margin: 18px auto 0;
+      background: linear-gradient(90deg, transparent, rgba(216,139,149,.74), transparent);
+      opacity: 0;
+      animation: introLine .58s ease forwards;
+      animation-delay: .34s;
+    }
+
+    @keyframes introTextUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes introLine {
+      to { opacity: 1; }
+    }
+
+    @keyframes introCardIn {
+      from {
+        opacity: .86;
+        transform: translateY(12px) scale(.985);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .install-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      z-index: 45;
+      padding: 22px;
+      background: rgba(40, 25, 30, .48);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .install-modal.open {
+      display: grid;
+      animation: overlayFade .22s ease both;
+    }
+
+    .install-panel {
+      position: relative;
+      width: min(420px, 100%);
+      border: 1px solid rgba(255,255,255,.38);
+      border-radius: 26px;
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 28px 80px rgba(77,40,48,.24);
+      padding: 24px;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+    }
+
+    .install-panel strong {
+      display: block;
+      font-size: 20px;
+      letter-spacing: -.03em;
+      margin-bottom: 8px;
+    }
+
+    .install-panel p {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .install-steps {
+      display: grid;
+      gap: 8px;
+      padding: 12px;
+      border-radius: 18px;
+      background: rgba(216,139,149,.10);
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .install-close {
+      position: absolute;
+      right: 14px;
+      top: 14px;
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.76);
+      color: var(--text);
+    }
+
+    body.dark .install-panel {
+      background: rgba(28,22,25,.94);
+      color: var(--text);
+    }
+
+    body.dark .install-close {
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+    }
+
     .toast {
       position: fixed;
       left: 50%;
@@ -978,7 +1203,7 @@
 
     @keyframes slowZoom {
       from { transform: scale(1); }
-      to { transform: scale(1.045); }
+      to { transform: scale(1.025); }
     }
 
     @keyframes modalSoftIn {
@@ -998,6 +1223,31 @@
         radial-gradient(circle at 82% 14%, rgba(255, 231, 201, .30), transparent 30%),
         radial-gradient(circle at 50% 100%, rgba(216,139,149,.16), transparent 36%),
         linear-gradient(135deg, #261b20 0%, #3a252b 52%, #24191b 100%);
+    }
+
+
+    /* 자동 슬라이드 몰입 모드 이미지 잘림 방지 */
+    body.immersive .main-img {
+      max-width: min(92vw, 100%);
+      max-height: min(86vh, 100%);
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      transform-origin: center center;
+    }
+
+    @media (max-width: 920px) {
+      body.immersive .main-img {
+        max-width: 94vw;
+        max-height: 82vh;
+      }
+    }
+
+    @media (max-width: 520px) {
+      body.immersive .main-img {
+        max-width: 94vw;
+        max-height: 80vh;
+      }
     }
 
     @media (max-width: 920px) {
@@ -1095,6 +1345,12 @@
   </style>
 </head>
 <body>
+  <div id="intro" class="intro" aria-label="DK and HL Wedding Book">
+    <div class="intro-card">
+      <span class="intro-logo">DK &amp; HL</span>
+      <span class="intro-sub">Wedding Book</span>
+    </div>
+  </div>
   <main class="app">
     <aside class="sidebar">
       <section class="brand">
@@ -1145,6 +1401,7 @@
             <button id="downloadBtn" class="icon-btn compact" type="button" title="사진 다운로드">↓</button>
             <button id="themeBtn" class="icon-btn theme-toggle" type="button" title="다크모드">☾ 다크모드</button>
             <button id="shareBtn" class="icon-btn compact" type="button" title="공유">🔗</button>
+            <button id="homeBtn" class="icon-btn compact" type="button" title="홈화면 추가">＋</button>
             <button id="fullBtn" class="icon-btn compact" type="button" title="크게 보기">⛶</button>
           </div>
         </div>
@@ -1177,6 +1434,17 @@
         <button id="gridCloseBtn" class="grid-close" type="button" aria-label="닫기">×</button>
       </div>
       <div id="gridList" class="grid-list"></div>
+    </div>
+  </div>
+  <div id="installModal" class="install-modal" role="dialog" aria-modal="true" aria-label="홈화면 추가 안내">
+    <div class="install-panel">
+      <button id="installCloseBtn" class="install-close" type="button" aria-label="닫기">×</button>
+      <strong>DK&HL Wedding Book</strong>
+      <p id="installGuide">홈화면에 추가해서 앱처럼 열 수 있어요.</p>
+      <div class="install-steps">
+        <span>iPhone: 공유 버튼 → 홈 화면에 추가</span>
+        <span>Android: 브라우저 메뉴 → 앱 설치 또는 홈 화면에 추가</span>
+      </div>
     </div>
   </div>
   <div id="pullRefresh" class="pull-refresh" aria-hidden="true"><span></span><b>새로고침</b></div>
@@ -1214,6 +1482,7 @@
       downloadBtn: document.getElementById("downloadBtn"),
       themeBtn: document.getElementById("themeBtn"),
       shareBtn: document.getElementById("shareBtn"),
+      homeBtn: document.getElementById("homeBtn"),
       fullBtn: document.getElementById("fullBtn"),
       prevBtn: document.getElementById("prevBtn"),
       nextBtn: document.getElementById("nextBtn"),
@@ -1222,6 +1491,9 @@
       gridModal: document.getElementById("gridModal"),
       gridList: document.getElementById("gridList"),
       gridCloseBtn: document.getElementById("gridCloseBtn"),
+      installModal: document.getElementById("installModal"),
+      installCloseBtn: document.getElementById("installCloseBtn"),
+      installGuide: document.getElementById("installGuide"),
       toast: document.getElementById("toast"),
       pullRefresh: document.getElementById("pullRefresh"),
       bgm: document.getElementById("bgm"),
@@ -1252,8 +1524,28 @@
       slideDirection: 1,
       longPressTimer: null,
       longPressTriggered: false,
-      immersive: false
+      immersive: false,
+      modalPointerActive: false,
+      modalStartX: 0,
+      modalStartY: 0,
+      modalStartTime: 0,
+      modalHintTimer: null,
+      deferredInstallPrompt: null
     };
+
+
+    function hideIntro() {
+      const intro = document.getElementById("intro");
+      if (!intro) return;
+
+      window.setTimeout(() => {
+        intro.classList.add("hide");
+      }, 920);
+
+      window.setTimeout(() => {
+        intro.remove();
+      }, 1400);
+    }
 
     function pad(value, length = 2) {
       return String(value).padStart(length, "0");
@@ -1435,6 +1727,9 @@
         renderDots();
         syncActiveThumbnail();
         preloadAround(state.index);
+        if (els.modal.classList.contains("open")) {
+          updateModalImage();
+        }
 
         requestAnimationFrame(() => {
           els.mainImg.classList.remove("changing");
@@ -1584,10 +1879,92 @@
       applyTheme();
     }
 
+
+    function setupPwaManifest() {
+      const manifest = {
+        name: "DK&HL Wedding Book",
+        short_name: "Wedding Book",
+        description: "2026.08.30 DK&HL Wedding Book",
+        start_url: "/index01.html",
+        scope: "/",
+        display: "standalone",
+        background_color: "#fff7f8",
+        theme_color: "#fbe7ec",
+        icons: [
+          {
+            src: "wedding/app-icon-192.png",
+            sizes: "192x192",
+            type: "image/png",
+            purpose: "any maskable"
+          },
+          {
+            src: "wedding/app-icon-512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "any maskable"
+          }
+        ]
+      };
+
+      const blob = new Blob([JSON.stringify(manifest)], { type: "application/manifest+json" });
+      const manifestUrl = URL.createObjectURL(blob);
+      const link = document.createElement("link");
+      link.rel = "manifest";
+      link.href = manifestUrl;
+      document.head.appendChild(link);
+    }
+
+    function setupInstallPrompt() {
+      window.addEventListener("beforeinstallprompt", (event) => {
+        event.preventDefault();
+        state.deferredInstallPrompt = event;
+      });
+
+      window.addEventListener("appinstalled", () => {
+        state.deferredInstallPrompt = null;
+        toast("홈화면에 추가됐어요");
+      });
+    }
+
+    function isIos() {
+      return /iphone|ipad|ipod/i.test(navigator.userAgent);
+    }
+
+    function isStandalone() {
+      return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+    }
+
+    async function addToHomeScreen() {
+      if (isStandalone()) {
+        toast("이미 홈화면 앱으로 실행 중입니다");
+        return;
+      }
+
+      if (state.deferredInstallPrompt) {
+        const promptEvent = state.deferredInstallPrompt;
+        state.deferredInstallPrompt = null;
+        promptEvent.prompt();
+        await promptEvent.userChoice;
+        return;
+      }
+
+      if (isIos()) {
+        els.installGuide.textContent = "iPhone에서는 하단 공유 버튼을 누른 뒤 ‘홈 화면에 추가’를 선택해 주세요.";
+      } else {
+        els.installGuide.textContent = "브라우저 메뉴에서 ‘앱 설치’ 또는 ‘홈 화면에 추가’를 선택해 주세요.";
+      }
+
+      els.installModal.classList.add("open");
+    }
+
+    function closeInstallGuide() {
+      els.installModal.classList.remove("open");
+    }
+
     async function sharePage() {
       const url = window.location.href;
-      const title = "Wedding Gallery";
-      const text = "2026.08.30 DK&HL Wedding Photos";
+      const title = "DK&HL Wedding Book";
+      const text = "2026.08.30 DK&HL Wedding Book";
 
       if (navigator.share) {
         try {
@@ -1615,7 +1992,7 @@
       state.immersive = true;
       document.body.classList.add("immersive");
       closeGrid();
-      els.modal.classList.remove("open");
+      closeModal();
     }
 
     function exitImmersiveMode() {
@@ -1643,11 +2020,39 @@
       }
     }
 
-    function openModal() {
-      if (state.slideshow) toggleSlideshow();
+    function updateModalImage() {
       const photo = photos[state.index];
       els.modalImg.src = photo.file;
+      els.modalImg.alt = photo.title;
+    }
+
+    function showModalSwipeHint() {
+      clearTimeout(state.modalHintTimer);
+      els.modal.classList.remove("hint");
+      void els.modal.offsetWidth;
+      els.modal.classList.add("hint");
+
+      state.modalHintTimer = setTimeout(() => {
+        els.modal.classList.remove("hint");
+      }, 1800);
+    }
+
+    function openModal() {
+      if (state.slideshow) toggleSlideshow();
+      updateModalImage();
       els.modal.classList.add("open");
+      showModalSwipeHint();
+    }
+
+    function moveModal(step) {
+      state.slideDirection = step >= 0 ? 1 : -1;
+      move(step);
+      updateModalImage();
+    }
+
+    function closeModal() {
+      clearTimeout(state.modalHintTimer);
+      els.modal.classList.remove("open", "hint");
     }
 
     function renderGrid() {
@@ -1806,6 +2211,43 @@
       state.activePointerId = null;
     }
 
+
+    function handleModalPointerDown(event) {
+      state.modalPointerActive = true;
+      state.modalStartX = event.clientX;
+      state.modalStartY = event.clientY;
+      state.modalStartTime = Date.now();
+
+      try {
+        els.modal.setPointerCapture(event.pointerId);
+      } catch (error) {}
+    }
+
+    function handleModalPointerUp(event) {
+      if (!state.modalPointerActive) return;
+
+      const diffX = event.clientX - state.modalStartX;
+      const diffY = event.clientY - state.modalStartY;
+      const elapsed = Date.now() - state.modalStartTime;
+      state.modalPointerActive = false;
+
+      const isHorizontalSwipe = Math.abs(diffX) > 44 && Math.abs(diffX) > Math.abs(diffY) * 1.2;
+      if (isHorizontalSwipe) {
+        els.modal.classList.remove("hint");
+        moveModal(diffX < 0 ? 1 : -1);
+        return;
+      }
+
+      const isTapOnBackdrop = event.target === els.modal && Math.abs(diffX) < 10 && Math.abs(diffY) < 10 && elapsed < 450;
+      if (isTapOnBackdrop) {
+        closeModal();
+      }
+    }
+
+    function handleModalPointerCancel() {
+      state.modalPointerActive = false;
+    }
+
     function isPageAtTop() {
       return window.scrollY <= 0 && document.documentElement.scrollTop <= 0;
     }
@@ -1875,6 +2317,7 @@
     els.downloadBtn.addEventListener("click", downloadCurrentPhoto);
     els.themeBtn.addEventListener("click", toggleTheme);
     els.shareBtn.addEventListener("click", sharePage);
+    els.homeBtn.addEventListener("click", addToHomeScreen);
     els.slideshowBtn.addEventListener("click", toggleSlideshow);
     els.prevBtn.addEventListener("click", () => move(-1));
     els.nextBtn.addEventListener("click", () => move(1));
@@ -1884,10 +2327,16 @@
     els.frame.addEventListener("pointerup", handlePointerUp);
     els.frame.addEventListener("pointercancel", handlePointerCancel);
 
-    els.modal.addEventListener("click", () => els.modal.classList.remove("open"));
+    els.modal.addEventListener("pointerdown", handleModalPointerDown);
+    els.modal.addEventListener("pointerup", handleModalPointerUp);
+    els.modal.addEventListener("pointercancel", handleModalPointerCancel);
     els.gridCloseBtn.addEventListener("click", closeGrid);
     els.gridModal.addEventListener("click", (event) => {
       if (event.target === els.gridModal) closeGrid();
+    });
+    els.installCloseBtn.addEventListener("click", closeInstallGuide);
+    els.installModal.addEventListener("click", (event) => {
+      if (event.target === els.installModal) closeInstallGuide();
     });
     els.progressWrap.addEventListener("click", jumpByProgress);
     els.mainImg.addEventListener("pointerdown", startLongPress);
@@ -1907,8 +2356,9 @@
       if (event.key === "ArrowLeft") move(-1);
       if (event.key === "ArrowRight") move(1);
       if (event.key === "Escape") {
-        els.modal.classList.remove("open");
+        closeModal();
         closeGrid();
+        closeInstallGuide();
         if (state.slideshow) toggleSlideshow();
         else exitImmersiveMode();
       }
@@ -1919,6 +2369,9 @@
       }
     });
 
+    hideIntro();
+    setupPwaManifest();
+    setupInstallPrompt();
     applyTheme();
     enableFirstTouchMusic();
     enablePullToRefresh();
