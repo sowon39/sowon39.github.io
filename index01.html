@@ -221,6 +221,7 @@
       gap: 12px;
       scrollbar-width: thin;
       scroll-behavior: smooth;
+      overscroll-behavior: contain;
     }
 
     .photo-item {
@@ -294,31 +295,61 @@
 
     .actions {
       display: flex;
-      gap: 10px;
+      flex-direction: column;
+      gap: 9px;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .action-group {
+      display: flex;
+      gap: 8px;
       align-items: center;
-      flex-wrap: wrap;
       justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .primary-actions {
+      padding: 5px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.42);
+    }
+
+    .utility-actions {
+      opacity: .92;
     }
 
     .icon-btn {
       border: 1px solid var(--line);
       border-radius: 999px;
       background: rgba(255,255,255,.76);
-      min-width: 44px;
-      height: 44px;
-      padding: 0 15px;
+      min-width: 42px;
+      height: 40px;
+      padding: 0 13px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 7px;
       color: var(--text);
       font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-size: 13px;
-      transition: transform .2s ease, background .2s ease;
+      font-size: 12px;
+      font-weight: 800;
+      transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
       white-space: nowrap;
     }
 
-    .icon-btn:hover { transform: translateY(-1px); background: #fff; }
+    .icon-btn.compact {
+      width: 40px;
+      min-width: 40px;
+      padding: 0;
+    }
+
+    .icon-btn:hover {
+      transform: translateY(-1px);
+      background: #fff;
+      box-shadow: 0 8px 18px rgba(77, 40, 48, .08);
+    }
 
     .stage {
       position: relative;
@@ -438,6 +469,170 @@
       background: linear-gradient(90deg, var(--brand), #f0b9a8);
       border-radius: 999px;
       transition: width .25s ease;
+    }
+
+    .progress-wrap {
+      cursor: pointer;
+      position: relative;
+    }
+
+    .progress-wrap::after {
+      content: "";
+      position: absolute;
+      inset: -8px 0;
+    }
+
+    .dots {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 6px;
+      max-width: 180px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 0 2px;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+      overscroll-behavior: contain;
+    }
+
+    .dots::-webkit-scrollbar { display: none; }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border: 0;
+      border-radius: 999px;
+      padding: 0;
+      background: rgba(139,116,120,.32);
+      transition: width .2s ease, background .2s ease, transform .2s ease;
+      flex: 0 0 auto;
+    }
+
+    .dot.active {
+      width: 20px;
+      background: var(--brand);
+      transform: translateY(-1px);
+    }
+
+    .grid-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      z-index: 35;
+      background: rgba(22,16,18,.72);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 22px;
+    }
+
+    .grid-modal.open {
+      display: block;
+      animation: overlayFade .22s ease both;
+    }
+
+    .grid-panel {
+      width: min(980px, 100%);
+      max-height: calc(100vh - 44px);
+      margin: 0 auto;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.28);
+      border-radius: 28px;
+      background: rgba(255,255,255,.9);
+      box-shadow: 0 28px 80px rgba(0,0,0,.28);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+    }
+
+    .grid-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-weight: 900;
+    }
+
+    .grid-close {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.8);
+      width: 38px;
+      height: 38px;
+      color: var(--text);
+    }
+
+    .grid-list {
+      overflow: auto;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+      gap: 12px;
+    }
+
+    .grid-tile {
+      border: 1px solid transparent;
+      background: rgba(255,255,255,.74);
+      border-radius: 18px;
+      padding: 7px;
+      color: inherit;
+      text-align: left;
+      transition: transform .2s ease, border-color .2s ease, background .2s ease;
+    }
+
+    .grid-tile:hover {
+      transform: translateY(-2px);
+      background: #fff;
+    }
+
+    .grid-tile.active {
+      border-color: rgba(216,139,149,.95);
+      background: #fff;
+    }
+
+    .grid-tile img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border-radius: 13px;
+      background: #f4e2e4;
+    }
+
+    .grid-tile span {
+      display: block;
+      margin-top: 7px;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--muted);
+    }
+
+    body.intro-ready .sidebar,
+    body.intro-ready .viewer {
+      animation: introUp .58s cubic-bezier(.22,.72,.22,1) both;
+    }
+
+    body.intro-ready .viewer {
+      animation-delay: .08s;
+    }
+
+    @keyframes introUp {
+      from {
+        opacity: 0;
+        transform: translateY(14px) scale(.985);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes overlayFade {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
     .modal {
@@ -565,6 +760,10 @@
     }
 
     body.dark .frame { background: rgba(0,0,0,.18); }
+    body.dark .grid-panel { background: rgba(28,22,25,.94); }
+    body.dark .grid-close,
+    body.dark .grid-tile { background: rgba(255,255,255,.08); color: var(--text); }
+    body.dark .grid-tile.active { background: rgba(255,255,255,.18); }
 
     @media (max-width: 920px) {
       body { overflow: auto; }
@@ -600,9 +799,16 @@
         padding: 14px;
       }
       .actions {
-        justify-content: flex-start;
-        gap: 8px;
+        align-items: stretch;
+        width: 100%;
       }
+      .action-group {
+        justify-content: flex-start;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        scrollbar-width: none;
+      }
+      .action-group::-webkit-scrollbar { display: none; }
       .icon-btn {
         height: 40px;
         padding: 0 12px;
@@ -677,16 +883,19 @@
           <span id="currentMeta">1 / 22</span>
         </div>
         <div class="actions">
-          <button id="favoriteBtn" class="icon-btn" type="button" title="좋아요">♡</button>
-          <button id="filterBtn" class="icon-btn" type="button" title="좋아요한 사진만 보기">♥ 모아보기</button>
-          <button id="slideshowBtn" class="icon-btn" type="button" title="자동 재생">▶ 자동</button>
-          <button id="fitBtn" class="icon-btn" type="button" title="채우기 전환">▣ 맞춤</button>
-          <button id="bwBtn" class="icon-btn" type="button" title="흑백 필터">◐ 흑백</button>
-          <button id="musicBtn" class="icon-btn" type="button" title="음악 재생/일시정지">♪ 재생</button>
-          <button id="downloadBtn" class="icon-btn" type="button" title="사진 다운로드">↓ 저장</button>
-          <button id="themeBtn" class="icon-btn" type="button" title="다크모드">☾ 밤</button>
-          <button id="shareBtn" class="icon-btn" type="button" title="공유">🔗 공유</button>
-          <button id="fullBtn" class="icon-btn" type="button" title="크게 보기">⛶ 크게</button>
+          <div class="action-group primary-actions">
+            <button id="favoriteBtn" class="icon-btn compact" type="button" title="좋아요">♡</button>
+            <button id="filterBtn" class="icon-btn" type="button" title="좋아요한 사진만 보기">♥ 모아보기</button>
+            <button id="gridBtn" class="icon-btn" type="button" title="전체 사진 보기">☷ 전체보기</button>
+            <button id="slideshowBtn" class="icon-btn" type="button" title="자동 재생">▶ 자동</button>
+          </div>
+          <div class="action-group utility-actions">
+            <button id="musicBtn" class="icon-btn" type="button" title="음악 재생/일시정지">♪ 재생</button>
+            <button id="downloadBtn" class="icon-btn compact" type="button" title="사진 다운로드">↓</button>
+            <button id="themeBtn" class="icon-btn compact" type="button" title="다크모드">☾</button>
+            <button id="shareBtn" class="icon-btn compact" type="button" title="공유">🔗</button>
+            <button id="fullBtn" class="icon-btn compact" type="button" title="크게 보기">⛶</button>
+          </div>
         </div>
       </header>
 
@@ -700,14 +909,24 @@
 
       <footer class="caption">
         <span id="counter">0 / 0</span>
-        <div class="progress-wrap"><div id="progress" class="progress"></div></div>
-        <span>← → 이동 · 더블클릭 확대</span>
+        <div id="progressWrap" class="progress-wrap" title="클릭해서 이동"><div id="progress" class="progress"></div></div>
+        <div id="dots" class="dots" aria-label="사진 위치"></div>
       </footer>
     </section>
   </main>
 
   <div id="modal" class="modal" role="dialog" aria-modal="true" aria-label="원본 크게 보기">
     <img id="modalImg" src="" alt="크게 본 웨딩 사진" />
+  </div>
+
+  <div id="gridModal" class="grid-modal" role="dialog" aria-modal="true" aria-label="전체 사진 보기">
+    <div class="grid-panel">
+      <div class="grid-head">
+        <span>전체 사진</span>
+        <button id="gridCloseBtn" class="grid-close" type="button" aria-label="닫기">×</button>
+      </div>
+      <div id="gridList" class="grid-list"></div>
+    </div>
   </div>
   <div id="pullRefresh" class="pull-refresh" aria-hidden="true"><span></span><b>새로고침</b></div>
   <div id="toast" class="toast"></div>
@@ -734,11 +953,12 @@
       currentMeta: document.getElementById("currentMeta"),
       counter: document.getElementById("counter"),
       progress: document.getElementById("progress"),
+      progressWrap: document.getElementById("progressWrap"),
+      dots: document.getElementById("dots"),
       favoriteBtn: document.getElementById("favoriteBtn"),
       filterBtn: document.getElementById("filterBtn"),
+      gridBtn: document.getElementById("gridBtn"),
       slideshowBtn: document.getElementById("slideshowBtn"),
-      fitBtn: document.getElementById("fitBtn"),
-      bwBtn: document.getElementById("bwBtn"),
       musicBtn: document.getElementById("musicBtn"),
       downloadBtn: document.getElementById("downloadBtn"),
       themeBtn: document.getElementById("themeBtn"),
@@ -748,6 +968,9 @@
       nextBtn: document.getElementById("nextBtn"),
       modal: document.getElementById("modal"),
       modalImg: document.getElementById("modalImg"),
+      gridModal: document.getElementById("gridModal"),
+      gridList: document.getElementById("gridList"),
+      gridCloseBtn: document.getElementById("gridCloseBtn"),
       toast: document.getElementById("toast"),
       pullRefresh: document.getElementById("pullRefresh"),
       bgm: document.getElementById("bgm"),
@@ -762,8 +985,6 @@
       favorites: JSON.parse(localStorage.getItem("weddingFavorites") || "[]"),
       filterFavorites: false,
       slideshow: null,
-      cover: false,
-      bw: false,
       musicOn: false,
       darkMode: localStorage.getItem("weddingDarkMode") === "true",
       lastClock: {},
@@ -777,7 +998,9 @@
       pullDistance: 0,
       imageCache: new Map(),
       thumbCache: new Map(),
-      slideDirection: 1
+      slideDirection: 1,
+      longPressTimer: null,
+      longPressTriggered: false
     };
 
     function pad(value, length = 2) {
@@ -837,7 +1060,7 @@
 
     function applyTheme() {
       document.body.classList.toggle("dark", state.darkMode);
-      els.themeBtn.textContent = state.darkMode ? "☀ 낮" : "☾ 밤";
+      els.themeBtn.textContent = state.darkMode ? "☀ 기본모드" : "☾ 다크모드";
       localStorage.setItem("weddingDarkMode", String(state.darkMode));
     }
 
@@ -880,12 +1103,49 @@
         const activeItem = els.list.querySelector(`.photo-item[data-index="${state.index}"]`);
         if (!activeItem) return;
 
-        activeItem.scrollIntoView({
-          behavior: "smooth",
-          block: "nearest",
-          inline: "center"
+        // 모바일에서 scrollIntoView를 쓰면 페이지가 썸네일 섹션 쪽으로 튀는 문제가 있어
+        // 썸네일 리스트 내부의 가로 스크롤만 직접 이동시킵니다.
+        const listRect = els.list.getBoundingClientRect();
+        const itemRect = activeItem.getBoundingClientRect();
+
+        const currentScroll = els.list.scrollLeft;
+        const itemCenter = itemRect.left - listRect.left + currentScroll + itemRect.width / 2;
+        const targetScroll = itemCenter - els.list.clientWidth / 2;
+
+        els.list.scrollTo({
+          left: Math.max(0, targetScroll),
+          behavior: "smooth"
         });
       });
+    }
+
+    function renderDots() {
+      const list = filteredPhotos();
+      els.dots.innerHTML = "";
+
+      list.forEach((photo, visibleIndex) => {
+        const dot = document.createElement("button");
+        dot.className = `dot ${photo.originalIndex === state.index ? "active" : ""}`;
+        dot.type = "button";
+        dot.title = `${visibleIndex + 1} / ${list.length}`;
+        dot.addEventListener("click", () => {
+          state.slideDirection = photo.originalIndex >= state.index ? 1 : -1;
+          selectPhoto(photo.originalIndex);
+        });
+        els.dots.appendChild(dot);
+      });
+
+      const activeDot = els.dots.querySelector(".dot.active");
+      if (activeDot) {
+        const dotsRect = els.dots.getBoundingClientRect();
+        const dotRect = activeDot.getBoundingClientRect();
+        const currentScroll = els.dots.scrollLeft;
+        const dotCenter = dotRect.left - dotsRect.left + currentScroll + dotRect.width / 2;
+        els.dots.scrollTo({
+          left: Math.max(0, dotCenter - els.dots.clientWidth / 2),
+          behavior: "smooth"
+        });
+      }
     }
 
     function selectPhoto(index) {
@@ -911,6 +1171,7 @@
         els.progress.style.width = `${((state.index + 1) / photos.length) * 100}%`;
         updateFavoriteButton();
         renderList();
+        renderDots();
         syncActiveThumbnail();
         preloadAround(state.index);
 
@@ -954,6 +1215,7 @@
 
       const list = filteredPhotos();
       renderList();
+      renderDots();
 
       if (state.filterFavorites) {
         if (list.length) {
@@ -1002,6 +1264,8 @@
         selectPhoto(list[0].originalIndex);
       } else {
         renderList();
+        renderDots();
+        if (els.gridModal.classList.contains("open")) renderGrid();
       }
     }
 
@@ -1102,6 +1366,70 @@
       const photo = photos[state.index];
       els.modalImg.src = photo.file;
       els.modal.classList.add("open");
+    }
+
+    function renderGrid() {
+      const list = filteredPhotos();
+      els.gridList.innerHTML = "";
+
+      list.forEach((photo) => {
+        const liked = state.favorites.includes(photo.file);
+        const tile = document.createElement("button");
+        tile.className = `grid-tile ${photo.originalIndex === state.index ? "active" : ""}`;
+        tile.type = "button";
+        tile.innerHTML = `
+          <img src="${photo.thumb}" alt="${photo.title}" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='${photo.file}';">
+          <span>${liked ? "♥ " : ""}${photo.title}</span>
+        `;
+        tile.addEventListener("click", () => {
+          state.slideDirection = photo.originalIndex >= state.index ? 1 : -1;
+          closeGrid();
+          selectPhoto(photo.originalIndex);
+        });
+        els.gridList.appendChild(tile);
+      });
+    }
+
+    function openGrid() {
+      renderGrid();
+      els.gridModal.classList.add("open");
+      requestAnimationFrame(() => {
+        const activeTile = els.gridList.querySelector(".grid-tile.active");
+        if (activeTile) {
+          activeTile.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+        }
+      });
+    }
+
+    function closeGrid() {
+      els.gridModal.classList.remove("open");
+    }
+
+    function jumpByProgress(event) {
+      const list = filteredPhotos();
+      if (!list.length) return;
+
+      const rect = els.progressWrap.getBoundingClientRect();
+      const ratio = Math.min(Math.max((event.clientX - rect.left) / rect.width, 0), 1);
+      const visibleIndex = Math.min(Math.floor(ratio * list.length), list.length - 1);
+      const target = list[visibleIndex];
+
+      if (!target) return;
+      state.slideDirection = target.originalIndex >= state.index ? 1 : -1;
+      selectPhoto(target.originalIndex);
+    }
+
+    function startLongPress() {
+      state.longPressTriggered = false;
+      clearTimeout(state.longPressTimer);
+      state.longPressTimer = setTimeout(() => {
+        state.longPressTriggered = true;
+        downloadCurrentPhoto();
+      }, 720);
+    }
+
+    function cancelLongPress() {
+      clearTimeout(state.longPressTimer);
     }
 
 
@@ -1254,6 +1582,7 @@
 
     els.favoriteBtn.addEventListener("click", toggleFavorite);
     els.filterBtn.addEventListener("click", toggleFilterFavorites);
+    els.gridBtn.addEventListener("click", openGrid);
     els.musicBtn.addEventListener("click", toggleMusic);
     els.downloadBtn.addEventListener("click", downloadCurrentPhoto);
     els.themeBtn.addEventListener("click", toggleTheme);
@@ -1268,26 +1597,31 @@
     els.frame.addEventListener("pointercancel", handlePointerCancel);
 
     els.modal.addEventListener("click", () => els.modal.classList.remove("open"));
+    els.gridCloseBtn.addEventListener("click", closeGrid);
+    els.gridModal.addEventListener("click", (event) => {
+      if (event.target === els.gridModal) closeGrid();
+    });
+    els.progressWrap.addEventListener("click", jumpByProgress);
+    els.mainImg.addEventListener("pointerdown", startLongPress);
+    els.mainImg.addEventListener("pointerup", cancelLongPress);
+    els.mainImg.addEventListener("pointercancel", cancelLongPress);
+    els.mainImg.addEventListener("pointerleave", cancelLongPress);
+    els.mainImg.addEventListener("contextmenu", (event) => {
+      if (state.longPressTriggered) event.preventDefault();
+    });
     els.mainImg.addEventListener("animationend", () => {
       els.mainImg.classList.remove("slide-in");
     });
 
-    els.fitBtn.addEventListener("click", () => {
-      state.cover = !state.cover;
-      els.mainImg.classList.toggle("fit-cover", state.cover);
-      els.fitBtn.textContent = state.cover ? "▣ 채움" : "▣ 맞춤";
-    });
 
-    els.bwBtn.addEventListener("click", () => {
-      state.bw = !state.bw;
-      els.mainImg.classList.toggle("bw", state.bw);
-      els.bwBtn.textContent = state.bw ? "● 컬러" : "◐ 흑백";
-    });
 
     document.addEventListener("keydown", (event) => {
       if (event.key === "ArrowLeft") move(-1);
       if (event.key === "ArrowRight") move(1);
-      if (event.key === "Escape") els.modal.classList.remove("open");
+      if (event.key === "Escape") {
+        els.modal.classList.remove("open");
+        closeGrid();
+      }
       if (event.key.toLowerCase() === "f") toggleFavorite();
       if (event.key === " ") {
         event.preventDefault();
@@ -1303,7 +1637,9 @@
     updateFilterButton();
     setInterval(renderDateCounts, 1000);
     renderList();
+    renderDots();
     selectPhoto(state.index);
+    requestAnimationFrame(() => document.body.classList.add("intro-ready"));
   </script>
 </body>
 </html>
