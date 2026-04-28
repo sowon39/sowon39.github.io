@@ -15,7 +15,7 @@
   <link rel="icon" type="image/png" sizes="192x192" href="wedding/app-icon-192.png" />
   <link rel="icon" type="image/png" sizes="512x512" href="wedding/app-icon-512.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="wedding/apple-touch-icon.png" />
-  <meta name="description" content="2026.08.30 DK&HL Wedding Book" />
+  <meta name="description" content="2026.08.30 DK&HL Wedding Photos" />
   <link rel="canonical" href="https://sowon39.github.io/index01.html" />
   <link rel="image_src" href="https://sowon39.github.io/wedding/og.jpg?v=5" />
 
@@ -28,7 +28,7 @@
        권장: 1200x630px JPG, 가급적 300KB~1MB 이하 -->
   <meta property="og:type" content="website" />
   <meta property="og:title" content="DK&HL Wedding Book" />
-  <meta property="og:description" content="2026.08.30 DK&HL Wedding Book" />
+  <meta property="og:description" content="2026.08.30 DK&HL Wedding Photos" />
   <meta property="og:url" content="https://sowon39.github.io/index01.html" />
   <meta property="og:site_name" content="DK&HL Wedding Book" />
   <meta property="og:locale" content="ko_KR" />
@@ -41,7 +41,7 @@
 
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="DK&HL Wedding Book" />
-  <meta name="twitter:description" content="2026.08.30 DK&HL Wedding Book" />
+  <meta name="twitter:description" content="2026.08.30 DK&HL Wedding Photos" />
   <meta name="twitter:image" content="https://sowon39.github.io/wedding/og.jpg?v=5" />
 
   <style>
@@ -999,6 +999,115 @@
       color: var(--text);
     }
 
+
+    /* 확대보기 모바일 중앙 정렬 보정 */
+    .modal {
+      align-items: center;
+      justify-items: center;
+    }
+
+    .modal img {
+      display: block;
+      margin: auto;
+      object-fit: contain;
+      transform-origin: center center;
+    }
+
+
+    @media (max-width: 520px) {
+      .modal::before,
+      .modal::after {
+        width: 20px;
+        height: 20px;
+        border-top-width: 1.5px;
+        border-right-width: 1.5px;
+        opacity: 0;
+      }
+
+      .modal.hint::before,
+      .modal.hint::after {
+        opacity: .58;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .modal {
+        padding: 14px;
+      }
+
+      .modal img {
+        max-width: calc(100vw - 28px);
+        max-height: calc(100vh - 28px);
+      }
+
+      .modal::before {
+        left: 14px;
+      }
+
+      .modal::after {
+        right: 14px;
+      }
+    }
+
+
+    /* 확대보기 스와이프 터치감 개선 */
+    .modal {
+      touch-action: none;
+      overscroll-behavior: contain;
+    }
+
+    .modal img {
+      user-select: none;
+      -webkit-user-drag: none;
+      touch-action: none;
+      will-change: transform, opacity;
+      transition: transform .22s ease, opacity .22s ease;
+    }
+
+    .modal img.swiping {
+      transition: none;
+    }
+
+    .modal img.modal-slide-in {
+      animation: modalSlideIn .28s cubic-bezier(.22,.72,.22,1) both;
+    }
+
+    @keyframes modalSlideIn {
+      from {
+        opacity: .72;
+        transform: translateX(var(--modal-slide-from, 18px)) scale(.992);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+      }
+    }
+
+
+    /* 확대보기 열렸을 때 뒤쪽 페이지 스크롤 완전 차단 */
+    body.modal-open {
+      overflow: hidden;
+      position: fixed;
+      width: 100%;
+      left: 0;
+      right: 0;
+      touch-action: none;
+    }
+
+    body.modal-open .app {
+      pointer-events: none;
+    }
+
+    body.modal-open .modal {
+      pointer-events: auto;
+    }
+
+    .modal.open {
+      touch-action: none;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: auto;
+    }
+
     .toast {
       position: fixed;
       left: 50%;
@@ -1453,7 +1562,7 @@
 
   <script>
     const weddingDate = "2026-08-30T14:30:00";
-    const MUSIC_START_TIME = 85;
+    const MUSIC_START_TIME = 76;
 
     const photos = Array.from({ length: 22 }, (_, index) => {
       const number = String(index + 1).padStart(2, "0");
@@ -1529,7 +1638,13 @@
       modalStartX: 0,
       modalStartY: 0,
       modalStartTime: 0,
+      modalCurrentX: 0,
+      modalCurrentY: 0,
+      modalLastX: 0,
+      modalLastTime: 0,
+      modalVelocityX: 0,
       modalHintTimer: null,
+      lockedScrollY: 0,
       deferredInstallPrompt: null
     };
 
@@ -1884,7 +1999,7 @@
       const manifest = {
         name: "DK&HL Wedding Book",
         short_name: "Wedding Book",
-        description: "2026.08.30 DK&HL Wedding Book",
+        description: "2026.08.30 DK&HL Wedding Photos",
         start_url: "/index01.html",
         scope: "/",
         display: "standalone",
@@ -1964,7 +2079,7 @@
     async function sharePage() {
       const url = window.location.href;
       const title = "DK&HL Wedding Book";
-      const text = "2026.08.30 DK&HL Wedding Book";
+      const text = "2026.08.30 DK&HL Wedding Photos";
 
       if (navigator.share) {
         try {
@@ -2020,6 +2135,19 @@
       }
     }
 
+
+    function lockPageScroll() {
+      state.lockedScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+      document.body.style.top = `-${state.lockedScrollY}px`;
+      document.body.classList.add("modal-open");
+    }
+
+    function unlockPageScroll() {
+      document.body.classList.remove("modal-open");
+      document.body.style.top = "";
+      window.scrollTo(0, state.lockedScrollY || 0);
+    }
+
     function updateModalImage() {
       const photo = photos[state.index];
       els.modalImg.src = photo.file;
@@ -2040,6 +2168,7 @@
     function openModal() {
       if (state.slideshow) toggleSlideshow();
       updateModalImage();
+      lockPageScroll();
       els.modal.classList.add("open");
       showModalSwipeHint();
     }
@@ -2053,6 +2182,7 @@
     function closeModal() {
       clearTimeout(state.modalHintTimer);
       els.modal.classList.remove("open", "hint");
+      unlockPageScroll();
     }
 
     function renderGrid() {
@@ -2212,15 +2342,74 @@
     }
 
 
+
+    function preventModalScrollLeak(event) {
+      if (els.modal.classList.contains("open")) {
+        event.preventDefault();
+      }
+    }
+
     function handleModalPointerDown(event) {
+      if (!els.modal.classList.contains("open")) return;
+      if (event.button !== undefined && event.button !== 0) return;
+
       state.modalPointerActive = true;
       state.modalStartX = event.clientX;
       state.modalStartY = event.clientY;
+      state.modalCurrentX = event.clientX;
+      state.modalCurrentY = event.clientY;
+      state.modalLastX = event.clientX;
       state.modalStartTime = Date.now();
+      state.modalLastTime = state.modalStartTime;
+      state.modalVelocityX = 0;
+
+      els.modal.classList.remove("hint");
+      els.modalImg.classList.add("swiping");
 
       try {
         els.modal.setPointerCapture(event.pointerId);
       } catch (error) {}
+    }
+
+    function handleModalPointerMove(event) {
+      if (els.modal.classList.contains("open")) {
+        event.preventDefault();
+      }
+      if (!state.modalPointerActive) return;
+
+      const now = Date.now();
+      const diffX = event.clientX - state.modalStartX;
+      const diffY = event.clientY - state.modalStartY;
+      const dt = Math.max(now - state.modalLastTime, 1);
+
+      state.modalVelocityX = (event.clientX - state.modalLastX) / dt;
+      state.modalCurrentX = event.clientX;
+      state.modalCurrentY = event.clientY;
+      state.modalLastX = event.clientX;
+      state.modalLastTime = now;
+
+      const mostlyHorizontal = Math.abs(diffX) > Math.abs(diffY) * .75;
+
+      if (mostlyHorizontal) {
+        event.preventDefault();
+        const limitedX = Math.max(Math.min(diffX, 90), -90);
+        const opacity = Math.max(1 - Math.abs(limitedX) / 320, .72);
+        els.modalImg.style.transform = `translateX(${limitedX}px) scale(.995)`;
+        els.modalImg.style.opacity = String(opacity);
+      }
+    }
+
+    function resetModalDragStyle() {
+      els.modalImg.classList.remove("swiping");
+      els.modalImg.style.transform = "";
+      els.modalImg.style.opacity = "";
+    }
+
+    function animateModalSlide(direction) {
+      els.modalImg.classList.remove("modal-slide-in");
+      els.modalImg.style.setProperty("--modal-slide-from", `${direction * 22}px`);
+      void els.modalImg.offsetWidth;
+      els.modalImg.classList.add("modal-slide-in");
     }
 
     function handleModalPointerUp(event) {
@@ -2228,13 +2417,23 @@
 
       const diffX = event.clientX - state.modalStartX;
       const diffY = event.clientY - state.modalStartY;
-      const elapsed = Date.now() - state.modalStartTime;
-      state.modalPointerActive = false;
+      const elapsed = Math.max(Date.now() - state.modalStartTime, 1);
+      const averageVelocityX = diffX / elapsed;
+      const velocityX = Math.abs(state.modalVelocityX) > Math.abs(averageVelocityX)
+        ? state.modalVelocityX
+        : averageVelocityX;
 
-      const isHorizontalSwipe = Math.abs(diffX) > 44 && Math.abs(diffX) > Math.abs(diffY) * 1.2;
+      state.modalPointerActive = false;
+      resetModalDragStyle();
+
+      const distancePass = Math.abs(diffX) > 34 && Math.abs(diffX) > Math.abs(diffY) * .9;
+      const velocityPass = Math.abs(velocityX) > .32 && Math.abs(diffX) > 18;
+      const isHorizontalSwipe = distancePass || velocityPass;
+
       if (isHorizontalSwipe) {
-        els.modal.classList.remove("hint");
-        moveModal(diffX < 0 ? 1 : -1);
+        const step = diffX < 0 ? 1 : -1;
+        moveModal(step);
+        animateModalSlide(step >= 0 ? 1 : -1);
         return;
       }
 
@@ -2246,6 +2445,7 @@
 
     function handleModalPointerCancel() {
       state.modalPointerActive = false;
+      resetModalDragStyle();
     }
 
     function isPageAtTop() {
@@ -2328,8 +2528,12 @@
     els.frame.addEventListener("pointercancel", handlePointerCancel);
 
     els.modal.addEventListener("pointerdown", handleModalPointerDown);
+    els.modal.addEventListener("pointermove", handleModalPointerMove);
     els.modal.addEventListener("pointerup", handleModalPointerUp);
     els.modal.addEventListener("pointercancel", handleModalPointerCancel);
+    els.modal.addEventListener("lostpointercapture", handleModalPointerCancel);
+    els.modal.addEventListener("touchmove", preventModalScrollLeak, { passive: false });
+    els.modal.addEventListener("wheel", preventModalScrollLeak, { passive: false });
     els.gridCloseBtn.addEventListener("click", closeGrid);
     els.gridModal.addEventListener("click", (event) => {
       if (event.target === els.gridModal) closeGrid();
@@ -2348,6 +2552,9 @@
     });
     els.mainImg.addEventListener("animationend", () => {
       els.mainImg.classList.remove("slide-in");
+    });
+    els.modalImg.addEventListener("animationend", () => {
+      els.modalImg.classList.remove("modal-slide-in");
     });
 
 
