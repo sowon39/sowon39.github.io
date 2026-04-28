@@ -2339,6 +2339,142 @@
       }
     }
 
+  
+    /* ✅ 확대보기 핀치줌 최종 수정 */
+    .modal.open {
+      touch-action: none !important;
+      overflow: hidden !important;
+    }
+
+    .modal.open img {
+      touch-action: none !important;
+      user-select: none !important;
+      -webkit-user-select: none !important;
+      -webkit-user-drag: none !important;
+      transform-origin: center center !important;
+      will-change: transform, opacity !important;
+    }
+
+    .modal.open img.is-zoomed {
+      cursor: grab;
+      transition: none !important;
+    }
+
+    .modal.open img.is-pinching {
+      transition: none !important;
+    }
+
+  
+    /* 🎬 시네마틱 효과 최종 강화 */
+    body.immersive .stage,
+    body.immersive .frame {
+      overflow: visible !important;
+    }
+
+    body.immersive .main-img {
+      max-width: 78vw !important;
+      max-height: 68dvh !important;
+      will-change: transform, opacity, filter;
+    }
+
+    body.immersive .main-img.slide-in {
+      animation-duration: 1.35s, 4.8s !important;
+      animation-timing-function: cubic-bezier(.19,.78,.26,1), cubic-bezier(.25,.1,.25,1) !important;
+      animation-fill-mode: both, forwards !important;
+    }
+
+    body.immersive .main-img.cine-sweep-right { animation-name: cineEnterRight, cineSweepRight !important; }
+    body.immersive .main-img.cine-sweep-left { animation-name: cineEnterLeft, cineSweepLeft !important; }
+    body.immersive .main-img.cine-rise-big { animation-name: cineEnterRise, cineRiseBig !important; }
+    body.immersive .main-img.cine-drop-soft { animation-name: cineEnterDrop, cineDropSoft !important; }
+    body.immersive .main-img.cine-push-deep { animation-name: cineFadeSoft, cinePushDeep !important; }
+    body.immersive .main-img.cine-pull-wide { animation-name: cineFadeSoft, cinePullWide !important; }
+    body.immersive .main-img.cine-tilt-drift { animation-name: cineFadeSoft, cineTiltDrift !important; }
+    body.immersive .main-img.cine-orbit-wide { animation-name: cineFadeSoft, cineOrbitWide !important; }
+    body.immersive .main-img.cine-parallax { animation-name: cineEnterParallax, cineParallax !important; }
+
+    @keyframes cineEnterRight {
+      0% { opacity: 0; transform: translateX(92px) scale(.985); filter: brightness(1.16) saturate(.94); }
+      100% { opacity: 1; transform: translateX(0) scale(1); filter: brightness(1) saturate(1); }
+    }
+
+    @keyframes cineEnterLeft {
+      0% { opacity: 0; transform: translateX(-92px) scale(.985); filter: brightness(1.16) saturate(.94); }
+      100% { opacity: 1; transform: translateX(0) scale(1); filter: brightness(1) saturate(1); }
+    }
+
+    @keyframes cineEnterRise {
+      0% { opacity: 0; transform: translateY(72px) scale(.982); filter: brightness(1.14) saturate(.95); }
+      100% { opacity: 1; transform: translateY(0) scale(1); filter: brightness(1) saturate(1); }
+    }
+
+    @keyframes cineEnterDrop {
+      0% { opacity: 0; transform: translateY(-58px) scale(.988); filter: brightness(1.12) saturate(.96); }
+      100% { opacity: 1; transform: translateY(0) scale(1); filter: brightness(1) saturate(1); }
+    }
+
+    @keyframes cineEnterParallax {
+      0% { opacity: 0; transform: translate(70px, 28px) scale(.985); filter: brightness(1.16) saturate(.94); }
+      100% { opacity: 1; transform: translate(0, 0) scale(1); filter: brightness(1) saturate(1); }
+    }
+
+    @keyframes cineFadeSoft {
+      0% { opacity: 0; filter: brightness(1.14) saturate(.95); }
+      100% { opacity: 1; filter: brightness(1) saturate(1); }
+    }
+
+    @keyframes cineSweepRight {
+      from { transform: translateX(-54px) scale(1.035); }
+      to { transform: translateX(34px) scale(1.055); }
+    }
+
+    @keyframes cineSweepLeft {
+      from { transform: translateX(54px) scale(1.035); }
+      to { transform: translateX(-34px) scale(1.055); }
+    }
+
+    @keyframes cineRiseBig {
+      from { transform: translateY(42px) scale(1.025); }
+      to { transform: translateY(-34px) scale(1.052); }
+    }
+
+    @keyframes cineDropSoft {
+      from { transform: translateY(-38px) scale(1.025); }
+      to { transform: translateY(30px) scale(1.048); }
+    }
+
+    @keyframes cinePushDeep {
+      from { transform: scale(1); }
+      to { transform: scale(1.08); }
+    }
+
+    @keyframes cinePullWide {
+      from { transform: scale(1.08); }
+      to { transform: scale(1.01); }
+    }
+
+    @keyframes cineTiltDrift {
+      from { transform: rotate(-.85deg) translateX(-28px) scale(1.035); }
+      to { transform: rotate(.85deg) translateX(28px) scale(1.05); }
+    }
+
+    @keyframes cineOrbitWide {
+      0% { transform: translate(-34px, 24px) scale(1.035) rotate(-.35deg); }
+      100% { transform: translate(34px, -24px) scale(1.052) rotate(.35deg); }
+    }
+
+    @keyframes cineParallax {
+      0% { transform: translate(-42px, 24px) scale(1.03); }
+      100% { transform: translate(42px, -18px) scale(1.055); }
+    }
+
+    @media (max-width: 520px) {
+      body.immersive .main-img {
+        max-width: 76vw !important;
+        max-height: 66dvh !important;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -2451,7 +2587,7 @@
       </div>
     </div>
   </div>
-  <div id="pullRefresh" class="pull-refresh" aria-hidden="true"><span></span><b>새로고침</b></div>
+  <div id="pullRefresh" class="pull-refresh" aria-hidden="true"><span></span><b>더 당기면 새로고침</b></div>
   <div id="toast" class="toast"></div>
   <audio id="bgm" src="wedding/ae.mp3" loop preload="none"></audio>
 
@@ -2524,6 +2660,7 @@
       pullStartY: 0,
       pullActive: false,
       pullDistance: 0,
+      pullStartedAtTopY: 0,
       imageCache: new Map(),
       thumbCache: new Map(),
       slideDirection: 1,
@@ -2743,7 +2880,16 @@
         "cine-push-in",
         "cine-pull-back",
         "cine-tilt",
-        "cine-orbit"
+        "cine-orbit",
+        "cine-sweep-right",
+        "cine-sweep-left",
+        "cine-rise-big",
+        "cine-drop-soft",
+        "cine-push-deep",
+        "cine-pull-wide",
+        "cine-tilt-drift",
+        "cine-orbit-wide",
+        "cine-parallax"
       );
     }
 
@@ -2753,13 +2899,15 @@
       if (!document.body.classList.contains("immersive")) return;
 
       const cinematicEffects = [
-        "cine-drift-right",
-        "cine-drift-left",
-        "cine-rise",
-        "cine-push-in",
-        "cine-pull-back",
-        "cine-tilt",
-        "cine-orbit"
+        "cine-sweep-right",
+        "cine-sweep-left",
+        "cine-rise-big",
+        "cine-drop-soft",
+        "cine-push-deep",
+        "cine-pull-wide",
+        "cine-tilt-drift",
+        "cine-orbit-wide",
+        "cine-parallax"
       ];
 
       let nextEffectIndex = Math.floor(Math.random() * cinematicEffects.length);
@@ -3091,7 +3239,7 @@
 
         // 음악은 자동 슬라이드와 분리합니다.
         // 이미 재생 중인 음악은 그대로 이어지고, 꺼져 있으면 그대로 꺼진 상태를 유지합니다.
-        state.slideshow = setInterval(() => move(1), 4500);
+        state.slideshow = setInterval(() => move(1), 3000);
         els.slideshowBtn.textContent = "Ⅱ 정지";
         toast("자동 재생 시작");
       }
@@ -3099,18 +3247,23 @@
 
 
 
+
+
+
+
     function resetModalZoom() {
       state.modalScale = 1;
       state.modalTranslateX = 0;
       state.modalTranslateY = 0;
+      state.modalPinching = false;
+      state.modalPinchStartDistance = 0;
+      state.modalPinchStartScale = 1;
       state.modalPanStartX = 0;
       state.modalPanStartY = 0;
       state.modalStartTranslateX = 0;
       state.modalStartTranslateY = 0;
-      state.modalPinching = false;
-      state.modalPinchStartDistance = 0;
-      state.modalPinchStartScale = 1;
-      els.modalImg.classList.remove("is-zoomed");
+
+      els.modalImg.classList.remove("is-zoomed", "is-pinching");
       els.modalImg.style.transform = "";
       els.modalImg.style.opacity = "";
     }
@@ -3123,6 +3276,9 @@
 
     function applyModalTransform() {
       if (state.modalScale <= 1.01) {
+        state.modalScale = 1;
+        state.modalTranslateX = 0;
+        state.modalTranslateY = 0;
         els.modalImg.classList.remove("is-zoomed");
         els.modalImg.style.transform = "";
         return;
@@ -3133,15 +3289,30 @@
         `translate3d(${state.modalTranslateX}px, ${state.modalTranslateY}px, 0) scale(${state.modalScale})`;
     }
 
-    function applyModalZoom(scale) {
-      state.modalScale = Math.min(Math.max(scale, 1), 3.2);
-
+    function clampModalPan() {
       if (state.modalScale <= 1.01) {
+        state.modalTranslateX = 0;
+        state.modalTranslateY = 0;
+        return;
+      }
+
+      const maxX = Math.min(window.innerWidth * 0.42, 260) * (state.modalScale - 1);
+      const maxY = Math.min(window.innerHeight * 0.42, 320) * (state.modalScale - 1);
+
+      state.modalTranslateX = Math.max(Math.min(state.modalTranslateX, maxX), -maxX);
+      state.modalTranslateY = Math.max(Math.min(state.modalTranslateY, maxY), -maxY);
+    }
+
+    function applyModalZoom(scale) {
+      state.modalScale = Math.min(Math.max(scale, 1), 4);
+
+      if (state.modalScale < 1.03) {
         state.modalScale = 1;
         state.modalTranslateX = 0;
         state.modalTranslateY = 0;
       }
 
+      clampModalPan();
       applyModalTransform();
     }
 
@@ -3150,17 +3321,22 @@
 
       if (event.touches.length === 2) {
         event.preventDefault();
+        event.stopPropagation();
+
         state.modalPinching = true;
         state.modalPointerActive = false;
         state.modalPinchStartDistance = getTouchDistance(event.touches);
         state.modalPinchStartScale = state.modalScale || 1;
         els.modal.classList.remove("hint");
         els.modalImg.classList.remove("swiping");
+        els.modalImg.classList.add("is-pinching");
         return;
       }
 
       if (event.touches.length === 1 && state.modalScale > 1.01) {
         event.preventDefault();
+        event.stopPropagation();
+
         state.modalPanStartX = event.touches[0].clientX;
         state.modalPanStartY = event.touches[0].clientY;
         state.modalStartTranslateX = state.modalTranslateX;
@@ -3171,9 +3347,18 @@
     function handleModalTouchMove(event) {
       if (!els.modal.classList.contains("open")) return;
 
-      if (state.modalPinching && event.touches.length === 2) {
+      if (event.touches.length === 2) {
         event.preventDefault();
         event.stopPropagation();
+
+        if (!state.modalPinching) {
+          state.modalPinching = true;
+          state.modalPinchStartDistance = getTouchDistance(event.touches);
+          state.modalPinchStartScale = state.modalScale || 1;
+          els.modalImg.classList.add("is-pinching");
+          return;
+        }
+
         const currentDistance = getTouchDistance(event.touches);
         if (!state.modalPinchStartDistance) return;
 
@@ -3188,24 +3373,36 @@
 
         const dx = event.touches[0].clientX - state.modalPanStartX;
         const dy = event.touches[0].clientY - state.modalPanStartY;
-        const maxX = Math.min(window.innerWidth * .34, 180) * (state.modalScale - 1);
-        const maxY = Math.min(window.innerHeight * .34, 220) * (state.modalScale - 1);
 
-        state.modalTranslateX = Math.max(Math.min(state.modalStartTranslateX + dx, maxX), -maxX);
-        state.modalTranslateY = Math.max(Math.min(state.modalStartTranslateY + dy, maxY), -maxY);
+        state.modalTranslateX = state.modalStartTranslateX + dx;
+        state.modalTranslateY = state.modalStartTranslateY + dy;
+        clampModalPan();
         applyModalTransform();
       }
     }
 
     function handleModalTouchEnd(event) {
+      if (!els.modal.classList.contains("open")) return;
+
       if (state.modalPinching && event.touches.length < 2) {
+        event.preventDefault();
+        event.stopPropagation();
+
         state.modalPinching = false;
-        if (state.modalScale < 1.04) {
+        els.modalImg.classList.remove("is-pinching");
+
+        if (state.modalScale < 1.03) {
           applyModalZoom(1);
+        }
+
+        if (event.touches.length === 1 && state.modalScale > 1.01) {
+          state.modalPanStartX = event.touches[0].clientX;
+          state.modalPanStartY = event.touches[0].clientY;
+          state.modalStartTranslateX = state.modalTranslateX;
+          state.modalStartTranslateY = state.modalTranslateY;
         }
       }
     }
-
 
 
     function lockPageScroll() {
@@ -3427,6 +3624,7 @@
     function handleModalPointerDown(event) {
       if (!els.modal.classList.contains("open")) return;
       if (state.modalPinching || state.modalScale > 1.01) return;
+      if (state.modalPinching || state.modalScale > 1.01) return;
       if (event.button !== undefined && event.button !== 0) return;
 
       state.modalPointerActive = true;
@@ -3451,6 +3649,7 @@
       if (els.modal.classList.contains("open")) {
         event.preventDefault();
       }
+      if (state.modalPinching || state.modalScale > 1.01) return;
       if (state.modalPinching || state.modalScale > 1.01) return;
       if (!state.modalPointerActive) return;
 
@@ -3538,16 +3737,20 @@
     }
 
     function showPullRefresh(distance) {
-      const threshold = 92;
+      const threshold = 165;
       const progress = Math.min(distance / threshold, 1);
       els.pullRefresh.classList.add("show");
       els.pullRefresh.classList.toggle("ready", distance >= threshold);
+      const label = els.pullRefresh.querySelector("b");
+      if (label) label.textContent = distance >= threshold ? "놓으면 새로고침" : "더 당기면 새로고침";
       els.pullRefresh.style.opacity = String(Math.min(progress + .15, 1));
       els.pullRefresh.style.transform = `translateX(-50%) translateY(${Math.min(distance * .42, 42) - 26}px) scale(${.96 + progress * .04})`;
     }
 
     function resetPullRefresh() {
       els.pullRefresh.classList.remove("show", "ready", "loading");
+      const label = els.pullRefresh.querySelector("b");
+      if (label) label.textContent = "더 당기면 새로고침";
       els.pullRefresh.style.opacity = "";
       els.pullRefresh.style.transform = "";
       state.pullActive = false;
@@ -3555,45 +3758,91 @@
     }
 
     function enablePullToRefresh() {
+      const threshold = 165;
+      const minHoldTime = 240;
+      const showAfter = 56;
+      const maxAllowedSpeed = 1.15;
+
+      let pulling = false;
+      let startTime = 0;
+
       window.addEventListener("touchstart", (event) => {
         if (!event.touches || event.touches.length !== 1) return;
         if (!isPageAtTop()) return;
+        if (els.modal.classList.contains("open")) return;
+        if (state.slideshow) return;
 
         state.pullStartY = event.touches[0].clientY;
+        state.pullStartedAtTopY = state.pullStartY;
         state.pullActive = true;
         state.pullDistance = 0;
+        pulling = true;
+        startTime = Date.now();
       }, { passive: true });
 
       window.addEventListener("touchmove", (event) => {
-        if (!state.pullActive || !event.touches || event.touches.length !== 1) return;
+        if (!pulling || !state.pullActive) return;
+        if (!event.touches || event.touches.length !== 1) return;
+        if (els.modal.classList.contains("open")) return;
 
-        const distance = event.touches[0].clientY - state.pullStartY;
-        if (distance > 0 && isPageAtTop()) {
-          state.pullDistance = Math.min(distance, 140);
+        const currentY = event.touches[0].clientY;
+        const distance = currentY - state.pullStartY;
+        const elapsed = Math.max(Date.now() - startTime, 1);
+        const speed = distance / elapsed;
+
+        // 위로 스크롤하거나, 중간에 페이지가 맨 위가 아니게 되면 새로고침 의도 아님
+        if (distance <= 0 || !isPageAtTop()) {
+          pulling = false;
+          resetPullRefresh();
+          return;
+        }
+
+        // 빠르게 휙 움직이는 플릭은 새로고침 의도에서 제외
+        if (distance > 0 && speed > maxAllowedSpeed && elapsed < 180) {
+          pulling = false;
+          resetPullRefresh();
+          return;
+        }
+
+        // 충분히 끌어내리기 전까지는 UI도 안 띄움
+        if (distance > showAfter) {
+          state.pullDistance = Math.min(distance, 230);
           showPullRefresh(state.pullDistance);
-          if (distance > 18) event.preventDefault();
+          event.preventDefault();
         }
       }, { passive: false });
 
       window.addEventListener("touchend", () => {
-        if (!state.pullActive) return;
+        if (!pulling || !state.pullActive) {
+          pulling = false;
+          resetPullRefresh();
+          return;
+        }
 
-        if (state.pullDistance >= 92) {
+        const holdTime = Date.now() - startTime;
+        const shouldRefresh =
+          state.pullDistance >= threshold &&
+          holdTime >= minHoldTime &&
+          isPageAtTop();
+
+        if (shouldRefresh) {
           els.pullRefresh.classList.remove("ready");
           els.pullRefresh.classList.add("show", "loading");
           els.pullRefresh.style.opacity = "1";
-          els.pullRefresh.style.transform = "translateX(-50%) translateY(18px) scale(1)";
-          setTimeout(() => window.location.reload(), 420);
+          els.pullRefresh.style.transform = "translateX(-50%) translateY(24px) scale(1)";
+          setTimeout(() => window.location.reload(), 460);
         } else {
           resetPullRefresh();
         }
+
+        pulling = false;
+      }, { passive: true });
+
+      window.addEventListener("touchcancel", () => {
+        pulling = false;
+        resetPullRefresh();
       }, { passive: true });
     }
-
-
-
-
-
 
     els.favoriteBtn.addEventListener("click", toggleFavorite);
     els.filterBtn.addEventListener("click", toggleFilterFavorites);
@@ -3612,14 +3861,14 @@
     els.frame.addEventListener("pointerup", handlePointerUp);
     els.frame.addEventListener("pointercancel", handlePointerCancel);
 
+    els.modal.addEventListener("touchstart", handleModalTouchStart, { passive: false });
+    els.modal.addEventListener("touchmove", handleModalTouchMove, { passive: false });
+    els.modal.addEventListener("touchend", handleModalTouchEnd, { passive: false });
     els.modal.addEventListener("pointerdown", handleModalPointerDown);
     els.modal.addEventListener("pointermove", handleModalPointerMove);
     els.modal.addEventListener("pointerup", handleModalPointerUp);
     els.modal.addEventListener("pointercancel", handleModalPointerCancel);
     els.modal.addEventListener("lostpointercapture", handleModalPointerCancel);
-    els.modal.addEventListener("touchstart", handleModalTouchStart, { passive: false });
-    els.modal.addEventListener("touchmove", handleModalTouchMove, { passive: false });
-    els.modal.addEventListener("touchend", handleModalTouchEnd, { passive: false });
     els.modal.addEventListener("touchmove", preventModalScrollLeak, { passive: false });
     els.modal.addEventListener("wheel", preventModalScrollLeak, { passive: false });
     els.gridCloseBtn.addEventListener("click", closeGrid);
