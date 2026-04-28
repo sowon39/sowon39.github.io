@@ -150,6 +150,24 @@
       font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
+
+    .dday-link {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
+      transition: transform .22s ease, box-shadow .22s ease;
+    }
+
+    .dday-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 46px rgba(198, 104, 117, .28);
+    }
+
+    .dday-link:active {
+      transform: translateY(0) scale(.995);
+    }
+
     .count-card.highlight {
       background: linear-gradient(135deg, rgba(216,139,149,.96), rgba(245,190,172,.92));
       color: #fff;
@@ -173,6 +191,64 @@
       font-size: 11px;
       font-weight: 700;
       opacity: .72;
+    }
+
+
+    .dday-summary {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 14px;
+      margin: 0 0 14px;
+    }
+
+    .dday-kicker {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      opacity: .72;
+    }
+
+    .calendar-dday {
+      display: block;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: clamp(34px, 5vw, 46px);
+      line-height: .94;
+      letter-spacing: -.08em;
+      color: #fff;
+      text-shadow: 0 10px 28px rgba(90,44,52,.18);
+    }
+
+    .dday-place {
+      display: block;
+      margin-bottom: 2px;
+      text-align: right;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1.45;
+      opacity: .82;
+    }
+
+    .countdown-title {
+      position: relative;
+      z-index: 1;
+      margin: 2px 0 8px;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .02em;
+      opacity: .76;
+    }
+
+    .exact-countdown {
+      position: relative;
+      z-index: 1;
     }
 
     .flip-row {
@@ -1345,6 +1421,136 @@
       transform-origin: center center;
     }
 
+
+    /* 자동 슬라이드 위치/감성 효과 강화 */
+    body.immersive .stage {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: clamp(20px, 4vw, 48px);
+    }
+
+    body.immersive .frame {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    body.immersive .main-img {
+      max-width: min(92vw, 100%);
+      max-height: min(82vh, 100%);
+      object-fit: contain;
+      margin: auto;
+    }
+
+    body.immersive .main-img.slide-in {
+      animation-duration: 1.35s, 4.2s;
+      animation-timing-function: ease, ease;
+      animation-fill-mode: both, forwards;
+    }
+
+    body.immersive .main-img.effect-zoom-in {
+      animation-name: weddingFadeIn, slowZoomIn;
+    }
+
+    body.immersive .main-img.effect-zoom-out {
+      animation-name: weddingFadeInZoomOut, slowZoomOut;
+    }
+
+    body.immersive .main-img.effect-pan-left {
+      animation-name: weddingFadeIn, slowPanLeft;
+    }
+
+    body.immersive .main-img.effect-pan-right {
+      animation-name: weddingFadeIn, slowPanRight;
+    }
+
+    body.immersive .main-img.effect-float {
+      animation-name: weddingFadeInFloat, slowFloat;
+    }
+
+    @keyframes slowZoomIn {
+      from { transform: scale(1); }
+      to { transform: scale(1.025); }
+    }
+
+    @keyframes weddingFadeInZoomOut {
+      0% {
+        opacity: 0;
+        transform: scale(1.045);
+        filter: brightness(1.12) saturate(.94);
+      }
+      55% {
+        opacity: .86;
+        filter: brightness(1.04) saturate(.98);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1.025);
+        filter: brightness(1) saturate(1);
+      }
+    }
+
+    @keyframes slowZoomOut {
+      from { transform: scale(1.025); }
+      to { transform: scale(1); }
+    }
+
+    @keyframes slowPanLeft {
+      from { transform: scale(1.018) translateX(8px); }
+      to { transform: scale(1.018) translateX(-8px); }
+    }
+
+    @keyframes slowPanRight {
+      from { transform: scale(1.018) translateX(-8px); }
+      to { transform: scale(1.018) translateX(8px); }
+    }
+
+    @keyframes weddingFadeInFloat {
+      0% {
+        opacity: 0;
+        transform: translateY(8px) scale(1.035);
+        filter: brightness(1.1) saturate(.96);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: brightness(1) saturate(1);
+      }
+    }
+
+    @keyframes slowFloat {
+      from { transform: translateY(4px) scale(1.012); }
+      to { transform: translateY(-4px) scale(1.018); }
+    }
+
+    @media (max-width: 920px) {
+      body.immersive .stage {
+        min-height: 100svh;
+        padding: 18px 12px;
+      }
+
+      body.immersive .main-img {
+        max-width: 94vw;
+        max-height: 78svh;
+      }
+    }
+
+    @media (max-width: 520px) {
+      body.immersive .stage {
+        min-height: 100svh;
+        padding: 16px 10px;
+      }
+
+      body.immersive .main-img {
+        max-width: 94vw;
+        max-height: 76svh;
+      }
+    }
+
     @media (max-width: 920px) {
       body.immersive .main-img {
         max-width: 94vw;
@@ -1356,6 +1562,136 @@
       body.immersive .main-img {
         max-width: 94vw;
         max-height: 80vh;
+      }
+    }
+
+
+    /* 자동 슬라이드 위치/감성 효과 강화 */
+    body.immersive .stage {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: clamp(20px, 4vw, 48px);
+    }
+
+    body.immersive .frame {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    body.immersive .main-img {
+      max-width: min(92vw, 100%);
+      max-height: min(82vh, 100%);
+      object-fit: contain;
+      margin: auto;
+    }
+
+    body.immersive .main-img.slide-in {
+      animation-duration: 1.35s, 4.2s;
+      animation-timing-function: ease, ease;
+      animation-fill-mode: both, forwards;
+    }
+
+    body.immersive .main-img.effect-zoom-in {
+      animation-name: weddingFadeIn, slowZoomIn;
+    }
+
+    body.immersive .main-img.effect-zoom-out {
+      animation-name: weddingFadeInZoomOut, slowZoomOut;
+    }
+
+    body.immersive .main-img.effect-pan-left {
+      animation-name: weddingFadeIn, slowPanLeft;
+    }
+
+    body.immersive .main-img.effect-pan-right {
+      animation-name: weddingFadeIn, slowPanRight;
+    }
+
+    body.immersive .main-img.effect-float {
+      animation-name: weddingFadeInFloat, slowFloat;
+    }
+
+    @keyframes slowZoomIn {
+      from { transform: scale(1); }
+      to { transform: scale(1.025); }
+    }
+
+    @keyframes weddingFadeInZoomOut {
+      0% {
+        opacity: 0;
+        transform: scale(1.045);
+        filter: brightness(1.12) saturate(.94);
+      }
+      55% {
+        opacity: .86;
+        filter: brightness(1.04) saturate(.98);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1.025);
+        filter: brightness(1) saturate(1);
+      }
+    }
+
+    @keyframes slowZoomOut {
+      from { transform: scale(1.025); }
+      to { transform: scale(1); }
+    }
+
+    @keyframes slowPanLeft {
+      from { transform: scale(1.018) translateX(8px); }
+      to { transform: scale(1.018) translateX(-8px); }
+    }
+
+    @keyframes slowPanRight {
+      from { transform: scale(1.018) translateX(-8px); }
+      to { transform: scale(1.018) translateX(8px); }
+    }
+
+    @keyframes weddingFadeInFloat {
+      0% {
+        opacity: 0;
+        transform: translateY(8px) scale(1.035);
+        filter: brightness(1.1) saturate(.96);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: brightness(1) saturate(1);
+      }
+    }
+
+    @keyframes slowFloat {
+      from { transform: translateY(4px) scale(1.012); }
+      to { transform: translateY(-4px) scale(1.018); }
+    }
+
+    @media (max-width: 920px) {
+      body.immersive .stage {
+        min-height: 100svh;
+        padding: 18px 12px;
+      }
+
+      body.immersive .main-img {
+        max-width: 94vw;
+        max-height: 78svh;
+      }
+    }
+
+    @media (max-width: 520px) {
+      body.immersive .stage {
+        min-height: 100svh;
+        padding: 16px 10px;
+      }
+
+      body.immersive .main-img {
+        max-width: 94vw;
+        max-height: 76svh;
       }
     }
 
@@ -1464,12 +1800,19 @@
     <aside class="sidebar">
       <section class="brand">
         <div class="date-grid" aria-label="날짜 카운트">
-          <div class="count-card highlight d-day-card">
+          <a class="count-card highlight d-day-card dday-link" href="https://naver.me/xQeEV26v" target="_blank" rel="noopener noreferrer" title="예식장 위치 보기">
             <span class="count-label">Wedding Day <small>2026.08.30</small></span>
-            <h2 class="dday-headline">D-day<span class="dday-sub">2026.08.30 14:30 그레이스파티 인천(부평역)</span></h2>
-            <div class="flip-row" aria-live="polite">
+            <div class="dday-summary">
+              <div>
+                <span class="dday-kicker">Calendar D-day</span>
+                <strong id="calendarDday" class="calendar-dday">D-000</strong>
+              </div>
+              <span class="dday-place">2026.08.30 14:30<br>그레이스파티 인천(부평역)</span>
+            </div>
+            <div class="countdown-title">실시간 카운트다운</div>
+            <div class="flip-row exact-countdown" aria-live="polite">
               <div class="flip-unit">
-                <div id="ddayDays" class="flip-number">000</div>
+                <div id="ddayExactDays" class="flip-number">000</div>
                 <span class="flip-caption">DAYS</span>
               </div>
               <div class="flip-unit">
@@ -1485,7 +1828,7 @@
                 <span class="flip-caption">SEC</span>
               </div>
             </div>
-          </div>
+          </a>
         </div>
       </section>
 
@@ -1562,7 +1905,7 @@
 
   <script>
     const weddingDate = "2026-08-30T14:30:00";
-    const MUSIC_START_TIME = 76;
+    const MUSIC_START_TIME = 85;
 
     const photos = Array.from({ length: 22 }, (_, index) => {
       const number = String(index + 1).padStart(2, "0");
@@ -1606,7 +1949,8 @@
       toast: document.getElementById("toast"),
       pullRefresh: document.getElementById("pullRefresh"),
       bgm: document.getElementById("bgm"),
-      ddayDays: document.getElementById("ddayDays"),
+      calendarDday: document.getElementById("calendarDday"),
+      ddayExactDays: document.getElementById("ddayExactDays"),
       ddayHours: document.getElementById("ddayHours"),
       ddayMinutes: document.getElementById("ddayMinutes"),
       ddaySeconds: document.getElementById("ddaySeconds")
@@ -1645,6 +1989,7 @@
       modalVelocityX: 0,
       modalHintTimer: null,
       lockedScrollY: 0,
+      lastEffectIndex: -1,
       deferredInstallPrompt: null
     };
 
@@ -1678,20 +2023,28 @@
     function getCountdown() {
       const now = new Date();
       const target = new Date(weddingDate);
-      const diff = target - now;
-      const abs = Math.abs(diff);
+
+      // D-day 대표 표기는 날짜 기준입니다. 시간 때문에 하루 적게 보이지 않게 합니다.
+      const todayDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const targetDateOnly = new Date(target.getFullYear(), target.getMonth(), target.getDate());
+      const calendarDays = Math.max(Math.ceil((targetDateOnly - todayDateOnly) / 86400000), 0);
+
+      // 실시간 카운트다운은 실제 예식 시간(2026-08-30 14:30) 기준입니다.
+      const timeDiff = Math.max(target - now, 0);
 
       return {
-        days: Math.floor(abs / 86400000),
-        hours: Math.floor((abs % 86400000) / 3600000),
-        minutes: Math.floor((abs % 3600000) / 60000),
-        seconds: Math.floor((abs % 60000) / 1000)
+        calendarDays,
+        exactDays: Math.floor(timeDiff / 86400000),
+        hours: Math.floor((timeDiff % 86400000) / 3600000),
+        minutes: Math.floor((timeDiff % 3600000) / 60000),
+        seconds: Math.floor((timeDiff % 60000) / 1000)
       };
     }
 
     function renderDateCounts() {
       const countdown = getCountdown();
-      setFlipValue(els.ddayDays, pad(countdown.days, 3), "days");
+      els.calendarDday.textContent = `D-${countdown.calendarDays.toLocaleString("ko-KR")}`;
+      setFlipValue(els.ddayExactDays, pad(countdown.exactDays, 3), "exactDays");
       setFlipValue(els.ddayHours, pad(countdown.hours), "hours");
       setFlipValue(els.ddayMinutes, pad(countdown.minutes), "minutes");
       setFlipValue(els.ddaySeconds, pad(countdown.seconds), "seconds");
@@ -1808,6 +2161,39 @@
       }
     }
 
+
+    function clearPhotoEffects() {
+      els.mainImg.classList.remove(
+        "effect-zoom-in",
+        "effect-zoom-out",
+        "effect-pan-left",
+        "effect-pan-right",
+        "effect-float"
+      );
+    }
+
+    function applyRandomPhotoEffect() {
+      clearPhotoEffects();
+
+      if (!document.body.classList.contains("immersive")) return;
+
+      const effects = [
+        "effect-zoom-in",
+        "effect-zoom-out",
+        "effect-pan-left",
+        "effect-pan-right",
+        "effect-float"
+      ];
+
+      let nextEffectIndex = Math.floor(Math.random() * effects.length);
+      if (nextEffectIndex === state.lastEffectIndex) {
+        nextEffectIndex = (nextEffectIndex + 1) % effects.length;
+      }
+
+      state.lastEffectIndex = nextEffectIndex;
+      els.mainImg.classList.add(effects[nextEffectIndex]);
+    }
+
     function selectPhoto(index) {
       state.index = (index + photos.length) % photos.length;
       const photo = photos[state.index];
@@ -1848,6 +2234,8 @@
 
         requestAnimationFrame(() => {
           els.mainImg.classList.remove("changing");
+          clearPhotoEffects();
+          applyRandomPhotoEffect();
           void els.mainImg.offsetWidth;
           els.mainImg.classList.add("slide-in");
           els.frame.classList.remove("is-loading");
@@ -2113,6 +2501,7 @@
     function exitImmersiveMode() {
       state.immersive = false;
       document.body.classList.remove("immersive");
+      clearPhotoEffects();
     }
 
     function toggleSlideshow() {
@@ -2552,6 +2941,9 @@
     });
     els.mainImg.addEventListener("animationend", () => {
       els.mainImg.classList.remove("slide-in");
+      if (!document.body.classList.contains("immersive")) {
+        clearPhotoEffects();
+      }
     });
     els.modalImg.addEventListener("animationend", () => {
       els.modalImg.classList.remove("modal-slide-in");
