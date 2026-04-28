@@ -2475,6 +2475,30 @@
       }
     }
 
+  
+    /* ✅ 확대보기 핀치줌 최종 보정: animation transform 충돌 제거 */
+    .modal.open {
+      touch-action: none !important;
+      overflow: hidden !important;
+    }
+
+    .modal.open img.zoomable {
+      touch-action: none !important;
+      user-select: none !important;
+      -webkit-user-select: none !important;
+      -webkit-user-drag: none !important;
+      transform-origin: center center !important;
+      will-change: transform, opacity !important;
+    }
+
+    .modal.open img.zoomable.is-zoomed,
+    .modal.open img.zoomable.is-pinching,
+    .modal.open img.zoomable.is-panning {
+      animation: none !important;
+      transition: none !important;
+      cursor: grab;
+    }
+
   </style>
 </head>
 <body>
@@ -2679,6 +2703,7 @@
       modalHintTimer: null,
       lockedScrollY: 0,
       lastEffectIndex: -1,
+      modalPanning: false,
       deferredInstallPrompt: null,
       modalScale: 1,
       modalTranslateX: 0,
@@ -3087,15 +3112,57 @@
       }
     }
 
-    function downloadCurrentPhoto() {
+    function isAppleMobile() {
+      return /iphone|ipad|ipod/i.test(navigator.userAgent);
+    }
+
+    async function downloadCurrentPhoto() {
       const photo = photos[state.index];
-      const link = document.createElement("a");
-      link.href = photo.file;
-      link.download = photo.file.split("/").pop() || "wedding-photo.jpg";
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      toast("사진 저장 시작");
+      const filename = photo.file.split("/").pop() || "wedding-photo.jpg";
+
+      try {
+        const response = await fetch(photo.file, { cache: "force-cache" });
+        const blob = await response.blob();
+        const file = new File([blob], filename, { type: blob.type || "image/jpeg" });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: "DK&HL Wedding Book",
+            text: "사진 저장 또는 공유"
+          });
+          return;
+        }
+
+        if (isAppleMobile()) {
+          openModal();
+          toast("사진을 길게 눌러 저장해 주세요");
+          return;
+        }
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1200);
+        toast("사진 저장 시작");
+      } catch (error) {
+        if (isAppleMobile()) {
+          openModal();
+          toast("사진을 길게 눌러 저장해 주세요");
+        } else {
+          const link = document.createElement("a");
+          link.href = photo.file;
+          link.download = filename;
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          toast("사진 저장 시작");
+        }
+      }
     }
 
     function toggleBwMode() {
@@ -3251,11 +3318,15 @@
 
 
 
+
+
+
     function resetModalZoom() {
       state.modalScale = 1;
       state.modalTranslateX = 0;
       state.modalTranslateY = 0;
       state.modalPinching = false;
+      state.modalPanning = false;
       state.modalPinchStartDistance = 0;
       state.modalPinchStartScale = 1;
       state.modalPanStartX = 0;
@@ -3263,7 +3334,7 @@
       state.modalStartTranslateX = 0;
       state.modalStartTranslateY = 0;
 
-      els.modalImg.classList.remove("is-zoomed", "is-pinching");
+      els.modalImg.classList.remove("is-zoomed", "is-pinching", "is-panning");
       els.modalImg.style.transform = "";
       els.modalImg.style.opacity = "";
     }
@@ -3279,7 +3350,7 @@
         state.modalScale = 1;
         state.modalTranslateX = 0;
         state.modalTranslateY = 0;
-        els.modalImg.classList.remove("is-zoomed");
+        els.modalImg.classList.remove("is-zoomed", "is-pinching", "is-panning");
         els.modalImg.style.transform = "";
         return;
       }
@@ -3296,8 +3367,8 @@
         return;
       }
 
-      const maxX = Math.min(window.innerWidth * 0.42, 260) * (state.modalScale - 1);
-      const maxY = Math.min(window.innerHeight * 0.42, 320) * (state.modalScale - 1);
+      const maxX = Math.min(window.innerWidth * 0.46, 320) * (state.modalScale - 1);
+      const maxY = Math.min(window.innerHeight * 0.46, 360) * (state.modalScale - 1);
 
       state.modalTranslateX = Math.max(Math.min(state.modalTranslateX, maxX), -maxX);
       state.modalTranslateY = Math.max(Math.min(state.modalTranslateY, maxY), -maxY);
@@ -3319,28 +3390,35 @@
     function handleModalTouchStart(event) {
       if (!els.modal.classList.contains("open")) return;
 
+      // 두 손가락 = 핀치줌 시작
       if (event.touches.length === 2) {
         event.preventDefault();
         event.stopPropagation();
 
         state.modalPinching = true;
+        state.modalPanning = false;
         state.modalPointerActive = false;
         state.modalPinchStartDistance = getTouchDistance(event.touches);
         state.modalPinchStartScale = state.modalScale || 1;
+
         els.modal.classList.remove("hint");
-        els.modalImg.classList.remove("swiping");
+        els.modalImg.classList.remove("swiping", "modal-slide-in");
         els.modalImg.classList.add("is-pinching");
         return;
       }
 
+      // 확대된 상태에서 한 손가락 = 이미지 이동
       if (event.touches.length === 1 && state.modalScale > 1.01) {
         event.preventDefault();
         event.stopPropagation();
 
+        state.modalPanning = true;
         state.modalPanStartX = event.touches[0].clientX;
         state.modalPanStartY = event.touches[0].clientY;
         state.modalStartTranslateX = state.modalTranslateX;
         state.modalStartTranslateY = state.modalTranslateY;
+
+        els.modalImg.classList.add("is-panning");
       }
     }
 
@@ -3356,7 +3434,6 @@
           state.modalPinchStartDistance = getTouchDistance(event.touches);
           state.modalPinchStartScale = state.modalScale || 1;
           els.modalImg.classList.add("is-pinching");
-          return;
         }
 
         const currentDistance = getTouchDistance(event.touches);
@@ -3371,11 +3448,21 @@
         event.preventDefault();
         event.stopPropagation();
 
+        if (!state.modalPanning) {
+          state.modalPanning = true;
+          state.modalPanStartX = event.touches[0].clientX;
+          state.modalPanStartY = event.touches[0].clientY;
+          state.modalStartTranslateX = state.modalTranslateX;
+          state.modalStartTranslateY = state.modalTranslateY;
+          els.modalImg.classList.add("is-panning");
+        }
+
         const dx = event.touches[0].clientX - state.modalPanStartX;
         const dy = event.touches[0].clientY - state.modalPanStartY;
 
         state.modalTranslateX = state.modalStartTranslateX + dx;
         state.modalTranslateY = state.modalStartTranslateY + dy;
+
         clampModalPan();
         applyModalTransform();
       }
@@ -3396,11 +3483,19 @@
         }
 
         if (event.touches.length === 1 && state.modalScale > 1.01) {
+          state.modalPanning = true;
           state.modalPanStartX = event.touches[0].clientX;
           state.modalPanStartY = event.touches[0].clientY;
           state.modalStartTranslateX = state.modalTranslateX;
           state.modalStartTranslateY = state.modalTranslateY;
+          els.modalImg.classList.add("is-panning");
         }
+        return;
+      }
+
+      if (event.touches.length === 0) {
+        state.modalPanning = false;
+        els.modalImg.classList.remove("is-panning");
       }
     }
 
@@ -3511,6 +3606,7 @@
 
     function startLongPress() {
       if (state.slideshow) return;
+      if (isAppleMobile()) return;
       state.longPressTriggered = false;
       clearTimeout(state.longPressTimer);
       state.longPressTimer = setTimeout(() => {
@@ -3623,6 +3719,7 @@
 
     function handleModalPointerDown(event) {
       if (!els.modal.classList.contains("open")) return;
+      if (state.modalPinching || state.modalPanning || state.modalScale > 1.01) return;
       if (state.modalPinching || state.modalScale > 1.01) return;
       if (state.modalPinching || state.modalScale > 1.01) return;
       if (event.button !== undefined && event.button !== 0) return;
@@ -3864,6 +3961,7 @@
     els.modal.addEventListener("touchstart", handleModalTouchStart, { passive: false });
     els.modal.addEventListener("touchmove", handleModalTouchMove, { passive: false });
     els.modal.addEventListener("touchend", handleModalTouchEnd, { passive: false });
+    els.modal.addEventListener("touchcancel", handleModalTouchEnd, { passive: false });
     els.modal.addEventListener("pointerdown", handleModalPointerDown);
     els.modal.addEventListener("pointermove", handleModalPointerMove);
     els.modal.addEventListener("pointerup", handleModalPointerUp);
