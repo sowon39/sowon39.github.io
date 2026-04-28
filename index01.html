@@ -3142,6 +3142,236 @@
       }
     }
 
+
+    /* 📸 사진 전환: 칼같은 컷 대신 부드러운 페이드 */
+    .main-img {
+      will-change: opacity, transform, filter;
+    }
+
+    .main-img.changing {
+      opacity: 0;
+      transform: translateX(var(--slide-from, 0px)) scale(.992);
+      filter: brightness(1.04) saturate(.96);
+      transition:
+        opacity .42s ease,
+        transform .52s cubic-bezier(.22,.72,.22,1),
+        filter .52s ease;
+    }
+
+    .main-img.slide-in {
+      animation: softPhotoIn .72s cubic-bezier(.22,.72,.22,1) both !important;
+    }
+
+    @keyframes softPhotoIn {
+      0% {
+        opacity: 0;
+        transform: translateX(var(--slide-from, 14px)) scale(.992);
+        filter: brightness(1.06) saturate(.96);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+        filter: brightness(1) saturate(1);
+      }
+    }
+
+    /* 🎬 시네마틱 전용: transform 충돌 없는 단일 애니메이션 */
+    body.immersive .main-img {
+      max-width: 78vw !important;
+      max-height: 68dvh !important;
+      will-change: opacity, transform, filter;
+      backface-visibility: hidden;
+      transform: translateZ(0);
+    }
+
+    body.immersive .main-img.changing {
+      opacity: 0;
+      transform: scale(.985);
+      filter: blur(8px) brightness(1.12) saturate(.93);
+      transition:
+        opacity .45s ease,
+        transform .45s cubic-bezier(.22,.72,.22,1),
+        filter .45s ease;
+    }
+
+    body.immersive .main-img.slide-in {
+      animation-duration: 3s !important;
+      animation-timing-function: cubic-bezier(.2,.74,.24,1) !important;
+      animation-fill-mode: both !important;
+    }
+
+    body.immersive .main-img.cinema-reveal-right { animation-name: smoothCinemaRight !important; }
+    body.immersive .main-img.cinema-reveal-left { animation-name: smoothCinemaLeft !important; }
+    body.immersive .main-img.cinema-lift { animation-name: smoothCinemaLift !important; }
+    body.immersive .main-img.cinema-dolly-in { animation-name: smoothCinemaDollyIn !important; }
+    body.immersive .main-img.cinema-dolly-out { animation-name: smoothCinemaDollyOut !important; }
+    body.immersive .main-img.cinema-orbit { animation-name: smoothCinemaOrbit !important; }
+    body.immersive .main-img.cinema-dream { animation-name: smoothCinemaDream !important; }
+    body.immersive .main-img.cinema-portrait { animation-name: smoothCinemaPortrait !important; }
+
+    @keyframes smoothCinemaRight {
+      0% {
+        opacity: 0;
+        transform: translate3d(72px, 10px, 0) scale(.965);
+        filter: blur(9px) brightness(1.14) saturate(.92);
+      }
+      34% {
+        opacity: 1;
+        transform: translate3d(10px, 3px, 0) scale(1.015);
+        filter: blur(1px) brightness(1.04) saturate(.98);
+      }
+      100% {
+        opacity: 1;
+        transform: translate3d(-18px, -4px, 0) scale(1.045);
+        filter: blur(0) brightness(1) saturate(1.02);
+      }
+    }
+
+    @keyframes smoothCinemaLeft {
+      0% {
+        opacity: 0;
+        transform: translate3d(-72px, 10px, 0) scale(.965);
+        filter: blur(9px) brightness(1.14) saturate(.92);
+      }
+      34% {
+        opacity: 1;
+        transform: translate3d(-10px, 3px, 0) scale(1.015);
+        filter: blur(1px) brightness(1.04) saturate(.98);
+      }
+      100% {
+        opacity: 1;
+        transform: translate3d(18px, -4px, 0) scale(1.045);
+        filter: blur(0) brightness(1) saturate(1.02);
+      }
+    }
+
+    @keyframes smoothCinemaLift {
+      0% {
+        opacity: 0;
+        transform: translate3d(0, 66px, 0) scale(.965);
+        filter: blur(8px) brightness(1.13) saturate(.94);
+      }
+      36% {
+        opacity: 1;
+        transform: translate3d(0, 8px, 0) scale(1.012);
+        filter: blur(1px) brightness(1.04) saturate(.98);
+      }
+      100% {
+        opacity: 1;
+        transform: translate3d(0, -22px, 0) scale(1.045);
+        filter: blur(0) brightness(1) saturate(1.02);
+      }
+    }
+
+    @keyframes smoothCinemaDollyIn {
+      0% {
+        opacity: 0;
+        transform: scale(.955);
+        filter: blur(10px) brightness(1.16) saturate(.9);
+      }
+      32% {
+        opacity: 1;
+        transform: scale(1.006);
+        filter: blur(1px) brightness(1.04) saturate(.98);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1.075);
+        filter: blur(0) brightness(1) saturate(1.02);
+      }
+    }
+
+    @keyframes smoothCinemaDollyOut {
+      0% {
+        opacity: 0;
+        transform: scale(1.105);
+        filter: blur(10px) brightness(1.14) saturate(.92);
+      }
+      35% {
+        opacity: 1;
+        transform: scale(1.07);
+        filter: blur(1px) brightness(1.04) saturate(.98);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1.012);
+        filter: blur(0) brightness(1) saturate(1.02);
+      }
+    }
+
+    @keyframes smoothCinemaOrbit {
+      0% {
+        opacity: 0;
+        transform: translate3d(-52px, 28px, 0) rotate(-.45deg) scale(.97);
+        filter: blur(9px) brightness(1.15) saturate(.92);
+      }
+      35% {
+        opacity: 1;
+        transform: translate3d(-12px, 8px, 0) rotate(-.12deg) scale(1.018);
+        filter: blur(1px) brightness(1.04) saturate(.98);
+      }
+      100% {
+        opacity: 1;
+        transform: translate3d(26px, -18px, 0) rotate(.35deg) scale(1.055);
+        filter: blur(0) brightness(1) saturate(1.02);
+      }
+    }
+
+    @keyframes smoothCinemaDream {
+      0% {
+        opacity: 0;
+        transform: translate3d(-30px, 22px, 0) scale(.95);
+        filter: blur(12px) brightness(1.18) saturate(.88);
+      }
+      38% {
+        opacity: 1;
+        transform: translate3d(-6px, 6px, 0) scale(1.01);
+        filter: blur(1.5px) brightness(1.05) saturate(.98);
+      }
+      100% {
+        opacity: 1;
+        transform: translate3d(18px, -14px, 0) scale(1.05);
+        filter: blur(0) brightness(1) saturate(1.03);
+      }
+    }
+
+    @keyframes smoothCinemaPortrait {
+      0% {
+        opacity: 0;
+        transform: translate3d(0, 34px, 0) scale(1.035);
+        filter: blur(8px) brightness(1.12) saturate(.92);
+      }
+      36% {
+        opacity: 1;
+        transform: translate3d(0, 6px, 0) scale(1.03);
+        filter: blur(1px) brightness(1.04) saturate(.98);
+      }
+      100% {
+        opacity: 1;
+        transform: translate3d(0, -16px, 0) scale(1.062);
+        filter: blur(0) brightness(1) saturate(1.02);
+      }
+    }
+
+    @media (max-width: 520px) {
+      body.immersive .main-img {
+        max-width: 76vw !important;
+        max-height: 66dvh !important;
+      }
+
+      @keyframes smoothCinemaRight {
+        0% { opacity: 0; transform: translate3d(54px, 8px, 0) scale(.97); filter: blur(8px) brightness(1.14) saturate(.92); }
+        34% { opacity: 1; transform: translate3d(8px, 2px, 0) scale(1.012); filter: blur(1px) brightness(1.04) saturate(.98); }
+        100% { opacity: 1; transform: translate3d(-13px, -3px, 0) scale(1.038); filter: blur(0) brightness(1) saturate(1.02); }
+      }
+
+      @keyframes smoothCinemaLeft {
+        0% { opacity: 0; transform: translate3d(-54px, 8px, 0) scale(.97); filter: blur(8px) brightness(1.14) saturate(.92); }
+        34% { opacity: 1; transform: translate3d(-8px, 2px, 0) scale(1.012); filter: blur(1px) brightness(1.04) saturate(.98); }
+        100% { opacity: 1; transform: translate3d(13px, -3px, 0) scale(1.038); filter: blur(0) brightness(1) saturate(1.02); }
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -3621,7 +3851,7 @@
         if (document.body.classList.contains("immersive")) {
           els.mainImg.style.setProperty("--slide-from", "0px");
         } else {
-          els.mainImg.style.setProperty("--slide-from", `${direction * 22}px`);
+          els.mainImg.style.setProperty("--slide-from", `${direction * 12}px`);
         }
         els.mainImg.classList.remove("slide-in");
 
@@ -3951,6 +4181,7 @@
     function exitImmersiveMode() {
       state.immersive = false;
       document.body.classList.remove("immersive");
+      els.mainImg.classList.remove("slide-in");
       clearPhotoEffects();
     }
 
@@ -4648,8 +4879,8 @@
       if (state.longPressTriggered) event.preventDefault();
     });
     els.mainImg.addEventListener("animationend", () => {
-      els.mainImg.classList.remove("slide-in");
       if (!document.body.classList.contains("immersive")) {
+        els.mainImg.classList.remove("slide-in");
         clearPhotoEffects();
       }
     });
