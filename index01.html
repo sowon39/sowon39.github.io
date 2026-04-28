@@ -3,8 +3,25 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <title>Wedding Gallery</title>
-  <meta name="description" content="Wedding photo gallery" />
+  <meta name="description" content="2026.08.30 우리의 웨딩 갤러리" />
+
+  <!-- 카카오톡/문자/공유 미리보기 설정
+       GitHub Pages에 올린 뒤 아래 YOUR_GITHUB_ID / YOUR_REPO_NAME만 실제 값으로 바꾸세요.
+       og:image는 카카오톡 썸네일로 보일 이미지입니다. wedding01.jpg를 추천합니다. -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Wedding Gallery" />
+  <meta property="og:description" content="2026.08.30 우리의 웨딩 사진을 담았습니다." />
+  <meta property="og:image" content="https://YOUR_GITHUB_ID.github.io/YOUR_REPO_NAME/wedding/wedding01.jpg" />
+  <meta property="og:url" content="https://YOUR_GITHUB_ID.github.io/YOUR_REPO_NAME/index01.html" />
+  <meta property="og:site_name" content="Wedding Gallery" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Wedding Gallery" />
+  <meta name="twitter:description" content="2026.08.30 우리의 웨딩 사진을 담았습니다." />
+  <meta name="twitter:image" content="https://YOUR_GITHUB_ID.github.io/YOUR_REPO_NAME/wedding/wedding01.jpg" />
+
   <style>
     :root {
       --panel: rgba(255, 255, 255, 0.78);
@@ -143,9 +160,7 @@
       align-items: stretch;
     }
 
-    .flip-unit {
-      min-width: 0;
-    }
+    .flip-unit { min-width: 0; }
 
     .flip-number {
       position: relative;
@@ -162,6 +177,7 @@
       overflow: hidden;
       box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 8px 18px rgba(45, 27, 31, .16);
       transform-origin: center;
+      transition: transform .2s ease;
     }
 
     .flip-number::before {
@@ -175,9 +191,7 @@
       z-index: 1;
     }
 
-    .flip-number.tick {
-      animation: flipTick .38s ease;
-    }
+    .flip-number.tick { animation: flipTick .38s ease; }
 
     .flip-caption {
       display: block;
@@ -186,27 +200,6 @@
       font-size: 10px;
       font-weight: 800;
       opacity: .76;
-    }
-
-    .love-days {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      gap: 12px;
-    }
-
-    .love-days strong {
-      display: block;
-      font-size: 34px;
-      line-height: 1;
-      letter-spacing: -.06em;
-    }
-
-    .love-days span {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
-      white-space: nowrap;
     }
 
     .list {
@@ -327,15 +320,19 @@
       width: 100%;
       height: 100%;
       border-radius: 24px;
-      display: grid;
-      place-items: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       overflow: hidden;
       background: rgba(255,255,255,.35);
     }
 
     .main-img {
+      display: block;
       max-width: 100%;
       max-height: 100%;
+      width: auto;
+      height: auto;
       object-fit: contain;
       border-radius: 18px;
       box-shadow: 0 18px 60px rgba(60,35,40,.22);
@@ -535,7 +532,6 @@
         font-size: 17px;
       }
       .flip-caption { font-size: 9px; }
-      .love-days strong { font-size: 28px; }
       .current-title strong { font-size: 16px; }
     }
   </style>
@@ -581,6 +577,7 @@
         </div>
         <div class="actions">
           <button id="favoriteBtn" class="icon-btn" type="button" title="좋아요">♡</button>
+          <button id="filterBtn" class="icon-btn" type="button" title="좋아요한 사진만 보기">♥ 모아보기</button>
           <button id="slideshowBtn" class="icon-btn" type="button" title="자동 재생">▶ 자동</button>
           <button id="fitBtn" class="icon-btn" type="button" title="채우기 전환">▣ 맞춤</button>
           <button id="bwBtn" class="icon-btn" type="button" title="흑백 필터">◐ 흑백</button>
@@ -615,8 +612,7 @@
   <audio id="bgm" src="wedding/ae.mp3" loop preload="none"></audio>
 
   <script>
-    const weddingDate = "2026-08-30T00:00:00";
-    const datingStartDate = "2019-06-14T00:00:00";
+    const weddingDate = "2026-08-30T14:30:00";
     const MUSIC_START_TIME = 72;
 
     const photos = Array.from({ length: 22 }, (_, index) => {
@@ -635,6 +631,7 @@
       counter: document.getElementById("counter"),
       progress: document.getElementById("progress"),
       favoriteBtn: document.getElementById("favoriteBtn"),
+      filterBtn: document.getElementById("filterBtn"),
       slideshowBtn: document.getElementById("slideshowBtn"),
       fitBtn: document.getElementById("fitBtn"),
       bwBtn: document.getElementById("bwBtn"),
@@ -658,6 +655,7 @@
     let state = {
       index: 0,
       favorites: JSON.parse(localStorage.getItem("weddingFavorites") || "[]"),
+      filterFavorites: false,
       slideshow: null,
       cover: false,
       bw: false,
@@ -702,7 +700,13 @@
     }
 
     function filteredPhotos() {
-      return photos.map((photo, originalIndex) => ({ ...photo, originalIndex }));
+      let list = photos.map((photo, originalIndex) => ({ ...photo, originalIndex }));
+
+      if (state.filterFavorites) {
+        list = list.filter(photo => state.favorites.includes(photo.file));
+      }
+
+      return list;
     }
 
     function saveFavorites() {
@@ -721,13 +725,20 @@
       localStorage.setItem("weddingDarkMode", String(state.darkMode));
     }
 
-    function startRandomPhoto() {
-      if (photos.length > 1) state.index = Math.floor(Math.random() * photos.length);
-    }
-
     function renderList() {
       const list = filteredPhotos();
       els.list.innerHTML = "";
+
+      if (!list.length) {
+        const empty = document.createElement("div");
+        empty.className = "photo-item";
+        empty.style.display = "block";
+        empty.style.textAlign = "center";
+        empty.style.padding = "18px";
+        empty.textContent = "좋아요한 사진이 없습니다.";
+        els.list.appendChild(empty);
+        return;
+      }
 
       list.forEach((photo) => {
         const active = photo.originalIndex === state.index;
@@ -770,8 +781,39 @@
       els.favoriteBtn.style.color = liked ? "#fff" : "var(--text)";
     }
 
+    function updateFilterButton() {
+      els.filterBtn.textContent = state.filterFavorites ? "전체보기" : "♥ 모아보기";
+      els.filterBtn.style.background = state.filterFavorites ? "#2c2324" : "rgba(255,255,255,.76)";
+      els.filterBtn.style.color = state.filterFavorites ? "#fff" : "var(--text)";
+    }
+
+    function toggleFilterFavorites() {
+      state.filterFavorites = !state.filterFavorites;
+      updateFilterButton();
+
+      const list = filteredPhotos();
+      renderList();
+
+      if (state.filterFavorites) {
+        if (list.length) {
+          selectPhoto(list[0].originalIndex);
+        } else {
+          toast("좋아요한 사진이 없습니다");
+        }
+      } else {
+        selectPhoto(state.index);
+      }
+    }
+
     function move(step) {
-      selectPhoto(state.index + step);
+      const list = filteredPhotos();
+      if (!list.length) return;
+
+      const currentVisibleIndex = list.findIndex(photo => photo.originalIndex === state.index);
+      const safeIndex = currentVisibleIndex === -1 ? 0 : currentVisibleIndex;
+      const next = list[(safeIndex + step + list.length) % list.length];
+
+      selectPhoto(next.originalIndex);
     }
 
     function toggleFavorite() {
@@ -785,7 +827,20 @@
       }
       saveFavorites();
       updateFavoriteButton();
-      renderList();
+      updateFilterButton();
+
+      const list = filteredPhotos();
+      if (state.filterFavorites && !list.length) {
+        renderList();
+        toast("좋아요한 사진이 없습니다");
+        return;
+      }
+
+      if (state.filterFavorites && !state.favorites.includes(file)) {
+        selectPhoto(list[0].originalIndex);
+      } else {
+        renderList();
+      }
     }
 
     async function playMusicFromHighlight(showMessage = true) {
@@ -845,10 +900,11 @@
     async function sharePage() {
       const url = window.location.href;
       const title = "Wedding Gallery";
+      const text = "2026.08.30 우리의 웨딩 사진을 담았습니다.";
 
       if (navigator.share) {
         try {
-          await navigator.share({ title, url });
+          await navigator.share({ title, text, url });
           return;
         } catch (error) {}
       }
@@ -887,6 +943,7 @@
     }
 
     els.favoriteBtn.addEventListener("click", toggleFavorite);
+    els.filterBtn.addEventListener("click", toggleFilterFavorites);
     els.musicBtn.addEventListener("click", toggleMusic);
     els.downloadBtn.addEventListener("click", downloadCurrentPhoto);
     els.themeBtn.addEventListener("click", toggleTheme);
@@ -924,8 +981,8 @@
     applyTheme();
     enableFirstTouchMusic();
     renderDateCounts();
+    updateFilterButton();
     setInterval(renderDateCounts, 1000);
-    
     renderList();
     selectPhoto(state.index);
   </script>
