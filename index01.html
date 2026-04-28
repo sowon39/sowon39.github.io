@@ -2499,6 +2499,649 @@
       cursor: grab;
     }
 
+
+    /* 🎬 인트로 여운 + 줌/블러 페이드 전환 */
+    .intro.cinematic-exit {
+      animation: introCinematicExit 1.25s cubic-bezier(.22,.72,.22,1) forwards;
+      pointer-events: none;
+    }
+
+    .intro.cinematic-exit .intro-card {
+      animation: introCardExit 1.25s cubic-bezier(.22,.72,.22,1) forwards;
+    }
+
+    @keyframes introCinematicExit {
+      0% {
+        opacity: 1;
+        visibility: visible;
+        transform: scale(1);
+        filter: blur(0);
+      }
+      55% {
+        opacity: .92;
+        transform: scale(1.025);
+        filter: blur(1.5px);
+      }
+      100% {
+        opacity: 0;
+        visibility: hidden;
+        transform: scale(1.08);
+        filter: blur(7px);
+      }
+    }
+
+    @keyframes introCardExit {
+      0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-8px) scale(1.035);
+        filter: blur(3px);
+      }
+    }
+
+
+    /* 앱 느낌 상단 아이덴티티 */
+    .app-identity {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .app-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      object-fit: cover;
+      flex: 0 0 auto;
+      box-shadow: 0 8px 22px rgba(77,40,48,.14);
+      background: rgba(255,255,255,.72);
+    }
+
+    .current-title em {
+      display: block;
+      margin-bottom: 3px;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 11px;
+      font-style: normal;
+      font-weight: 900;
+      letter-spacing: .01em;
+      color: var(--brand-dark);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* 🎞️ Premium Cinematic Wedding Mode */
+    body.immersive {
+      background:
+        radial-gradient(circle at 15% 12%, rgba(255, 212, 225, .78), transparent 28%),
+        radial-gradient(circle at 85% 20%, rgba(255, 238, 204, .70), transparent 30%),
+        radial-gradient(circle at 50% 105%, rgba(198, 104, 117, .26), transparent 42%),
+        linear-gradient(135deg, #fff9f8 0%, #f8dde4 45%, #fff1e8 100%) !important;
+    }
+
+    body.dark.immersive {
+      background:
+        radial-gradient(circle at 15% 12%, rgba(216, 139, 149, .34), transparent 28%),
+        radial-gradient(circle at 85% 20%, rgba(246, 190, 172, .28), transparent 30%),
+        radial-gradient(circle at 50% 105%, rgba(198, 104, 117, .20), transparent 42%),
+        linear-gradient(135deg, #24191d 0%, #3b242b 48%, #211719 100%) !important;
+    }
+
+    body.immersive::before {
+      content: "";
+      position: fixed;
+      inset: -12%;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 20% 18%, rgba(255,255,255,.38), transparent 30%),
+        radial-gradient(circle at 78% 24%, rgba(255,231,205,.32), transparent 33%),
+        radial-gradient(circle at 50% 78%, rgba(255,202,214,.24), transparent 44%),
+        linear-gradient(110deg, transparent 0 35%, rgba(255,255,255,.22) 45%, transparent 58% 100%);
+      filter: blur(18px);
+      opacity: .92;
+      animation: cinematicLightMove 8s ease-in-out infinite alternate;
+    }
+
+    body.immersive::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: .28;
+      background:
+        radial-gradient(circle at center, transparent 42%, rgba(92,42,54,.16) 100%),
+        repeating-linear-gradient(0deg, rgba(55,35,40,.022) 0 1px, transparent 1px 4px),
+        repeating-linear-gradient(90deg, rgba(255,255,255,.018) 0 1px, transparent 1px 5px);
+      mix-blend-mode: multiply;
+    }
+
+    body.immersive .frame::before {
+      content: "";
+      position: absolute;
+      inset: 4% 9%;
+      pointer-events: none;
+      border-radius: 34px;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,.36), transparent 56%),
+        radial-gradient(circle at 50% 50%, rgba(216,139,149,.20), transparent 68%);
+      filter: blur(34px);
+      opacity: .82;
+      transform: scale(.98);
+      animation: cinematicHalo 3s ease-in-out infinite alternate;
+      z-index: 0;
+    }
+
+    body.immersive .frame::after {
+      content: "";
+      position: absolute;
+      inset: 9% 11%;
+      pointer-events: none;
+      border-radius: 30px;
+      border: 1px solid rgba(255,255,255,.22);
+      box-shadow:
+        inset 0 0 40px rgba(255,255,255,.10),
+        0 30px 90px rgba(169,92,104,.16);
+      opacity: .62;
+      z-index: 0;
+    }
+
+    body.immersive .main-img {
+      position: relative;
+      z-index: 1;
+      max-width: 76vw !important;
+      max-height: 66dvh !important;
+      border-radius: 22px !important;
+      box-shadow:
+        0 42px 130px rgba(112, 54, 66, .30),
+        0 18px 46px rgba(77, 40, 48, .18),
+        0 0 0 1px rgba(255,255,255,.24);
+      filter: saturate(1.02) contrast(1.015);
+    }
+
+    body.immersive .main-img.slide-in {
+      animation-duration: .72s, 3s !important;
+      animation-timing-function: cubic-bezier(.17,.74,.22,1), cubic-bezier(.23,.1,.16,1) !important;
+      animation-fill-mode: both, forwards !important;
+    }
+
+    body.immersive .main-img.cinema-reveal-right { animation-name: cinemaRevealRight, cinemaKenRight !important; }
+    body.immersive .main-img.cinema-reveal-left { animation-name: cinemaRevealLeft, cinemaKenLeft !important; }
+    body.immersive .main-img.cinema-lift { animation-name: cinemaRevealUp, cinemaLift !important; }
+    body.immersive .main-img.cinema-dolly-in { animation-name: cinemaGlowIn, cinemaDollyIn !important; }
+    body.immersive .main-img.cinema-dolly-out { animation-name: cinemaGlowIn, cinemaDollyOut !important; }
+    body.immersive .main-img.cinema-orbit { animation-name: cinemaGlowIn, cinemaOrbit !important; }
+    body.immersive .main-img.cinema-dream { animation-name: cinemaDreamIn, cinemaDreamFloat !important; }
+    body.immersive .main-img.cinema-portrait { animation-name: cinemaPortraitIn, cinemaPortraitDrift !important; }
+
+    @keyframes cinematicLightMove {
+      0% { transform: translate(-1.5%, -1%) scale(1); opacity: .80; }
+      50% { transform: translate(1.5%, .8%) scale(1.03); opacity: .96; }
+      100% { transform: translate(2.8%, 1.4%) scale(1.05); opacity: .86; }
+    }
+
+    @keyframes cinematicHalo {
+      from { opacity: .55; transform: scale(.96) translateY(8px); }
+      to { opacity: .88; transform: scale(1.03) translateY(-6px); }
+    }
+
+    @keyframes cinemaRevealRight {
+      0% { opacity: 0; transform: translateX(120px) scale(.965); filter: blur(8px) brightness(1.16) saturate(.92); }
+      58% { opacity: .92; filter: blur(1.5px) brightness(1.05) saturate(.98); }
+      100% { opacity: 1; transform: translateX(0) scale(1); filter: blur(0) brightness(1) saturate(1.02); }
+    }
+
+    @keyframes cinemaRevealLeft {
+      0% { opacity: 0; transform: translateX(-120px) scale(.965); filter: blur(8px) brightness(1.16) saturate(.92); }
+      58% { opacity: .92; filter: blur(1.5px) brightness(1.05) saturate(.98); }
+      100% { opacity: 1; transform: translateX(0) scale(1); filter: blur(0) brightness(1) saturate(1.02); }
+    }
+
+    @keyframes cinemaRevealUp {
+      0% { opacity: 0; transform: translateY(88px) scale(.965); filter: blur(7px) brightness(1.14) saturate(.94); }
+      100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0) brightness(1) saturate(1.02); }
+    }
+
+    @keyframes cinemaGlowIn {
+      0% { opacity: 0; filter: blur(9px) brightness(1.18) saturate(.9); }
+      65% { opacity: .94; filter: blur(1px) brightness(1.05) saturate(.98); }
+      100% { opacity: 1; filter: blur(0) brightness(1) saturate(1.02); }
+    }
+
+    @keyframes cinemaDreamIn {
+      0% { opacity: 0; transform: scale(.94); filter: blur(10px) brightness(1.18) saturate(.88); }
+      100% { opacity: 1; transform: scale(1); filter: blur(0) brightness(1) saturate(1.03); }
+    }
+
+    @keyframes cinemaPortraitIn {
+      0% { opacity: 0; transform: translateY(38px) scale(1.04); filter: blur(7px) brightness(1.12) saturate(.92); }
+      100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0) brightness(1) saturate(1.02); }
+    }
+
+    @keyframes cinemaKenRight {
+      from { transform: translateX(-44px) scale(1.035); }
+      to { transform: translateX(40px) scale(1.075); }
+    }
+
+    @keyframes cinemaKenLeft {
+      from { transform: translateX(44px) scale(1.035); }
+      to { transform: translateX(-40px) scale(1.075); }
+    }
+
+    @keyframes cinemaLift {
+      from { transform: translateY(34px) scale(1.025); }
+      to { transform: translateY(-38px) scale(1.070); }
+    }
+
+    @keyframes cinemaDollyIn {
+      from { transform: scale(1); }
+      to { transform: scale(1.095); }
+    }
+
+    @keyframes cinemaDollyOut {
+      from { transform: scale(1.095); }
+      to { transform: scale(1.015); }
+    }
+
+    @keyframes cinemaOrbit {
+      0% { transform: translate(-38px, 28px) rotate(-.55deg) scale(1.04); }
+      100% { transform: translate(38px, -26px) rotate(.55deg) scale(1.078); }
+    }
+
+    @keyframes cinemaDreamFloat {
+      0% { transform: translate(-22px, 18px) scale(1.035); }
+      100% { transform: translate(24px, -20px) scale(1.072); }
+    }
+
+    @keyframes cinemaPortraitDrift {
+      0% { transform: translateY(26px) scale(1.055); }
+      100% { transform: translateY(-18px) scale(1.082); }
+    }
+
+    /* 모바일 앱형 레이아웃: D-day → 버튼/네비 → 사진 → 썸네일 */
+    @media (max-width: 920px) {
+      body {
+        overflow-x: hidden;
+      }
+
+      .app {
+        display: flex !important;
+        flex-direction: column;
+        width: 100%;
+        min-height: 100svh;
+        height: auto;
+        padding: 8px;
+        gap: 8px;
+      }
+
+      .sidebar {
+        display: contents;
+      }
+
+      .brand {
+        order: 1;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        backdrop-filter: blur(22px);
+        -webkit-backdrop-filter: blur(22px);
+        box-shadow: var(--shadow);
+        border-radius: 22px;
+        padding: 12px;
+      }
+
+      .viewer {
+        order: 2;
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr) auto;
+        width: 100%;
+        min-height: 0;
+        height: calc(100svh - 255px);
+        max-height: 620px;
+        border-radius: 22px;
+      }
+
+      .list {
+        order: 3;
+        width: 100%;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        backdrop-filter: blur(22px);
+        -webkit-backdrop-filter: blur(22px);
+        box-shadow: var(--shadow);
+        border-radius: 22px;
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 96px;
+        gap: 8px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 9px;
+        max-height: 120px;
+      }
+
+      .photo-item {
+        grid-template-columns: 1fr;
+        gap: 6px;
+        padding: 7px;
+        border-radius: 16px;
+      }
+
+      .thumb {
+        width: 100%;
+        height: 62px;
+        border-radius: 12px;
+      }
+
+      .item-title {
+        font-size: 11px;
+        text-align: center;
+      }
+
+      .topbar {
+        order: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px;
+        align-items: stretch;
+      }
+
+      .app-identity {
+        width: 100%;
+      }
+
+      .app-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+      }
+
+      .current-title strong {
+        font-size: 14px;
+      }
+
+      .current-title span {
+        font-size: 11px;
+        margin-top: 2px;
+      }
+
+      .actions {
+        width: 100%;
+        gap: 7px;
+      }
+
+      .action-group {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        scrollbar-width: none;
+      }
+
+      .action-group::-webkit-scrollbar {
+        display: none;
+      }
+
+      .icon-btn {
+        flex: 0 0 auto;
+        height: 36px;
+        min-width: auto;
+        padding: 0 11px;
+        font-size: 11px;
+      }
+
+      .icon-btn.compact {
+        width: 36px;
+        min-width: 36px;
+      }
+
+      .stage {
+        order: 2;
+        min-height: 0;
+        height: 100%;
+        padding: 8px 10px;
+      }
+
+      .caption {
+        order: 3;
+        padding: 8px 10px 10px;
+        gap: 8px;
+        font-size: 11px;
+      }
+
+      .progress-wrap {
+        min-width: 60px;
+      }
+
+      .dots {
+        max-width: 96px;
+      }
+
+      .nav-arrow {
+        width: 38px;
+        height: 38px;
+        font-size: 23px;
+      }
+
+      .prev { left: 8px; }
+      .next { right: 8px; }
+
+      .main-img {
+        max-width: 100%;
+        max-height: 100%;
+      }
+
+      body.immersive .main-img {
+        max-width: 74vw !important;
+        max-height: 64dvh !important;
+      }
+
+      body.immersive .frame::before {
+        inset: 10% 4%;
+      }
+
+      @keyframes cinemaKenRight {
+        from { transform: translateX(-34px) scale(1.03); }
+        to { transform: translateX(32px) scale(1.07); }
+      }
+
+      @keyframes cinemaKenLeft {
+        from { transform: translateX(34px) scale(1.03); }
+        to { transform: translateX(-32px) scale(1.07); }
+      }
+    }
+
+    @media (max-width: 520px) {
+      .app {
+        padding: 7px;
+        gap: 7px;
+      }
+
+      .brand {
+        padding: 10px;
+      }
+
+      .viewer {
+        height: calc(100svh - 248px);
+        min-height: 390px;
+      }
+
+      .list {
+        grid-auto-columns: 88px;
+        max-height: 112px;
+      }
+
+      .thumb {
+        height: 58px;
+      }
+
+      .flip-number {
+        min-height: 40px;
+        font-size: 15px;
+      }
+
+      .calendar-dday {
+        font-size: 32px;
+      }
+
+      .dday-summary {
+        margin-bottom: 10px;
+      }
+
+      .countdown-title {
+        margin-bottom: 6px;
+      }
+    }
+
+    @media (max-width: 390px) {
+      .viewer {
+        height: calc(100svh - 238px);
+        min-height: 360px;
+      }
+
+      .flip-row {
+        gap: 4px;
+      }
+
+      .flip-number {
+        min-height: 36px;
+        font-size: 14px;
+      }
+
+      .flip-caption {
+        margin-top: 4px;
+      }
+    }
+
+
+    /* 최상단 앱 로고 헤더 */
+    .app-header {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.66);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      box-shadow: 0 14px 42px rgba(77,40,48,.12);
+      border-radius: 22px;
+      padding: 12px 14px;
+      min-width: 0;
+    }
+
+    .app-header-logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
+      object-fit: cover;
+      flex: 0 0 auto;
+      box-shadow: 0 9px 24px rgba(77,40,48,.16);
+      background: rgba(255,255,255,.8);
+    }
+
+    .app-header-copy {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+      line-height: 1.1;
+    }
+
+    .app-header-copy strong {
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      font-weight: 950;
+      letter-spacing: -.02em;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .app-header-copy span {
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+      color: var(--brand-dark);
+      opacity: .78;
+      white-space: nowrap;
+    }
+
+    body.dark .app-header {
+      background: rgba(28,22,25,.68);
+    }
+
+    /* topbar 안에는 현재 사진 정보만 남깁니다 */
+    .topbar .current-title em,
+    .topbar .app-identity,
+    .topbar .app-icon {
+      display: none !important;
+    }
+
+    @media (max-width: 920px) {
+      .app-header {
+        display: flex;
+        order: 0;
+        width: 100%;
+        position: sticky;
+        top: 7px;
+        z-index: 12;
+      }
+
+      .brand {
+        order: 1;
+      }
+
+      .viewer {
+        order: 2;
+      }
+
+      .list {
+        order: 3;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .app-header {
+        justify-content: flex-start;
+        padding: 10px 12px;
+        border-radius: 20px;
+      }
+
+      .app-header-logo {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+      }
+
+      .app-header-copy strong {
+        font-size: 15px;
+      }
+
+      .app-header-copy span {
+        font-size: 9px;
+      }
+
+      .viewer {
+        height: calc(100svh - 306px) !important;
+        min-height: 340px !important;
+      }
+    }
+
+    @media (min-width: 921px) {
+      .app-header {
+        display: none !important;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -2509,6 +3152,13 @@
     </div>
   </div>
   <main class="app">
+  <div class="app-header" aria-label="DK&HL Wedding Book">
+    <img class="app-header-logo" src="wedding/app-icon-192.png" alt="DK&HL Wedding Book" onerror="this.style.display='none'">
+    <div class="app-header-copy">
+      <strong>DK&HL Wedding Book</strong>
+      <span>Wedding Photo Gallery</span>
+    </div>
+  </div>
     <aside class="sidebar">
       <section class="brand">
         <div class="date-grid" aria-label="날짜 카운트">
@@ -2722,13 +3372,18 @@
       const intro = document.getElementById("intro");
       if (!intro) return;
 
+      // 문구 애니메이션이 끝난 뒤 약 2초간 여운을 주고,
+      // 살짝 확대 + 블러 + 페이드로 자연스럽게 메인으로 진입합니다.
+      const introHoldDelay = 2900;
+      const exitDuration = 1250;
+
       window.setTimeout(() => {
-        intro.classList.add("hide");
-      }, 920);
+        intro.classList.add("cinematic-exit");
+      }, introHoldDelay);
 
       window.setTimeout(() => {
         intro.remove();
-      }, 1400);
+      }, introHoldDelay + exitDuration + 120);
     }
 
     function pad(value, length = 2) {
@@ -2914,7 +3569,15 @@
         "cine-pull-wide",
         "cine-tilt-drift",
         "cine-orbit-wide",
-        "cine-parallax"
+        "cine-parallax",
+        "cinema-reveal-right",
+        "cinema-reveal-left",
+        "cinema-lift",
+        "cinema-dolly-in",
+        "cinema-dolly-out",
+        "cinema-orbit",
+        "cinema-dream",
+        "cinema-portrait"
       );
     }
 
@@ -2923,25 +3586,24 @@
 
       if (!document.body.classList.contains("immersive")) return;
 
-      const cinematicEffects = [
-        "cine-sweep-right",
-        "cine-sweep-left",
-        "cine-rise-big",
-        "cine-drop-soft",
-        "cine-push-deep",
-        "cine-pull-wide",
-        "cine-tilt-drift",
-        "cine-orbit-wide",
-        "cine-parallax"
+      const premiumEffects = [
+        "cinema-reveal-right",
+        "cinema-reveal-left",
+        "cinema-lift",
+        "cinema-dolly-in",
+        "cinema-dolly-out",
+        "cinema-orbit",
+        "cinema-dream",
+        "cinema-portrait"
       ];
 
-      let nextEffectIndex = Math.floor(Math.random() * cinematicEffects.length);
+      let nextEffectIndex = Math.floor(Math.random() * premiumEffects.length);
       if (nextEffectIndex === state.lastEffectIndex) {
-        nextEffectIndex = (nextEffectIndex + 1) % cinematicEffects.length;
+        nextEffectIndex = (nextEffectIndex + 1) % premiumEffects.length;
       }
 
       state.lastEffectIndex = nextEffectIndex;
-      els.mainImg.classList.add(cinematicEffects[nextEffectIndex]);
+      els.mainImg.classList.add(premiumEffects[nextEffectIndex]);
     }
 
     function selectPhoto(index) {
@@ -3300,7 +3962,7 @@
         exitImmersiveMode();
 
         els.slideshowBtn.textContent = "🎬 시네마틱";
-        toast("자동 재생 정지");
+        toast("시네마틱 정지");
       } else {
         enterImmersiveMode();
 
@@ -3308,7 +3970,7 @@
         // 이미 재생 중인 음악은 그대로 이어지고, 꺼져 있으면 그대로 꺼진 상태를 유지합니다.
         state.slideshow = setInterval(() => move(1), 3000);
         els.slideshowBtn.textContent = "Ⅱ 정지";
-        toast("자동 재생 시작");
+        toast("시네마틱 시작");
       }
     }
 
@@ -4027,7 +4689,7 @@
     renderList();
     renderDots();
     selectPhoto(state.index);
-    requestAnimationFrame(() => document.body.classList.add("intro-ready"));
+    setTimeout(() => document.body.classList.add("intro-ready"), 3920);
   </script>
 </body>
 </html>
