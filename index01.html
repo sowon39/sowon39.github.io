@@ -1,0 +1,933 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wedding Gallery</title>
+  <meta name="description" content="Wedding photo gallery" />
+  <style>
+    :root {
+      --panel: rgba(255, 255, 255, 0.78);
+      --text: #2c2324;
+      --muted: #8b7478;
+      --brand: #d88b95;
+      --brand-dark: #a95c68;
+      --line: rgba(95, 60, 67, 0.14);
+      --shadow: 0 24px 80px rgba(77, 40, 48, 0.18);
+      --radius: 28px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { height: 100%; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: ui-serif, Georgia, "Times New Roman", "Apple SD Gothic Neo", "Noto Serif KR", serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 18% 8%, rgba(255, 212, 219, 0.8), transparent 28%),
+        radial-gradient(circle at 82% 10%, rgba(255, 236, 206, 0.85), transparent 26%),
+        linear-gradient(135deg, #fffaf9 0%, #f8eced 48%, #fff5ef 100%);
+      overflow: hidden;
+    }
+
+    button { font: inherit; cursor: pointer; }
+
+    .app {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      height: 100vh;
+      padding: 22px;
+      gap: 22px;
+    }
+
+    .sidebar, .viewer {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .brand {
+      padding: 22px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .date-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .count-card.d-day-card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .count-card.d-day-card::after {
+      content: "";
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      right: -70px;
+      top: -80px;
+      background: radial-gradient(circle, rgba(255,255,255,.42), transparent 68%);
+      pointer-events: none;
+    }
+
+    .dday-headline {
+      margin: 0 0 14px;
+      font-family: ui-serif, Georgia, "Times New Roman", "Apple SD Gothic Neo", "Noto Serif KR", serif;
+      font-size: 24px;
+      line-height: 1.08;
+      letter-spacing: -.05em;
+    }
+
+    .dday-sub {
+      display: block;
+      margin-top: 6px;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0;
+      opacity: .78;
+    }
+
+    .count-card {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: rgba(255,255,255,.62);
+      padding: 16px;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .count-card.highlight {
+      background: linear-gradient(135deg, rgba(216,139,149,.96), rgba(245,190,172,.92));
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 16px 38px rgba(198, 104, 117, .22);
+    }
+
+    .count-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .02em;
+      opacity: .84;
+      margin-bottom: 12px;
+    }
+
+    .count-label small {
+      font-size: 11px;
+      font-weight: 700;
+      opacity: .72;
+    }
+
+    .flip-row {
+      display: grid;
+      grid-template-columns: 1.35fr .88fr .88fr .88fr;
+      gap: 7px;
+      align-items: stretch;
+    }
+
+    .flip-unit {
+      min-width: 0;
+    }
+
+    .flip-number {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 54px;
+      border-radius: 16px;
+      background: rgba(44, 35, 36, .88);
+      color: #fff;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -.05em;
+      overflow: hidden;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 8px 18px rgba(45, 27, 31, .16);
+      transform-origin: center;
+    }
+
+    .flip-number::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 1px;
+      background: rgba(255,255,255,.16);
+      z-index: 1;
+    }
+
+    .flip-number.tick {
+      animation: flipTick .38s ease;
+    }
+
+    .flip-caption {
+      display: block;
+      margin-top: 7px;
+      text-align: center;
+      font-size: 10px;
+      font-weight: 800;
+      opacity: .76;
+    }
+
+    .love-days {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 12px;
+    }
+
+    .love-days strong {
+      display: block;
+      font-size: 34px;
+      line-height: 1;
+      letter-spacing: -.06em;
+    }
+
+    .love-days span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .list {
+      overflow: auto;
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+      scrollbar-width: thin;
+    }
+
+    .photo-item {
+      display: grid;
+      grid-template-columns: 86px 1fr;
+      gap: 14px;
+      align-items: center;
+      width: 100%;
+      text-align: left;
+      border: 1px solid transparent;
+      background: rgba(255,255,255,.54);
+      border-radius: 22px;
+      padding: 10px;
+      color: inherit;
+      transition: transform .2s ease, border-color .2s ease, background .2s ease;
+    }
+
+    .photo-item:hover { transform: translateY(-2px); background: rgba(255,255,255,.88); }
+    .photo-item.active { border-color: rgba(216,139,149,.9); background: #fff; }
+
+    .thumb {
+      width: 86px;
+      height: 64px;
+      object-fit: cover;
+      border-radius: 16px;
+      background: #f4e2e4;
+    }
+
+    .item-title {
+      display: block;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .viewer {
+      position: relative;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      min-width: 0;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .current-title { min-width: 0; }
+
+    .current-title strong {
+      display: block;
+      font-size: 18px;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .current-title span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 13px;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .icon-btn {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.76);
+      min-width: 44px;
+      height: 44px;
+      padding: 0 15px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 13px;
+      transition: transform .2s ease, background .2s ease;
+      white-space: nowrap;
+    }
+
+    .icon-btn:hover { transform: translateY(-1px); background: #fff; }
+
+    .stage {
+      position: relative;
+      min-height: 0;
+      display: grid;
+      place-items: center;
+      padding: 22px;
+      overflow: hidden;
+    }
+
+    .frame {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 24px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background: rgba(255,255,255,.35);
+    }
+
+    .main-img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border-radius: 18px;
+      box-shadow: 0 18px 60px rgba(60,35,40,.22);
+      user-select: none;
+      -webkit-user-drag: none;
+      transition: opacity .25s ease, transform .25s ease, filter .25s ease;
+    }
+
+    .main-img.changing { opacity: 0; transform: scale(.985); }
+    .main-img.zoomed { transform: scale(1.55); cursor: zoom-out; }
+    .main-img.fit-cover { width: 100%; height: 100%; object-fit: cover; }
+    .main-img.bw { filter: grayscale(1) contrast(1.05); }
+
+    .nav-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 52px;
+      height: 52px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(255,255,255,.8);
+      box-shadow: 0 10px 30px rgba(60,35,40,.14);
+      color: var(--text);
+      font-size: 28px;
+      z-index: 3;
+    }
+
+    .nav-arrow:hover { background: #fff; }
+    .prev { left: 18px; }
+    .next { right: 18px; }
+
+    .caption {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 20px 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 14px;
+    }
+
+    .progress-wrap {
+      flex: 1;
+      height: 7px;
+      background: rgba(80,50,55,.1);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--brand), #f0b9a8);
+      border-radius: 999px;
+      transition: width .25s ease;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      background: rgba(22,16,18,.78);
+      z-index: 30;
+      padding: 22px;
+    }
+
+    .modal.open { display: grid; }
+
+    .modal img {
+      max-width: 96vw;
+      max-height: 92vh;
+      border-radius: 20px;
+      box-shadow: 0 28px 90px rgba(0,0,0,.45);
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%) translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      background: rgba(44,35,36,.9);
+      color: #fff;
+      border-radius: 999px;
+      padding: 12px 18px;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      transition: opacity .2s ease, transform .2s ease;
+      z-index: 40;
+      white-space: nowrap;
+    }
+
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @keyframes flipTick {
+      0% { transform: rotateX(0deg); filter: brightness(1); }
+      45% { transform: rotateX(-12deg); filter: brightness(.9); }
+      100% { transform: rotateX(0deg); filter: brightness(1); }
+    }
+
+    body.dark {
+      --panel: rgba(28, 22, 25, 0.78);
+      --text: #fff3f0;
+      --muted: #c9aeb2;
+      --brand: #e49aa5;
+      --brand-dark: #ffc2c9;
+      --line: rgba(255, 231, 235, 0.14);
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
+      background:
+        radial-gradient(circle at 18% 8%, rgba(170, 74, 91, 0.45), transparent 28%),
+        radial-gradient(circle at 82% 10%, rgba(173, 115, 78, 0.32), transparent 26%),
+        linear-gradient(135deg, #171214 0%, #2a1d22 48%, #1a1416 100%);
+    }
+
+    body.dark .icon-btn,
+    body.dark .photo-item,
+    body.dark .count-card {
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+    }
+
+    body.dark .photo-item.active {
+      background: rgba(255,255,255,.2);
+      color: #fff;
+    }
+
+    body.dark .frame { background: rgba(0,0,0,.18); }
+
+    @media (max-width: 920px) {
+      body { overflow: auto; }
+      .app {
+        grid-template-columns: 1fr;
+        height: auto;
+        min-height: 100vh;
+        padding: 12px;
+        gap: 12px;
+      }
+      .sidebar { max-height: none; }
+      .brand { padding: 16px; }
+      .list {
+        grid-auto-flow: column;
+        grid-auto-columns: 116px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 12px;
+      }
+      .photo-item {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        padding: 8px;
+      }
+      .thumb {
+        width: 100%;
+        height: 78px;
+      }
+      .viewer { min-height: 62vh; }
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 14px;
+      }
+      .actions {
+        justify-content: flex-start;
+        gap: 8px;
+      }
+      .icon-btn {
+        height: 40px;
+        padding: 0 12px;
+        font-size: 12px;
+      }
+      .stage { padding: 12px; min-height: 48vh; }
+      .caption {
+        padding: 12px 14px 14px;
+        font-size: 12px;
+      }
+      .caption span:last-child { display: none; }
+      .nav-arrow {
+        width: 44px;
+        height: 44px;
+      }
+      .prev { left: 10px; }
+      .next { right: 10px; }
+    }
+
+    @media (max-width: 520px) {
+      .app { padding: 8px; }
+      .sidebar, .viewer { border-radius: 22px; }
+      .date-grid { gap: 10px; }
+      .flip-row { gap: 5px; }
+      .flip-number {
+        min-height: 46px;
+        border-radius: 13px;
+        font-size: 17px;
+      }
+      .flip-caption { font-size: 9px; }
+      .love-days strong { font-size: 28px; }
+      .current-title strong { font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <aside class="sidebar">
+      <section class="brand">
+        <div class="date-grid" aria-label="날짜 카운트">
+          <div class="count-card highlight d-day-card">
+            <span class="count-label">Wedding Day <small>2026.08.30</small></span>
+            <h2 class="dday-headline">D-day<span class="dday-sub">2026.08.30 14:30 그레이스파티 인천(부평역)</span></h2>
+            <div class="flip-row" aria-live="polite">
+              <div class="flip-unit">
+                <div id="ddayDays" class="flip-number">000</div>
+                <span class="flip-caption">DAYS</span>
+              </div>
+              <div class="flip-unit">
+                <div id="ddayHours" class="flip-number">00</div>
+                <span class="flip-caption">HOURS</span>
+              </div>
+              <div class="flip-unit">
+                <div id="ddayMinutes" class="flip-number">00</div>
+                <span class="flip-caption">MIN</span>
+              </div>
+              <div class="flip-unit">
+                <div id="ddaySeconds" class="flip-number">00</div>
+                <span class="flip-caption">SEC</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="photoList" class="list" aria-label="사진 목록"></section>
+    </aside>
+
+    <section class="viewer">
+      <header class="topbar">
+        <div class="current-title">
+          <strong id="currentName">Photo 01</strong>
+          <span id="currentMeta">1 / 22</span>
+        </div>
+        <div class="actions">
+          <button id="favoriteBtn" class="icon-btn" type="button" title="좋아요">♡</button>
+          <button id="slideshowBtn" class="icon-btn" type="button" title="자동 재생">▶ 자동</button>
+          <button id="fitBtn" class="icon-btn" type="button" title="채우기 전환">▣ 맞춤</button>
+          <button id="bwBtn" class="icon-btn" type="button" title="흑백 필터">◐ 흑백</button>
+          <button id="musicBtn" class="icon-btn" type="button" title="음악 재생/일시정지">♪ 재생</button>
+          <button id="downloadBtn" class="icon-btn" type="button" title="사진 다운로드">↓ 저장</button>
+          <button id="themeBtn" class="icon-btn" type="button" title="다크모드">☾ 밤</button>
+          <button id="shareBtn" class="icon-btn" type="button" title="공유">🔗 공유</button>
+          <button id="fullBtn" class="icon-btn" type="button" title="크게 보기">⛶ 크게</button>
+        </div>
+      </header>
+
+      <div class="stage">
+        <button class="nav-arrow prev" id="prevBtn" type="button" aria-label="이전 사진">‹</button>
+        <div class="frame" id="frame">
+          <img id="mainImg" class="main-img" src="" alt="웨딩 사진" />
+        </div>
+        <button class="nav-arrow next" id="nextBtn" type="button" aria-label="다음 사진">›</button>
+      </div>
+
+      <footer class="caption">
+        <span id="counter">0 / 0</span>
+        <div class="progress-wrap"><div id="progress" class="progress"></div></div>
+        <span>← → 이동 · 더블클릭 확대</span>
+      </footer>
+    </section>
+  </main>
+
+  <div id="modal" class="modal" role="dialog" aria-modal="true" aria-label="원본 크게 보기">
+    <img id="modalImg" src="" alt="크게 본 웨딩 사진" />
+  </div>
+  <div id="toast" class="toast"></div>
+  <audio id="bgm" src="wedding/ae.mp3" loop preload="none"></audio>
+
+  <script>
+    const weddingDate = "2026-08-30T00:00:00";
+    const datingStartDate = "2019-06-14T00:00:00";
+    const MUSIC_START_TIME = 72;
+
+    const photos = Array.from({ length: 22 }, (_, index) => {
+      const number = String(index + 1).padStart(2, "0");
+      return {
+        file: `wedding/wedding${number}.jpg`,
+        title: `Photo ${number}`
+      };
+    });
+
+    const els = {
+      list: document.getElementById("photoList"),
+      mainImg: document.getElementById("mainImg"),
+      currentName: document.getElementById("currentName"),
+      currentMeta: document.getElementById("currentMeta"),
+      counter: document.getElementById("counter"),
+      progress: document.getElementById("progress"),
+      favoriteBtn: document.getElementById("favoriteBtn"),
+      slideshowBtn: document.getElementById("slideshowBtn"),
+      fitBtn: document.getElementById("fitBtn"),
+      bwBtn: document.getElementById("bwBtn"),
+      musicBtn: document.getElementById("musicBtn"),
+      downloadBtn: document.getElementById("downloadBtn"),
+      themeBtn: document.getElementById("themeBtn"),
+      shareBtn: document.getElementById("shareBtn"),
+      fullBtn: document.getElementById("fullBtn"),
+      prevBtn: document.getElementById("prevBtn"),
+      nextBtn: document.getElementById("nextBtn"),
+      modal: document.getElementById("modal"),
+      modalImg: document.getElementById("modalImg"),
+      toast: document.getElementById("toast"),
+      bgm: document.getElementById("bgm"),
+      ddayDays: document.getElementById("ddayDays"),
+      ddayHours: document.getElementById("ddayHours"),
+      ddayMinutes: document.getElementById("ddayMinutes"),
+      ddaySeconds: document.getElementById("ddaySeconds")
+    };
+
+    let state = {
+      index: 0,
+      favorites: JSON.parse(localStorage.getItem("weddingFavorites") || "[]"),
+      slideshow: null,
+      cover: false,
+      bw: false,
+      musicOn: false,
+      darkMode: localStorage.getItem("weddingDarkMode") === "true",
+      lastClock: {}
+    };
+
+    function pad(value, length = 2) {
+      return String(value).padStart(length, "0");
+    }
+
+    function setFlipValue(el, value, key) {
+      if (state.lastClock[key] === value) return;
+      state.lastClock[key] = value;
+      el.textContent = value;
+      el.classList.remove("tick");
+      void el.offsetWidth;
+      el.classList.add("tick");
+    }
+
+    function getCountdown() {
+      const now = new Date();
+      const target = new Date(weddingDate);
+      const diff = target - now;
+      const abs = Math.abs(diff);
+
+      return {
+        days: Math.floor(abs / 86400000),
+        hours: Math.floor((abs % 86400000) / 3600000),
+        minutes: Math.floor((abs % 3600000) / 60000),
+        seconds: Math.floor((abs % 60000) / 1000)
+      };
+    }
+
+    function renderDateCounts() {
+      const countdown = getCountdown();
+      setFlipValue(els.ddayDays, pad(countdown.days, 3), "days");
+      setFlipValue(els.ddayHours, pad(countdown.hours), "hours");
+      setFlipValue(els.ddayMinutes, pad(countdown.minutes), "minutes");
+      setFlipValue(els.ddaySeconds, pad(countdown.seconds), "seconds");
+    }
+
+    function filteredPhotos() {
+      return photos.map((photo, originalIndex) => ({ ...photo, originalIndex }));
+    }
+
+    function saveFavorites() {
+      localStorage.setItem("weddingFavorites", JSON.stringify(state.favorites));
+    }
+
+    function toast(message) {
+      els.toast.textContent = message;
+      els.toast.classList.add("show");
+      setTimeout(() => els.toast.classList.remove("show"), 1400);
+    }
+
+    function applyTheme() {
+      document.body.classList.toggle("dark", state.darkMode);
+      els.themeBtn.textContent = state.darkMode ? "☀ 낮" : "☾ 밤";
+      localStorage.setItem("weddingDarkMode", String(state.darkMode));
+    }
+
+    function startRandomPhoto() {
+      if (photos.length > 1) state.index = Math.floor(Math.random() * photos.length);
+    }
+
+    function renderList() {
+      const list = filteredPhotos();
+      els.list.innerHTML = "";
+
+      list.forEach((photo) => {
+        const active = photo.originalIndex === state.index;
+        const liked = state.favorites.includes(photo.file);
+        const button = document.createElement("button");
+        button.className = `photo-item ${active ? "active" : ""}`;
+        button.type = "button";
+        button.innerHTML = `
+          <img class="thumb" src="${photo.file}" alt="${photo.title}" loading="lazy" onerror="this.style.opacity=.25">
+          <span><span class="item-title">${liked ? "♥ " : ""}${photo.title}</span></span>
+        `;
+        button.addEventListener("click", () => selectPhoto(photo.originalIndex));
+        els.list.appendChild(button);
+      });
+    }
+
+    function selectPhoto(index) {
+      state.index = (index + photos.length) % photos.length;
+      const photo = photos[state.index];
+      els.mainImg.classList.add("changing");
+
+      setTimeout(() => {
+        els.mainImg.src = photo.file;
+        els.mainImg.alt = photo.title;
+        els.currentName.textContent = photo.title;
+        els.currentMeta.textContent = `${state.index + 1} / ${photos.length}`;
+        els.counter.textContent = `${state.index + 1} / ${photos.length}`;
+        els.progress.style.width = `${((state.index + 1) / photos.length) * 100}%`;
+        updateFavoriteButton();
+        renderList();
+        els.mainImg.classList.remove("changing");
+      }, 140);
+    }
+
+    function updateFavoriteButton() {
+      const photo = photos[state.index];
+      const liked = state.favorites.includes(photo.file);
+      els.favoriteBtn.textContent = liked ? "♥" : "♡";
+      els.favoriteBtn.style.background = liked ? "#2c2324" : "rgba(255,255,255,.76)";
+      els.favoriteBtn.style.color = liked ? "#fff" : "var(--text)";
+    }
+
+    function move(step) {
+      selectPhoto(state.index + step);
+    }
+
+    function toggleFavorite() {
+      const file = photos[state.index].file;
+      if (state.favorites.includes(file)) {
+        state.favorites = state.favorites.filter(item => item !== file);
+        toast("좋아요 해제");
+      } else {
+        state.favorites.push(file);
+        toast("좋아요 추가");
+      }
+      saveFavorites();
+      updateFavoriteButton();
+      renderList();
+    }
+
+    async function playMusicFromHighlight(showMessage = true) {
+      try {
+        if (!state.musicOn) {
+          els.bgm.currentTime = MUSIC_START_TIME;
+        }
+        await els.bgm.play();
+        state.musicOn = true;
+        els.musicBtn.textContent = "Ⅱ 정지";
+        if (showMessage) toast("음악 재생");
+      } catch (error) {
+        if (showMessage) toast("음악 파일을 확인해 주세요");
+      }
+    }
+
+    function pauseMusic(showMessage = true) {
+      els.bgm.pause();
+      state.musicOn = false;
+      els.musicBtn.textContent = "♪ 재생";
+      if (showMessage) toast("음악 일시정지");
+    }
+
+    function enableFirstTouchMusic() {
+      const playOnce = async () => {
+        await playMusicFromHighlight(false);
+      };
+      document.addEventListener("click", playOnce, { once: true });
+      document.addEventListener("touchstart", playOnce, { once: true });
+      document.addEventListener("keydown", playOnce, { once: true });
+    }
+
+    async function toggleMusic() {
+      if (state.musicOn) {
+        pauseMusic(true);
+      } else {
+        await playMusicFromHighlight(true);
+      }
+    }
+
+    function downloadCurrentPhoto() {
+      const photo = photos[state.index];
+      const link = document.createElement("a");
+      link.href = photo.file;
+      link.download = photo.file.split("/").pop() || "wedding-photo.jpg";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toast("사진 저장 시작");
+    }
+
+    function toggleTheme() {
+      state.darkMode = !state.darkMode;
+      applyTheme();
+    }
+
+    async function sharePage() {
+      const url = window.location.href;
+      const title = "Wedding Gallery";
+
+      if (navigator.share) {
+        try {
+          await navigator.share({ title, url });
+          return;
+        } catch (error) {}
+      }
+
+      try {
+        await navigator.clipboard.writeText(url);
+        toast("링크 복사 완료");
+      } catch (error) {
+        const input = document.createElement("input");
+        input.value = url;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand("copy");
+        input.remove();
+        toast("링크 복사 완료");
+      }
+    }
+
+    function toggleSlideshow() {
+      if (state.slideshow) {
+        clearInterval(state.slideshow);
+        state.slideshow = null;
+        els.slideshowBtn.textContent = "▶ 자동";
+        toast("자동 재생 정지");
+      } else {
+        state.slideshow = setInterval(() => move(1), 3200);
+        els.slideshowBtn.textContent = "Ⅱ 정지";
+        toast("자동 재생 시작");
+      }
+    }
+
+    function openModal() {
+      const photo = photos[state.index];
+      els.modalImg.src = photo.file;
+      els.modal.classList.add("open");
+    }
+
+    els.favoriteBtn.addEventListener("click", toggleFavorite);
+    els.musicBtn.addEventListener("click", toggleMusic);
+    els.downloadBtn.addEventListener("click", downloadCurrentPhoto);
+    els.themeBtn.addEventListener("click", toggleTheme);
+    els.shareBtn.addEventListener("click", sharePage);
+    els.slideshowBtn.addEventListener("click", toggleSlideshow);
+    els.prevBtn.addEventListener("click", () => move(-1));
+    els.nextBtn.addEventListener("click", () => move(1));
+    els.fullBtn.addEventListener("click", openModal);
+    els.mainImg.addEventListener("dblclick", () => els.mainImg.classList.toggle("zoomed"));
+    els.modal.addEventListener("click", () => els.modal.classList.remove("open"));
+
+    els.fitBtn.addEventListener("click", () => {
+      state.cover = !state.cover;
+      els.mainImg.classList.toggle("fit-cover", state.cover);
+      els.fitBtn.textContent = state.cover ? "▣ 채움" : "▣ 맞춤";
+    });
+
+    els.bwBtn.addEventListener("click", () => {
+      state.bw = !state.bw;
+      els.mainImg.classList.toggle("bw", state.bw);
+      els.bwBtn.textContent = state.bw ? "● 컬러" : "◐ 흑백";
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft") move(-1);
+      if (event.key === "ArrowRight") move(1);
+      if (event.key === "Escape") els.modal.classList.remove("open");
+      if (event.key.toLowerCase() === "f") toggleFavorite();
+      if (event.key === " ") {
+        event.preventDefault();
+        toggleSlideshow();
+      }
+    });
+
+    applyTheme();
+    enableFirstTouchMusic();
+    renderDateCounts();
+    setInterval(renderDateCounts, 1000);
+    
+    renderList();
+    selectPhoto(state.index);
+  </script>
+</body>
+</html>
