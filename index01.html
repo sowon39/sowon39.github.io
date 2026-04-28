@@ -1011,6 +1011,30 @@
       }
     }
 
+
+    /* 인트로 안전 종료 보정: JS가 늦어도 화면을 막지 않음 */
+    .intro {
+      animation: introAutoRelease 1.45s ease forwards;
+    }
+
+    .intro.force-hide {
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+
+    @keyframes introAutoRelease {
+      0%, 62% {
+        opacity: 1;
+        visibility: visible;
+      }
+      100% {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+    }
+
     .install-modal {
       position: fixed;
       inset: 0;
@@ -1540,7 +1564,7 @@
     }
 
 
-    /* 🎬 Final movie slideshow: 안 잘림 + 감성 무비 효과 */
+    /* 🎬 최종 무비 슬라이드 보정: 중앙 정렬 + 안 잘림 */
     body.immersive .app {
       height: 100svh;
       min-height: 100svh;
@@ -1555,22 +1579,22 @@
     }
 
     body.immersive .stage {
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
       width: 100vw;
       height: 100svh;
       min-height: 100svh;
-      padding: clamp(18px, 4vw, 44px);
+      padding: clamp(18px, 4vw, 44px) !important;
       overflow: hidden;
     }
 
     body.immersive .frame {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
       width: 100%;
       height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       overflow: visible;
       background: transparent;
       border-radius: 0;
@@ -1582,93 +1606,52 @@
       max-width: 94vw !important;
       max-height: 84svh !important;
       object-fit: contain !important;
-      object-position: center center;
-      margin: auto;
+      object-position: center center !important;
+      margin: auto !important;
       transform-origin: center center;
-      border-radius: 20px;
       will-change: opacity, transform, filter;
     }
 
-    body.immersive .main-img.changing {
-      opacity: 0;
-      transform: scale(.992);
-      filter: brightness(1.08) saturate(.96);
-    }
-
-    body.immersive .main-img.slide-in {
-      animation-duration: 1.35s, 4.25s;
-      animation-timing-function: cubic-bezier(.22,.72,.22,1), ease-in-out;
-      animation-fill-mode: both, forwards;
-    }
-
     body.immersive .main-img.movie-zoom-in {
-      animation-name: movieFadeIn, movieZoomIn;
+      animation-name: movieFadeIn, movieZoomIn !important;
     }
 
     body.immersive .main-img.movie-zoom-out {
-      animation-name: movieFadeInZoomOut, movieZoomOut;
+      animation-name: movieFadeInZoomOut, movieZoomOut !important;
     }
 
     body.immersive .main-img.movie-pan-left {
-      animation-name: movieFadeIn, moviePanLeft;
+      animation-name: movieFadeIn, moviePanLeft !important;
     }
 
     body.immersive .main-img.movie-pan-right {
-      animation-name: movieFadeIn, moviePanRight;
+      animation-name: movieFadeIn, moviePanRight !important;
     }
 
     body.immersive .main-img.movie-float-up {
-      animation-name: movieFadeInFloat, movieFloatUp;
+      animation-name: movieFadeInFloat, movieFloatUp !important;
     }
 
     body.immersive .main-img.movie-soft-tilt {
-      animation-name: movieFadeIn, movieSoftTilt;
+      animation-name: movieFadeIn, movieSoftTilt !important;
     }
 
     @keyframes movieFadeIn {
-      0% {
-        opacity: 0;
-        transform: scale(1.006);
-        filter: brightness(1.12) saturate(.94);
-      }
-      48% {
-        opacity: .9;
-        filter: brightness(1.04) saturate(.98);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1);
-        filter: brightness(1) saturate(1);
-      }
+      0% { opacity: 0; transform: scale(1.006); filter: brightness(1.12) saturate(.94); }
+      48% { opacity: .9; filter: brightness(1.04) saturate(.98); }
+      100% { opacity: 1; transform: scale(1); filter: brightness(1) saturate(1); }
     }
 
     @keyframes movieFadeInZoomOut {
-      0% {
-        opacity: 0;
-        transform: scale(1.022);
-        filter: brightness(1.12) saturate(.94);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1.012);
-        filter: brightness(1) saturate(1);
-      }
+      0% { opacity: 0; transform: scale(1.022); filter: brightness(1.12) saturate(.94); }
+      100% { opacity: 1; transform: scale(1.012); filter: brightness(1) saturate(1); }
     }
 
     @keyframes movieFadeInFloat {
-      0% {
-        opacity: 0;
-        transform: translateY(7px) scale(1.006);
-        filter: brightness(1.1) saturate(.96);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        filter: brightness(1) saturate(1);
-      }
+      0% { opacity: 0; transform: translateY(7px) scale(1.006); filter: brightness(1.1) saturate(.96); }
+      100% { opacity: 1; transform: translateY(0) scale(1); filter: brightness(1) saturate(1); }
     }
 
-    /* scale 수치를 크게 잡지 않아 사진이 잘리지 않도록 안전하게 제한 */
     @keyframes movieZoomIn {
       from { transform: scale(1); }
       to { transform: scale(1.014); }
@@ -1700,12 +1683,6 @@
     }
 
     @media (max-width: 920px) {
-      body.immersive .stage {
-        height: 100svh;
-        min-height: 100svh;
-        padding: 18px 10px;
-      }
-
       body.immersive .main-img {
         max-width: 94vw !important;
         max-height: 82svh !important;
@@ -1714,9 +1691,7 @@
 
     @media (max-width: 520px) {
       body.immersive .stage {
-        height: 100svh;
-        min-height: 100svh;
-        padding: 18px 10px;
+        padding: 18px 10px !important;
       }
 
       body.immersive .main-img {
@@ -1750,7 +1725,7 @@
     }
 
 
-    /* 🎬 Final movie slideshow: 안 잘림 + 감성 무비 효과 */
+    /* 🎬 최종 무비 슬라이드 보정: 중앙 정렬 + 안 잘림 */
     body.immersive .app {
       height: 100svh;
       min-height: 100svh;
@@ -1765,22 +1740,22 @@
     }
 
     body.immersive .stage {
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
       width: 100vw;
       height: 100svh;
       min-height: 100svh;
-      padding: clamp(18px, 4vw, 44px);
+      padding: clamp(18px, 4vw, 44px) !important;
       overflow: hidden;
     }
 
     body.immersive .frame {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
       width: 100%;
       height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       overflow: visible;
       background: transparent;
       border-radius: 0;
@@ -1792,93 +1767,52 @@
       max-width: 94vw !important;
       max-height: 84svh !important;
       object-fit: contain !important;
-      object-position: center center;
-      margin: auto;
+      object-position: center center !important;
+      margin: auto !important;
       transform-origin: center center;
-      border-radius: 20px;
       will-change: opacity, transform, filter;
     }
 
-    body.immersive .main-img.changing {
-      opacity: 0;
-      transform: scale(.992);
-      filter: brightness(1.08) saturate(.96);
-    }
-
-    body.immersive .main-img.slide-in {
-      animation-duration: 1.35s, 4.25s;
-      animation-timing-function: cubic-bezier(.22,.72,.22,1), ease-in-out;
-      animation-fill-mode: both, forwards;
-    }
-
     body.immersive .main-img.movie-zoom-in {
-      animation-name: movieFadeIn, movieZoomIn;
+      animation-name: movieFadeIn, movieZoomIn !important;
     }
 
     body.immersive .main-img.movie-zoom-out {
-      animation-name: movieFadeInZoomOut, movieZoomOut;
+      animation-name: movieFadeInZoomOut, movieZoomOut !important;
     }
 
     body.immersive .main-img.movie-pan-left {
-      animation-name: movieFadeIn, moviePanLeft;
+      animation-name: movieFadeIn, moviePanLeft !important;
     }
 
     body.immersive .main-img.movie-pan-right {
-      animation-name: movieFadeIn, moviePanRight;
+      animation-name: movieFadeIn, moviePanRight !important;
     }
 
     body.immersive .main-img.movie-float-up {
-      animation-name: movieFadeInFloat, movieFloatUp;
+      animation-name: movieFadeInFloat, movieFloatUp !important;
     }
 
     body.immersive .main-img.movie-soft-tilt {
-      animation-name: movieFadeIn, movieSoftTilt;
+      animation-name: movieFadeIn, movieSoftTilt !important;
     }
 
     @keyframes movieFadeIn {
-      0% {
-        opacity: 0;
-        transform: scale(1.006);
-        filter: brightness(1.12) saturate(.94);
-      }
-      48% {
-        opacity: .9;
-        filter: brightness(1.04) saturate(.98);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1);
-        filter: brightness(1) saturate(1);
-      }
+      0% { opacity: 0; transform: scale(1.006); filter: brightness(1.12) saturate(.94); }
+      48% { opacity: .9; filter: brightness(1.04) saturate(.98); }
+      100% { opacity: 1; transform: scale(1); filter: brightness(1) saturate(1); }
     }
 
     @keyframes movieFadeInZoomOut {
-      0% {
-        opacity: 0;
-        transform: scale(1.022);
-        filter: brightness(1.12) saturate(.94);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1.012);
-        filter: brightness(1) saturate(1);
-      }
+      0% { opacity: 0; transform: scale(1.022); filter: brightness(1.12) saturate(.94); }
+      100% { opacity: 1; transform: scale(1.012); filter: brightness(1) saturate(1); }
     }
 
     @keyframes movieFadeInFloat {
-      0% {
-        opacity: 0;
-        transform: translateY(7px) scale(1.006);
-        filter: brightness(1.1) saturate(.96);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        filter: brightness(1) saturate(1);
-      }
+      0% { opacity: 0; transform: translateY(7px) scale(1.006); filter: brightness(1.1) saturate(.96); }
+      100% { opacity: 1; transform: translateY(0) scale(1); filter: brightness(1) saturate(1); }
     }
 
-    /* scale 수치를 크게 잡지 않아 사진이 잘리지 않도록 안전하게 제한 */
     @keyframes movieZoomIn {
       from { transform: scale(1); }
       to { transform: scale(1.014); }
@@ -1910,12 +1844,6 @@
     }
 
     @media (max-width: 920px) {
-      body.immersive .stage {
-        height: 100svh;
-        min-height: 100svh;
-        padding: 18px 10px;
-      }
-
       body.immersive .main-img {
         max-width: 94vw !important;
         max-height: 82svh !important;
@@ -1924,9 +1852,7 @@
 
     @media (max-width: 520px) {
       body.immersive .stage {
-        height: 100svh;
-        min-height: 100svh;
-        padding: 18px 10px;
+        padding: 18px 10px !important;
       }
 
       body.immersive .main-img {
@@ -2056,7 +1982,7 @@
     }
 
 
-    /* 🎬 Final movie slideshow: 안 잘림 + 감성 무비 효과 */
+    /* 🎬 최종 무비 슬라이드 보정: 중앙 정렬 + 안 잘림 */
     body.immersive .app {
       height: 100svh;
       min-height: 100svh;
@@ -2071,22 +1997,22 @@
     }
 
     body.immersive .stage {
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
       width: 100vw;
       height: 100svh;
       min-height: 100svh;
-      padding: clamp(18px, 4vw, 44px);
+      padding: clamp(18px, 4vw, 44px) !important;
       overflow: hidden;
     }
 
     body.immersive .frame {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
       width: 100%;
       height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       overflow: visible;
       background: transparent;
       border-radius: 0;
@@ -2098,93 +2024,52 @@
       max-width: 94vw !important;
       max-height: 84svh !important;
       object-fit: contain !important;
-      object-position: center center;
-      margin: auto;
+      object-position: center center !important;
+      margin: auto !important;
       transform-origin: center center;
-      border-radius: 20px;
       will-change: opacity, transform, filter;
     }
 
-    body.immersive .main-img.changing {
-      opacity: 0;
-      transform: scale(.992);
-      filter: brightness(1.08) saturate(.96);
-    }
-
-    body.immersive .main-img.slide-in {
-      animation-duration: 1.35s, 4.25s;
-      animation-timing-function: cubic-bezier(.22,.72,.22,1), ease-in-out;
-      animation-fill-mode: both, forwards;
-    }
-
     body.immersive .main-img.movie-zoom-in {
-      animation-name: movieFadeIn, movieZoomIn;
+      animation-name: movieFadeIn, movieZoomIn !important;
     }
 
     body.immersive .main-img.movie-zoom-out {
-      animation-name: movieFadeInZoomOut, movieZoomOut;
+      animation-name: movieFadeInZoomOut, movieZoomOut !important;
     }
 
     body.immersive .main-img.movie-pan-left {
-      animation-name: movieFadeIn, moviePanLeft;
+      animation-name: movieFadeIn, moviePanLeft !important;
     }
 
     body.immersive .main-img.movie-pan-right {
-      animation-name: movieFadeIn, moviePanRight;
+      animation-name: movieFadeIn, moviePanRight !important;
     }
 
     body.immersive .main-img.movie-float-up {
-      animation-name: movieFadeInFloat, movieFloatUp;
+      animation-name: movieFadeInFloat, movieFloatUp !important;
     }
 
     body.immersive .main-img.movie-soft-tilt {
-      animation-name: movieFadeIn, movieSoftTilt;
+      animation-name: movieFadeIn, movieSoftTilt !important;
     }
 
     @keyframes movieFadeIn {
-      0% {
-        opacity: 0;
-        transform: scale(1.006);
-        filter: brightness(1.12) saturate(.94);
-      }
-      48% {
-        opacity: .9;
-        filter: brightness(1.04) saturate(.98);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1);
-        filter: brightness(1) saturate(1);
-      }
+      0% { opacity: 0; transform: scale(1.006); filter: brightness(1.12) saturate(.94); }
+      48% { opacity: .9; filter: brightness(1.04) saturate(.98); }
+      100% { opacity: 1; transform: scale(1); filter: brightness(1) saturate(1); }
     }
 
     @keyframes movieFadeInZoomOut {
-      0% {
-        opacity: 0;
-        transform: scale(1.022);
-        filter: brightness(1.12) saturate(.94);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1.012);
-        filter: brightness(1) saturate(1);
-      }
+      0% { opacity: 0; transform: scale(1.022); filter: brightness(1.12) saturate(.94); }
+      100% { opacity: 1; transform: scale(1.012); filter: brightness(1) saturate(1); }
     }
 
     @keyframes movieFadeInFloat {
-      0% {
-        opacity: 0;
-        transform: translateY(7px) scale(1.006);
-        filter: brightness(1.1) saturate(.96);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        filter: brightness(1) saturate(1);
-      }
+      0% { opacity: 0; transform: translateY(7px) scale(1.006); filter: brightness(1.1) saturate(.96); }
+      100% { opacity: 1; transform: translateY(0) scale(1); filter: brightness(1) saturate(1); }
     }
 
-    /* scale 수치를 크게 잡지 않아 사진이 잘리지 않도록 안전하게 제한 */
     @keyframes movieZoomIn {
       from { transform: scale(1); }
       to { transform: scale(1.014); }
@@ -2216,12 +2101,6 @@
     }
 
     @media (max-width: 920px) {
-      body.immersive .stage {
-        height: 100svh;
-        min-height: 100svh;
-        padding: 18px 10px;
-      }
-
       body.immersive .main-img {
         max-width: 94vw !important;
         max-height: 82svh !important;
@@ -2230,9 +2109,7 @@
 
     @media (max-width: 520px) {
       body.immersive .stage {
-        height: 100svh;
-        min-height: 100svh;
-        padding: 18px 10px;
+        padding: 18px 10px !important;
       }
 
       body.immersive .main-img {
@@ -2266,7 +2143,7 @@
     }
 
 
-    /* 🎬 Final movie slideshow: 안 잘림 + 감성 무비 효과 */
+    /* 🎬 최종 무비 슬라이드 보정: 중앙 정렬 + 안 잘림 */
     body.immersive .app {
       height: 100svh;
       min-height: 100svh;
@@ -2281,22 +2158,22 @@
     }
 
     body.immersive .stage {
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
       width: 100vw;
       height: 100svh;
       min-height: 100svh;
-      padding: clamp(18px, 4vw, 44px);
+      padding: clamp(18px, 4vw, 44px) !important;
       overflow: hidden;
     }
 
     body.immersive .frame {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
       width: 100%;
       height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       overflow: visible;
       background: transparent;
       border-radius: 0;
@@ -2308,93 +2185,52 @@
       max-width: 94vw !important;
       max-height: 84svh !important;
       object-fit: contain !important;
-      object-position: center center;
-      margin: auto;
+      object-position: center center !important;
+      margin: auto !important;
       transform-origin: center center;
-      border-radius: 20px;
       will-change: opacity, transform, filter;
     }
 
-    body.immersive .main-img.changing {
-      opacity: 0;
-      transform: scale(.992);
-      filter: brightness(1.08) saturate(.96);
-    }
-
-    body.immersive .main-img.slide-in {
-      animation-duration: 1.35s, 4.25s;
-      animation-timing-function: cubic-bezier(.22,.72,.22,1), ease-in-out;
-      animation-fill-mode: both, forwards;
-    }
-
     body.immersive .main-img.movie-zoom-in {
-      animation-name: movieFadeIn, movieZoomIn;
+      animation-name: movieFadeIn, movieZoomIn !important;
     }
 
     body.immersive .main-img.movie-zoom-out {
-      animation-name: movieFadeInZoomOut, movieZoomOut;
+      animation-name: movieFadeInZoomOut, movieZoomOut !important;
     }
 
     body.immersive .main-img.movie-pan-left {
-      animation-name: movieFadeIn, moviePanLeft;
+      animation-name: movieFadeIn, moviePanLeft !important;
     }
 
     body.immersive .main-img.movie-pan-right {
-      animation-name: movieFadeIn, moviePanRight;
+      animation-name: movieFadeIn, moviePanRight !important;
     }
 
     body.immersive .main-img.movie-float-up {
-      animation-name: movieFadeInFloat, movieFloatUp;
+      animation-name: movieFadeInFloat, movieFloatUp !important;
     }
 
     body.immersive .main-img.movie-soft-tilt {
-      animation-name: movieFadeIn, movieSoftTilt;
+      animation-name: movieFadeIn, movieSoftTilt !important;
     }
 
     @keyframes movieFadeIn {
-      0% {
-        opacity: 0;
-        transform: scale(1.006);
-        filter: brightness(1.12) saturate(.94);
-      }
-      48% {
-        opacity: .9;
-        filter: brightness(1.04) saturate(.98);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1);
-        filter: brightness(1) saturate(1);
-      }
+      0% { opacity: 0; transform: scale(1.006); filter: brightness(1.12) saturate(.94); }
+      48% { opacity: .9; filter: brightness(1.04) saturate(.98); }
+      100% { opacity: 1; transform: scale(1); filter: brightness(1) saturate(1); }
     }
 
     @keyframes movieFadeInZoomOut {
-      0% {
-        opacity: 0;
-        transform: scale(1.022);
-        filter: brightness(1.12) saturate(.94);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1.012);
-        filter: brightness(1) saturate(1);
-      }
+      0% { opacity: 0; transform: scale(1.022); filter: brightness(1.12) saturate(.94); }
+      100% { opacity: 1; transform: scale(1.012); filter: brightness(1) saturate(1); }
     }
 
     @keyframes movieFadeInFloat {
-      0% {
-        opacity: 0;
-        transform: translateY(7px) scale(1.006);
-        filter: brightness(1.1) saturate(.96);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        filter: brightness(1) saturate(1);
-      }
+      0% { opacity: 0; transform: translateY(7px) scale(1.006); filter: brightness(1.1) saturate(.96); }
+      100% { opacity: 1; transform: translateY(0) scale(1); filter: brightness(1) saturate(1); }
     }
 
-    /* scale 수치를 크게 잡지 않아 사진이 잘리지 않도록 안전하게 제한 */
     @keyframes movieZoomIn {
       from { transform: scale(1); }
       to { transform: scale(1.014); }
@@ -2426,12 +2262,6 @@
     }
 
     @media (max-width: 920px) {
-      body.immersive .stage {
-        height: 100svh;
-        min-height: 100svh;
-        padding: 18px 10px;
-      }
-
       body.immersive .main-img {
         max-width: 94vw !important;
         max-height: 82svh !important;
@@ -2440,9 +2270,7 @@
 
     @media (max-width: 520px) {
       body.immersive .stage {
-        height: 100svh;
-        min-height: 100svh;
-        padding: 18px 10px;
+        padding: 18px 10px !important;
       }
 
       body.immersive .main-img {
@@ -2563,7 +2391,7 @@
                 <span class="dday-kicker">Calendar D-day</span>
                 <strong id="calendarDday" class="calendar-dday">D-000</strong>
               </div>
-              <span class="dday-place">2026.08.30 14:30<br>그레이스파티 인천(부평역)<em class="hall-link">웨딩홀 위치 보기 &gt;</em></span>
+              <span class="dday-place">2026.08.30 14:30<br>그레이스파티 인천(부평역)<em class="hall-link">홀 위치 보기 &gt;</em></span>
             </div>
             <div class="countdown-title">실시간 카운트다운</div>
             <div class="flip-row exact-countdown" aria-live="polite">
@@ -2661,7 +2489,7 @@
 
   <script>
     const weddingDate = "2026-08-30T14:30:00";
-    const MUSIC_START_TIME = 85;
+    const MUSIC_START_TIME = 76;
 
     const photos = Array.from({ length: 22 }, (_, index) => {
       const number = String(index + 1).padStart(2, "0");
@@ -2746,21 +2574,35 @@
       modalHintTimer: null,
       lockedScrollY: 0,
       lastEffectIndex: -1,
-      deferredInstallPrompt: null
+      deferredInstallPrompt: null,
+      introHideTimer: null,
+      introRemoveTimer: null
     };
 
 
-    function hideIntro() {
+    function hideIntro(delay = 1050) {
       const intro = document.getElementById("intro");
       if (!intro) return;
 
-      window.setTimeout(() => {
-        intro.classList.add("hide");
-      }, 920);
+      window.clearTimeout(state.introHideTimer);
+      window.clearTimeout(state.introRemoveTimer);
 
+      state.introHideTimer = window.setTimeout(() => {
+        intro.classList.add("hide", "force-hide");
+      }, delay);
+
+      state.introRemoveTimer = window.setTimeout(() => {
+        if (intro && intro.parentNode) intro.remove();
+      }, delay + 520);
+    }
+
+    function releaseIntroImmediately() {
+      const intro = document.getElementById("intro");
+      if (!intro) return;
+      intro.classList.add("hide", "force-hide");
       window.setTimeout(() => {
-        intro.remove();
-      }, 1400);
+        if (intro && intro.parentNode) intro.remove();
+      }, 180);
     }
 
     function pad(value, length = 2) {
@@ -2957,11 +2799,6 @@
       els.mainImg.classList.add(movieEffects[nextEffectIndex]);
     }
 
-
-      state.lastEffectIndex = nextEffectIndex;
-      els.mainImg.classList.add(effects[nextEffectIndex]);
-    }
-
     function selectPhoto(index) {
       state.index = (index + photos.length) % photos.length;
       const photo = photos[state.index];
@@ -2977,11 +2814,7 @@
         if (document.body.classList.contains("immersive")) {
           els.mainImg.style.setProperty("--slide-from", "0px");
         } else {
-          if (document.body.classList.contains("immersive")) {
-          els.mainImg.style.setProperty("--slide-from", "0px");
-        } else {
           els.mainImg.style.setProperty("--slide-from", `${direction * 22}px`);
-        }
         }
         els.mainImg.classList.remove("slide-in");
 
@@ -3736,7 +3569,10 @@
       }
     });
 
-    hideIntro();
+    hideIntro(1050);
+    window.addEventListener("load", () => hideIntro(180), { once: true });
+    document.addEventListener("pointerdown", releaseIntroImmediately, { once: true });
+    document.addEventListener("keydown", releaseIntroImmediately, { once: true });
     setupPwaManifest();
     setupInstallPrompt();
     applyTheme();
