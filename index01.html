@@ -4823,7 +4823,45 @@
       text-shadow: 0 1px 0 rgba(255,255,255,.5) !important;
     }
 
-  </style>
+
+    /* ✅ 인트로 갇힘 방지 최종 안전장치 */
+    body.force-intro-done .intro {
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+
+  
+.view-link {
+  display:inline-block;
+  margin-top:8px;
+  font-size:14px;
+  color:#6b4c52;
+  text-decoration:none;
+}
+.view-link:hover {
+  text-decoration:underline;
+}
+
+
+    /* ✅ D-day 카드 디자인 유지 + 링크는 '홀 위치 보기 >'에만 적용 */
+    .dday-link {
+      cursor: default !important;
+    }
+
+    .hall-link {
+      color: inherit !important;
+      cursor: pointer !important;
+      pointer-events: auto !important;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .hall-link:hover {
+      opacity: 1;
+    }
+
+</style>
 </head>
 <body>
   <div id="intro" class="intro" aria-label="DK and HL Wedding Book">
@@ -4843,14 +4881,14 @@
     <aside class="sidebar">
       <section class="brand">
         <div class="date-grid" aria-label="날짜 카운트">
-          <a class="count-card highlight d-day-card dday-link" href="https://naver.me/xQeEV26v" target="_blank" rel="noopener noreferrer" title="예식장 위치 보기">
+          <div class="count-card highlight d-day-card dday-link">
             <span class="count-label">Wedding Day <small>2026.08.30</small></span>
             <div class="dday-summary">
               <div>
                 <span class="dday-kicker">Calendar D-day</span>
                 <strong id="calendarDday" class="calendar-dday">D-000</strong>
               </div>
-              <span class="dday-place">2026.08.30 14:30<br>그레이스파티 인천(부평역)<em class="hall-link">홀 위치 보기 &gt;</em></span>
+              <span class="dday-place">2026.08.30 14:30<br>그레이스파티 인천(부평역)<a class="hall-link" href="https://naver.me/xQeEV26v" target="_blank" rel="noopener noreferrer" title="홀 위치 지도 새창 열기">홀 위치 보기 &gt;</a></span>
             </div>
             <div class="countdown-title">실시간 카운트다운</div>
             <div class="flip-row exact-countdown" aria-live="polite">
@@ -4871,7 +4909,7 @@
                 <span class="flip-caption">SEC</span>
               </div>
             </div>
-          </a>
+          </div>
         </div>
       </section>
 
@@ -5016,6 +5054,7 @@
       filterFavorites: false,
       slideshow: null,
       musicOn: false,
+      musicStartedOnce: false,
       bw: localStorage.getItem("weddingBwMode") === "true",
       lastClock: {},
       gestureStartX: 0,
@@ -5547,19 +5586,24 @@
         await els.bgm.play();
 
         state.musicOn = true;
+        state.musicStartedOnce = true;
         els.musicBtn.textContent = "Ⅱ 정지";
         fadeAudioTo(1, 1800);
 
         if (showMessage) toast("음악 재생");
       } catch (error) {
         els.bgm.volume = 1;
+        state.musicOn = false;
+        els.musicBtn.textContent = "♪ 재생";
         if (showMessage) toast("음악 파일을 확인해 주세요");
       }
     }
 
     async function playMusicFromHighlight(showMessage = true) {
-      const restart = !state.musicOn;
-      await playMusicWithFade({ restart, showMessage });
+      // 최초 재생만 85초 등 지정 시작점에서 시작.
+      // 이후 일시정지/복귀/재생은 현재 위치에서 이어집니다.
+      const shouldStartFromHighlight = !state.musicStartedOnce && els.bgm.currentTime < 1;
+      await playMusicWithFade({ restart: shouldStartFromHighlight, showMessage });
     }
 
     function pauseMusic(showMessage = true) {
@@ -5648,10 +5692,14 @@
 
 
     function handleVisibilityMusic() {
+      // 인트로가 떠 있는 동안에는 음악 상태를 건드리지 않습니다.
+      if (document.getElementById("intro")) return;
+
       if (document.hidden) {
         state.resumeMusicAfterVisibility = state.musicOn && !els.bgm.paused;
         if (state.resumeMusicAfterVisibility) {
           els.bgm.pause();
+          els.bgm.volume = 1;
         }
         return;
       }
@@ -6525,8 +6573,6 @@
       els.modalImg.classList.remove("modal-slide-in");
     });
 
-
-
     document.addEventListener("visibilitychange", handleVisibilityMusic);
 
     document.addEventListener("keydown", (event) => {
@@ -6560,6 +6606,38 @@
     renderDots();
     selectPhoto(state.index);
     setTimeout(() => document.body.classList.add("intro-ready"), 3920);
-  </script>
+
+    function forceExitIntro() {
+      const intro = document.getElementById("intro");
+      document.body.classList.add("intro-ready", "force-intro-done");
+
+      if (intro) {
+        intro.classList.add("hide", "cinematic-exit");
+        intro.style.pointerEvents = "none";
+
+        window.setTimeout(() => {
+          if (intro && intro.parentNode) {
+            intro.parentNode.removeChild(intro);
+          }
+        }, 900);
+      }
+    }
+
+    window.setTimeout(forceExitIntro, 5200);
+
+  
+    // D-day 카드는 그대로 두고, '홀 위치 보기 >' 링크만 이동합니다.
+    document.addEventListener("click", (event) => {
+      const hallLink = event.target.closest(".hall-link");
+      if (hallLink) return;
+
+      const ddayCard = event.target.closest(".d-day-card.dday-link");
+      if (ddayCard) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    }, true);
+
+</script>
 </body>
 </html>
