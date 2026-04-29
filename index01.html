@@ -3808,6 +3808,1021 @@
       }
     }
 
+
+    /* 🍎 Apple Liquid Glass x Wedding Mood Theme */
+    :root {
+      --panel: rgba(255, 255, 255, 0.48);
+      --panel-strong: rgba(255, 255, 255, 0.66);
+      --glass-stroke: rgba(255, 255, 255, 0.62);
+      --glass-inner: rgba(255, 255, 255, 0.34);
+      --text: #2c2324;
+      --muted: #8a7479;
+      --brand: #d98f9b;
+      --brand-dark: #9f5b68;
+      --line: rgba(92, 58, 67, 0.13);
+      --shadow: 0 24px 70px rgba(103, 56, 67, 0.18);
+      --radius: 30px;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 12% 6%, rgba(255, 215, 225, .78), transparent 28%),
+        radial-gradient(circle at 88% 10%, rgba(255, 238, 208, .72), transparent 30%),
+        radial-gradient(circle at 48% 100%, rgba(218, 145, 158, .22), transparent 40%),
+        linear-gradient(135deg, #fffaf9 0%, #f7e8eb 48%, #fff3ef 100%) !important;
+    }
+
+    .sidebar,
+    .viewer,
+    .brand,
+    .list,
+    .app-header,
+    .count-card,
+    .grid-panel,
+    .install-panel {
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.62), rgba(255,255,255,.30)) !important;
+      border: 1px solid rgba(255,255,255,.58) !important;
+      box-shadow:
+        0 24px 70px rgba(103, 56, 67, .14),
+        inset 0 1px 0 rgba(255,255,255,.62),
+        inset 0 -1px 0 rgba(255,255,255,.20) !important;
+      backdrop-filter: blur(28px) saturate(1.55) !important;
+      -webkit-backdrop-filter: blur(28px) saturate(1.55) !important;
+    }
+
+    .viewer,
+    .sidebar,
+    .brand,
+    .list,
+    .app-header {
+      border-radius: 30px !important;
+    }
+
+    .topbar,
+    .caption,
+    .brand {
+      border-color: rgba(255,255,255,.34) !important;
+    }
+
+    .count-card.highlight {
+      background:
+        linear-gradient(135deg, rgba(215, 135, 150, .90), rgba(247, 196, 177, .72)) !important;
+      border: 1px solid rgba(255,255,255,.42) !important;
+      box-shadow:
+        0 20px 50px rgba(190, 93, 113, .25),
+        inset 0 1px 0 rgba(255,255,255,.34) !important;
+    }
+
+    .icon-btn,
+    .grid-close,
+    .install-close {
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.72), rgba(255,255,255,.34)) !important;
+      border: 1px solid rgba(255,255,255,.54) !important;
+      box-shadow:
+        0 8px 20px rgba(103, 56, 67, .10),
+        inset 0 1px 0 rgba(255,255,255,.62) !important;
+      backdrop-filter: blur(20px) saturate(1.35);
+      -webkit-backdrop-filter: blur(20px) saturate(1.35);
+    }
+
+    .primary-actions {
+      background: rgba(255,255,255,.26) !important;
+      border: 1px solid rgba(255,255,255,.46) !important;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.36);
+    }
+
+    .photo-item,
+    .grid-tile {
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.54), rgba(255,255,255,.24)) !important;
+      border: 1px solid rgba(255,255,255,.42) !important;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.42);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .photo-item.active,
+    .grid-tile.active {
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.92), rgba(255,245,248,.58)) !important;
+      border-color: rgba(216,139,149,.62) !important;
+      box-shadow:
+        0 10px 24px rgba(190, 93, 113, .12),
+        inset 0 1px 0 rgba(255,255,255,.72);
+    }
+
+    .frame {
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.34), rgba(255,255,255,.13)) !important;
+      border: 1px solid rgba(255,255,255,.34);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.36);
+    }
+
+    /* 최상단 앱 제목: 웨딩 무드 serif 로고 */
+    .app-header {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .app-header::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(110deg, transparent 0 34%, rgba(255,255,255,.42) 48%, transparent 62% 100%);
+      transform: translateX(-120%);
+      animation: glassHeaderSheen 5.8s ease-in-out infinite;
+      opacity: .7;
+    }
+
+    .app-header-logo {
+      border-radius: 15px !important;
+      box-shadow:
+        0 10px 26px rgba(103, 56, 67, .18),
+        inset 0 1px 0 rgba(255,255,255,.6) !important;
+    }
+
+    .app-header-copy strong {
+      font-family: Georgia, "Times New Roman", "Noto Serif KR", "Apple SD Gothic Neo", serif !important;
+      font-size: 19px !important;
+      font-weight: 500 !important;
+      letter-spacing: .035em !important;
+      color: #3b292d !important;
+      text-shadow: 0 1px 0 rgba(255,255,255,.65);
+    }
+
+    .app-header-copy span {
+      font-family: Georgia, "Times New Roman", "Noto Serif KR", serif !important;
+      font-size: 10px !important;
+      font-style: italic !important;
+      font-weight: 500 !important;
+      letter-spacing: .18em !important;
+      color: var(--brand-dark) !important;
+      opacity: .74 !important;
+      text-transform: none !important;
+    }
+
+    @keyframes glassHeaderSheen {
+      0%, 58% { transform: translateX(-130%); }
+      78%, 100% { transform: translateX(130%); }
+    }
+
+    /* 🎬 시네마틱 레이어 DOM: 실제로 보이는 영화적 요소 */
+    .cinema-layer {
+      position: fixed;
+      inset: 0;
+      display: none;
+      pointer-events: none;
+      z-index: 2;
+      overflow: hidden;
+    }
+
+    body.immersive .cinema-layer {
+      display: block;
+    }
+
+    .cinema-orb,
+    .cinema-streak,
+    .cinema-petal {
+      position: absolute;
+      display: block;
+      pointer-events: none;
+      will-change: transform, opacity, filter;
+    }
+
+    .cinema-orb {
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(255,255,255,.95), rgba(255,218,228,.42) 45%, transparent 72%);
+      filter: blur(.2px);
+      opacity: .7;
+      mix-blend-mode: screen;
+    }
+
+    .orb-a { left: 12%; top: 76%; animation: orbFloatA 4.8s linear infinite; }
+    .orb-b { left: 72%; top: 24%; width: 22px; height: 22px; animation: orbFloatB 5.6s linear infinite; opacity: .62; }
+    .orb-c { left: 86%; top: 66%; width: 13px; height: 13px; animation: orbFloatC 4.2s linear infinite; opacity: .56; }
+
+    .cinema-streak {
+      width: 44vw;
+      height: 18vh;
+      border-radius: 999px;
+      background: linear-gradient(100deg, transparent, rgba(255,255,255,.34), rgba(255,210,220,.24), transparent);
+      filter: blur(18px);
+      mix-blend-mode: screen;
+      opacity: .72;
+    }
+
+    .streak-a {
+      left: -18vw;
+      top: 12vh;
+      transform: rotate(-16deg);
+      animation: streakSweepA 3.8s ease-in-out infinite;
+    }
+
+    .streak-b {
+      right: -22vw;
+      bottom: 18vh;
+      transform: rotate(18deg);
+      animation: streakSweepB 4.6s ease-in-out infinite;
+      opacity: .52;
+    }
+
+    .cinema-petal {
+      width: 10px;
+      height: 16px;
+      border-radius: 80% 20% 80% 20%;
+      background: linear-gradient(135deg, rgba(255,211,222,.88), rgba(255,255,255,.22));
+      filter: blur(.1px);
+      opacity: .56;
+      transform: rotate(30deg);
+      mix-blend-mode: screen;
+    }
+
+    .petal-a { left: 18%; top: -8%; animation: petalFallA 5.2s linear infinite; }
+    .petal-b { left: 52%; top: -10%; animation: petalFallB 6.1s linear infinite; animation-delay: 1.2s; }
+    .petal-c { left: 78%; top: -9%; animation: petalFallC 5.7s linear infinite; animation-delay: .4s; }
+
+    body.immersive .stage::after {
+      opacity: .72 !important;
+      background:
+        radial-gradient(circle at center, transparent 40%, rgba(85,38,48,.18) 100%),
+        repeating-linear-gradient(0deg, rgba(65,35,43,.032) 0 1px, transparent 1px 4px),
+        repeating-linear-gradient(90deg, rgba(255,255,255,.022) 0 1px, transparent 1px 5px) !important;
+      mix-blend-mode: multiply !important;
+    }
+
+    @keyframes orbFloatA {
+      0% { transform: translate3d(0, 0, 0) scale(.8); opacity: 0; }
+      15% { opacity: .68; }
+      100% { transform: translate3d(46vw, -62vh, 0) scale(1.32); opacity: 0; }
+    }
+
+    @keyframes orbFloatB {
+      0% { transform: translate3d(0, 0, 0) scale(.85); opacity: 0; }
+      20% { opacity: .62; }
+      100% { transform: translate3d(-50vw, 54vh, 0) scale(1.22); opacity: 0; }
+    }
+
+    @keyframes orbFloatC {
+      0% { transform: translate3d(0, 0, 0) scale(.75); opacity: 0; }
+      20% { opacity: .56; }
+      100% { transform: translate3d(-42vw, -44vh, 0) scale(1.18); opacity: 0; }
+    }
+
+    @keyframes streakSweepA {
+      0% { transform: translateX(-28vw) rotate(-16deg); opacity: 0; }
+      34% { opacity: .72; }
+      100% { transform: translateX(120vw) rotate(-16deg); opacity: 0; }
+    }
+
+    @keyframes streakSweepB {
+      0% { transform: translateX(24vw) rotate(18deg); opacity: 0; }
+      38% { opacity: .52; }
+      100% { transform: translateX(-120vw) rotate(18deg); opacity: 0; }
+    }
+
+    @keyframes petalFallA {
+      0% { transform: translate3d(0, 0, 0) rotate(12deg); opacity: 0; }
+      16% { opacity: .56; }
+      100% { transform: translate3d(18vw, 112vh, 0) rotate(240deg); opacity: 0; }
+    }
+
+    @keyframes petalFallB {
+      0% { transform: translate3d(0, 0, 0) rotate(-18deg); opacity: 0; }
+      16% { opacity: .46; }
+      100% { transform: translate3d(-16vw, 112vh, 0) rotate(-220deg); opacity: 0; }
+    }
+
+    @keyframes petalFallC {
+      0% { transform: translate3d(0, 0, 0) rotate(28deg); opacity: 0; }
+      16% { opacity: .52; }
+      100% { transform: translate3d(-24vw, 112vh, 0) rotate(260deg); opacity: 0; }
+    }
+
+    /* 🎞️ 애니메이션 리팩토링: 방향만 다른 효과가 아니라 서로 다른 연출 */
+    body.immersive .main-img.slide-in {
+      animation-duration: 2.55s !important;
+      animation-timing-function: cubic-bezier(.16,.76,.22,1) !important;
+      animation-fill-mode: both !important;
+    }
+
+    body.immersive .main-img.cinema-reveal-right { animation-name: sceneSlideReveal !important; }
+    body.immersive .main-img.cinema-reveal-left { animation-name: sceneSoftFocus !important; }
+    body.immersive .main-img.cinema-lift { animation-name: sceneFloatUp !important; }
+    body.immersive .main-img.cinema-dolly-in { animation-name: sceneDollyGlow !important; }
+    body.immersive .main-img.cinema-dolly-out { animation-name: scenePullMemory !important; }
+    body.immersive .main-img.cinema-orbit { animation-name: sceneOrbitFrame !important; }
+    body.immersive .main-img.cinema-dream { animation-name: sceneDreamBloom !important; }
+    body.immersive .main-img.cinema-portrait { animation-name: scenePortraitBreath !important; }
+
+    @keyframes sceneSlideReveal {
+      0% { opacity: 0; transform: translate3d(82px, 0, 0) scale(.96); filter: blur(10px) brightness(1.18) saturate(.88); }
+      28% { opacity: 1; transform: translate3d(10px, 0, 0) scale(1.012); filter: blur(1px) brightness(1.04) saturate(.98); }
+      100% { opacity: 1; transform: translate3d(-18px, -3px, 0) scale(1.048); filter: blur(0) brightness(1) saturate(1.02); }
+    }
+
+    @keyframes sceneSoftFocus {
+      0% { opacity: 0; transform: scale(1.08); filter: blur(16px) brightness(1.22) saturate(.82); }
+      34% { opacity: .96; transform: scale(1.035); filter: blur(3px) brightness(1.06) saturate(.96); }
+      100% { opacity: 1; transform: scale(1.006); filter: blur(0) brightness(1) saturate(1.02); }
+    }
+
+    @keyframes sceneFloatUp {
+      0% { opacity: 0; transform: translate3d(0, 62px, 0) scale(.97); filter: blur(9px) brightness(1.13) saturate(.94); }
+      36% { opacity: 1; transform: translate3d(0, 6px, 0) scale(1.012); filter: blur(1px) brightness(1.04) saturate(.98); }
+      100% { opacity: 1; transform: translate3d(0, -20px, 0) scale(1.042); filter: blur(0) brightness(1) saturate(1.02); }
+    }
+
+    @keyframes sceneDollyGlow {
+      0% { opacity: 0; transform: scale(.94); filter: blur(12px) brightness(1.20) saturate(.88); }
+      26% { opacity: 1; transform: scale(1.006); filter: blur(1px) brightness(1.06) saturate(1); }
+      100% { opacity: 1; transform: scale(1.072); filter: blur(0) brightness(1) saturate(1.04); }
+    }
+
+    @keyframes scenePullMemory {
+      0% { opacity: 0; transform: scale(1.12) translateY(-8px); filter: blur(12px) brightness(1.16) saturate(.88); }
+      28% { opacity: 1; transform: scale(1.065) translateY(-2px); filter: blur(1px) brightness(1.04) saturate(.98); }
+      100% { opacity: 1; transform: scale(1.012) translateY(4px); filter: blur(0) brightness(1) saturate(1.02); }
+    }
+
+    @keyframes sceneOrbitFrame {
+      0% { opacity: 0; transform: translate3d(-44px, 26px, 0) rotate(-.7deg) scale(.965); filter: blur(10px) brightness(1.15) saturate(.90); }
+      36% { opacity: 1; transform: translate3d(-8px, 5px, 0) rotate(-.15deg) scale(1.016); filter: blur(1px) brightness(1.04) saturate(.98); }
+      100% { opacity: 1; transform: translate3d(22px, -16px, 0) rotate(.42deg) scale(1.05); filter: blur(0) brightness(1) saturate(1.02); }
+    }
+
+    @keyframes sceneDreamBloom {
+      0% { opacity: 0; transform: translate3d(-16px, 12px, 0) scale(.92); filter: blur(18px) brightness(1.24) saturate(.78); }
+      24% { opacity: .9; filter: blur(6px) brightness(1.12) saturate(.92); }
+      62% { opacity: 1; transform: translate3d(6px, -5px, 0) scale(1.026); filter: blur(1px) brightness(1.03) saturate(1.02); }
+      100% { opacity: 1; transform: translate3d(16px, -12px, 0) scale(1.048); filter: blur(0) brightness(1) saturate(1.04); }
+    }
+
+    @keyframes scenePortraitBreath {
+      0% { opacity: 0; transform: translate3d(0, 20px, 0) scale(1.04); filter: blur(8px) brightness(1.12) saturate(.92); }
+      30% { opacity: 1; transform: translate3d(0, 3px, 0) scale(1.026); filter: blur(1px) brightness(1.04) saturate(.98); }
+      100% { opacity: 1; transform: translate3d(0, -10px, 0) scale(1.052); filter: blur(0) brightness(1) saturate(1.02); }
+    }
+
+    @media (max-width: 520px) {
+      .cinema-orb { opacity: .55; }
+      .cinema-streak { opacity: .5; }
+      .cinema-petal { opacity: .45; }
+
+      .app-header-copy strong {
+        font-size: 17px !important;
+      }
+    }
+
+
+    /* 🍎 Liquid Glass v2: 더 얇고 세련된 유리감 */
+    :root {
+      --liquid-bg: rgba(255, 255, 255, .34);
+      --liquid-bg-strong: rgba(255, 255, 255, .52);
+      --liquid-stroke: rgba(255, 255, 255, .62);
+      --liquid-shadow: 0 18px 50px rgba(105, 58, 69, .13);
+      --liquid-inner: inset 0 1px 0 rgba(255,255,255,.62), inset 0 -1px 0 rgba(255,255,255,.18);
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 12% 8%, rgba(255, 222, 231, .72), transparent 30%),
+        radial-gradient(circle at 88% 12%, rgba(255, 242, 213, .64), transparent 32%),
+        radial-gradient(circle at 50% 105%, rgba(211, 136, 151, .18), transparent 42%),
+        linear-gradient(135deg, #fffdfc 0%, #f8edf0 48%, #fff6f1 100%) !important;
+    }
+
+    .sidebar,
+    .viewer,
+    .brand,
+    .list,
+    .count-card,
+    .grid-panel,
+    .install-panel {
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.48), rgba(255,255,255,.20)) !important;
+      border: 1px solid var(--liquid-stroke) !important;
+      box-shadow: var(--liquid-shadow), var(--liquid-inner) !important;
+      backdrop-filter: blur(34px) saturate(1.8) !important;
+      -webkit-backdrop-filter: blur(34px) saturate(1.8) !important;
+    }
+
+    .icon-btn,
+    .photo-item,
+    .grid-tile,
+    .grid-close,
+    .install-close {
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.54), rgba(255,255,255,.20)) !important;
+      border: 1px solid rgba(255,255,255,.56) !important;
+      box-shadow:
+        0 8px 22px rgba(105,58,69,.10),
+        inset 0 1px 0 rgba(255,255,255,.64),
+        inset 0 -1px 0 rgba(255,255,255,.16) !important;
+      backdrop-filter: blur(24px) saturate(1.65) !important;
+      -webkit-backdrop-filter: blur(24px) saturate(1.65) !important;
+    }
+
+    .icon-btn:hover {
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.72), rgba(255,255,255,.32)) !important;
+      transform: translateY(-1px) scale(1.01);
+    }
+
+    .count-card.highlight {
+      background:
+        linear-gradient(145deg, rgba(216,139,149,.86), rgba(247,196,177,.62)) !important;
+      border: 1px solid rgba(255,255,255,.45) !important;
+      box-shadow:
+        0 20px 52px rgba(188,90,111,.22),
+        inset 0 1px 0 rgba(255,255,255,.42),
+        inset 0 -1px 0 rgba(255,255,255,.16) !important;
+    }
+
+    .frame {
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.30), rgba(255,255,255,.10)) !important;
+      border: 1px solid rgba(255,255,255,.42) !important;
+      backdrop-filter: blur(18px) saturate(1.45);
+      -webkit-backdrop-filter: blur(18px) saturate(1.45);
+    }
+
+    /* 최상단은 상자가 아니라 '브랜드 바' 느낌으로 정리 */
+    .app-header {
+      display: none;
+      position: relative;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 11px;
+      width: 100%;
+      padding: 6px 8px 2px;
+      background: transparent !important;
+      border: 0 !important;
+      box-shadow: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      border-radius: 0 !important;
+      overflow: visible;
+    }
+
+    .app-header::before {
+      content: "";
+      position: absolute;
+      left: 2px;
+      right: 2px;
+      bottom: -7px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(160,91,104,.22), transparent);
+      pointer-events: none;
+    }
+
+    .app-header::after {
+      display: none !important;
+    }
+
+    .app-header-logo {
+      width: 36px !important;
+      height: 36px !important;
+      border-radius: 12px !important;
+      object-fit: cover;
+      box-shadow:
+        0 10px 26px rgba(105,58,69,.15),
+        inset 0 1px 0 rgba(255,255,255,.65) !important;
+      background: rgba(255,255,255,.52);
+      backdrop-filter: blur(18px) saturate(1.4);
+      -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    }
+
+    .app-header-copy strong {
+      font-family: Georgia, "Times New Roman", "Noto Serif KR", serif !important;
+      font-size: 18px !important;
+      font-weight: 500 !important;
+      letter-spacing: .035em !important;
+      color: #39282d !important;
+      line-height: 1.05;
+    }
+
+    .app-header-copy span {
+      margin-top: 1px;
+      font-family: Georgia, "Times New Roman", "Noto Serif KR", serif !important;
+      font-style: italic !important;
+      font-size: 10px !important;
+      font-weight: 500 !important;
+      letter-spacing: .18em !important;
+      color: var(--brand-dark) !important;
+      opacity: .72 !important;
+      text-transform: none !important;
+    }
+
+    @media (max-width: 920px) {
+      .app-header {
+        display: flex !important;
+        order: 0;
+        position: relative !important;
+        top: auto !important;
+        z-index: 2;
+        margin: 0 0 3px;
+      }
+
+      .brand {
+        order: 1;
+      }
+
+      .viewer {
+        order: 2;
+      }
+
+      .list {
+        order: 3;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .app-header {
+        padding: 5px 7px 1px;
+        margin-bottom: 2px;
+      }
+
+      .app-header-logo {
+        width: 34px !important;
+        height: 34px !important;
+      }
+
+      .app-header-copy strong {
+        font-size: 17px !important;
+      }
+
+      .app-header-copy span {
+        font-size: 9px !important;
+      }
+
+      /* 최상단 브랜드 바가 카드처럼 공간을 많이 차지하지 않으므로 사진 영역을 다시 확보 */
+      .viewer {
+        height: calc(100svh - 282px) !important;
+        min-height: 365px !important;
+      }
+    }
+
+    @media (max-width: 390px) {
+      .viewer {
+        height: calc(100svh - 270px) !important;
+        min-height: 345px !important;
+      }
+    }
+
+
+    /* 🎬 시네마틱 틱 끊김 방지: 애니메이션 끝 transform을 안정 상태로 보존 */
+    body.immersive .main-img {
+      transform: var(--cinema-final-transform, translate3d(0,0,0) scale(1)) !important;
+      will-change: transform, opacity, filter;
+    }
+
+    body.immersive .main-img.slide-in {
+      animation-duration: 2.55s !important;
+      animation-fill-mode: forwards !important;
+      animation-timing-function: cubic-bezier(.16,.76,.22,1) !important;
+    }
+
+    body.immersive .main-img.changing {
+      opacity: 0 !important;
+      transform: scale(.985) !important;
+      filter: blur(8px) brightness(1.12) saturate(.92) !important;
+      transition:
+        opacity .24s ease,
+        transform .26s cubic-bezier(.2,.72,.2,1),
+        filter .26s ease !important;
+    }
+
+    body.immersive .main-img.cinema-reveal-right { animation-name: sceneSlideRevealStable !important; }
+    body.immersive .main-img.cinema-reveal-left { animation-name: sceneSoftFocusStable !important; }
+    body.immersive .main-img.cinema-lift { animation-name: sceneFloatUpStable !important; }
+    body.immersive .main-img.cinema-dolly-in { animation-name: sceneDollyGlowStable !important; }
+    body.immersive .main-img.cinema-dolly-out { animation-name: scenePullMemoryStable !important; }
+    body.immersive .main-img.cinema-orbit { animation-name: sceneOrbitFrameStable !important; }
+    body.immersive .main-img.cinema-dream { animation-name: sceneDreamBloomStable !important; }
+    body.immersive .main-img.cinema-portrait { animation-name: scenePortraitBreathStable !important; }
+
+    @keyframes sceneSlideRevealStable {
+      0% { opacity: 0; transform: translate3d(70px, 0, 0) scale(.97); filter: blur(10px) brightness(1.18) saturate(.88); }
+      28% { opacity: 1; transform: translate3d(8px, 0, 0) scale(1.012); filter: blur(1px) brightness(1.04) saturate(.98); }
+      100% { opacity: 1; transform: var(--cinema-final-transform); filter: blur(0) brightness(1) saturate(1.02); }
+    }
+
+    @keyframes sceneSoftFocusStable {
+      0% { opacity: 0; transform: scale(1.075); filter: blur(16px) brightness(1.22) saturate(.82); }
+      34% { opacity: .96; transform: scale(1.032); filter: blur(3px) brightness(1.06) saturate(.96); }
+      100% { opacity: 1; transform: var(--cinema-final-transform); filter: blur(0) brightness(1) saturate(1.02); }
+    }
+
+    @keyframes sceneFloatUpStable {
+      0% { opacity: 0; transform: translate3d(0, 58px, 0) scale(.97); filter: blur(9px) brightness(1.13) saturate(.94); }
+      36% { opacity: 1; transform: translate3d(0, 6px, 0) scale(1.012); filter: blur(1px) brightness(1.04) saturate(.98); }
+      100% { opacity: 1; transform: var(--cinema-final-transform); filter: blur(0) brightness(1) saturate(1.02); }
+    }
+
+    @keyframes sceneDollyGlowStable {
+      0% { opacity: 0; transform: scale(.95); filter: blur(12px) brightness(1.20) saturate(.88); }
+      26% { opacity: 1; transform: scale(1.006); filter: blur(1px) brightness(1.06) saturate(1); }
+      100% { opacity: 1; transform: var(--cinema-final-transform); filter: blur(0) brightness(1) saturate(1.04); }
+    }
+
+    @keyframes scenePullMemoryStable {
+      0% { opacity: 0; transform: scale(1.11) translateY(-8px); filter: blur(12px) brightness(1.16) saturate(.88); }
+      28% { opacity: 1; transform: scale(1.058) translateY(-2px); filter: blur(1px) brightness(1.04) saturate(.98); }
+      100% { opacity: 1; transform: var(--cinema-final-transform); filter: blur(0) brightness(1) saturate(1.02); }
+    }
+
+    @keyframes sceneOrbitFrameStable {
+      0% { opacity: 0; transform: translate3d(-40px, 24px, 0) rotate(-.65deg) scale(.97); filter: blur(10px) brightness(1.15) saturate(.90); }
+      36% { opacity: 1; transform: translate3d(-8px, 5px, 0) rotate(-.15deg) scale(1.016); filter: blur(1px) brightness(1.04) saturate(.98); }
+      100% { opacity: 1; transform: var(--cinema-final-transform); filter: blur(0) brightness(1) saturate(1.02); }
+    }
+
+    @keyframes sceneDreamBloomStable {
+      0% { opacity: 0; transform: translate3d(-16px, 12px, 0) scale(.93); filter: blur(18px) brightness(1.24) saturate(.78); }
+      24% { opacity: .9; filter: blur(6px) brightness(1.12) saturate(.92); }
+      62% { opacity: 1; transform: translate3d(6px, -5px, 0) scale(1.026); filter: blur(1px) brightness(1.03) saturate(1.02); }
+      100% { opacity: 1; transform: var(--cinema-final-transform); filter: blur(0) brightness(1) saturate(1.04); }
+    }
+
+    @keyframes scenePortraitBreathStable {
+      0% { opacity: 0; transform: translate3d(0, 20px, 0) scale(1.04); filter: blur(8px) brightness(1.12) saturate(.92); }
+      30% { opacity: 1; transform: translate3d(0, 3px, 0) scale(1.026); filter: blur(1px) brightness(1.04) saturate(.98); }
+      100% { opacity: 1; transform: var(--cinema-final-transform); filter: blur(0) brightness(1) saturate(1.02); }
+    }
+
+
+    /* 모달/시네마틱 오버레이에서 뒤쪽 링크 클릭 누수 방지 */
+    .modal.open,
+    .grid-modal.open,
+    .install-modal.open {
+      pointer-events: auto !important;
+      z-index: 9990 !important;
+    }
+
+    body.modal-open .app {
+      pointer-events: none !important;
+    }
+
+    body.modal-open .modal {
+      pointer-events: auto !important;
+    }
+
+
+    /* ✅ 리퀴드 글래스 가독성/여백 개선 */
+    :root {
+      --glass-readable: rgba(255,255,255,.66);
+      --glass-readable-strong: rgba(255,255,255,.78);
+      --text-strong: #2a2023;
+      --button-text: #34272b;
+    }
+
+    .app {
+      padding: 26px !important;
+      gap: 24px !important;
+    }
+
+    .brand {
+      padding: 24px !important;
+    }
+
+    .topbar {
+      padding: 20px 22px !important;
+      gap: 18px !important;
+    }
+
+    .stage {
+      padding: 26px !important;
+    }
+
+    .caption {
+      padding: 18px 22px 22px !important;
+    }
+
+    .list {
+      padding: 16px !important;
+      gap: 14px !important;
+    }
+
+    .sidebar,
+    .viewer,
+    .brand,
+    .list,
+    .count-card,
+    .grid-panel,
+    .install-panel {
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.66), rgba(255,255,255,.36)) !important;
+      border-color: rgba(255,255,255,.72) !important;
+    }
+
+    .icon-btn {
+      color: var(--button-text) !important;
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.82), rgba(255,255,255,.48)) !important;
+      border-color: rgba(255,255,255,.72) !important;
+      text-shadow: 0 1px 0 rgba(255,255,255,.46);
+      font-weight: 900 !important;
+      box-shadow:
+        0 8px 22px rgba(105,58,69,.12),
+        inset 0 1px 0 rgba(255,255,255,.78),
+        inset 0 -1px 0 rgba(255,255,255,.22) !important;
+    }
+
+    .icon-btn:hover,
+    .icon-btn:focus-visible {
+      color: #21191c !important;
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.94), rgba(255,255,255,.62)) !important;
+    }
+
+    .icon-btn:focus-visible {
+      outline: 2px solid rgba(159,91,104,.46);
+      outline-offset: 2px;
+    }
+
+    .icon-btn[style*="background: rgb(44, 35, 36)"],
+    .icon-btn.active-glass {
+      color: #fff !important;
+      text-shadow: none !important;
+    }
+
+    .primary-actions,
+    .utility-actions {
+      color: var(--button-text) !important;
+    }
+
+    .photo-item,
+    .grid-tile {
+      color: var(--text-strong) !important;
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.68), rgba(255,255,255,.38)) !important;
+    }
+
+    .item-title,
+    .current-title strong,
+    .grid-head,
+    .count-label,
+    .countdown-title {
+      color: var(--text-strong) !important;
+    }
+
+    .current-title span,
+    .caption,
+    .grid-tile span {
+      color: #745f64 !important;
+    }
+
+    .progress-wrap {
+      background: rgba(62,38,44,.14) !important;
+    }
+
+    .toast {
+      background: rgba(38,29,33,.92) !important;
+      color: #fff !important;
+    }
+
+    body.dark .icon-btn,
+    body.dark .photo-item,
+    body.dark .count-card {
+      color: var(--text) !important;
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.15), rgba(255,255,255,.07)) !important;
+    }
+
+    body.dark .current-title span,
+    body.dark .caption,
+    body.dark .grid-tile span {
+      color: #d8c2c6 !important;
+    }
+
+    /* 모바일 여백도 타이트하지 않게 */
+    @media (max-width: 920px) {
+      .app {
+        padding: 12px !important;
+        gap: 12px !important;
+      }
+
+      .app-header {
+        padding: 8px 9px 4px !important;
+        margin-bottom: 4px !important;
+      }
+
+      .brand {
+        padding: 14px !important;
+      }
+
+      .topbar {
+        padding: 13px !important;
+        gap: 11px !important;
+      }
+
+      .stage {
+        padding: 12px !important;
+      }
+
+      .caption {
+        padding: 10px 12px 12px !important;
+      }
+
+      .list {
+        padding: 11px !important;
+        gap: 10px !important;
+      }
+
+      .action-group {
+        gap: 9px !important;
+      }
+
+      .icon-btn {
+        height: 38px !important;
+        padding: 0 13px !important;
+        font-size: 11.5px !important;
+      }
+
+      .icon-btn.compact {
+        width: 38px !important;
+        min-width: 38px !important;
+        padding: 0 !important;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .app {
+        padding: 10px !important;
+        gap: 10px !important;
+      }
+
+      .viewer {
+        height: calc(100svh - 292px) !important;
+        min-height: 360px !important;
+      }
+
+      .list {
+        max-height: 118px !important;
+      }
+
+      .thumb {
+        height: 60px !important;
+      }
+    }
+
+    /* 🎬 랜덤 시네마틱 씬 시스템 */
+    body.immersive .cinema-layer {
+      opacity: var(--scene-layer-opacity, .82);
+      filter: saturate(var(--scene-saturation, 1.1));
+    }
+
+    body.immersive.scene-silk .streak-a,
+    body.immersive.scene-silk .streak-b {
+      opacity: .86;
+    }
+
+    body.immersive.scene-bloom .cinema-orb {
+      opacity: .92;
+      transform-origin: center;
+    }
+
+    body.immersive.scene-petal .cinema-petal {
+      opacity: .78;
+    }
+
+    body.immersive.scene-calm .cinema-streak {
+      opacity: .32;
+    }
+
+    body.immersive.scene-calm .cinema-petal {
+      opacity: .28;
+    }
+
+    body.immersive.scene-dramatic .cinema-streak {
+      opacity: .92;
+      filter: blur(14px);
+    }
+
+    body.immersive .main-img {
+      --scene-duration: 2.7s;
+      --scene-ease: cubic-bezier(.17,.76,.22,1);
+      animation-duration: var(--scene-duration) !important;
+      animation-timing-function: var(--scene-ease) !important;
+      animation-fill-mode: forwards !important;
+    }
+
+    body.immersive .main-img.scene-soft-dissolve { animation-name: sceneSoftDissolve !important; }
+    body.immersive .main-img.scene-film-slide { animation-name: sceneFilmSlide !important; }
+    body.immersive .main-img.scene-dolly-kiss { animation-name: sceneDollyKiss !important; }
+    body.immersive .main-img.scene-memory-pull { animation-name: sceneMemoryPull !important; }
+    body.immersive .main-img.scene-orbit-love { animation-name: sceneOrbitLove !important; }
+    body.immersive .main-img.scene-veil-rise { animation-name: sceneVeilRise !important; }
+    body.immersive .main-img.scene-polaroid-float { animation-name: scenePolaroidFloat !important; }
+    body.immersive .main-img.scene-still-breath { animation-name: sceneStillBreath !important; }
+    body.immersive .main-img.scene-light-wipe { animation-name: sceneLightWipe !important; }
+    body.immersive .main-img.scene-dream-blur { animation-name: sceneDreamBlur !important; }
+
+    @keyframes sceneSoftDissolve {
+      0% { opacity: 0; transform: scale(1.018); filter: blur(18px) brightness(1.18) saturate(.86); }
+      40% { opacity: 1; transform: scale(1.012); filter: blur(3px) brightness(1.05) saturate(.98); }
+      100% { opacity: 1; transform: var(--cinema-final-transform); filter: blur(0) brightness(1) saturate(1.03); }
+    }
+
+    @keyframes sceneFilmSlide {
+      0% { opacity: 0; transform: translate3d(92px, 0, 0) scale(.955); filter: blur(8px) brightness(1.15) saturate(.9); }
+      30% { opacity: 1; transform: translate3d(8px, 0, 0) scale(1.008); filter: blur(1px) brightness(1.04) saturate(.98); }
+      100% { opacity: 1; transform: var(--cinema-final-transform); filter: blur(0) brightness(1) saturate(1.02); }
+    }
+
+    @keyframes sceneDollyKiss {
+      0% { opacity: 0; transform: scale(.92); filter: blur(11px) brightness(1.18) saturate(.88); }
+      24% { opacity: 1; transform: scale(1.006); filter: blur(1px) brightness(1.05) saturate(1); }
+      100% { opacity: 1; transform: var(--cinema-final-transform); filter: blur(0) brightness(1.01) saturate(1.05); }
+    }
+
+    @keyframes sceneMemoryPull {
+      0% { opacity: 0; transform: scale(1.14) translateY(-10px); filter: blur(14px) brightness(1.16) saturate(.86); }
+      36% { opacity: 1; transform: scale(1.06) translateY(-2px); filter: blur(1px) brightness(1.04) saturate(.98); }
+      100% { opacity: 1; transform: var(--cinema-final-transform); filter: blur(0) brightness(1) saturate(1.02); }
+    }
+
+    @keyframes sceneOrbitLove {
+      0% { opacity: 0; transform: translate3d(-58px, 30px, 0) rotate(-1.1deg) scale(.955); filter: blur(10px) brightness(1.16) saturate(.88); }
+      38% { opacity: 1; transform: translate3d(-8px, 4px, 0) rotate(-.2deg) scale(1.012); filter: blur(1px) brightness(1.04) saturate(.98); }
+      100% { opacity: 1; transform: var(--cinema-final-transform); filter: blur(0) brightness(1) saturate(1.03); }
+    }
+
+    @keyframes sceneVeilRise {
+      0% { opacity: 0; transform: translate3d(0, 80px, 0) scale(.96); filter: blur(16px) brightness(1.20) saturate(.88); }
+      42% { opacity: 1; transform: translate3d(0, 8px, 0) scale(1.006); filter: blur(2px) brightness(1.05) saturate(.98); }
+      100% { opacity: 1; transform: var(--cinema-final-transform); filter: blur(0) brightness(1) saturate(1.03); }
+    }
+
+    @keyframes scenePolaroidFloat {
+      0% { opacity: 0; transform: translate3d(20px, 42px, 0) rotate(1.6deg) scale(.94); filter: blur(9px) brightness(1.12) saturate(.92); }
+      32% { opacity: 1; transform: translate3d(6px, 6px, 0) rotate(.4deg) scale(1.006); filter: blur(1px) brightness(1.03) saturate(.99); }
+      100% { opacity: 1; transform: var(--cinema-final-transform); filter: blur(0) brightness(1) saturate(1.02); }
+    }
+
+    @keyframes sceneStillBreath {
+      0% { opacity: 0; transform: scale(1.035); filter: blur(12px) brightness(1.12) saturate(.92); }
+      46% { opacity: 1; transform: scale(1.016); filter: blur(1px) brightness(1.03) saturate(.98); }
+      100% { opacity: 1; transform: var(--cinema-final-transform); filter: blur(0) brightness(1) saturate(1.02); }
+    }
+
+    @keyframes sceneLightWipe {
+      0% { opacity: 0; transform: translate3d(-40px, 0, 0) scale(1.04); filter: blur(18px) brightness(1.28) saturate(.8); }
+      28% { opacity: 1; transform: translate3d(0, 0, 0) scale(1.018); filter: blur(3px) brightness(1.10) saturate(.96); }
+      100% { opacity: 1; transform: var(--cinema-final-transform); filter: blur(0) brightness(1) saturate(1.03); }
+    }
+
+    @keyframes sceneDreamBlur {
+      0% { opacity: 0; transform: translate3d(-18px, 14px, 0) scale(.90); filter: blur(22px) brightness(1.26) saturate(.76); }
+      28% { opacity: .9; filter: blur(8px) brightness(1.12) saturate(.92); }
+      66% { opacity: 1; transform: translate3d(6px, -4px, 0) scale(1.022); filter: blur(1.5px) brightness(1.04) saturate(1); }
+      100% { opacity: 1; transform: var(--cinema-final-transform); filter: blur(0) brightness(1) saturate(1.05); }
+    }
+
+    @media (max-width: 520px) {
+      body.immersive .main-img {
+        max-width: 78vw !important;
+        max-height: 68dvh !important;
+      }
+    }
+
+
+    /* ✅ 좋아요/모아보기 버튼 글자 사라짐 방지 */
+    #favoriteBtn,
+    #filterBtn {
+      color: #34272b !important;
+      -webkit-text-fill-color: #34272b !important;
+      opacity: 1 !important;
+    }
+
+    #favoriteBtn.active-glass,
+    #filterBtn.active-glass {
+      color: #fff !important;
+      -webkit-text-fill-color: #fff !important;
+      background:
+        linear-gradient(145deg, rgba(44,35,36,.96), rgba(72,50,56,.88)) !important;
+      border-color: rgba(255,255,255,.28) !important;
+      text-shadow: none !important;
+      box-shadow:
+        0 10px 24px rgba(44,35,36,.22),
+        inset 0 1px 0 rgba(255,255,255,.18) !important;
+    }
+
+    #favoriteBtn:not(.active-glass),
+    #filterBtn:not(.active-glass) {
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.86), rgba(255,255,255,.52)) !important;
+      color: #34272b !important;
+      -webkit-text-fill-color: #34272b !important;
+      text-shadow: 0 1px 0 rgba(255,255,255,.5) !important;
+    }
+
   </style>
 </head>
 <body>
@@ -3822,7 +4837,7 @@
     <img class="app-header-logo" src="wedding/app-icon-192.png" alt="DK&HL Wedding Book" onerror="this.style.display='none'">
     <div class="app-header-copy">
       <strong>DK&HL Wedding Book</strong>
-      <span>Wedding Photo Gallery</span>
+      <span>Our Wedding Album</span>
     </div>
   </div>
     <aside class="sidebar">
@@ -3886,6 +4901,17 @@
           </div>
         </div>
       </header>
+
+      <div class="cinema-layer" aria-hidden="true">
+        <span class="cinema-orb orb-a"></span>
+        <span class="cinema-orb orb-b"></span>
+        <span class="cinema-orb orb-c"></span>
+        <span class="cinema-streak streak-a"></span>
+        <span class="cinema-streak streak-b"></span>
+        <span class="cinema-petal petal-a"></span>
+        <span class="cinema-petal petal-b"></span>
+        <span class="cinema-petal petal-c"></span>
+      </div>
 
       <div class="stage">
         <button class="nav-arrow prev" id="prevBtn" type="button" aria-label="이전 사진">‹</button>
@@ -4244,7 +5270,25 @@
         "cinema-dolly-out",
         "cinema-orbit",
         "cinema-dream",
-        "cinema-portrait"
+        "cinema-portrait",
+        "scene-soft-dissolve",
+        "scene-film-slide",
+        "scene-dolly-kiss",
+        "scene-memory-pull",
+        "scene-orbit-love",
+        "scene-veil-rise",
+        "scene-polaroid-float",
+        "scene-still-breath",
+        "scene-light-wipe",
+        "scene-dream-blur"
+      );
+
+      document.body.classList.remove(
+        "scene-silk",
+        "scene-bloom",
+        "scene-petal",
+        "scene-calm",
+        "scene-dramatic"
       );
     }
 
@@ -4253,24 +5297,82 @@
 
       if (!document.body.classList.contains("immersive")) return;
 
-      const premiumEffects = [
-        "cinema-reveal-right",
-        "cinema-reveal-left",
-        "cinema-lift",
-        "cinema-dolly-in",
-        "cinema-dolly-out",
-        "cinema-orbit",
-        "cinema-dream",
-        "cinema-portrait"
+      const scenes = [
+        {
+          cls: "scene-soft-dissolve",
+          mood: "scene-calm",
+          duration: "2.8s",
+          final: "scale(1.012)"
+        },
+        {
+          cls: "scene-film-slide",
+          mood: "scene-dramatic",
+          duration: "2.35s",
+          final: "translate3d(-18px, -3px, 0) scale(1.044)"
+        },
+        {
+          cls: "scene-dolly-kiss",
+          mood: "scene-bloom",
+          duration: "2.45s",
+          final: "scale(1.066)"
+        },
+        {
+          cls: "scene-memory-pull",
+          mood: "scene-calm",
+          duration: "2.7s",
+          final: "scale(1.012) translateY(4px)"
+        },
+        {
+          cls: "scene-orbit-love",
+          mood: "scene-silk",
+          duration: "2.65s",
+          final: "translate3d(20px, -14px, 0) rotate(.38deg) scale(1.046)"
+        },
+        {
+          cls: "scene-veil-rise",
+          mood: "scene-petal",
+          duration: "2.9s",
+          final: "translate3d(0, -18px, 0) scale(1.040)"
+        },
+        {
+          cls: "scene-polaroid-float",
+          mood: "scene-petal",
+          duration: "2.55s",
+          final: "translate3d(12px, -8px, 0) rotate(-.32deg) scale(1.032)"
+        },
+        {
+          cls: "scene-still-breath",
+          mood: "scene-calm",
+          duration: "3s",
+          final: "scale(1.034)"
+        },
+        {
+          cls: "scene-light-wipe",
+          mood: "scene-dramatic",
+          duration: "2.25s",
+          final: "translate3d(14px, -6px, 0) scale(1.038)"
+        },
+        {
+          cls: "scene-dream-blur",
+          mood: "scene-bloom",
+          duration: "2.85s",
+          final: "translate3d(14px, -10px, 0) scale(1.044)"
+        }
       ];
 
-      let nextEffectIndex = Math.floor(Math.random() * premiumEffects.length);
+      let nextEffectIndex = Math.floor(Math.random() * scenes.length);
       if (nextEffectIndex === state.lastEffectIndex) {
-        nextEffectIndex = (nextEffectIndex + 1) % premiumEffects.length;
+        nextEffectIndex = (nextEffectIndex + 1) % scenes.length;
       }
 
       state.lastEffectIndex = nextEffectIndex;
-      els.mainImg.classList.add(premiumEffects[nextEffectIndex]);
+      const scene = scenes[nextEffectIndex];
+
+      document.body.classList.add(scene.mood);
+      els.mainImg.style.setProperty("--cinema-final-transform", scene.final);
+      els.mainImg.style.setProperty("--scene-duration", scene.duration);
+      els.mainImg.style.setProperty("--scene-layer-opacity", scene.mood === "scene-calm" ? ".62" : ".9");
+      els.mainImg.classList.add(scene.cls);
     }
 
     function selectPhoto(index) {
@@ -4332,15 +5434,26 @@
     function updateFavoriteButton() {
       const photo = photos[state.index];
       const liked = state.favorites.includes(photo.file);
+
       els.favoriteBtn.textContent = liked ? "♥" : "♡";
-      els.favoriteBtn.style.background = liked ? "#2c2324" : "rgba(255,255,255,.76)";
-      els.favoriteBtn.style.color = liked ? "#fff" : "var(--text)";
+      els.favoriteBtn.classList.toggle("active-glass", liked);
+      els.favoriteBtn.setAttribute("aria-pressed", String(liked));
+
+      // Liquid Glass 테마에서 inline style과 CSS가 충돌해 글자가 사라지는 문제 방지
+      els.favoriteBtn.style.background = "";
+      els.favoriteBtn.style.color = "";
+      els.favoriteBtn.style.webkitTextFillColor = "";
     }
 
     function updateFilterButton() {
       els.filterBtn.textContent = state.filterFavorites ? "전체보기" : "♥ 모아보기";
-      els.filterBtn.style.background = state.filterFavorites ? "#2c2324" : "rgba(255,255,255,.76)";
-      els.filterBtn.style.color = state.filterFavorites ? "#fff" : "var(--text)";
+      els.filterBtn.classList.toggle("active-glass", state.filterFavorites);
+      els.filterBtn.setAttribute("aria-pressed", String(state.filterFavorites));
+
+      // Liquid Glass 테마에서 inline style과 CSS가 충돌해 글자가 사라지는 문제 방지
+      els.filterBtn.style.background = "";
+      els.filterBtn.style.color = "";
+      els.filterBtn.style.webkitTextFillColor = "";
     }
 
     function toggleFilterFavorites() {
@@ -4403,22 +5516,55 @@
       }
     }
 
-    async function playMusicFromHighlight(showMessage = true) {
+
+    function fadeAudioTo(targetVolume = 1, duration = 1600) {
+      const audio = els.bgm;
+      const startVolume = Number.isFinite(audio.volume) ? audio.volume : 1;
+      const startTime = performance.now();
+
+      function step(now) {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        audio.volume = startVolume + (targetVolume - startVolume) * eased;
+
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        } else {
+          audio.volume = targetVolume;
+        }
+      }
+
+      requestAnimationFrame(step);
+    }
+
+    async function playMusicWithFade({ restart = false, showMessage = true } = {}) {
       try {
-        if (!state.musicOn) {
+        if (restart) {
           els.bgm.currentTime = MUSIC_START_TIME;
         }
+
+        els.bgm.volume = 0;
         await els.bgm.play();
+
         state.musicOn = true;
         els.musicBtn.textContent = "Ⅱ 정지";
+        fadeAudioTo(1, 1800);
+
         if (showMessage) toast("음악 재생");
       } catch (error) {
+        els.bgm.volume = 1;
         if (showMessage) toast("음악 파일을 확인해 주세요");
       }
     }
 
+    async function playMusicFromHighlight(showMessage = true) {
+      const restart = !state.musicOn;
+      await playMusicWithFade({ restart, showMessage });
+    }
+
     function pauseMusic(showMessage = true) {
       els.bgm.pause();
+      els.bgm.volume = 1;
       state.musicOn = false;
       els.musicBtn.textContent = "♪ 재생";
       if (showMessage) toast("음악 일시정지");
@@ -4512,15 +5658,7 @@
 
       if (state.resumeMusicAfterVisibility) {
         state.resumeMusicAfterVisibility = false;
-        els.bgm.play()
-          .then(() => {
-            state.musicOn = true;
-            els.musicBtn.textContent = "Ⅱ 정지";
-          })
-          .catch(() => {
-            state.musicOn = false;
-            els.musicBtn.textContent = "♪ 재생";
-          });
+        playMusicWithFade({ restart: false, showMessage: false });
       }
     }
 
@@ -4643,6 +5781,10 @@
       state.immersive = false;
       document.body.classList.remove("immersive");
       els.mainImg.classList.remove("slide-in");
+      els.mainImg.style.transform = "";
+      els.mainImg.style.removeProperty("--cinema-final-transform");
+      els.mainImg.style.removeProperty("--scene-duration");
+      els.mainImg.style.removeProperty("--scene-layer-opacity");
       clearPhotoEffects();
     }
 
@@ -5073,6 +6215,14 @@
     }
 
 
+
+    function swallowModalEvent(event) {
+      if (!els.modal.classList.contains("open")) return;
+      event.preventDefault();
+      event.stopPropagation();
+      if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+    }
+
     function handleModalClick(event) {
       if (!els.modal.classList.contains("open")) return;
       event.preventDefault();
@@ -5081,6 +6231,17 @@
       if (event.target === els.modal) {
         closeModal();
       }
+    }
+
+
+    function handleModalBackdropPointer(event) {
+      if (!els.modal.classList.contains("open")) return;
+      if (event.target !== els.modal) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+      closeModal();
     }
 
     function handleModalPointerDown(event) {
@@ -5327,6 +6488,7 @@
     els.modal.addEventListener("touchend", handleModalTouchEnd, { passive: false });
     els.modal.addEventListener("touchcancel", handleModalTouchEnd, { passive: false });
     els.modal.addEventListener("click", handleModalClick, true);
+    els.modal.addEventListener("pointerdown", handleModalBackdropPointer, true);
     els.modal.addEventListener("pointerdown", handleModalPointerDown);
     els.modal.addEventListener("pointermove", handleModalPointerMove);
     els.modal.addEventListener("pointerup", handleModalPointerUp);
@@ -5351,10 +6513,13 @@
       if (state.longPressTriggered) event.preventDefault();
     });
     els.mainImg.addEventListener("animationend", () => {
-      if (!document.body.classList.contains("immersive")) {
-        els.mainImg.classList.remove("slide-in");
-        clearPhotoEffects();
+      if (document.body.classList.contains("immersive")) {
+        els.mainImg.style.transform = getComputedStyle(els.mainImg).getPropertyValue("--cinema-final-transform") || "";
+        return;
       }
+
+      els.mainImg.classList.remove("slide-in");
+      clearPhotoEffects();
     });
     els.modalImg.addEventListener("animationend", () => {
       els.modalImg.classList.remove("modal-slide-in");
