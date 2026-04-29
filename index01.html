@@ -5616,12 +5616,30 @@
     }
 
     function enableFirstTouchMusic() {
-      const playOnce = async () => {
+      let handled = false;
+
+      const cleanupFirstTouchMusic = () => {
+        document.removeEventListener("click", playOnce, true);
+        document.removeEventListener("touchstart", playOnce, true);
+        document.removeEventListener("keydown", playOnce, true);
+      };
+
+      const playOnce = async (event) => {
+        if (handled) return;
+        handled = true;
+        cleanupFirstTouchMusic();
+
+        // 음악 버튼을 직접 누른 경우는 toggleMusic이 처리합니다.
+        if (event && event.target && event.target.closest && event.target.closest("#musicBtn")) {
+          return;
+        }
+
         await playMusicFromHighlight(false);
       };
-      document.addEventListener("click", playOnce, { once: true });
-      document.addEventListener("touchstart", playOnce, { once: true });
-      document.addEventListener("keydown", playOnce, { once: true });
+
+      document.addEventListener("click", playOnce, true);
+      document.addEventListener("touchstart", playOnce, { passive: true, capture: true });
+      document.addEventListener("keydown", playOnce, true);
     }
 
     async function toggleMusic() {
