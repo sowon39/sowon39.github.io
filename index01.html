@@ -4823,6 +4823,27 @@
       text-shadow: 0 1px 0 rgba(255,255,255,.5) !important;
     }
 
+
+    /* ✅ 확대보기 닫힘 직후 뒤쪽 링크 클릭 누수 완전 차단 */
+    .modal.open {
+      z-index: 9999 !important;
+      pointer-events: auto !important;
+    }
+
+    body.modal-open .app,
+    body.modal-closing-shield .app {
+      pointer-events: none !important;
+    }
+
+    body.modal-closing-shield::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 9998;
+      pointer-events: auto;
+      background: transparent;
+    }
+
   </style>
 </head>
 <body>
@@ -5016,6 +5037,7 @@
       filterFavorites: false,
       slideshow: null,
       musicOn: false,
+      musicStartedOnce: false,
       bw: localStorage.getItem("weddingBwMode") === "true",
       lastClock: {},
       gestureStartX: 0,
@@ -5543,6 +5565,22 @@
           els.bgm.currentTime = MUSIC_START_TIME;
         }
 
+        const targetVolume = 1;
+        els.bgm.volume = 0;
+        await els.bgm.play();
+
+        state.musicOn = true;
+        state.musicStartedOnce = true;
+        els.musicBtn.textContent = "Ⅱ 정지";
+        fadeAudioTo(targetVolume, 1800);
+
+        if (showMessage) toast("음악 재생");
+      } catch (error) {
+        els.bgm.volume = 1;
+        if (showMessage) toast("음악 파일을 확인해 주세요");
+      }
+    }
+
         els.bgm.volume = 0;
         await els.bgm.play();
 
@@ -5558,8 +5596,8 @@
     }
 
     async function playMusicFromHighlight(showMessage = true) {
-      const restart = !state.musicOn;
-      await playMusicWithFade({ restart, showMessage });
+      const shouldStartFromHighlight = !state.musicStartedOnce && els.bgm.currentTime < 1;
+      await playMusicWithFade({ restart: shouldStartFromHighlight, showMessage });
     }
 
     function pauseMusic(showMessage = true) {
@@ -5652,6 +5690,7 @@
         state.resumeMusicAfterVisibility = state.musicOn && !els.bgm.paused;
         if (state.resumeMusicAfterVisibility) {
           els.bgm.pause();
+          els.bgm.volume = 1;
         }
         return;
       }
@@ -6046,7 +6085,13 @@
       clearTimeout(state.modalHintTimer);
       resetModalZoom();
       els.modal.classList.remove("open", "hint");
+      state.modalBackdropStarted = false;
       unlockPageScroll();
+
+      document.body.classList.add("modal-closing-shield");
+      window.setTimeout(() => {
+        document.body.classList.remove("modal-closing-shield");
+      }, 420);
     }
 
     function renderGrid() {
@@ -6216,32 +6261,54 @@
 
 
 
+
+
     function swallowModalEvent(event) {
       if (!els.modal.classList.contains("open")) return;
+
+      if (event.target === els.modalImg) return;
+
       event.preventDefault();
       event.stopPropagation();
       if (event.stopImmediatePropagation) event.stopImmediatePropagation();
     }
 
-    function handleModalClick(event) {
+    function handleModalBackdropStart(event) {
       if (!els.modal.classList.contains("open")) return;
-      event.preventDefault();
-      event.stopPropagation();
 
-      if (event.target === els.modal) {
+      state.modalBackdropStarted = event.target === els.modal;
+
+      if (state.modalBackdropStarted) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+      }
+    }
+
+    function handleModalBackdropEnd(event) {
+      if (!els.modal.classList.contains("open")) return;
+
+      const shouldClose = state.modalBackdropStarted && event.target === els.modal;
+      state.modalBackdropStarted = false;
+
+      if (shouldClose) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (event.stopImmediatePropagation) event.stopImmediatePropagation();
         closeModal();
       }
     }
 
-
-    function handleModalBackdropPointer(event) {
+    function handleModalClick(event) {
       if (!els.modal.classList.contains("open")) return;
-      if (event.target !== els.modal) return;
 
       event.preventDefault();
       event.stopPropagation();
       if (event.stopImmediatePropagation) event.stopImmediatePropagation();
-      closeModal();
+
+      if (event.target === els.modal) {
+        closeModal();
+      }
     }
 
     function handleModalPointerDown(event) {
@@ -6487,8 +6554,13 @@
     els.modal.addEventListener("touchmove", handleModalTouchMove, { passive: false });
     els.modal.addEventListener("touchend", handleModalTouchEnd, { passive: false });
     els.modal.addEventListener("touchcancel", handleModalTouchEnd, { passive: false });
+    els.modal.addEventListener("pointerdown", handleModalBackdropStart, true);
+    els.modal.addEventListener("pointerup", handleModalBackdropEnd, true);
+    els.modal.addEventListener("touchstart", handleModalBackdropStart, { passive: false, capture: true });
+    els.modal.addEventListener("touchend", handleModalBackdropEnd, { passive: false, capture: true });
+    els.modal.addEventListener("mousedown", swallowModalEvent, true);
+    els.modal.addEventListener("mouseup", swallowModalEvent, true);
     els.modal.addEventListener("click", handleModalClick, true);
-    els.modal.addEventListener("pointerdown", handleModalBackdropPointer, true);
     els.modal.addEventListener("pointerdown", handleModalPointerDown);
     els.modal.addEventListener("pointermove", handleModalPointerMove);
     els.modal.addEventListener("pointerup", handleModalPointerUp);
