@@ -5616,31 +5616,52 @@
     }
 
     function enableFirstTouchMusic() {
-      let handled = false;
+      setupFirstInteractionAutoplay();
+    }
 
-      const cleanupFirstTouchMusic = () => {
-        document.removeEventListener("click", playOnce, true);
-        document.removeEventListener("touchstart", playOnce, true);
-        document.removeEventListener("keydown", playOnce, true);
+
+    function setupFirstInteractionAutoplay() {
+      if (window.__weddingAutoplayBound) return;
+      window.__weddingAutoplayBound = true;
+
+      let done = false;
+
+      const cleanup = () => {
+        document.removeEventListener("pointerdown", tryAutoplay, true);
+        document.removeEventListener("touchstart", tryAutoplay, true);
+        document.removeEventListener("click", tryAutoplay, true);
+        document.removeEventListener("keydown", tryAutoplay, true);
       };
 
-      const playOnce = async (event) => {
-        if (handled) return;
-        handled = true;
-        cleanupFirstTouchMusic();
+      const tryAutoplay = async (event) => {
+        if (done) return;
 
-        // 음악 버튼을 직접 누른 경우는 toggleMusic이 처리합니다.
+        // 음악 버튼 직접 조작은 toggleMusic이 처리합니다.
         if (event && event.target && event.target.closest && event.target.closest("#musicBtn")) {
+          done = true;
+          cleanup();
           return;
         }
+
+        done = true;
+        cleanup();
+
+        if (state.musicOn || !els.bgm.paused) return;
 
         await playMusicFromHighlight(false);
       };
 
-      document.addEventListener("click", playOnce, true);
-      document.addEventListener("touchstart", playOnce, { passive: true, capture: true });
-      document.addEventListener("keydown", playOnce, true);
+      document.addEventListener("pointerdown", tryAutoplay, true);
+      document.addEventListener("touchstart", tryAutoplay, { passive: true, capture: true });
+      document.addEventListener("click", tryAutoplay, true);
+      document.addEventListener("keydown", tryAutoplay, true);
     }
+
+    // 접속 후 첫 사용자 입력 자동재생을 확실히 등록합니다.
+    setupFirstInteractionAutoplay();
+    document.addEventListener("DOMContentLoaded", setupFirstInteractionAutoplay);
+    window.addEventListener("load", setupFirstInteractionAutoplay);
+
 
     async function toggleMusic() {
       if (state.musicOn) {
